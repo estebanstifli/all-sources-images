@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * Define the internationalization functionality
@@ -9,8 +9,8 @@
  * @link       https://magic-post-thumbnail.com/
  * @since      1.0.0
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
-class Magic_Post_Thumbnail_i18n {
+class All_Sources_Images_i18n {
 	/**
 	 * Load the plugin text domain for translation.
 	 *
@@ -33,7 +33,7 @@ class Magic_Post_Thumbnail_i18n {
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'mpt',
+			'all-sources-images',
 			false,
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);

@@ -1,13 +1,13 @@
-<?php
+﻿<?php
 
 /**
- * The functionalities for MPT images generation
+ * The functionalities for ASI Images generation
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/admin
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/admin
  * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
-class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
+class All_Sources_Images_Generation extends All_Sources_Images_Admin {
     /**
      * The ID of this plugin.
      *
@@ -37,14 +37,14 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         // Ajax calls
-        add_action( 'wp_ajax_nopriv_generate_image', array(&$this, 'MPT_ajax_call') );
-        add_action( 'wp_ajax_generate_image', array(&$this, 'MPT_ajax_call') );
-        $main_settings = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( FALSE ) );
+        add_action( 'wp_ajax_nopriv_generate_image', array(&$this, 'ASI_ajax_call') );
+        add_action( 'wp_ajax_generate_image', array(&$this, 'ASI_ajax_call') );
+        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( FALSE ) );
         // Enable save_post hook
         if ( isset( $main_settings['enable_save_post_hook'] ) && 'enable' == $main_settings['enable_save_post_hook'] ) {
             add_action(
                 'save_post',
-                array(&$this, 'MPT_check_post_type'),
+                array(&$this, 'ASI_check_post_type'),
                 10,
                 3
             );
@@ -56,13 +56,13 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_ajax_call() {
+    public function ASI_ajax_call() {
         // Convert the JSON-encoded post IDs into an array and sanitize them.
         $post_ids = array_map( 'absint', json_decode( $_POST['ids_mpt_generation'] ) );
         // Check if button "Generate Automatically" is clicked
         $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? boolval( $_POST['buttonAutoGenerate'] ) : false );
         // Security checks: Verify user capability and nonce for security.
-        if ( !current_user_can( 'mpt_manage' ) || false === wp_verify_nonce( $_POST['nonce'], 'ajax_nonce_magic_post_thumbnail' ) ) {
+        if ( !current_user_can( 'ASI_manage' ) || false === wp_verify_nonce( $_POST['nonce'], 'ajax_nonce_All_Sources_Images' ) ) {
             wp_send_json_error();
             // Send an error response if checks fail.
         }
@@ -81,7 +81,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         $current_post_index = (int) $_POST['currentPostIndex'];
         $current_post_id = $post_ids_with_keys[$current_post_index];
         // Load plugin settings for image generation.
-        $main_settings = get_option( 'MPT_plugin_main_settings' );
+        $main_settings = get_option( 'ASI_plugin_main_settings' );
         // Check if the 'rewrite featured image' option is enabled.
         if ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) {
             $rewrite_featured = true;
@@ -109,7 +109,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             // Image already exists and rewriting is not needed.
         } elseif ( (!has_post_thumbnail( $current_post_id ) || $rewrite_featured == true || $image_location != 'featured') && $current_post_id != 0 ) {
             // Generate featured image if not present or if rewriting is enabled.
-            $image_generation_result = $this->MPT_create_thumb(
+            $image_generation_result = $this->ASI_create_thumb(
                 $current_post_id,
                 '0',
                 '0',
@@ -124,8 +124,8 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                 $button_autogenerate
             );
             // Check result and set generation status.
-            $MPT_return = ( is_array( $image_generation_result ) ? $image_generation_result['id'] : $image_generation_result );
-            if ( $MPT_return == null ) {
+            $ASI_return = ( is_array( $image_generation_result ) ? $image_generation_result['id'] : $image_generation_result );
+            if ( $ASI_return == null ) {
                 $generation_status = 'failed';
             } else {
                 $generation_status = 'successful';
@@ -136,16 +136,16 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             // An error occurred during generation.
         }
         // Load compatibility settings for external plugins.
-        $compatibility = wp_parse_args( get_option( 'MPT_plugin_compatibility_settings' ), $this->MPT_default_options_compatibility_settings( TRUE ) );
+        $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
         $thumbnail_url = '';
         // Handle image preview when using the FIFU plugin.
-        if ( true == $compatibility['enable_FIFU'] && 'FIFU' == $img_block['image_location'] && (is_plugin_active( 'featured-image-from-url/featured-image-from-url.php' ) || is_plugin_active( 'fifu-premium/fifu-premium.php' )) && $MPT_return != null ) {
-        } elseif ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $MPT_return ) ) {
+        if ( true == $compatibility['enable_FIFU'] && 'FIFU' == $img_block['image_location'] && (is_plugin_active( 'featured-image-from-url/featured-image-from-url.php' ) || is_plugin_active( 'fifu-premium/fifu-premium.php' )) && $ASI_return != null ) {
+        } elseif ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $ASI_return ) ) {
             // Display the newly generated image.
-            $new_image = wp_get_attachment_image_src( $MPT_return, array(70, 70) );
-            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . $MPT_return . '"><img src="' . $new_image[0] . '" width="70" height="70" /></a>';
-            $datas['thumbnail_id'] = $MPT_return;
-            $datas['postimagediv'] = _wp_post_thumbnail_html( $MPT_return, $current_post_id );
+            $new_image = wp_get_attachment_image_src( $ASI_return, array(70, 70) );
+            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . $ASI_return . '"><img src="' . $new_image[0] . '" width="70" height="70" /></a>';
+            $datas['thumbnail_id'] = $ASI_return;
+            $datas['postimagediv'] = _wp_post_thumbnail_html( $ASI_return, $current_post_id );
         } elseif ( $generation_status == 'already-done' && "featured" === $image_location ) {
             // Display existing featured image.
             $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . get_post_thumbnail_id( $current_post_id ) . '">' . get_the_post_thumbnail( $current_post_id, array('70', '70') ) . '</a>';
@@ -183,17 +183,17 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         }
     }
 
-    public function MPT_check_post_type( $ID, $post, $update ) {
+    public function ASI_check_post_type( $ID, $post, $update ) {
         // Checks whether the capacity has already been checked for this session
-        if ( get_option( 'mpt_hook_checked' ) ) {
+        if ( get_option( 'ASI_hook_checked' ) ) {
             // Deletes the option immediately after execution
-            delete_option( 'mpt_hook_checked' );
+            delete_option( 'ASI_hook_checked' );
             return;
             // Exits the function if it has already been executed
         }
         // Set capacity as verified to avoid additional calls
-        update_option( 'mpt_hook_checked', true );
-        $transient_key = 'mpt_wp_insert_processing_post_' . $ID;
+        update_option( 'ASI_hook_checked', true );
+        $transient_key = 'ASI_wp_insert_processing_post_' . $ID;
         if ( wp_is_post_revision( $ID ) || wp_is_post_autosave( $ID ) ) {
             return;
         }
@@ -207,19 +207,19 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         }
         global $pagenow;
         // Avoid not selected post types
-        $main_settings = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( FALSE ) );
+        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( FALSE ) );
         if ( empty( $main_settings['choosed_save_post_post_type'] ) ) {
-            $choosed_post_type = $this->MPT_default_posts_types();
+            $choosed_post_type = $this->ASI_default_posts_types();
             $main_settings['choosed_save_post_post_type'] = $choosed_post_type["choosed_post_type"];
         }
         if ( !in_array( get_post_type( $ID ), $main_settings['choosed_save_post_post_type'] ) ) {
             return false;
         }
-        //$active_posts_types	= wp_parse_args( get_option( 'MPT_plugin_posts_settings' ), $this->MPT_default_options_posts_settings( FALSE ) );
-        $active_posts_types = $this->MPT_default_posts_types();
+        //$active_posts_types	= wp_parse_args( get_option( 'ASI_plugin_posts_settings' ), $this->ASI_default_options_posts_settings( FALSE ) );
+        $active_posts_types = $this->ASI_default_posts_types();
         // Avoid generation when click "Add New"
         if ( ($pagenow == 'index.php' || $pagenow == 'post.php') && in_array( get_post_type( $ID ), $active_posts_types['choosed_post_type'] ) ) {
-            $main_settings = get_option( 'MPT_plugin_main_settings' );
+            $main_settings = get_option( 'ASI_plugin_main_settings' );
             if ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) {
                 $rewrite_featured = true;
             } else {
@@ -227,7 +227,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             }
             $img_blocks = $main_settings['image_block'];
             foreach ( $img_blocks as $key_img_block => $img_block ) {
-                $this->MPT_create_thumb(
+                $this->ASI_create_thumb(
                     $ID,
                     '0',
                     '1',
@@ -263,7 +263,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @access private
      */
-    private function MPT_check_existing_image( $title, $filename ) {
+    private function ASI_check_existing_image( $title, $filename ) {
         // Clean the base filename (remove extension and numbers)
         $base_filename = preg_replace( '/[0-9]+\\./', '.', $filename );
         $base_filename = pathinfo( $base_filename, PATHINFO_FILENAME );
@@ -291,7 +291,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_create_thumb(
+    public function ASI_create_thumb(
         $id,
         $check_value_enable = 0,
         $check_post_type = 1,
@@ -306,7 +306,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         $button_autogenerate = false
     ) {
         // Launch logs
-        $log = $this->MPT_monolog_call();
+        $log = $this->ASI_monolog_call();
         $log->info( 'New generation starting', array(
             'post' => $id,
         ) );
@@ -318,7 +318,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             return false;
         }
         // Settings
-        $main_settings = get_option( 'MPT_plugin_main_settings' );
+        $main_settings = get_option( 'ASI_plugin_main_settings' );
         // one shot generation
         if ( null == $key_img_block ) {
             $key_img_block = array_key_first( $main_settings['image_block'] );
@@ -351,14 +351,14 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             ) );
             return false;
         }
-        if ( !current_user_can( 'mpt_manage' ) && !class_exists( 'Main_WPeMatico' ) && !class_exists( 'FeedWordPress' ) && !class_exists( 'rssPostImporter' ) && !class_exists( 'CyberSyn_Syndicator' ) && !class_exists( 'wp_automatic' ) ) {
+        if ( !current_user_can( 'ASI_manage' ) && !class_exists( 'Main_WPeMatico' ) && !class_exists( 'FeedWordPress' ) && !class_exists( 'rssPostImporter' ) && !class_exists( 'CyberSyn_Syndicator' ) && !class_exists( 'wp_automatic' ) ) {
             $log->error( 'The user does not have sufficient rights', array(
                 'post' => $id,
             ) );
             return false;
         }
         // Choosed Post types
-        $post_types_default = $this->MPT_default_posts_types();
+        $post_types_default = $this->ASI_default_posts_types();
         $post_type_availables = $post_types_default['choosed_post_type'];
         $categories_availables = $post_types_default['choosed_categories'];
         /*
@@ -382,9 +382,9 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                 return false;
             }
         }
-        $options = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( TRUE ) );
-        $options_banks = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( TRUE ) );
-        $options_cron = wp_parse_args( get_option( 'MPT_plugin_cron_settings' ), $this->MPT_default_options_cron_settings( TRUE ) );
+        $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
+        $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+        $options_cron = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ), $this->ASI_default_options_cron_settings( TRUE ) );
         $options = array_merge( $options, $options_banks, $options_cron );
         if ( isset( $api_chosen ) ) {
             $options['api_chosen'] = $api_chosen;
@@ -417,7 +417,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         }
         if ( TRUE == $get_only_thumb ) {
             /* SET ALL PARAMETERS */
-            $array_parameters = $this->MPT_Get_Parameters( $img_block, $options, $search );
+            $array_parameters = $this->ASI_Get_Parameters( $img_block, $options, $search );
             $api_url = $array_parameters['url'];
             unset($array_parameters['url']);
             if ( !isset( $api_url ) ) {
@@ -426,7 +426,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                 ) );
                 return false;
             }
-            $result_body = $this->MPT_Generate(
+            $result_body = $this->ASI_Generate(
                 //$options['api_chosen'],
                 $img_block['api_chosen'],
                 $api_url,
@@ -446,7 +446,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             foreach ( $options_banks['api_chosen_auto'] as $bank ) {
                 // Reset options according new image bank
                 $options['api_chosen'] = $bank;
-                $array_parameters = $this->MPT_Get_Parameters( $options, $options, $search );
+                $array_parameters = $this->ASI_Get_Parameters( $options, $options, $search );
                 $api_url = $array_parameters['url'];
                 unset($array_parameters['url']);
                 if ( !isset( $api_url ) ) {
@@ -456,7 +456,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                     continue;
                 }
                 /* GET THE IMAGE URL */
-                list( $url_results, $file_media, $alt_img ) = $this->MPT_Generate(
+                list( $url_results, $file_media, $alt_img ) = $this->ASI_Generate(
                     $bank,
                     $api_url,
                     $array_parameters,
@@ -482,7 +482,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             }
         } else {
             // Process the main image block
-            $result = $this->MPT_Process_Image_Block(
+            $result = $this->ASI_Process_Image_Block(
                 $img_block,
                 $options,
                 $search,
@@ -495,7 +495,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                     'post' => $id,
                 ) );
                 $img_block['api_chosen'] = $img_block['api_chosen_2'];
-                $result = $this->MPT_Process_Image_Block(
+                $result = $this->ASI_Process_Image_Block(
                     $img_block,
                     $options,
                     $search,
@@ -510,7 +510,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             // Extract results and continue processing
             extract( $result );
         }
-        $compatibility = wp_parse_args( get_option( 'MPT_plugin_compatibility_settings' ), $this->MPT_default_options_compatibility_settings( TRUE ) );
+        $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
         $path_parts = pathinfo( $url_results );
         $filename = $path_parts['basename'];
         $wp_upload_dir = wp_upload_dir();
@@ -563,7 +563,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         if ( isset( $main_settings['image_reuse'] ) && $main_settings['image_reuse'] == true ) {
             // Check if image file already exist if option is set
             $proposed_filename = sanitize_title( $search );
-            $existing_image_id = $this->MPT_check_existing_image( get_the_title( $id ), $proposed_filename );
+            $existing_image_id = $this->ASI_check_existing_image( get_the_title( $id ), $proposed_filename );
             if ( $existing_image_id ) {
                 // Use the existing image instead of downloading a new one
                 $log->info( 'Featured image with existing image (option set)', array(
@@ -571,7 +571,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                     'image' => $existing_image_id,
                 ) );
                 set_post_thumbnail( $id, $existing_image_id );
-                do_action( 'mpt_after_create_thumb', $id, $existing_image_id );
+                do_action( 'ASI_after_create_thumb', $id, $existing_image_id );
                 return $existing_image_id;
             }
         }
@@ -649,7 +649,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                         $placement = $img_block['image_custom_location_placement'];
                         $position = $img_block['image_custom_location_position'];
                         $image_size = $img_block['image_custom_image_size'];
-                        $content = $this->MPT_insert_content_image(
+                        $content = $this->ASI_insert_content_image(
                             $content_post->post_content,
                             $attach_id,
                             $tag,
@@ -680,7 +680,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                      * Remove save_post Action to avoid infinite loop.
                      * cf https://developer.wordpress.org/reference/hooks/save_post/#avoiding-infinite-loops
                      * Use "remove_all_actions" instead of "remove_action". Otherwise the log file bug
-                     * remove_action( 'save_post', array( &$this, 'MPT_create_thumb' ) );
+                     * remove_action( 'save_post', array( &$this, 'ASI_create_thumb' ) );
                      */
                     remove_all_actions( 'save_post' );
                     wp_insert_post( array(
@@ -707,19 +707,19 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                         'post_type'             => $content_post->post_type,
                         'post_mime_type'        => $content_post->post_mime_type,
                     ) );
-                    add_action( 'save_post', array(&$this, 'MPT_create_thumb') );
+                    add_action( 'save_post', array(&$this, 'ASI_create_thumb') );
                     $log->info( 'Image added into the post', array(
                         'post'  => $id,
                         'image' => $attach_id,
                     ) );
                 }
-                do_action( 'mpt_after_create_thumb', $id, $attach_id );
+                do_action( 'ASI_after_create_thumb', $id, $attach_id );
                 if ( true === $include_datas ) {
                     return array(
                         'id'             => $attach_id,
                         'keyword'        => $keywords_search,
                         'img_resolution' => $attach_data['width'] . 'x' . $attach_data['height'] . 'px',
-                        'img_size'       => $this->MPT_get_image_size_in_bytes( $attach_id ),
+                        'img_size'       => $this->ASI_get_image_size_in_bytes( $attach_id ),
                         'api_chosen'     => $img_block['api_chosen'],
                     );
                 } else {
@@ -739,7 +739,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      * @param int $id Post ID
      * @return array|false Returns generated image data or false on failure
      */
-    private function MPT_Process_Image_Block(
+    private function ASI_Process_Image_Block(
         $img_block,
         $options,
         $search,
@@ -747,7 +747,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         $id
     ) {
         // Set all parameters
-        $array_parameters = $this->MPT_Get_Parameters( $img_block, $options, $search );
+        $array_parameters = $this->ASI_Get_Parameters( $img_block, $options, $search );
         $api_url = ( isset( $array_parameters['url'] ) ? $array_parameters['url'] : null );
         unset($array_parameters['url']);
         // Check if API URL is provided
@@ -758,7 +758,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             return false;
         }
         // Get the image URL
-        list( $url_results, $file_media, $alt_img, $caption_img ) = $this->MPT_Generate(
+        list( $url_results, $file_media, $alt_img, $caption_img ) = $this->ASI_Generate(
             $img_block['api_chosen'],
             $api_url,
             $array_parameters,
@@ -787,7 +787,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since 6.0.0
      */
-    private function MPT_get_image_size_in_bytes( $attachment_id ) {
+    private function ASI_get_image_size_in_bytes( $attachment_id ) {
         // Full path of the image
         $image_path = get_attached_file( $attachment_id );
         if ( $image_path && file_exists( $image_path ) ) {
@@ -804,7 +804,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since 5.2.0
      */
-    private function MPT_insert_content_image(
+    private function ASI_insert_content_image(
         $content,
         $attach_id,
         $tag = 'p',
@@ -813,7 +813,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         $image_size = 'large'
     ) {
         // Check if the Classic Editor is being used
-        $classic_editor = $this->MPT_is_using_classic_editor();
+        $classic_editor = $this->ASI_is_using_classic_editor();
         $match = false;
         // Variable to track if the image was inserted successfully
         // Loop until the image insertion is successful
@@ -837,7 +837,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                 $alt_text = get_post_meta( $attach_id, '_wp_attachment_image_alt', true );
                 $image = '<img src="' . esc_url( $image_src[0] ) . '" alt="' . esc_attr( $alt_text ) . '" class="wp-image-' . esc_attr( $attach_id ) . '"/>';
                 // Include caption if enabled in settings
-                $options = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( TRUE ) );
+                $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
                 if ( isset( $options['enable_caption'] ) && 'enable' == $options['enable_caption'] ) {
                     $caption_text = wp_get_attachment_caption( $attach_id );
                     $image .= '<figcaption class="wp-element-caption">' . esc_html( $caption_text ) . '</figcaption>';
@@ -940,7 +940,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    6.0.0
      */
-    private function MPT_extract_adjacent_element(
+    private function ASI_extract_adjacent_element(
         $content,
         $element = 'p',
         $element_number = 1,
@@ -1012,7 +1012,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    5.2.0
      */
-    private function MPT_is_using_classic_editor() {
+    private function ASI_is_using_classic_editor() {
         // Include the is_plugin_active function if it's not already defined
         if ( !function_exists( 'is_plugin_active' ) ) {
             include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -1026,7 +1026,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    private function MPT_Get_Parameters( $img_block, $options, $search ) {
+    private function ASI_Get_Parameters( $img_block, $options, $search ) {
         /* GOOGLE IMAGE SCRAPING PARAMETERS */
         if ( $img_block['api_chosen'] == 'google_scraping' ) {
             $country = ( !empty( $options['google_scraping']['search_country'] ) ? $options['google_scraping']['search_country'] : 'en' );
@@ -1264,7 +1264,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_Generate(
+    public function ASI_Generate(
         $service,
         $url,
         $url_parameters,
@@ -1272,13 +1272,13 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
         $get_only_thumb = false,
         $search = ''
     ) {
-        $log = $this->MPT_monolog_call();
-        list( $result_body, $result ) = $this->MPT_get_results( $service, $url, $url_parameters );
+        $log = $this->ASI_monolog_call();
+        list( $result_body, $result ) = $this->ASI_get_results( $service, $url, $url_parameters );
         // In case of API problem
         if ( empty( $result_body ) ) {
             return false;
         }
-        $log = $this->MPT_monolog_call();
+        $log = $this->ASI_monolog_call();
         $log->info( 'Source used', array(
             'Service' => $service,
         ) );
@@ -1288,7 +1288,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             $predictionId = $result_body['id'];
             $getUrl = $result_body['urls']['get'];
             // retrieve API token from settings
-            $options = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( true ) );
+            $options = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( true ) );
             $apiToken = ( !empty( $options['replicate']['apikey'] ) ? $options['replicate']['apikey'] : '' );
             // poll until prediction is complete
             do {
@@ -1376,7 +1376,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             foreach ( $loop_results as $loop_result_result => $loop_result ) {
                 $remote_img = wp_remote_head( $loop_result['url'] );
                 $remote_response = wp_remote_retrieve_response_code( $remote_img );
-                $log = $this->MPT_monolog_call();
+                $log = $this->ASI_monolog_call();
                 $log->info( 'Remote image', array(
                     'remote_img' => $loop_result,
                 ) );
@@ -1423,7 +1423,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                 } elseif ( $service == 'dallev1' ) {
                     $url_result = $fetch_result[$url_path];
                     // Show revised prompt (by openAI) in logs
-                    $log = $this->MPT_monolog_call();
+                    $log = $this->ASI_monolog_call();
                     $log->info( 'DALL_E', array(
                         'revised_prompt' => $fetch_result['revised_prompt'],
                     ) );
@@ -1435,7 +1435,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                 } else {
                     $url_result = $fetch_result[$url_path];
                 }
-                $options = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( TRUE ) );
+                $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
                 $alt = '';
                 // Caption texts
                 if ( isset( $options['enable_caption'] ) && 'enable' == $options['enable_caption'] ) {
@@ -1465,7 +1465,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                         $caption = '';
                     }
                     if ( 'author_bank' == $options['caption_from'] && $service != 'google_scraping' ) {
-                        $caption .= esc_html__( ' from ', 'mpt' ) . ucfirst( $service );
+                        $caption .= esc_html__( ' from ', 'all-sources-images' ) . ucfirst( $service );
                     }
                 } else {
                     $caption = '';
@@ -1528,7 +1528,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
                         if ( base64_decode( $url_result, true ) !== false ) {
                             // Decoding the image in Base64
                             $image_data = base64_decode( $url_result );
-                            $options_banks = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( TRUE ) );
+                            $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
                             // Specify a file path for the image in the download directory
                             $upload_dir = wp_upload_dir();
                             $file_path = $upload_dir['path'] . '/temp_mpt_stability_' . uniqid() . '.' . $options_banks['stability']['output_format'];
@@ -1576,7 +1576,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    private function MPT_get_results( $service, $url, $url_parameters ) {
+    private function ASI_get_results( $service, $url, $url_parameters ) {
         if ( $service == 'dallev1' || $service == 'stability' || $service == 'pexels' || $service == 'replicate' ) {
             $defaults = $url_parameters;
         } else {
@@ -1591,7 +1591,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             );
         }
         // Proxy settins
-        $options_proxy = get_option( 'MPT_plugin_proxy_settings' );
+        $options_proxy = get_option( 'ASI_plugin_proxy_settings' );
         $result = wp_remote_request( $url, $defaults );
         // If error happen
         if ( !empty( $result->errors['http_request_failed'] ) ) {
@@ -1607,14 +1607,14 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
             //preg_match_all( '/,\["http[^"]((?!gstatic).)*",\d+?,\d+?\]/', $result['body'], $output_img_urls );
             preg_match_all( '/data-ou="(http[^"]*)"/', $result['body'], $output_img_urls );
             $result_body['results'] = array_map(
-                array(&$this, 'MPT_order_array_urls'),
+                array(&$this, 'ASI_order_array_urls'),
                 $output_img_urls[1],
                 $output_img_alts[1],
                 $output_img_captions[1]
             );
         } else {
             $result_body = json_decode( $result['body'], true );
-            $log = $this->MPT_monolog_call();
+            $log = $this->ASI_monolog_call();
             // Dall-e: Catch the error
             if ( $service == 'dallev1' && $result_body['error']['message'] ) {
                 //error_log( print_r( $result, true ) );
@@ -1636,7 +1636,7 @@ class Magic_Post_Thumbnail_Generation extends Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_order_array_urls( $str, $str_alt, $str_caption ) {
+    public function ASI_order_array_urls( $str, $str_alt, $str_caption ) {
         // Get only the url and exclude Google image url (domain gstatic)
         $pattern = '/,\\["(http[^"]((?!gstatic).)*)",\\d+?,\\d+?\\]/';
         $replacement = '$1';

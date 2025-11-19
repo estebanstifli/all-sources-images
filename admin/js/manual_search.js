@@ -1,4 +1,4 @@
-const { dispatch, select } = wp.data;
+﻿const { dispatch, select } = wp.data;
 const { createBlock } = wp.blocks;
 
 function addMPTBlockAndOpenModal() {
@@ -12,7 +12,7 @@ function addMPTBlockAndOpenModal() {
 
 
     // Create an instance of the mpt/mpt-images block
-    const block = createBlock('mpt/mpt-images');
+    const block = createBlock('asi/asi-images');
 
     //dispatch('core/block-editor').insertBlock(block, indexBlock);
     dispatch('core/block-editor').insertBlock(block);

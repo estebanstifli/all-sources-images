@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
@@ -6,7 +6,7 @@ if ( !function_exists( 'add_filter' ) ) {
     exit;
 }
 /* Banks for Automatic Bulk */
-$list_api_auto = $this->MPT_banks_name_auto();
+$list_api_auto = $this->ASI_banks_name_auto();
 include_once 'places_template.php';
 // Display saved blocks
 if ( !empty( $image_blocks ) ) {
@@ -29,28 +29,28 @@ if ( !empty( $image_blocks ) ) {
         ?> top-add-block-img">
                 <th scope="row">
                     <?php 
-        esc_html_e( 'Featured Image / Inline Content', 'mpt' );
+        esc_html_e( 'Featured Image / Inline Content', 'all-sources-images' );
         ?>
                 </th>
                 <td class="image_location radio-list">
                     <label class="radio radio-outline radio-outline-2x radio-primary">
-                        <input value="featured" name="MPT_plugin_main_settings[image_block][<?php 
+                        <input value="featured" name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][image_location]" type="radio" <?php 
         checked( $block['image_location'], 'featured' );
         ?>>
                         <span></span> <?php 
-        esc_html_e( 'Featured Image', 'mpt' );
+        esc_html_e( 'Featured Image', 'all-sources-images' );
         ?>
                     </label>
                     <label class="radio radio-outline radio-outline-2x radio-primary">
-                        <input value="custom" name="MPT_plugin_main_settings[image_block][<?php 
+                        <input value="custom" name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][image_location]" type="radio" <?php 
         checked( $block['image_location'], 'custom' );
         ?>>
                         <span></span> <?php 
-        esc_html_e( 'Inline content', 'mpt' );
+        esc_html_e( 'Inline content', 'all-sources-images' );
         ?>
                     </label>
 
@@ -59,7 +59,7 @@ if ( !empty( $image_blocks ) ) {
         ?>
 
                     <p class="description"><i><?php 
-        esc_html_e( '"Inline content" allows you to generate the image anywhere in the content', 'mpt' );
+        esc_html_e( '"Inline content" allows you to generate the image anywhere in the content', 'all-sources-images' );
         ?></i></p>
                 </td>
             </tr>
@@ -74,96 +74,96 @@ if ( !empty( $image_blocks ) ) {
         ?> mid-add-block-img">
                 <th scope="row">
                     <label for="hseparator"><?php 
-        esc_html_e( 'Image position', 'mpt' );
+        esc_html_e( 'Image position', 'all-sources-images' );
         ?></label>
                 </th>
                 <td class="custom_image_location" valign="top">
                     <label><?php 
-        esc_html_e( 'Insert', 'mpt' );
+        esc_html_e( 'Insert', 'all-sources-images' );
         ?>
-                        <select name="MPT_plugin_main_settings[image_block][<?php 
+                        <select name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][image_custom_location_placement]" class="select-custom-location form-control">
                             <option value="before" <?php 
         selected( ( isset( $block['image_custom_location_placement'] ) ? $block['image_custom_location_placement'] : '' ), 'before' );
         ?>><?php 
-        esc_html_e( 'Before', 'mpt' );
+        esc_html_e( 'Before', 'all-sources-images' );
         ?></option>
                             <option value="after" <?php 
         selected( ( isset( $block['image_custom_location_placement'] ) ? $block['image_custom_location_placement'] : '' ), 'after' );
         ?>><?php 
-        esc_html_e( 'After', 'mpt' );
+        esc_html_e( 'After', 'all-sources-images' );
         ?></option>
                         </select> 
                         <?php 
-        esc_html_e( 'the', 'mpt' );
+        esc_html_e( 'the', 'all-sources-images' );
         ?>
-                        <select name="MPT_plugin_main_settings[image_block][<?php 
+                        <select name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][image_custom_location_position]" class="select-custom-location form-control">
                             <option value="1" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '1' );
         ?>><?php 
-        esc_html_e( 'First', 'mpt' );
+        esc_html_e( 'First', 'all-sources-images' );
         ?></option>
                             <option value="2" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '2' );
         ?>><?php 
-        esc_html_e( 'Second', 'mpt' );
+        esc_html_e( 'Second', 'all-sources-images' );
         ?></option>
                             <option value="3" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '3' );
         ?>><?php 
-        esc_html_e( 'Third', 'mpt' );
+        esc_html_e( 'Third', 'all-sources-images' );
         ?></option>
                             <option value="4" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '4' );
         ?>><?php 
-        esc_html_e( 'Fourth', 'mpt' );
+        esc_html_e( 'Fourth', 'all-sources-images' );
         ?></option>
                             <option value="5" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '5' );
         ?>><?php 
-        esc_html_e( 'Fifth', 'mpt' );
+        esc_html_e( 'Fifth', 'all-sources-images' );
         ?></option>
                             <option value="6" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '6' );
         ?>><?php 
-        esc_html_e( 'Sixth', 'mpt' );
+        esc_html_e( 'Sixth', 'all-sources-images' );
         ?></option>
                             <option value="7" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '7' );
         ?>><?php 
-        esc_html_e( 'Seventh', 'mpt' );
+        esc_html_e( 'Seventh', 'all-sources-images' );
         ?></option>
                             <option value="8" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '8' );
         ?>><?php 
-        esc_html_e( 'Eighth', 'mpt' );
+        esc_html_e( 'Eighth', 'all-sources-images' );
         ?></option>
                             <option value="9" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '9' );
         ?>><?php 
-        esc_html_e( 'Ninth', 'mpt' );
+        esc_html_e( 'Ninth', 'all-sources-images' );
         ?></option>
                             <option value="10" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), '10' );
         ?>><?php 
-        esc_html_e( 'Tenth', 'mpt' );
+        esc_html_e( 'Tenth', 'all-sources-images' );
         ?></option>
                             <option value="last" <?php 
         selected( ( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '' ), 'last' );
         ?>><?php 
-        esc_html_e( 'Last', 'mpt' );
+        esc_html_e( 'Last', 'all-sources-images' );
         ?></option>
                         </select>
-                        <select name="MPT_plugin_main_settings[image_block][<?php 
+                        <select name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][image_custom_location_tag]" class="select-custom-location form-control">
                             <option value="p" <?php 
         selected( ( isset( $block['image_custom_location_tag'] ) ? $block['image_custom_location_tag'] : '' ), 'p' );
         ?>><?php 
-        esc_html_e( 'paragraph (p)', 'mpt' );
+        esc_html_e( 'paragraph (p)', 'all-sources-images' );
         ?></option>
                             <option value="h2" <?php 
         selected( ( isset( $block['image_custom_location_tag'] ) ? $block['image_custom_location_tag'] : '' ), 'h2' );
@@ -186,7 +186,7 @@ if ( !empty( $image_blocks ) ) {
                             <option value="a" <?php 
         selected( ( isset( $block['image_custom_location_tag'] ) ? $block['image_custom_location_tag'] : '' ), 'a' );
         ?>><?php 
-        esc_html_e( 'link (a)', 'mpt' );
+        esc_html_e( 'link (a)', 'all-sources-images' );
         ?></option>
                         </select>
                     </label>
@@ -201,12 +201,12 @@ if ( !empty( $image_blocks ) ) {
         ?> mid-add-block-img">
                 <th scope="row">
                     <label for="hseparator"><?php 
-        esc_html_e( 'Image size', 'mpt' );
+        esc_html_e( 'Image size', 'all-sources-images' );
         ?></label>
                 </th>
                 <td class="custom_image_size" valign="top">
                     <label>
-                        <select name="MPT_plugin_main_settings[image_block][<?php 
+                        <select name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][image_custom_image_size]" class="select-custom-location form-control">
                             <?php 
@@ -234,12 +234,12 @@ if ( !empty( $image_blocks ) ) {
         ?> mid-add-block-img">
                 <th scope="row">
                     <label for="hseparator"><?php 
-        esc_html_e( 'Image Source', 'mpt' );
+        esc_html_e( 'Image Source', 'all-sources-images' );
         ?></label>
                 </th>
                 <td class="custom_image_size" valign="top">
                     <label>
-                        <select name="MPT_plugin_main_settings[image_block][<?php 
+                        <select name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][api_chosen]" class="select-custom-location form-control">
                             <?php 
@@ -273,16 +273,16 @@ if ( !empty( $image_blocks ) ) {
         ?> mid-add-block-img">
                 <th scope="row">
                     <label for="hseparator"><?php 
-        esc_html_e( 'Second Image Source', 'mpt' );
+        esc_html_e( 'Second Image Source', 'all-sources-images' );
         ?></label>
                 </th>
                 <td class="custom_image_size" valign="top">
                     <label>
-                        <select name="MPT_plugin_main_settings[image_block][<?php 
+                        <select name="ASI_plugin_main_settings[image_block][<?php 
         echo $blockIndex;
         ?>][api_chosen_2]" class="select-custom-location form-control">
                             <option value="none"><?php 
-        esc_html_e( 'None', 'mpt' );
+        esc_html_e( 'None', 'all-sources-images' );
         ?></option>
                             <?php 
         foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) {
@@ -306,7 +306,7 @@ if ( !empty( $image_blocks ) ) {
         ?>
                         </select> 
                         <i><?php 
-        esc_html_e( 'Second Image Source, just in case the first one doesn\'t work', 'mpt' );
+        esc_html_e( 'Second Image Source, just in case the first one doesn\'t work', 'all-sources-images' );
         ?></i>
                     </label>
                 </td>
@@ -325,7 +325,7 @@ if ( !empty( $image_blocks ) ) {
                     <button type="button" class="btn btn-sm font-weight-bolder btn-light-danger remove-block-btn <?php 
         echo $class_remove_btn;
         ?>" style="text-decoration: none;">[-] <?php 
-        esc_html_e( 'Delete', 'mpt' );
+        esc_html_e( 'Delete', 'all-sources-images' );
         ?></button>
                 </td>
             </tr>
@@ -354,7 +354,7 @@ $cloneID = 'add-image-btn-disabled';
 echo $cloneID;
 ?>">
                 [+] <?php 
-esc_html_e( 'Add an image location', 'mpt' );
+esc_html_e( 'Add an image location', 'all-sources-images' );
 ?>
             </a>
         </td>

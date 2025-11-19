@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * The file that defines the core plugin class
@@ -9,8 +9,8 @@
  * @link       https://magic-post-thumbnail.com/
  * @since      1.0.0
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  */
 
 /**
@@ -23,11 +23,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
-class Magic_Post_Thumbnail {
+class All_Sources_Images {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -35,7 +35,7 @@ class Magic_Post_Thumbnail {
 	 *
 	 * @since    4.0.0
 	 * @access   protected
-	 * @var      Magic_Post_Thumbnail_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      All_Sources_Images_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -67,12 +67,12 @@ class Magic_Post_Thumbnail {
 	 * @since    4.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'MAGIC_POST_THUMBNAIL_VERSION' ) ) {
-			$this->version = MAGIC_POST_THUMBNAIL_VERSION;
+		if ( defined( 'ALL_SOURCES_IMAGES_VERSION' ) ) {
+			$this->version = ALL_SOURCES_IMAGES_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'magic-post-thumbnail';
+		$this->plugin_name = 'all-sources-images';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -86,10 +86,10 @@ class Magic_Post_Thumbnail {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Magic_Post_Thumbnail_Loader. Orchestrates the hooks of the plugin.
-	 * - Magic_Post_Thumbnail_i18n. Defines internationalization functionality.
-	 * - Magic_Post_Thumbnail_Admin. Defines all hooks for the admin area.
-	 * - Magic_Post_Thumbnail_Public. Defines all hooks for the public side of the site.
+	 * - All_Sources_Images_Loader. Orchestrates the hooks of the plugin.
+	 * - All_Sources_Images_i18n. Defines internationalization functionality.
+	 * - All_Sources_Images_Admin. Defines all hooks for the admin area.
+	 * - All_Sources_Images_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -103,38 +103,38 @@ class Magic_Post_Thumbnail {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-magic-post-thumbnail-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-all-sources-images-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-magic-post-thumbnail-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-all-sources-images-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-magic-post-thumbnail-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-all-sources-images-admin.php';
 
 		/**
 		 * MPT Generation features
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-magic-post-thumbnail-generation.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-all-sources-images-generation.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-magic-post-thumbnail-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-all-sources-images-public.php';
 
-		$this->loader = new Magic_Post_Thumbnail_Loader();
+		$this->loader = new All_Sources_Images_Loader();
 
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Magic_Post_Thumbnail_i18n class in order to set the domain and to register the hook
+	 * Uses the All_Sources_Images_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    4.0.0
@@ -142,7 +142,7 @@ class Magic_Post_Thumbnail {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Magic_Post_Thumbnail_i18n();
+		$plugin_i18n = new All_Sources_Images_i18n();
 
 		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -157,16 +157,16 @@ class Magic_Post_Thumbnail {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Magic_Post_Thumbnail_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new All_Sources_Images_Admin( $this->get_plugin_name(), $this->get_version() );
 
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
-    	$this->loader->add_action( 'admin_menu', $plugin_admin, 'MPT_main_settings' );
-		$this->loader->add_filter( 'submenu_file', $plugin_admin, 'MPT_submenu_class' );
+    	$this->loader->add_action( 'admin_menu', $plugin_admin, 'ASI_main_settings' );
+		$this->loader->add_filter( 'submenu_file', $plugin_admin, 'ASI_submenu_class' );
 
-    	$this->loader->add_action( 'init', $plugin_admin, 'MPT_main_actions' );
+    	$this->loader->add_action( 'init', $plugin_admin, 'ASI_main_actions' );
 
 	}
 
@@ -179,7 +179,7 @@ class Magic_Post_Thumbnail {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Magic_Post_Thumbnail_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new All_Sources_Images_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
@@ -210,7 +210,7 @@ class Magic_Post_Thumbnail {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Magic_Post_Thumbnail_Loader    Orchestrates the hooks of the plugin.
+	 * @return    All_Sources_Images_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

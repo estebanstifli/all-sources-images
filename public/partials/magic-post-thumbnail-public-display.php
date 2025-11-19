@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * Provide a public-facing view for the plugin
@@ -8,8 +8,8 @@
  * @link       https://magic-post-thumbnail.com/
  * @since      1.0.0
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/public/partials
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/public/partials
  */
 ?>
 

@@ -1,13 +1,13 @@
-<?php
+﻿<?php
 
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://magic-post-thumbnail.com/
+ * @link       https://github.com/yourusername/all-sources-images
  * @since      1.0.0
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/admin
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/admin
  */
 /**
  * The admin-specific functionality of the plugin.
@@ -15,11 +15,11 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/admin
- * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/admin
+ * @author     Your Name <your@email.com>
  */
-class Magic_Post_Thumbnail_Admin {
+class All_Sources_Images_Admin {
     /**
      * The ID of this plugin.
      *
@@ -48,46 +48,35 @@ class Magic_Post_Thumbnail_Admin {
     public function __construct( $plugin_name, $version ) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        $mpt_generation = $this->MPT_generation_features();
-        // Freemius SDK Integration
-        if ( function_exists( '\\Magic_Post_Thumbnail_Admin\\MPT_Freemius' ) ) {
-            $this->MPT_freemius()->set_basename( true, __FILE__ );
-        } else {
-            if ( !function_exists( '\\Magic_Post_Thumbnail_Admin\\MPT_Freemius' ) ) {
-                $this->MPT_freemius();
-            }
-        }
-        // Adds a settings link to the plugins page
-        $exploded_path = explode( '/', str_replace( WP_PLUGIN_DIR . '/', '', __DIR__ ) );
-        $plugin_folder_name = reset( $exploded_path );
-        add_filter( 'plugin_action_links_' . $this->mpt_freemius()->get_plugin_basename(), array(&$this, 'MPT_add_link_parameters') );
+        $ASI_generation = $this->ASI_generation_features();
+
         // Crons for pro version
-        $cron_options = wp_parse_args( get_option( 'MPT_plugin_cron_settings' ) );
-        $compatibility = wp_parse_args( get_option( 'MPT_plugin_compatibility_settings' ), $this->MPT_default_options_compatibility_settings( TRUE ) );
+        $cron_options = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ) );
+        $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
         // Testing APIs function with Ajax call
-        add_action( 'wp_ajax_test_apis', array(&$this, 'MPT_test_apis') );
-        add_action( 'wp_ajax_nopriv_test_apis', array(&$this, 'MPT_test_apis') );
+        add_action( 'wp_ajax_test_apis', array(&$this, 'ASI_test_apis') );
+        add_action( 'wp_ajax_nopriv_test_apis', array(&$this, 'ASI_test_apis') );
         /* Gutenberg Block */
         // Scripts for Block & Translations
-        add_action( 'init', array(&$this, 'MPT_register_mpt_block') );
-        add_action( 'enqueue_block_editor_assets', array(&$this, 'MPT_enqueue_style_block') );
+        add_action( 'init', array(&$this, 'ASI_register_mpt_block') );
+        add_action( 'enqueue_block_editor_assets', array(&$this, 'ASI_enqueue_style_block') );
         // Gutenberg Block : Searching images with APIs
-        add_action( 'wp_ajax_block_searching_images', array(&$this, 'MPT_block_searching_images') );
-        add_action( 'wp_ajax_nopriv_block_searching_images', array(&$this, 'MPT_block_searching_images') );
+        add_action( 'wp_ajax_block_searching_images', array(&$this, 'ASI_block_searching_images') );
+        add_action( 'wp_ajax_nopriv_block_searching_images', array(&$this, 'ASI_block_searching_images') );
         // Gutenberg Block : Download images from APIs
-        add_action( 'wp_ajax_block_downloading_image', array(&$this, 'MPT_block_downloading_image') );
-        add_action( 'wp_ajax_nopriv_block_downloading_image', array(&$this, 'MPT_block_downloading_image') );
+        add_action( 'wp_ajax_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
+        add_action( 'wp_ajax_nopriv_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
         // Extend timeout request for wp_remote_request() with dalle
-        $options_banks = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( TRUE ) );
+        $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
         if ( isset( $options_banks['api_chosen_auto'] ) && true === in_array( 'dallev1', $options_banks['api_chosen_auto'] ) ) {
-            add_filter( 'http_request_timeout', array(&$this, 'MPT_custom_http_request_timeout') );
+            add_filter( 'http_request_timeout', array(&$this, 'ASI_custom_http_request_timeout') );
         }
         // Show & Hide notice for asking reviews
-        add_action( 'admin_notices', array(&$this, 'MPT_show_notice') );
-        add_action( 'wp_ajax_mpt_hide_notice', array(&$this, 'MPT_hide_notice') );
-        add_action( 'wp_ajax_mpt_remind_later', array(&$this, 'MPT_remind_later') );
+        add_action( 'admin_notices', array(&$this, 'ASI_show_notice') );
+        add_action( 'wp_ajax_asi_hide_notice', array(&$this, 'ASI_hide_notice') );
+        add_action( 'wp_ajax_asi_remind_later', array(&$this, 'ASI_remind_later') );
         // Migration v5 to v6
-        add_action( 'init', array(&$this, 'MPT_migration') );
+        add_action( 'init', array(&$this, 'ASI_migration') );
     }
 
     /**
@@ -96,17 +85,17 @@ class Magic_Post_Thumbnail_Admin {
      * @since    5.0.0
      * @access   public
      */
-    public function MPT_trigger_save_post() {
-        $log = $this->MPT_monolog_call();
+    public function ASI_trigger_save_post() {
+        $log = $this->ASI_monolog_call();
         $log->info( 'Launch Automatic plugin' );
-        //$automatic_generation = new Magic_Post_Thumbnail_Generation($this->plugin_name, $this->version);
+        //$automatic_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
         // Add a callback function to the save_post action to handle image generation
         add_action( 'save_post', function ( $post_id ) {
             // Schedule a single event with a delay to avoid conflicts
             wp_schedule_single_event( 
                 time() + 5,
                 // 5 seconds apart for each block
-                'mpt_generate_scheduled_image',
+                'ASI_generate_scheduled_image',
                 array($post_id)
              );
         } );
@@ -118,17 +107,17 @@ class Magic_Post_Thumbnail_Admin {
      * @since    6.0.0
      * @access   public
      */
-    public function MPT_generate_scheduled_image( $post_id ) {
-        $automatic_generation = new Magic_Post_Thumbnail_Generation($this->plugin_name, $this->version);
+    public function ASI_generate_scheduled_image( $post_id ) {
+        $automatic_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
         // Retrieve main settings from the plugin options
-        $main_settings = get_option( 'MPT_plugin_main_settings' );
+        $main_settings = get_option( 'ASI_plugin_main_settings' );
         $img_blocks = $main_settings['image_block'];
         // Iterate through each image block to schedule image generation
         foreach ( $img_blocks as $key_img_block => $img_block ) {
-            $log = $this->MPT_monolog_call();
+            $log = $this->ASI_monolog_call();
             $log->info( 'Generating scheduled image for post ID: ' . $post_id . ', block: ' . $key_img_block );
             // Generate the image for the specific block
-            $automatic_generation->MPT_create_thumb(
+            $automatic_generation->ASI_create_thumb(
                 $post_id,
                 0,
                 1,
@@ -150,17 +139,17 @@ class Magic_Post_Thumbnail_Admin {
      * @since    5.0.3
      * @access   public
      */
-    public function MPT_trigger_wp_insert_post( $post_ID ) {
+    public function ASI_trigger_wp_insert_post( $post_ID ) {
     }
 
-    public function MPT_trigger_wp_automatic( $post_data ) {
-        $log = $this->MPT_monolog_call();
+    public function ASI_trigger_wp_automatic( $post_data ) {
+        $log = $this->ASI_monolog_call();
         $log->info( 'Launch WordPress Automatic Plugin' );
-        $automatic_generation = new Magic_Post_Thumbnail_Generation($this->plugin_name, $this->version);
-        $main_settings = get_option( 'MPT_plugin_main_settings' );
+        $automatic_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
+        $main_settings = get_option( 'ASI_plugin_main_settings' );
         $img_blocks = $main_settings['image_block'];
         foreach ( $img_blocks as $key_img_block => $img_block ) {
-            $automatic_generation->MPT_create_thumb(
+            $automatic_generation->ASI_create_thumb(
                 $post_data['post_id'],
                 '0',
                 '1',
@@ -182,9 +171,9 @@ class Magic_Post_Thumbnail_Admin {
      * @since    4.0.0
      * @access   private
      */
-    private function MPT_generation_features() {
-        $mpt_generation = new Magic_Post_Thumbnail_Generation($this->plugin_name, $this->version);
-        return $mpt_generation;
+    private function ASI_generation_features() {
+        $ASI_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
+        return $ASI_generation;
     }
 
     /**
@@ -204,7 +193,7 @@ class Magic_Post_Thumbnail_Admin {
             );
         }
         // MPT Admin Dashboard
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' || $hook == 'admin_page_magic-post-thumbnail-admin-display-pricing' ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' || $hook == 'admin_page_all-sources-images-admin-display-pricing' ) {
             wp_enqueue_style(
                 $this->plugin_name,
                 plugin_dir_url( __FILE__ ) . 'css/magic-post-thumbnail-admin.css',
@@ -264,12 +253,12 @@ class Magic_Post_Thumbnail_Admin {
      */
     public function enqueue_scripts( $hook ) {
         global $pagenow;
-        $post_types_default = $this->MPT_default_posts_types();
-        $compatibility = wp_parse_args( get_option( 'MPT_plugin_compatibility_settings' ), $this->MPT_default_options_compatibility_settings( TRUE ) );
-        $block = wp_parse_args( get_option( 'MPT_plugin_block_settings' ), $this->MPT_default_options_block_settings( TRUE ) );
-        $options_banks = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( TRUE ) );
-        $options_auto = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( TRUE ) );
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' ) {
+        $post_types_default = $this->ASI_default_posts_types();
+        $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
+        $block = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
+        $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+        $options_auto = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' ) {
             wp_enqueue_script(
                 'prismjs-bundle',
                 plugin_dir_url( __FILE__ ) . 'js/prismjs.bundle.js',
@@ -301,37 +290,37 @@ class Magic_Post_Thumbnail_Admin {
         );
         // Bulk generation
         $module = ( isset( $_GET['module'] ) ? sanitize_text_field( $_GET['module'] ) : '' );
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' && ('bulk-generation' == $module || 'source' == $module || 'automatic' == $module || 'interval' == $module) ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && ('bulk-generation' == $module || 'source' == $module || 'automatic' == $module || 'interval' == $module) ) {
             wp_enqueue_script( 'jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.js', __FILE__ ) );
             wp_enqueue_style( 'style-jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.css', __FILE__ ) );
         }
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' && 'bulk-generation' == $module ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && 'bulk-generation' == $module ) {
             wp_enqueue_script( 'images-generation', plugins_url( 'js/generation.js', __FILE__ ), array('jquery-ui') );
         }
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' && 'source' == $module ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && 'source' == $module ) {
             wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui') );
             wp_localize_script( 'source', 'apisTestingAjax', array(
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
                 'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
-                'successful_testing' => esc_html__( 'Your API key works!', 'mpt' ),
-                'error_key'          => esc_html__( "Your API key doesn't work.", 'mpt' ),
-                'error_testing'      => esc_html__( 'An error has occurred with the remote API.', 'mpt' ),
+                'successful_testing' => esc_html__( 'Your API key works!', 'all-sources-images' ),
+                'error_key'          => esc_html__( "Your API key doesn't work.", 'all-sources-images' ),
+                'error_testing'      => esc_html__( 'An error has occurred with the remote API.', 'all-sources-images' ),
             ) );
         }
         // JavaScript Variables for nonce, admin-jax.php path and translations
         $js_vars = array(
             'wp_ajax_url'  => admin_url( 'admin-ajax.php' ),
             'translations' => array(
-                'successful'       => esc_html__( 'Successful generation !!', 'mpt' ),
-                'error_generation' => esc_html__( 'Error with images generation', 'mpt' ),
-                'error_plugin'     => esc_html__( 'Error with the plugin', 'mpt' ),
-                'search_terms'     => esc_html__( 'Search Terms', 'mpt' ),
-                'img_resolution'   => esc_html__( 'Image Resolution', 'mpt' ),
-                'img_size'         => esc_html__( 'Image Size', 'mpt' ),
-                'img_bank'         => esc_html__( 'Image Bank', 'mpt' ),
+                'successful'       => esc_html__( 'Successful generation !!', 'all-sources-images' ),
+                'error_generation' => esc_html__( 'Error with images generation', 'all-sources-images' ),
+                'error_plugin'     => esc_html__( 'Error with the plugin', 'all-sources-images' ),
+                'search_terms'     => esc_html__( 'Search Terms', 'all-sources-images' ),
+                'img_resolution'   => esc_html__( 'Image Resolution', 'all-sources-images' ),
+                'img_size'         => esc_html__( 'Image Size', 'all-sources-images' ),
+                'img_bank'         => esc_html__( 'Image Bank', 'all-sources-images' ),
             ),
         );
-        if ( !empty( $_POST['mpt'] ) || !empty( $_REQUEST['ids_mpt_generation'] ) || !empty( $_REQUEST['cats'] ) ) {
+        if ( !empty( $_POST['all-sources-images'] ) || !empty( $_REQUEST['ids_mpt_generation'] ) || !empty( $_REQUEST['cats'] ) ) {
             if ( !empty( $_REQUEST['cats'] ) ) {
                 $taxo_term = get_term( $_REQUEST['cats'] );
                 if ( empty( $taxo_term ) ) {
@@ -368,7 +357,7 @@ class Magic_Post_Thumbnail_Admin {
             $ids = array_map( 'intval', explode( ',', trim( $ids, ',' ) ) );
             $count = count( $ids );
             $ids = json_encode( $ids );
-            $ajax_nonce = wp_create_nonce( 'ajax_nonce_magic_post_thumbnail' );
+            $ajax_nonce = wp_create_nonce( 'ajax_nonce_All_Sources_Images' );
             $counter_image_block = 1;
             if ( isset( $options_auto['bulk_generation_interval'] ) && (int) $options_auto['bulk_generation_interval'] !== 0 ) {
                 $remaining_seconds = $this->cron_scheduled();
@@ -384,7 +373,7 @@ class Magic_Post_Thumbnail_Admin {
             );
         }
         //Include Main dashboard Js
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' || ($pagenow == 'index.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') && in_array( get_post_type( get_the_ID() ), $post_types_default['choosed_post_type'] ) ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' || ($pagenow == 'index.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') && in_array( get_post_type( get_the_ID() ), $post_types_default['choosed_post_type'] ) ) {
             wp_enqueue_script(
                 $this->plugin_name,
                 plugin_dir_url( __FILE__ ) . 'js/magic-post-thumbnail-admin.js',
@@ -395,7 +384,7 @@ class Magic_Post_Thumbnail_Admin {
                 )
             );
         }
-        if ( $hook == 'toplevel_page_magic-post-thumbnail-admin-display' && 'automatic' == $module ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && 'automatic' == $module ) {
             $image_blocks = ( isset( $options_auto['image_block'] ) ? $options_auto['image_block'] : array() );
             // Calculating the current block index based on existing blocks
             $blockIndex = count( $image_blocks ) + 1;
@@ -405,7 +394,7 @@ class Magic_Post_Thumbnail_Admin {
             ) );
         }
         $current_post_ID = json_encode( array_map( 'intval', array(get_the_ID()) ) );
-        $post_nounce = wp_create_nonce( 'ajax_nonce_magic_post_thumbnail' );
+        $post_nounce = wp_create_nonce( 'ajax_nonce_All_Sources_Images' );
         // Check if dalle is the first chosen image bank
         if ( isset( $options_banks['api_chosen_auto'] ) && true === in_array( 'dallev1', $options_banks['api_chosen_auto'] ) && 'dallev1' === reset( $options_banks['api_chosen_auto'] ) ) {
             $dalle = "true";
@@ -421,11 +410,11 @@ class Magic_Post_Thumbnail_Admin {
             'wp_ajax_url'       => admin_url( 'admin-ajax.php' ),
             'postID'            => $current_post_ID,
             'generateImg'       => plugin_dir_url( __FILE__ ) . 'img/generate.png',
-            'strGenerate'       => esc_html__( 'Generation', 'mpt' ),
-            'strNoGenerate'     => esc_html__( 'Generate Automatically', 'mpt' ),
-            'strDalleGenerate'  => esc_html__( 'Dall-e v3 Generation may take 20 to 40 seconds. Please be patient', 'mpt' ),
-            'strManualGenerate' => esc_html__( 'Generate Manually', 'mpt' ),
-            'strNoRewrite'      => esc_html__( 'Edit your overwrite settings if you want a new image', 'mpt' ),
+            'strGenerate'       => esc_html__( 'Generation', 'all-sources-images' ),
+            'strNoGenerate'     => esc_html__( 'Generate Automatically', 'all-sources-images' ),
+            'strDalleGenerate'  => esc_html__( 'Dall-e v3 Generation may take 20 to 40 seconds. Please be patient', 'all-sources-images' ),
+            'strManualGenerate' => esc_html__( 'Generate Manually', 'all-sources-images' ),
+            'strNoRewrite'      => esc_html__( 'Edit your overwrite settings if you want a new image', 'all-sources-images' ),
             'manual_search'     => $block['enable_manual_search'],
             'dalle'             => $dalle,
             'nonce'             => $post_nounce,
@@ -436,31 +425,31 @@ class Magic_Post_Thumbnail_Admin {
         }
         /* Translation for JS file */
         $translations_var['translations'] = array(
-            'pro_version'       => esc_html__( 'Only available with the pro version.', 'mpt' ),
-            'one_block'         => esc_html__( 'The free version allows one block generation. Multiple blocks are available with the Pro version.', 'mpt' ),
-            'only_one_featured' => esc_html__( 'Only one featured image per post is possible', 'mpt' ),
-            'delete_logs'       => esc_html__( 'Are you sure to delete all logs ?', 'mpt' ),
-            'no_interval'       => esc_html__( 'No interval', 'mpt' ),
-            'per_minute'        => esc_html__( 'per minute', 'mpt' ),
-            'per_hour'          => esc_html__( 'per hour', 'mpt' ),
+            'pro_version'       => esc_html__( 'Only available with the pro version.', 'all-sources-images' ),
+            'one_block'         => esc_html__( 'The free version allows one block generation. Multiple blocks are available with the Pro version.', 'all-sources-images' ),
+            'only_one_featured' => esc_html__( 'Only one featured image per post is possible', 'all-sources-images' ),
+            'delete_logs'       => esc_html__( 'Are you sure to delete all logs ?', 'all-sources-images' ),
+            'no_interval'       => esc_html__( 'No interval', 'all-sources-images' ),
+            'per_minute'        => esc_html__( 'per minute', 'all-sources-images' ),
+            'per_hour'          => esc_html__( 'per hour', 'all-sources-images' ),
             'rate_notice'       => sprintf(
                 '<p>%s</p><p><a href="%s" target="_blank" class="button button-primary">%s</a> <a href="#" id="mpt-remind-later" class="button">%s</a> <a href="#" id="mpt-already-done" class="button">%s</a></p>',
-                esc_html__( 'Thank you! We\'d be thrilled if you could rate us 5 stars on WordPress.org. Your positive feedback will help others find and benefit from Magic Post Thumbnail!', 'mpt' ),
+                esc_html__( 'Thank you! We\'d be thrilled if you could rate us 5 stars on WordPress.org. Your positive feedback will help others find and benefit from Magic Post Thumbnail!', 'all-sources-images' ),
                 esc_url( 'https://wordpress.org/support/plugin/magic-post-thumbnail/reviews/?filter=5#new-post' ),
-                esc_html__( 'Yes, I\'ll rate it with 5-stars', 'mpt' ),
-                esc_html__( 'No, maybe later', 'mpt' ),
-                esc_html__( 'I\'ve already done it', 'mpt' )
+                esc_html__( 'Yes, I\'ll rate it with 5-stars', 'all-sources-images' ),
+                esc_html__( 'No, maybe later', 'all-sources-images' ),
+                esc_html__( 'I\'ve already done it', 'all-sources-images' )
             ),
         );
         wp_localize_script( $this->plugin_name, 'translationsJsVars', $translations_var );
         wp_localize_script( 'common-mpt', 'translationsJsVars', $translations_var );
         wp_localize_script( 'mpt-rating', 'translationsJsVars', $translations_var );
-        wp_localize_script( 'images-generation', 'generationJsVars', $js_vars );
+        wp_localize_script( 'images-generation', 'asiGenerationVars', $js_vars );
     }
 
     public function cron_scheduled() {
         // interval delay
-        $options = wp_parse_args( get_option( 'MPT_plugin_main_settings' ) );
+        $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ) );
         $options_interval = $options['bulk_generation_interval'];
         // Switch interval options into seconds
         switch ( $options_interval ) {
@@ -498,42 +487,42 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_main_settings() {
+    public function ASI_main_settings() {
         add_menu_page(
-            __( 'Magic Post Thumbnail Options', 'mpt' ),
+            __( 'Magic Post Thumbnail Options', 'all-sources-images' ),
             'Magic Post Thumbnail',
-            'mpt_manage',
-            'magic-post-thumbnail-admin-display',
-            array(&$this, 'MPT_options'),
+            'ASI_manage',
+            'all-sources-images-admin-display',
+            array(&$this, 'ASI_options'),
             'dashicons-images-alt2',
             81
         );
         add_submenu_page(
-            'magic-post-thumbnail-admin-display',
-            __( 'Dashboard', 'mpt' ),
-            __( 'Dashboard', 'mpt' ),
-            'mpt_manage',
-            'magic-post-thumbnail-admin-display',
-            array(&$this, 'MPT_options')
+            'all-sources-images-admin-display',
+            __( 'Dashboard', 'all-sources-images' ),
+            __( 'Dashboard', 'all-sources-images' ),
+            'ASI_manage',
+            'all-sources-images-admin-display',
+            array(&$this, 'ASI_options')
         );
         add_submenu_page(
-            'magic-post-thumbnail-admin-display',
-            __( 'Source', 'mpt' ),
-            __( 'Source', 'mpt' ),
-            'mpt_manage',
-            'magic-post-thumbnail-admin-display&module=source',
-            array(&$this, 'MPT_options')
+            'all-sources-images-admin-display',
+            __( 'Source', 'all-sources-images' ),
+            __( 'Source', 'all-sources-images' ),
+            'ASI_manage',
+            'all-sources-images-admin-display&module=source',
+            array(&$this, 'ASI_options')
         );
         add_submenu_page(
-            'magic-post-thumbnail-admin-display',
-            __( 'Automatic Settings', 'mpt' ),
-            __( 'Settings', 'mpt' ),
-            'mpt_manage',
-            'magic-post-thumbnail-admin-display&module=automatic',
-            array(&$this, 'MPT_options')
+            'all-sources-images-admin-display',
+            __( 'Automatic Settings', 'all-sources-images' ),
+            __( 'Settings', 'all-sources-images' ),
+            'ASI_manage',
+            'all-sources-images-admin-display&module=automatic',
+            array(&$this, 'ASI_options')
         );
         /* Bulk Generation link for posts & custom post type */
-        $post_type_availables = get_option( 'MPT_plugin_posts_settings' );
+        $post_type_availables = get_option( 'ASI_plugin_posts_settings' );
         if ( isset( $post_type_availables['choosed_post_type'] ) ) {
             if ( false == $post_type_availables['choosed_post_type'] ) {
                 $post_type_availables['choosed_post_type'] = array();
@@ -561,11 +550,11 @@ class Magic_Post_Thumbnail_Admin {
             }
         }
         foreach ( $post_type_availables['choosed_post_type'] as $screen ) {
-            add_filter( 'bulk_actions-edit-' . $screen, array(&$this, 'MPT_add_bulk_actions') );
+            add_filter( 'bulk_actions-edit-' . $screen, array(&$this, 'ASI_add_bulk_actions') );
             // Text on dropdown
             add_action(
                 'handle_bulk_actions-edit-' . $screen,
-                array(&$this, 'MPT_bulk_action_handler'),
+                array(&$this, 'ASI_bulk_action_handler'),
                 10,
                 3
             );
@@ -574,7 +563,7 @@ class Magic_Post_Thumbnail_Admin {
         // Genererate link for Categories
         add_filter(
             'category_row_actions',
-            array(&$this, 'MPT_add_bulk_action_category'),
+            array(&$this, 'ASI_add_bulk_action_category'),
             10,
             2
         );
@@ -587,7 +576,7 @@ class Magic_Post_Thumbnail_Admin {
         foreach ( $taxonomies as $taxonomy ) {
             add_filter(
                 $taxonomy . '_row_actions',
-                array(&$this, 'MPT_add_bulk_action_category'),
+                array(&$this, 'ASI_add_bulk_action_category'),
                 10,
                 2
             );
@@ -599,18 +588,18 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    6.0.0
      */
-    public function MPT_submenu_class( $submenu_file ) {
-        if ( isset( $_GET['page'] ) && $_GET['page'] === 'magic-post-thumbnail-admin-display' ) {
+    public function ASI_submenu_class( $submenu_file ) {
+        if ( isset( $_GET['page'] ) && $_GET['page'] === 'all-sources-images-admin-display' ) {
             if ( isset( $_GET['module'] ) ) {
                 switch ( $_GET['module'] ) {
                     case 'dashboard':
-                        $submenu_file = 'magic-post-thumbnail-admin-display';
+                        $submenu_file = 'all-sources-images-admin-display';
                         break;
                     case 'source':
-                        $submenu_file = 'magic-post-thumbnail-admin-display&module=source';
+                        $submenu_file = 'all-sources-images-admin-display&module=source';
                         break;
                     case 'automatic':
-                        $submenu_file = 'magic-post-thumbnail-admin-display&module=automatic';
+                        $submenu_file = 'all-sources-images-admin-display&module=automatic';
                         break;
                 }
             }
@@ -623,38 +612,38 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_main_actions() {
-        if ( !current_user_can( 'mpt_manage' ) ) {
-            wp_die( esc_html__( 'You do not have sufficient permissions.', 'mpt' ) );
+    public function ASI_main_actions() {
+        if ( !current_user_can( 'ASI_manage' ) ) {
+            wp_die( esc_html__( 'You do not have sufficient permissions.', 'all-sources-images' ) );
         }
-        //register_setting('MPT-plugin-posts-settings', 'MPT_plugin_posts_settings');
-        register_setting( 'MPT-plugin-block-settings', 'MPT_plugin_block_settings' );
-        register_setting( 'MPT-plugin-main-settings', 'MPT_plugin_main_settings' );
-        register_setting( 'MPT-plugin-banks-settings', 'MPT_plugin_banks_settings', array(
-            'sanitize_callback' => array($this, 'MPT_sanitize_banks_settings'),
+        //register_setting('ASI-plugin-posts-settings', 'ASI_plugin_posts_settings');
+        register_setting( 'ASI-plugin-block-settings', 'ASI_plugin_block_settings' );
+        register_setting( 'ASI-plugin-main-settings', 'ASI_plugin_main_settings' );
+        register_setting( 'ASI-plugin-banks-settings', 'ASI_plugin_banks_settings', array(
+            'sanitize_callback' => array($this, 'ASI_sanitize_banks_settings'),
         ) );
-        register_setting( 'MPT-plugin-interval-settings', 'MPT_plugin_interval_settings' );
-        register_setting( 'MPT-plugin-cron-settings', 'MPT_plugin_cron_settings' );
-        register_setting( 'MPT-plugin-rights-settings', 'MPT_plugin_rights_settings' );
-        register_setting( 'MPT-plugin-proxy-settings', 'MPT_plugin_proxy_settings' );
-        register_setting( 'MPT-plugin-compatibility-settings', 'MPT_plugin_compatibility_settings' );
-        register_setting( 'MPT-plugin-logs-settings', 'MPT_plugin_logs_settings' );
+        register_setting( 'ASI-plugin-interval-settings', 'ASI_plugin_interval_settings' );
+        register_setting( 'ASI-plugin-cron-settings', 'ASI_plugin_cron_settings' );
+        register_setting( 'ASI-plugin-rights-settings', 'ASI_plugin_rights_settings' );
+        register_setting( 'ASI-plugin-proxy-settings', 'ASI_plugin_proxy_settings' );
+        register_setting( 'ASI-plugin-compatibility-settings', 'ASI_plugin_compatibility_settings' );
+        register_setting( 'ASI-plugin-logs-settings', 'ASI_plugin_logs_settings' );
         require_once dirname( __FILE__ ) . '/partials/download_log.php';
         require_once dirname( __FILE__ ) . '/partials/delete_log.php';
         add_filter(
             'map_meta_cap',
-            array(&$this, 'mpt_map_manage_options_capability'),
+            array(&$this, 'ASI_map_manage_options_capability'),
             10,
             4
         );
     }
 
     /**
-     * Change to "mpt_manage" rights for all plugin forms
+     * Change to "ASI_manage" rights for all plugin forms
      *
      * @since    5.2.11
      */
-    public function mpt_map_manage_options_capability(
+    public function ASI_map_manage_options_capability(
         $caps,
         $cap,
         $user_id,
@@ -664,18 +653,18 @@ class Magic_Post_Thumbnail_Admin {
         if ( $cap === 'manage_options' ) {
             // Check if the form is submitting a specific option related to your plugin
             if ( isset( $_POST['option_page'] ) && in_array( $_POST['option_page'], array(
-                'MPT-plugin-proxy-settings',
-                'MPT-plugin-main-settings',
-                'MPT-plugin-block-settings',
-                'MPT-plugin-compatibility-settings',
-                'MPT-plugin-cron-settings',
-                'MPT-plugin-logs-settings',
-                'MPT-plugin-rights-settings',
-                'MPT-plugin-banks-settings'
+                'ASI-plugin-proxy-settings',
+                'ASI-plugin-main-settings',
+                'ASI-plugin-block-settings',
+                'ASI-plugin-compatibility-settings',
+                'ASI-plugin-cron-settings',
+                'ASI-plugin-logs-settings',
+                'ASI-plugin-rights-settings',
+                'ASI-plugin-banks-settings'
             ) ) ) {
-                // If the user has the 'mpt_manage' capability, grant access to manage the options
-                if ( current_user_can( 'mpt_manage' ) ) {
-                    $caps = array('mpt_manage');
+                // If the user has the 'ASI_manage' capability, grant access to manage the options
+                if ( current_user_can( 'ASI_manage' ) ) {
+                    $caps = array('ASI_manage');
                 }
             }
         }
@@ -687,12 +676,12 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_options() {
-        if ( !current_user_can( 'mpt_manage' ) ) {
-            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'mpt' ) );
+    public function ASI_options() {
+        if ( !current_user_can( 'ASI_manage' ) ) {
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-sources-images' ) );
         }
-        do_action( 'mpt_before_options_panel' );
-        require_once dirname( __FILE__ ) . '/partials/magic-post-thumbnail-admin-display.php';
+        do_action( 'ASI_before_options_panel' );
+        require_once dirname( __FILE__ ) . '/partials/all-sources-images-admin-display.php';
     }
 
     /**
@@ -700,10 +689,10 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_submenu( $title = 'Submenu', $slug = 'dashboard', $icon = 'default.png' ) {
+    public function ASI_submenu( $title = 'Submenu', $slug = 'dashboard', $icon = 'default.png' ) {
         $url = explode( '?', esc_url_raw( add_query_arg( array() ) ) );
         $no_query_args = $url[0];
-        $current_url = remove_query_arg( 'ids_mpt_generation', add_query_arg( 'module', $slug, $this->MPT_current_url() ) );
+        $current_url = remove_query_arg( 'ids_mpt_generation', add_query_arg( 'module', $slug, $this->ASI_current_url() ) );
         if ( isset( $_GET['module'] ) ) {
             $current_module = sanitize_text_field( $_GET['module'] );
         } else {
@@ -716,7 +705,7 @@ class Magic_Post_Thumbnail_Admin {
         }
         // Exception with upgrade page
         if ( 'upgrade' == $slug ) {
-            $current_url = get_admin_url() . 'admin.php?page=magic-post-thumbnail-admin-display-pricing';
+            $current_url = get_admin_url() . 'admin.php?page=all-sources-images-admin-display-pricing';
         }
         ?>
 		<li class="<?php 
@@ -741,7 +730,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_current_url() {
+    public function ASI_current_url() {
         $requested_url = ( is_ssl() ? 'https://' : 'http://' );
         $requested_url .= $_SERVER['HTTP_HOST'];
         $requested_url .= $_SERVER['REQUEST_URI'];
@@ -749,34 +738,24 @@ class Magic_Post_Thumbnail_Admin {
     }
 
     /**
-     * Launch Freemius
-     *
-     * @since    4.0.0
-     */
-    public function MPT_freemius() {
-        $mpt_freemius = mpt_freemius();
-        return $mpt_freemius;
-    }
-
-    /**
      * Default banks name
      *
      * @since    6.0.0
      */
-    public function MPT_banks_name_auto() {
+    public function ASI_banks_name_auto() {
         /* Banks for Automatic Bulk */
         $list_api_auto = array(
-            esc_html__( 'Google Image (Scraping)', 'mpt' ) => array('google_scraping', true),
-            esc_html__( 'Google Image (API)', 'mpt' )      => array('google_image', true),
-            esc_html__( 'DALL·E (v3)', 'mpt' )            => array('dallev1', true),
-            esc_html__( 'Openverse', 'mpt' )               => array('cc_search', true),
-            esc_html__( 'Flickr', 'mpt' )                  => array('flickr', true),
-            esc_html__( 'Pixabay', 'mpt' )                 => array('pixabay', true),
-            esc_html__( 'Youtube', 'mpt' )                 => array('youtube', false),
-            esc_html__( 'Unsplash', 'mpt' )                => array('unsplash', false),
-            esc_html__( 'Pexels', 'mpt' )                  => array('pexels', false),
-            esc_html__( 'Stable Diffusion', 'mpt' )        => array('stability', false),
-            esc_html__( 'Replicate', 'mpt' )               => array('replicate', false),
+            esc_html__( 'Google Image (Scraping)', 'all-sources-images' ) => array('google_scraping', true),
+            esc_html__( 'Google Image (API)', 'all-sources-images' )      => array('google_image', true),
+            esc_html__( 'DALL·E (v3)', 'all-sources-images' )            => array('dallev1', true),
+            esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
+            esc_html__( 'Flickr', 'all-sources-images' )                  => array('flickr', true),
+            esc_html__( 'Pixabay', 'all-sources-images' )                 => array('pixabay', true),
+            esc_html__( 'Youtube', 'all-sources-images' )                 => array('youtube', false),
+            esc_html__( 'Unsplash', 'all-sources-images' )                => array('unsplash', false),
+            esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', false),
+            esc_html__( 'Stable Diffusion', 'all-sources-images' )        => array('stability', false),
+            esc_html__( 'Replicate', 'all-sources-images' )               => array('replicate', false),
         );
         return $list_api_auto;
     }
@@ -786,7 +765,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_default_posts_types() {
+    public function ASI_default_posts_types() {
         $post_types_default['choosed_post_type'] = get_post_types();
         unset(
             $post_types_default['choosed_post_type']['attachment'],
@@ -817,7 +796,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_main_settings( $never_set = FALSE ) {
+    public function ASI_default_options_main_settings( $never_set = FALSE ) {
         $default_options = array(
             'image_block'              => array(
                 1 => array(
@@ -843,9 +822,9 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_banks_settings( $never_set = FALSE ) {
+    public function ASI_default_options_banks_settings( $never_set = FALSE ) {
         // Migration from v4 to v5
-        $options_banks = get_option( 'MPT_plugin_banks_settings' );
+        $options_banks = get_option( 'ASI_plugin_banks_settings' );
         if ( isset( $options_banks['api_chosen'] ) && !isset( $options_banks['api_chosen_auto'] ) ) {
             // Already chosen bank as selected
             $ar_bank_auto = array($options_banks['api_chosen']);
@@ -923,7 +902,7 @@ class Magic_Post_Thumbnail_Admin {
      * @since    4.0.0
      */
     /*
-    	public function MPT_default_options_interval_settings( $never_set = FALSE ) {
+    	public function ASI_default_options_interval_settings( $never_set = FALSE ) {
     
     	    $default_options = array(
     	      // Interval
@@ -937,7 +916,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_compatibility_settings( $never_set = FALSE ) {
+    public function ASI_default_options_compatibility_settings( $never_set = FALSE ) {
         $default_options = array(
             'enable_FIFU' => false,
         );
@@ -949,7 +928,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_block_settings( $never_set = FALSE ) {
+    public function ASI_default_options_block_settings( $never_set = FALSE ) {
         $default_options = array(
             'enable_manual_search' => true,
         );
@@ -961,7 +940,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_cron_settings( $never_set = FALSE ) {
+    public function ASI_default_options_cron_settings( $never_set = FALSE ) {
         $default_options = array(
             'enable_cron' => 'disable',
         );
@@ -973,7 +952,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.2.11
      */
-    public function MPT_default_options_rights_settings( $never_set = FALSE ) {
+    public function ASI_default_options_rights_settings( $never_set = FALSE ) {
         $default_options = array(
             'rights_editor'      => '',
             'rights_author'      => '',
@@ -988,7 +967,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_proxy_settings( $never_set = FALSE ) {
+    public function ASI_default_options_proxy_settings( $never_set = FALSE ) {
         $default_options = array(
             'enable_proxy' => 'disable',
         );
@@ -1000,7 +979,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_default_options_logs_settings( $never_set = FALSE ) {
+    public function ASI_default_options_logs_settings( $never_set = FALSE ) {
         $default_options = array(
             'logs' => '',
         );
@@ -1012,7 +991,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    private function MPT_log_file( $check = false ) {
+    private function ASI_log_file( $check = false ) {
         $filename = ABSPATH . 'wp-content/uploads/magic-post-thumbnail/logs/';
         $files = @scandir( $filename );
         $result = '';
@@ -1039,13 +1018,13 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_monolog_call() {
-        $main_settings = get_option( 'MPT_plugin_logs_settings' );
+    public function ASI_monolog_call() {
+        $main_settings = get_option( 'ASI_plugin_logs_settings' );
         // Check if logs enabled
         if ( !empty( $main_settings['logs'] ) && true == $main_settings['logs'] ) {
             require_once dirname( __FILE__ ) . '/partials/monolog/vendor/autoload.php';
-            $log = new Monolog\Logger('mpt_logger');
-            $logfile = $this->MPT_log_file();
+            $log = new Monolog\Logger('ASI_logger');
+            $logfile = $this->ASI_log_file();
             // Now add some handlers
             $log->pushHandler( new Monolog\Handler\StreamHandler(ABSPATH . 'wp-content/uploads/magic-post-thumbnail/logs/' . $logfile, Monolog\Logger::DEBUG) );
             $log->pushHandler( new Monolog\Handler\FirePHPHandler() );
@@ -1061,8 +1040,8 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_check_interval() {
-        $options = wp_parse_args( get_option( 'MPT_plugin_main_settings' ), $this->MPT_default_options_main_settings( TRUE ) );
+    public function ASI_check_interval() {
+        $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
         $value_bulk_generation_interval = ( isset( $options['bulk_generation_interval'] ) ? (int) $options['bulk_generation_interval'] : 0 );
         if ( 0 == $value_bulk_generation_interval ) {
             return false;
@@ -1076,9 +1055,9 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_do_interval_cron( $new_ids_to_add = false ) {
+    public function ASI_do_interval_cron( $new_ids_to_add = false ) {
         // Get processing  ids
-        $interval_posts_to_generate = get_transient( 'MPT_interval_generation' );
+        $interval_posts_to_generate = get_transient( 'ASI_interval_generation' );
         // Check if last generation ids is done and clear it
         // Default status to "generation done"
         if ( !empty( $interval_posts_to_generate ) ) {
@@ -1091,8 +1070,8 @@ class Magic_Post_Thumbnail_Admin {
                 // Change default status to "generation processing"
                 $no_more_post_to_generate = false;
                 // Generation
-                $launch_MPT = new Magic_Post_Thumbnail_Generation($this->plugin_name, $this->version);
-                $MPT_return = $launch_MPT->MPT_create_thumb(
+                $launch_MPT = new All_Sources_Images_Generation($this->plugin_name, $this->version);
+                $ASI_return = $launch_MPT->ASI_create_thumb(
                     $interval_posts_to_generate[$post]['id'],
                     '0',
                     '0',
@@ -1100,9 +1079,9 @@ class Magic_Post_Thumbnail_Admin {
                     '0'
                 );
                 // Get the return status
-                if ( $MPT_return == null ) {
+                if ( $ASI_return == null ) {
                     // Settings
-                    $main_settings = get_option( 'MPT_plugin_main_settings' );
+                    $main_settings = get_option( 'ASI_plugin_main_settings' );
                     // Image location
                     $image_location = ( !empty( $main_settings['image_location'] ) ? $main_settings['image_location'] : 'featured' );
                     if ( has_post_thumbnail( $interval_posts_to_generate[$post]['id'] ) && "featured" === $image_location ) {
@@ -1125,7 +1104,7 @@ class Magic_Post_Thumbnail_Admin {
         // Generation done and new ids to generate
         if ( TRUE == $no_more_post_to_generate && $new_ids_to_add ) {
             // Delete old posts
-            delete_transient( 'MPT_interval_generation' );
+            delete_transient( 'ASI_interval_generation' );
             foreach ( $new_ids_to_add as $id ) {
                 $new_posts_to_generate[] = array(
                     'id'        => (int) $id,
@@ -1133,7 +1112,7 @@ class Magic_Post_Thumbnail_Admin {
                 );
             }
             // Add news posts
-            set_transient( 'MPT_interval_generation', $new_posts_to_generate );
+            set_transient( 'ASI_interval_generation', $new_posts_to_generate );
         } elseif ( TRUE == $no_more_post_to_generate && FALSE == $new_ids_to_add ) {
             // Generation done
             // Nothing to add/do
@@ -1153,10 +1132,10 @@ class Magic_Post_Thumbnail_Admin {
             }
             $interval_posts_to_generate = array_values( $temp_generate_posts );
             // Add news posts
-            set_transient( 'MPT_interval_generation', $interval_posts_to_generate );
+            set_transient( 'ASI_interval_generation', $interval_posts_to_generate );
         } else {
             // Generation not finished : Updating transient
-            set_transient( 'MPT_interval_generation', $interval_posts_to_generate );
+            set_transient( 'ASI_interval_generation', $interval_posts_to_generate );
         }
     }
 
@@ -1165,8 +1144,8 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_add_bulk_action_category( $actions, $tag ) {
-        $actions['atp'] = '<a href="admin.php?page=magic-post-thumbnail-admin-display&module=bulk-generation&cats=' . $tag->term_id . '" class="aria-button-if-js">' . esc_html__( 'Generate featured images', 'mpt' ) . '</a>';
+    public function ASI_add_bulk_action_category( $actions, $tag ) {
+        $actions['atp'] = '<a href="admin.php?page=all-sources-images-admin-display&module=bulk-generation&cats=' . $tag->term_id . '" class="aria-button-if-js">' . esc_html__( 'Generate featured images', 'all-sources-images' ) . '</a>';
         return $actions;
     }
 
@@ -1175,10 +1154,10 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_bulk_action_handler( $redirect_to, $action_name, $post_ids ) {
+    public function ASI_bulk_action_handler( $redirect_to, $action_name, $post_ids ) {
         if ( 'bulk_regenerate_thumbnails' === $action_name ) {
             $ids = implode( ',', array_map( 'intval', $post_ids ) );
-            wp_redirect( 'admin.php?page=magic-post-thumbnail-admin-display&module=bulk-generation&ids_mpt_generation=' . $ids, '301' );
+            wp_redirect( 'admin.php?page=all-sources-images-admin-display&module=bulk-generation&ids_mpt_generation=' . $ids, '301' );
             exit;
         }
         return $redirect_to;
@@ -1189,12 +1168,12 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.0.0
      */
-    public function MPT_add_bulk_actions( $actions ) {
+    public function ASI_add_bulk_actions( $actions ) {
         ?>
 	        <script type="text/javascript">
 	                jQuery(document).ready(function($){
 						$('select[name^="action"] option:last-child').before('<option value="bulk_regenerate_thumbnails"><?php 
-        echo esc_html__( 'Generate Images (MPT)', 'mpt' );
+        echo esc_html__( 'Generate Images (MPT)', 'all-sources-images' );
         ?></option>');
 	                });
 	        </script>
@@ -1207,7 +1186,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_test_apis() {
+    public function ASI_test_apis() {
         check_ajax_referer( 'api_testing_nonce', 'nonce' );
         $apiKey = sanitize_text_field( $_POST['apikey'] );
         $apiBank = sanitize_text_field( $_POST['apibank'] );
@@ -1286,28 +1265,28 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_register_mpt_block() {
-        $banks = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( TRUE ) );
-        $asset_file = (include plugin_dir_path( __FILE__ ) . 'blocks/mpt-images/build/index.asset.php');
+    public function ASI_register_mpt_block() {
+        $banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+        $asset_file = (include plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/index.asset.php');
         wp_register_script(
-            'mpt-images-script',
-            plugins_url( 'blocks/mpt-images/build/index.js', __FILE__ ),
+            'asi-images-script',
+            plugins_url( 'blocks/asi-images/build/index.js', __FILE__ ),
             $asset_file['dependencies'],
             $asset_file['version']
         );
-        register_block_type( 'mpt/mpt-images', array(
-            'editor_script' => 'mpt-images-script',
+        register_block_type( 'asi/asi-images', array(
+            'editor_script' => 'asi-images-script',
         ) );
-        wp_localize_script( 'mpt-images-script', 'mptAjax', array(
+        wp_localize_script( 'asi-images-script', 'asiAjax', array(
             'ajax_url'         => admin_url( 'admin-ajax.php' ),
             'admin_url'        => admin_url(),
-            'nonce'            => wp_create_nonce( 'mpt_gutenberg_block' ),
+            'nonce'            => wp_create_nonce( 'ASI_gutenberg_block' ),
             'choosed_banks'    => $banks['api_chosen_manual'],
-            'licensing_data'   => $this->mpt_freemius()->can_use_premium_code(),
-            'path_default_img' => plugins_url( '/blocks/mpt-images/img/', __FILE__ ),
+            'licensing_data'   => '1', // All features available
+            'path_default_img' => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
         ) );
         // Locate character strings
-        wp_set_script_translations( 'mpt-images-script', 'mpt', plugin_dir_path( __DIR__ ) . 'languages' );
+        wp_set_script_translations( 'asi-images-script', 'all-sources-images', plugin_dir_path( __DIR__ ) . 'languages' );
         add_action( 'admin_enqueue_scripts', function ( $hook ) {
             // Checks whether you are on an editing page
             if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
@@ -1321,7 +1300,7 @@ class Magic_Post_Thumbnail_Admin {
             }
         } );
         /* Translations for Gutenberg block */
-        load_plugin_textdomain( 'mpt', false, plugin_dir_path( __DIR__ ) . 'languages' );
+        load_plugin_textdomain( 'all-sources-images', false, plugin_dir_path( __DIR__ ) . 'languages' );
     }
 
     /**
@@ -1329,12 +1308,12 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_enqueue_style_block() {
+    public function ASI_enqueue_style_block() {
         wp_enqueue_style(
-            'mpt-images-editor-style',
-            plugins_url( 'blocks/mpt-images/build/mpt-images.css', __FILE__ ),
+            'asi-images-editor-style',
+            plugins_url( 'blocks/asi-images/build/asi-images.css', __FILE__ ),
             array(),
-            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/mpt-images/build/mpt-images.css' )
+            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/asi-images.css' )
         );
     }
 
@@ -1343,9 +1322,9 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_block_searching_images() {
+    public function ASI_block_searching_images() {
         // Check the nonce
-        check_ajax_referer( 'mpt_gutenberg_block', 'nonce' );
+        check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
         $search_term = sanitize_text_field( $_GET['search'] );
         $bank = sanitize_text_field( strtolower( $_GET['bank'] ) );
         $index = intval( $_GET['index'] );
@@ -1353,8 +1332,8 @@ class Magic_Post_Thumbnail_Admin {
         if ( FALSE === get_post_status( $id ) ) {
             wp_send_json_error( 'Error with post ID.' );
         }
-        $REST_generation = new Magic_Post_Thumbnail_Generation($this->plugin_name, $this->version);
-        $results_thumbs = $REST_generation->MPT_create_thumb(
+        $REST_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
+        $results_thumbs = $REST_generation->ASI_create_thumb(
             $id,
             '0',
             '1',
@@ -1379,9 +1358,9 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_block_downloading_image() {
+    public function ASI_block_downloading_image() {
         // Check the nonce
-        check_ajax_referer( 'mpt_gutenberg_block', 'nonce' );
+        check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
         $url_image = ( isset( $_POST['url_image'] ) ? sanitize_text_field( $_POST['url_image'] ) : '' );
         $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( $_POST['search_term'] ) : 'image' );
         $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( $_POST['bank'] ) : '' );
@@ -1391,7 +1370,7 @@ class Magic_Post_Thumbnail_Admin {
         /*
         if( $bank == 'envato' ) {
         
-        	$options_banks 		= get_option( 'MPT_plugin_banks_settings' );
+        	$options_banks 		= get_option( 'ASI_plugin_banks_settings' );
         	$envato_token		= ( ! empty( $options_banks['envato']['envato_token'] ) ) ? $options_banks['envato']['envato_token'] : '' ;
         
         	$url 				= 'https://api.extensions.envato.com/extensions/item/' . $url_image . '/download';
@@ -1477,7 +1456,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.0.0
      */
-    public function MPT_custom_http_request_timeout() {
+    public function ASI_custom_http_request_timeout() {
         return 40;
         // 40 seconds
     }
@@ -1487,8 +1466,8 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    2.0.5
      */
-    public function MPT_add_link_parameters( $links ) {
-        $settings_link = '<a href="admin.php?page=magic-post-thumbnail-admin-display">' . esc_html__( 'Settings', 'mpt' ) . '</a>';
+    public function ASI_add_link_parameters( $links ) {
+        $settings_link = '<a href="admin.php?page=all-sources-images-admin-display">' . esc_html__( 'Settings', 'all-sources-images' ) . '</a>';
         array_push( $links, $settings_link );
         return $links;
     }
@@ -1498,11 +1477,11 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.2.6
      */
-    public function MPT_show_notice() {
-        $activation_date = get_option( 'MPT_plugin_activation_date' );
-        $hide_notice = get_option( 'mpt_hide_notice' );
+    public function ASI_show_notice() {
+        $activation_date = get_option( 'ASI_plugin_activation_date' );
+        $hide_notice = get_option( 'ASI_hide_notice' );
         if ( !$activation_date ) {
-            update_option( 'MPT_plugin_activation_date', time() );
+            update_option( 'ASI_plugin_activation_date', time() );
             return false;
         }
         $days_since_activation = (time() - $activation_date) / (60 * 60 * 24);
@@ -1510,14 +1489,14 @@ class Magic_Post_Thumbnail_Admin {
             ?>
 			<div class="notice notice-success is-dismissible " id="mpt-rating-notice">
                 <p><?php 
-            esc_html_e( 'Do you enjoy using Magic Post Thumbnail? If so, please consider giving it a 5-star rating on WordPress.org. Your support helps others discover our plugin and means a lot to us!', 'mpt' );
+            esc_html_e( 'Do you enjoy using Magic Post Thumbnail? If so, please consider giving it a 5-star rating on WordPress.org. Your support helps others discover our plugin and means a lot to us!', 'all-sources-images' );
             ?></p>
                 <p>
                     <a href="#" id="mpt-rate" class="button button-primary"><?php 
-            esc_html_e( 'Sure!', 'mpt' );
+            esc_html_e( 'Sure!', 'all-sources-images' );
             ?></a>
                     <a href="#" id="mpt-hide-notice" class="button"><?php 
-            esc_html_e( 'No, thanks', 'mpt' );
+            esc_html_e( 'No, thanks', 'all-sources-images' );
             ?></a>
                 </p>
             </div>
@@ -1530,8 +1509,8 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.2.6
      */
-    public function MPT_hide_notice() {
-        update_option( 'mpt_hide_notice', 1 );
+    public function ASI_hide_notice() {
+        update_option( 'ASI_hide_notice', 1 );
         wp_die();
     }
 
@@ -1540,11 +1519,11 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    5.2.6
      */
-    public function MPT_remind_later() {
+    public function ASI_remind_later() {
         $delay = ( isset( $_POST['delay'] ) ? intval( $_POST['delay'] ) : 30 );
         $new_time = time() + $delay * 24 * 60 * 60;
         // Délai en jours
-        update_option( 'MPT_plugin_activation_date', $new_time );
+        update_option( 'ASI_plugin_activation_date', $new_time );
         wp_die();
     }
 
@@ -1553,10 +1532,10 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    6.0.0
      */
-    public function MPT_migration() {
+    public function ASI_migration() {
         // Retrieve existing options
-        $optionstomove = get_option( 'MPT_plugin_main_settings' );
-        $options_banks = get_option( 'MPT_plugin_banks_settings' );
+        $optionstomove = get_option( 'ASI_plugin_main_settings' );
+        $options_banks = get_option( 'ASI_plugin_banks_settings' );
         // Check if old values exist (migration needed)
         if ( $optionstomove && !isset( $optionstomove['image_block'][1] ) ) {
             // Fix 6.0.1 : Add image bank in options
@@ -1611,7 +1590,7 @@ class Magic_Post_Thumbnail_Admin {
                 unset($optionstomove[$key]);
             }
             // Save updated options
-            update_option( 'MPT_plugin_main_settings', $optionstomove );
+            update_option( 'ASI_plugin_main_settings', $optionstomove );
         } elseif ( isset( $optionstomove['image_block'][1] ) && $optionstomove && !isset( $optionstomove['image_block'][1]['api_chosen'] ) ) {
             // Fix 6.0.1 : Add image bank in options
             if ( isset( $options_banks['api_chosen_auto'] ) ) {
@@ -1621,7 +1600,7 @@ class Magic_Post_Thumbnail_Admin {
                 $default_bank = 'google_scraping';
             }
             // Retrieve current options
-            $current_options = get_option( 'MPT_plugin_main_settings', array() );
+            $current_options = get_option( 'ASI_plugin_main_settings', array() );
             // Update only the necessary values
             $current_options['image_block'][1] = array_merge( 
                 $current_options['image_block'][1] ?? array(),
@@ -1631,7 +1610,7 @@ class Magic_Post_Thumbnail_Admin {
                 )
              );
             // Save the updated options
-            update_option( 'MPT_plugin_main_settings', $current_options );
+            update_option( 'ASI_plugin_main_settings', $current_options );
         } else {
         }
     }
@@ -1641,7 +1620,7 @@ class Magic_Post_Thumbnail_Admin {
      *
      * @since    4.2.0
      */
-    public function MPT_sanitize_banks_settings( $input ) {
+    public function ASI_sanitize_banks_settings( $input ) {
         // Remove 'envato' from api_chosen_auto if present
         if ( isset( $input['api_chosen_auto'] ) && is_array( $input['api_chosen_auto'] ) ) {
             unset($input['api_chosen_auto']['envato']);

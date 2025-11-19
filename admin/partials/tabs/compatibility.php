@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
@@ -15,8 +15,8 @@ settings_errors();
     <form method="post" action="options.php" id="tabs">
 
 		<?php 
-settings_fields( 'MPT-plugin-compatibility-settings' );
-$options = wp_parse_args( get_option( 'MPT_plugin_compatibility_settings' ), $this->MPT_default_options_compatibility_settings( TRUE ) );
+settings_fields( 'ASI-plugin-compatibility-settings' );
+$options = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
 $checkbox_disabled = '';
 $disabled = '';
 $executeElseBlock = true;
@@ -39,7 +39,7 @@ if ( $executeElseBlock ) {
 												</div>
 												<div class="alert-text">
 													<?php 
-    esc_html_e( 'Only available with the pro version', 'mpt' );
+    esc_html_e( 'Only available with the pro version', 'all-sources-images' );
     ?>
 												</div>
 										</div>
@@ -55,7 +55,7 @@ if ( $executeElseBlock ) {
 				<tr>
 					<td>
 							<?php 
-esc_html_e( 'Compatibility with REST Requests', 'mpt' );
+esc_html_e( 'Compatibility with REST Requests', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -64,7 +64,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_REST]" id="enable_rest" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_REST]" id="enable_rest" value="true" <?php 
 echo ( !empty( $options['enable_REST'] ) && $options['enable_REST'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -82,7 +82,7 @@ echo ( !empty( $options['enable_REST'] ) && $options['enable_REST'] == 'true' ? 
 										</div>
 										<div class="alert-text">
 												<?php 
-_e( 'Enable compatibility with REST requests.<br><br> This can be useful, for example, if external services (such as AI posts) allow you to create posts directly in your WordPress.', 'mpt' );
+_e( 'Enable compatibility with REST requests.<br><br> This can be useful, for example, if external services (such as AI posts) allow you to create posts directly in your WordPress.', 'all-sources-images' );
 ?>
 										</div>
 								</div>
@@ -97,7 +97,7 @@ _e( 'Enable compatibility with REST requests.<br><br> This can be useful, for ex
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with WP All Import', 'mpt' );
+esc_html_e( 'Compatibility with WP All Import', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -106,7 +106,7 @@ echo $checkbox_disabled;
 ?>>
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_wpai]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_wpai]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_wpai'] ) && $options['enable_wpai'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -124,7 +124,7 @@ echo ( !empty( $options['enable_wpai'] ) && $options['enable_wpai'] == 'true' ? 
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with the plugin "WP All Import".', 'mpt' );
+esc_html_e( 'Enable compatibility with the plugin "WP All Import".', 'all-sources-images' );
 ?>
 								</div>
 							</div>
@@ -134,7 +134,7 @@ esc_html_e( 'Enable compatibility with the plugin "WP All Import".', 'mpt' );
 									<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with WPeMatico', 'mpt' );
+esc_html_e( 'Compatibility with WPeMatico', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -143,7 +143,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_wpematico]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_wpematico]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_wpematico'] ) && $options['enable_wpematico'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -161,7 +161,7 @@ echo ( !empty( $options['enable_wpematico'] ) && $options['enable_wpematico'] ==
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with the plugin "WPeMatico".', 'mpt' );
+esc_html_e( 'Enable compatibility with the plugin "WPeMatico".', 'all-sources-images' );
 ?>
 								</div>
 							</div>
@@ -171,7 +171,7 @@ esc_html_e( 'Enable compatibility with the plugin "WPeMatico".', 'mpt' );
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with FeedWordPress', 'mpt' );
+esc_html_e( 'Compatibility with FeedWordPress', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -180,7 +180,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_feedwordpress]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_feedwordpress]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_feedwordpress'] ) && $options['enable_feedwordpress'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -198,7 +198,7 @@ echo ( !empty( $options['enable_feedwordpress'] ) && $options['enable_feedwordpr
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with the plugin "FeedWordPress".', 'mpt' );
+esc_html_e( 'Enable compatibility with the plugin "FeedWordPress".', 'all-sources-images' );
 ?>
 								</div>
 							</div>
@@ -208,7 +208,7 @@ esc_html_e( 'Enable compatibility with the plugin "FeedWordPress".', 'mpt' );
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with WP Automatic Plugin', 'mpt' );
+esc_html_e( 'Compatibility with WP Automatic Plugin', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -217,7 +217,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_wpautomatic]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_wpautomatic]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_wpautomatic'] ) && $options['enable_wpautomatic'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -235,7 +235,7 @@ echo ( !empty( $options['enable_wpautomatic'] ) && $options['enable_wpautomatic'
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with the plugin "WP Automatic Plugin".', 'mpt' );
+esc_html_e( 'Enable compatibility with the plugin "WP Automatic Plugin".', 'all-sources-images' );
 ?>
 								</div>
 							</div>
@@ -250,7 +250,7 @@ esc_html_e( 'Enable compatibility with the plugin "WP Automatic Plugin".', 'mpt'
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with FIFU', 'mpt' );
+esc_html_e( 'Compatibility with FIFU', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -259,7 +259,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_FIFU]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_FIFU]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_FIFU'] ) && $options['enable_FIFU'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -277,7 +277,7 @@ echo ( !empty( $options['enable_FIFU'] ) && $options['enable_FIFU'] == 'true' ? 
 									</div>
 									<div class="alert-text">
 										<?php 
-_e( 'Enable compatibility with the plugin "Featured Image from URL".<br><br> Warning: This option will not upload your images into your media anymore.<br><br> Warning 2: Does not work with DALL-E & Stable Diffusion.', 'mpt' );
+_e( 'Enable compatibility with the plugin "Featured Image from URL".<br><br> Warning: This option will not upload your images into your media anymore.<br><br> Warning 2: Does not work with DALL-E & Stable Diffusion.', 'all-sources-images' );
 ?>
 									</div>
 								</div>
@@ -287,7 +287,7 @@ _e( 'Enable compatibility with the plugin "Featured Image from URL".<br><br> War
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with CMB2', 'mpt' );
+esc_html_e( 'Compatibility with CMB2', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -296,7 +296,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_cmb2]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_cmb2]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_cmb2'] ) && $options['enable_cmb2'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -314,7 +314,7 @@ echo ( !empty( $options['enable_cmb2'] ) && $options['enable_cmb2'] == 'true' ? 
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with CMB2 plugin to set image to CMB2 field', 'mpt' );
+esc_html_e( 'Enable compatibility with CMB2 plugin to set image to CMB2 field', 'all-sources-images' );
 ?>
 								</div>
 							</div>
@@ -324,7 +324,7 @@ esc_html_e( 'Enable compatibility with CMB2 plugin to set image to CMB2 field', 
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with ACF', 'mpt' );
+esc_html_e( 'Compatibility with ACF', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -333,7 +333,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_acf]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_acf]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_acf'] ) && $options['enable_acf'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -351,7 +351,7 @@ echo ( !empty( $options['enable_acf'] ) && $options['enable_acf'] == 'true' ? 'c
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with ACF plugin (Advanced Custom Fields) to set image to ACF field', 'mpt' );
+esc_html_e( 'Enable compatibility with ACF plugin (Advanced Custom Fields) to set image to ACF field', 'all-sources-images' );
 ?>
 								</div>
 							</div>
@@ -361,7 +361,7 @@ esc_html_e( 'Enable compatibility with ACF plugin (Advanced Custom Fields) to se
 				<tr>
 					<td>
 						<?php 
-esc_html_e( 'Compatibility with Meta Box', 'mpt' );
+esc_html_e( 'Compatibility with Meta Box', 'all-sources-images' );
 ?>
 					</td>
 					<td>
@@ -370,7 +370,7 @@ echo $checkbox_disabled;
 ?>">
 							<input <?php 
 echo $disabled;
-?> data-switch="true" type="checkbox" name="MPT_plugin_compatibility_settings[enable_metaboxio]" id="enable_logs" value="true" <?php 
+?> data-switch="true" type="checkbox" name="ASI_plugin_compatibility_settings[enable_metaboxio]" id="enable_logs" value="true" <?php 
 echo ( !empty( $options['enable_metaboxio'] ) && $options['enable_metaboxio'] == 'true' ? 'checked' : '' );
 ?> />
 						</label>
@@ -388,7 +388,7 @@ echo ( !empty( $options['enable_metaboxio'] ) && $options['enable_metaboxio'] ==
 								</div>
 								<div class="alert-text">
 									<?php 
-esc_html_e( 'Enable compatibility with Meta Box plugin (metabox.io) to set image to Meta Box field', 'mpt' );
+esc_html_e( 'Enable compatibility with Meta Box plugin (metabox.io) to set image to Meta Box field', 'all-sources-images' );
 ?>
 								</div>
 							</div>

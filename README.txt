@@ -1,41 +1,33 @@
-=== Generate Images (AI) - Magic Post Thumbnail ===
-Plugin Name:       Generate Images (AI) - Magic Post Thumbnail
-Version:           6.1.6
-Tags:              generate, image, dalle, stable diffusion, replicate
-Donate link:       https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40magic-post-thumbnail.com&item_name=Donation+for+Magic+Post+Thumbnail&currency_code=EUR&source=url
-Contributors:      Mcurly, wondercode
-Author URI:        https://magic-post-thumbnail.com/
-Author:            Magic Post Thumbnail
+=== All Sources Images ===
+Plugin Name:       All Sources Images
+Version:           1.0.0
+Tags:              generate, image, dalle, stable diffusion, replicate, pexels, unsplash, pixabay
+Contributors:      Custom Development
+Author URI:        https://github.com/yourusername/
+Author:            Your Name
 Requires at least: 6.0
 Tested up to:      6.8.3
-Stable tag:        6.1.6
+Stable tag:        1.0.0
 Requires PHP:      7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Get images for your posts with automatic generation & multiple banks. Generate as featured images or in your content with Gutenberg Block and in bulk
+Get images for your posts from multiple sources (AI + Image Banks). Generate as featured images or in your content with Gutenberg Block and in bulk
 
 == Description ==
 
-**Easily create eye-catching images for your posts automatically with Magic Post Thumbnail!**
+**Easily create eye-catching images for your posts automatically with All Sources Images!**
 
 Retrieve images from Google Images, DALL·E, Stable Diffusion, Replicate, Pexels, Unsplash or Pixabay thanks to API, **based on your post title**, text analysis and much more. The plugin add picture as your **featured thumbnail** or **inside the post** when you publish the post.
 
 The plugin allows you to configure some settings for your automatic images : **Image bank**, language search, selected post types, image type, free-to-use or not, image size and much more.
 
 
-**Tired of spending hours searching for the perfect images for your posts?** Magic Post Thumbnail! does the hard work for you!
-
-**<a target="_blank" href="https://magic-post-thumbnail.com/">Official Website</a>**
-**<a target="_blank" href="https://magic-post-thumbnail.com/docs/">Documentation</a>**
-
-Get a **30% discount for BLACK FRIDAY until November 30** when you upgrade to the **Pro version** with the code: **MPTBLACKFRIDAY25**
-
-https://www.youtube.com/watch?v=eNb5MXg5e4I
+**Tired of spending hours searching for the perfect images for your posts?** All Sources Images does the hard work for you!
 
 == What is included ? ==
 
-= Magic Post Thumbnail for FREE =
+= All Sources Images Features =
 
 <ul>
 <li>Generate Thumbnail for one post</li>
@@ -49,9 +41,7 @@ https://www.youtube.com/watch?v=eNb5MXg5e4I
 <li>Image generated randomized</li>
 </ul>
 
-= Magic Post Thumbnail PRO =
-
-Upgrade to our PRO version to unlock even more **advanced features** and take your blog to the next level!
+= Extended Features =
 
 <ul>
 
@@ -75,28 +65,28 @@ Upgrade to our PRO version to unlock even more **advanced features** and take yo
 * Spanish
 
 == Screenshots ==
-1. Magic Post Thumbnail : Bulk Generation
-2. Magic Post Thumbnail : Gutenberg Block
-3. Magic post Thumbnail : Settings
-4. Magic post Thumbnail : Post-Processing Settings
-5. Magic post Thumbnail : Generate images for post types
-6. Magic post Thumbnail : Image Banks
-7. Magic post Thumbnail : Generate featured images for taxonomies
-8. Magic post Thumbnail : Generate featured images for each post individually
-9. Magic post Thumbnail : Crons
+1. All Sources Images : Bulk Generation
+2. All Sources Images : Gutenberg Block
+3. All Sources Images : Settings
+4. All Sources Images : Post-Processing Settings
+5. All Sources Images : Generate images for post types
+6. All Sources Images : Image Banks
+7. All Sources Images : Generate featured images for taxonomies
+8. All Sources Images : Generate featured images for each post individually
+9. All Sources Images : Crons
 
-== Support the plugin ==
-If you've found the plugin useful, please consider <a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40magic-post-thumbnail.com&item_name=Donation+for+Magic+Post+Thumbnail&currency_code=EUR&source=url">making a donation</a>. Thank you for your support !
+== Support ==
+Custom development based on original Magic Post Thumbnail plugin.
 
 
 == Installation ==
 1. Activate the plugin
-2. Go to the "Magic Post Thumbnail" menu tab
+2. Go to the "All Sources Images" menu tab
 3. Configure your settings, which post type you want to enable it and the image bank.
 4. Go into a post, and choose "Click to generate" on the sidebar.
 5. You can also **mass generate thumbnails** for posts. Go into the list of your posts, choose posts or taxonomy you want to get thumbnails, and into "Bulk Actions" choose "Generate featured images"
 
-The "How to do" for APIs activations is <a target="_blank" href="https://magic-post-thumbnail.com/docs-category/image-databases/">available here</a>.
+Configure your API keys for each image bank you want to use.
 
 
 == Frequently Asked Questions ==
@@ -107,7 +97,7 @@ There are several ways :
 <ul>
 <li>You can generate an image with the button "Click to generate" on a post (works on Gutemberg & Classic Editor).</li>
 <li>You can mass generate thumbnails for posts. Go into the list of your posts, choose posts or taxonomy you want to get thumbnails, and into “Bulk Actions” choose “Generate featured images”</li>
-<li>You can also automatically schedule generation with crons with the Pro version, or by enabling compatibility with REST Requests, WPeMatico, FeedWordPress & WP Automatic Plugin.</li>
+<li>You can also automatically schedule generation with crons, or by enabling compatibility with REST Requests, WPeMatico, FeedWordPress & WP Automatic Plugin.</li>
 </ul>
 
 = Is it unlimited ? =
@@ -120,15 +110,25 @@ If you use Google Image too much for generation in a short time, your server may
 
 = I have other pre-sale questions, can you help? =
 
-Yes! You can ask us any question through our <a href="https://magic-post-thumbnail.com/contact-us/">support page</a>.
+Contact the plugin administrator for support.
 
 
 == Upgrade Notice ==
 
-Upgrade your plugin to **<a target="_blank" href="https://magic-post-thumbnail.com/pricing/">Pro Version</a>** ! You will get much more options to configure, more image banks, and customisable crons.
+This is a custom development version based on Magic Post Thumbnail 6.1.6.
 
 
 == Changelog ==
+
+= 1.0.0 - December 2025 =
+* Custom development fork based on Magic Post Thumbnail 6.1.6
+* Complete rebrand to "All Sources Images"
+* Renamed all functions, classes, and options from MPT/mpt to ASI/asi
+* Maintained all core functionality from original plugin
+* Updated text domain to 'all-sources-images'
+* Removed commercial links and promotional content
+
+Previous changelog history from Magic Post Thumbnail 6.1.6:
 
 = 6.1.6 - November 13, 2025 =
 * PRO: Improve compatibility with "Featured Image from URL" (FIFU) plugin - supports both free and premium versions

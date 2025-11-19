@@ -1,4 +1,4 @@
-window.onload = function(){
+﻿window.onload = function(){
 
   setTimeout(function (){
       var gutenbergEditor   = false;
@@ -27,7 +27,7 @@ function manualActionHandler() {
   const { select, dispatch } = wp.data;
   const block = select('core/block-editor').getSelectedBlock();
 
-  if (block && block.name === 'mpt/mpt-images') {
+  if (block && block.name === 'asi/asi-images') {
       dispatch('core/block-editor').updateBlockAttributes(block.clientId, { content: 'Nouveau contenu' });
   }
 }
@@ -106,7 +106,7 @@ function displayGenerationButton(gutenbergEditor = true) {
                     url : generationSpecificPostJsVars.postgeneration.wp_ajax_url,
                     method : 'POST',
                     data : {
-                            action             : 'generate_image',
+                            action             : 'asi_generate_image',
                             ids_mpt_generation : generationSpecificPostJsVars.postgeneration.postID,
                             currentPostIndex   : 1,
                             count              : 1,
@@ -539,9 +539,9 @@ jQuery(document).ready(function() {
     /* CRON SELECTION */
     jQuery("#general-options input.select-all-posts[type='radio']").change(function(){
       if( jQuery(this).val() == 'interval' ) {
-        jQuery( "select[name='MPT_plugin_cron_settings[posts_date_select_interval_hours]'],select[name='MPT_plugin_cron_settings[posts_date_select_interval_days]'],select[name='MPT_plugin_cron_settings[cron_interval_word]']").removeAttr('disabled');
+        jQuery( "select[name='ASI_plugin_cron_settings[posts_date_select_interval_hours]'],select[name='ASI_plugin_cron_settings[posts_date_select_interval_days]'],select[name='ASI_plugin_cron_settings[cron_interval_word]']").removeAttr('disabled');
       } else {
-        jQuery( "select[name='MPT_plugin_cron_settings[posts_date_select_interval_hours]'],select[name='MPT_plugin_cron_settings[posts_date_select_interval_days]'],select[name='MPT_plugin_cron_settings[cron_interval_word]']" ).attr('disabled', 'disabled');
+        jQuery( "select[name='ASI_plugin_cron_settings[posts_date_select_interval_hours]'],select[name='ASI_plugin_cron_settings[posts_date_select_interval_days]'],select[name='ASI_plugin_cron_settings[cron_interval_word]']" ).attr('disabled', 'disabled');
       }
     });
 
@@ -723,7 +723,7 @@ jQuery(document).ready(function() {
   }
 
   // Use event delegation for dynamically added radio buttons
-  jQuery(document).on('change', 'input[type="radio"][name^="MPT_plugin_main_settings[image_block]"]:not(.image-block-0 input[type="radio"])', function() {
+  jQuery(document).on('change', 'input[type="radio"][name^="ASI_plugin_main_settings[image_block]"]:not(.image-block-0 input[type="radio"])', function() {
       updateRadioState();
   });
 

@@ -1,4 +1,4 @@
-jQuery(function($) {
+﻿jQuery(function($) {
 
     // Drag & Drop Banks
     $(".chosen_api .radio-list").sortable({
@@ -24,7 +24,7 @@ jQuery(function($) {
 document.addEventListener("DOMContentLoaded", function() {
     const btnPixabay    = document.getElementById("btnPixabay");
     const resultPixabay = document.getElementById("resultPixabay");
-    const apiKeyInput   = document.querySelector('input[name="MPT_plugin_banks_settings[pixabay][apikey]"]');
+    const apiKeyInput   = document.querySelector('input[name="ASI_plugin_banks_settings[pixabay][apikey]"]');
     const imagePixabay  = document.querySelector("#resultPixabay img");
 
     btnPixabay.addEventListener("click", function() {
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnDalle          = document.getElementById("btnDalle");
     const resultDalle       = document.getElementById("resultDalle");
-    const apiKeyInputDalle  = document.querySelector('input[name="MPT_plugin_banks_settings[dallev1][apikey]"]');
+    const apiKeyInputDalle  = document.querySelector('input[name="ASI_plugin_banks_settings[dallev1][apikey]"]');
     const imageDalle        = document.querySelector("#resultDalle img");
 
     btnDalle.addEventListener("click", function() {
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnStability          = document.getElementById("btnStability");
     const resultStability       = document.getElementById("resultStability");
-    const apiKeyInputStability  = document.querySelector('input[name="MPT_plugin_banks_settings[stability][apikey]"]');
+    const apiKeyInputStability  = document.querySelector('input[name="ASI_plugin_banks_settings[stability][apikey]"]');
     const imageStability        = document.querySelector("#resultStability img");
 
     btnStability.addEventListener("click", function() {
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnReplicate    = document.getElementById("btnReplicate");
     const resultReplicate = document.getElementById("resultReplicate");
-    const apiKeyInput     = document.querySelector('input[name="MPT_plugin_banks_settings[replicate][apikey]"]');
+    const apiKeyInput     = document.querySelector('input[name="ASI_plugin_banks_settings[replicate][apikey]"]');
     const imageReplicate  = document.querySelector("#resultReplicate img");
 
     btnReplicate.addEventListener("click", function() {
@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                action:  "test_apis",
+                action:  "asi_test_apis",
                 apibank: "replicate",
                 nonce:   apisTestingAjax.nonce,
                 apikey:  apiKeyInput.value
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnYoutube    = document.getElementById("btnYoutube");
     const resultYoutube = document.getElementById("resultYoutube");
-    const apiKeyInput   = document.querySelector('input[name="MPT_plugin_banks_settings[youtube][apikey]"]');
+    const apiKeyInput   = document.querySelector('input[name="ASI_plugin_banks_settings[youtube][apikey]"]');
     const imageYt       = document.querySelector("#resultYoutube img");
 
     btnYoutube.addEventListener("click", function() {
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnUnsplash       = document.getElementById("btnUnsplash");
     const resultUnsplash    = document.getElementById("resultUnsplash");
-    const apiKeyInput       = document.querySelector('input[name="MPT_plugin_banks_settings[unsplash][apikey]"]');
+    const apiKeyInput       = document.querySelector('input[name="ASI_plugin_banks_settings[unsplash][apikey]"]');
     const imageUnsplash     = document.querySelector("#resultUnsplash img");
 
     btnUnsplash.addEventListener("click", function() {
@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnPexels         = document.getElementById("btnPexels");
     const resultPexels      = document.getElementById("resultPexels");
-    const apiKeyInput       = document.querySelector('input[name="MPT_plugin_banks_settings[pexels][apikey]"]');
+    const apiKeyInput       = document.querySelector('input[name="ASI_plugin_banks_settings[pexels][apikey]"]');
     const imagePexels       = document.querySelector("#resultPexels img");
 
     btnPexels.addEventListener("click", function() {
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnEnvato         = document.getElementById("btnEnvato");
     const resultEnvato      = document.getElementById("resultEnvato");
-    const envatoTokenInput  = document.querySelector('input[name="MPT_plugin_banks_settings[envato][envato_token]"]');
+    const envatoTokenInput  = document.querySelector('input[name="ASI_plugin_banks_settings[envato][envato_token]"]');
     const imageEnvato       = document.querySelector("#resultEnvato img");
 
     btnEnvato.addEventListener("click", function() {

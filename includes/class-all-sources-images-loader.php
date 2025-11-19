@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * Register all actions and filters for the plugin
@@ -6,8 +6,8 @@
  * @link       https://magic-post-thumbnail.com/
  * @since      1.0.0
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  */
 
 /**
@@ -17,11 +17,11 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
-class Magic_Post_Thumbnail_Loader {
+class All_Sources_Images_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.
@@ -125,7 +125,7 @@ class Magic_Post_Thumbnail_Loader {
 		}
                 
 
-    do_action( 'mpt_freemius_loaded' );
+    do_action( 'ASI_freemius_loaded' );
 	}
 
 }

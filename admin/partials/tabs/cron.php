@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
@@ -15,8 +15,8 @@ settings_errors();
     <form method="post" action="options.php" id="tabs">
 
             <?php 
-settings_fields( 'MPT-plugin-cron-settings' );
-$options = wp_parse_args( get_option( 'MPT_plugin_cron_settings' ), $this->MPT_default_options_cron_settings( FALSE ) );
+settings_fields( 'ASI-plugin-cron-settings' );
+$options = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ), $this->ASI_default_options_cron_settings( FALSE ) );
 $executeElseBlock = true;
 if ( $executeElseBlock ) {
     ?>
@@ -35,7 +35,7 @@ if ( $executeElseBlock ) {
 												</div>
 												<div class="alert-text">
 														<?php 
-    esc_html_e( 'Only available with the pro version', 'mpt' );
+    esc_html_e( 'Only available with the pro version', 'all-sources-images' );
     ?>
 												</div>
 										</div>

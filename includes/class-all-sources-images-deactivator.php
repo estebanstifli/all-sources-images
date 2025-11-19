@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * Fired during plugin deactivation
@@ -6,8 +6,8 @@
  * @link       https://magic-post-thumbnail.com/
  * @since      1.0.0
  *
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Magic_Post_Thumbnail
- * @subpackage Magic_Post_Thumbnail/includes
+ * @package    All_Sources_Images
+ * @subpackage All_Sources_Images/includes
  * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
-class Magic_Post_Thumbnail_Deactivator {
+class All_Sources_Images_Deactivator {
 
 	/**
 	 * Short Description. (use period)

@@ -1,9 +1,8 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
 		exit();
-}
 ?>
 <tr valign="top">
     <td colspan="2">
@@ -18,7 +17,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                 </svg><!--end::Svg Icon--></span>
                 </div>
                 <div class="alert-text">
-                    <?php _e( 'Enable the "save_post" & "wp_insert_post" hook. <br/><br/>What does it means ? Everytime you create or update a post, an image will be generated.<br/><br/>Warning: Use it precautionary. If you don\'t understand what it is, disable it.', 'mpt' ); ?>
+                    <?php _e( 'Enable the "save_post" & "wp_insert_post" hook. <br/><br/>What does it means ? Everytime you create or update a post, an image will be generated.<br/><br/>Warning: Use it precautionary. If you don\'t understand what it is, disable it.', 'all-sources-images' ); ?>
                 </div>
             </div>
         </p>
@@ -28,11 +27,11 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 <tr valign="top" >
     <th scope="row">
-        <label for="hseparator"><?php esc_html_e( '"Save Post" Hook', 'mpt' ); ?></label>
+        <label for="hseparator"><?php esc_html_e( '"Save Post" Hook', 'all-sources-images' ); ?></label>
     </th>
     <td>
         <label class="checkbox">
-            <input data-switch="true" type="checkbox" name="MPT_plugin_main_settings[enable_save_post_hook]" id="enable_save_post_hook" value="enable" <?php echo( !empty( $options['enable_save_post_hook']) && $options['enable_save_post_hook'] == 'enable' )? 'checked': ''; ?> />
+            <input data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_save_post_hook]" id="enable_save_post_hook" value="enable" <?php echo( !empty( $options['enable_save_post_hook']) && $options['enable_save_post_hook'] == 'enable' )? 'checked': ''; ?> />
         </label>
     </td>
 </tr>
@@ -50,7 +49,7 @@ if ( ! function_exists( 'add_filter' ) ) {
             </svg><!--end::Svg Icon--></span>
             </div>
             <div class="alert-text">
-                <?php esc_html_e( 'Select the post type on which you want to fire the hook.', 'mpt' ); ?>
+                <?php esc_html_e( 'Select the post type on which you want to fire the hook.', 'all-sources-images' ); ?>
             </div>
         </div>
     </td>
@@ -58,10 +57,10 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 <tr valign="top" class="show_save_post_hook" <?php echo( !isset($options['enable_save_post_hook']) || ($options['enable_save_post_hook'] != 'enable') ? 'style="display:none;"': ''); ?>>
         <th scope="row">
-            <?php esc_html_e( '"Save Post" Hook post type', 'mpt' ); ?>
+            <?php esc_html_e( '"Save Post" Hook post type', 'all-sources-images' ); ?>
         </th>
         <td class="post-type checkbox-list">
-                <label class="checkbox"><input type="checkbox" name="select-all-pt" id="select-all-pt"/><span></span> <?php esc_html_e( 'Select all', 'mpt' ); ?></label>
+                <label class="checkbox"><input type="checkbox" name="select-all-pt" id="select-all-pt"/><span></span> <?php esc_html_e( 'Select all', 'all-sources-images' ); ?></label>
                 <?php
 
                         $post_types_default = get_post_types( '', 'objects' );
@@ -78,25 +77,23 @@ if ( ! function_exists( 'add_filter' ) ) {
                                         
 
                                         echo '<label class="checkbox">
-                                                <input '. $checked .' name="MPT_plugin_main_settings[choosed_save_post_post_type]['. $post_type->name .']" type="checkbox" value="'. $post_type->name .'"><span></span> '. $post_type->labels->name .'
+                                                <input '. $checked .' name="ASI_plugin_main_settings[choosed_save_post_post_type]['. $post_type->name .']" type="checkbox" value="'. $post_type->name .'"><span></span> '. $post_type->labels->name .'
                                         </label>';
                                 }
-                        }
-                ?>
+                        ?>
         </td>
 </tr>
 
 <?php 
-    if ( true === $this->MPT_freemius()->is__premium_only() ) { 
-        if ( $this->mpt_freemius()->can_use_premium_code() ) {
+    
 ?>
     <tr valign="top" class="wp_insert_post">
         <th scope="row">
-            <label for="hseparator"><?php esc_html_e( '"WP Insert Post" Hook', 'mpt' ); ?></label>
+            <label for="hseparator"><?php esc_html_e( '"WP Insert Post" Hook', 'all-sources-images' ); ?></label>
         </th>
         <td>
             <label class="checkbox checkbox-admin">
-                <input data-switch="true" type="checkbox" name="MPT_plugin_main_settings[enable_wp_insert_post_hook]" id="enable_wp_insert_post_hook" value="enable" <?php echo( !empty( $options['enable_wp_insert_post_hook']) && $options['enable_wp_insert_post_hook'] == 'enable' )? 'checked': ''; ?> />
+                <input data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_wp_insert_post_hook]" id="enable_wp_insert_post_hook" value="enable" <?php echo( !empty( $options['enable_wp_insert_post_hook']) && $options['enable_wp_insert_post_hook'] == 'enable' )? 'checked': ''; ?> />
             </label>
         </td>
     </tr>
@@ -114,7 +111,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                 </svg><!--end::Svg Icon--></span>
                 </div>
                 <div class="alert-text">
-                    <?php esc_html_e( 'Select the post type on which you want to fire the hook.', 'mpt' ); ?>
+                    <?php esc_html_e( 'Select the post type on which you want to fire the hook.', 'all-sources-images' ); ?>
                 </div>
             </div>
         </td>
@@ -122,10 +119,10 @@ if ( ! function_exists( 'add_filter' ) ) {
 
     <tr valign="top" class="show_wp_insert_post_hook" <?php echo( !isset($options['enable_wp_insert_post_hook']) || ($options['enable_wp_insert_post_hook'] != 'enable') ? 'style="display:none;"': ''); ?>>
             <th scope="row">
-                <?php esc_html_e( '"WP Insert Post" Hook post type', 'mpt' ); ?>
+                <?php esc_html_e( '"WP Insert Post" Hook post type', 'all-sources-images' ); ?>
             </th>
             <td class="post-type-2 checkbox-list">
-                    <label class="checkbox"><input type="checkbox" name="select-all-pt-2" id="select-all-pt-2"/><span></span> <?php esc_html_e( 'Select all', 'mpt' ); ?></label>
+                    <label class="checkbox"><input type="checkbox" name="select-all-pt-2" id="select-all-pt-2"/><span></span> <?php esc_html_e( 'Select all', 'all-sources-images' ); ?></label>
                     <?php
 
                             $post_types_default = get_post_types( '', 'objects' );
@@ -142,11 +139,10 @@ if ( ! function_exists( 'add_filter' ) ) {
                                         
 
                                         echo '<label class="checkbox">
-                                                <input '. $checked .' name="MPT_plugin_main_settings[choosed_wp_insert_post_type]['. $post_type->name .']" type="checkbox" value="'. $post_type->name .'"><span></span> '. $post_type->labels->name .'
+                                                <input '. $checked .' name="ASI_plugin_main_settings[choosed_wp_insert_post_type]['. $post_type->name .']" type="checkbox" value="'. $post_type->name .'"><span></span> '. $post_type->labels->name .'
                                         </label>';
                                     }
-                            }
-                    ?>
+                            ?>
             </td>
     </tr>
 
@@ -155,17 +151,17 @@ if ( ! function_exists( 'add_filter' ) ) {
     <tr valign="top" class="wp_insert_post">
         <th scope="row">
             <label for="hseparator">
-                <?php esc_html_e( '"WP Insert Post" Hook', 'mpt' ); ?><br/>
-                <small><?php esc_html_e( 'Only available with the pro version', 'mpt' ); ?></small>
+                <?php esc_html_e( '"WP Insert Post" Hook', 'all-sources-images' ); ?><br/>
+                <small><?php esc_html_e( 'Only available with the pro version', 'all-sources-images' ); ?></small>
             </label>
         </th>
         <td>
             <label class="checkbox checkbox-disabled checkbox-admin">
-                <input disabled="disabled" data-switch="true" type="checkbox" name="MPT_plugin_main_settings[enable_wp_insert_post_hook]" id="enable_wp_insert_post_hook" value="disable" />
+                <input disabled="disabled" data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_wp_insert_post_hook]" id="enable_wp_insert_post_hook" value="disable" />
             </label>
         </td>
     </tr>
-<?php } ?>
+<?php ?>
 
 <tr valign="top" class="based_on_bottom">
     <td colspan="2">
@@ -180,7 +176,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                 </svg><!--end::Svg Icon--></span>
                 </div>
                 <div class="alert-text">
-                    <?php _e( 'In strict search mode, quotation marks are added to the search term.<br/><br/>Warning:This may drastically reduce the number of results.', 'mpt' ); ?>
+                    <?php _e( 'In strict search mode, quotation marks are added to the search term.<br/><br/>Warning:This may drastically reduce the number of results.', 'all-sources-images' ); ?>
                 </div>
             </div>
         </p>
@@ -188,16 +184,15 @@ if ( ! function_exists( 'add_filter' ) ) {
 </tr>
 
 <?php 
-    if ( true === $this->MPT_freemius()->is__premium_only() ) { 
-        if ( $this->mpt_freemius()->can_use_premium_code() ) {
+    
 ?>
     <tr valign="top">
         <th scope="row">
-            <label for="hseparator"><?php esc_html_e( 'Strict Search Mode', 'mpt' ); ?></label>
+            <label for="hseparator"><?php esc_html_e( 'Strict Search Mode', 'all-sources-images' ); ?></label>
         </th>
         <td>
             <label class="checkbox">
-                <input data-switch="true" type="checkbox" name="MPT_plugin_main_settings[enable_strict_search]" id="enable_strict_search" value="enable" <?php echo( !empty( $options['enable_strict_search']) && $options['enable_strict_search'] == 'enable' )? 'checked': ''; ?> />
+                <input data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_strict_search]" id="enable_strict_search" value="enable" <?php echo( !empty( $options['enable_strict_search']) && $options['enable_strict_search'] == 'enable' )? 'checked': ''; ?> />
             </label>
         </td>
     </tr>
@@ -205,24 +200,24 @@ if ( ! function_exists( 'add_filter' ) ) {
 ?>
         <tr valign="top">
             <th scope="row">
-                <label for="hseparator"><?php esc_html_e( 'Strict Search Mode', 'mpt' ); ?></label><br/>
-                <small><?php esc_html_e( 'Only available with the pro version', 'mpt' ); ?></small>
+                <label for="hseparator"><?php esc_html_e( 'Strict Search Mode', 'all-sources-images' ); ?></label><br/>
+                <small><?php esc_html_e( 'Only available with the pro version', 'all-sources-images' ); ?></small>
             </th>
             <td>
                 <label class="checkbox">
-                    <input disabled="disabled" data-switch="true" type="checkbox" name="MPT_plugin_main_settings[enable_strict_search]" id="enable_strict_search" value="enable" <?php echo( !empty( $options['enable_strict_search']) && $options['enable_strict_search'] == 'enable' )? 'checked': ''; ?> />
+                    <input disabled="disabled" data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_strict_search]" id="enable_strict_search" value="enable" <?php echo( !empty( $options['enable_strict_search']) && $options['enable_strict_search'] == 'enable' )? 'checked': ''; ?> />
                 </label>
             </td>
         </tr>
-<?php } ?>
+<?php ?>
 
 <tr valign="top" class="based_on_bottom">
     <th scope="row">
-        <label for="hseparator"><?php esc_html_e( 'Interval', 'mpt' ); ?></label>
+        <label for="hseparator"><?php esc_html_e( 'Interval', 'all-sources-images' ); ?></label>
     </th>
     <td class="chosen_api">
         <div class="form-group">
-            <input type="range" class="custom-range" min="0" max="7" id="bulk-generation-interval" value="<?php echo $value_bulk_generation_interval; ?>" name="MPT_plugin_main_settings[bulk_generation_interval]">
+            <input type="range" class="custom-range" min="0" max="7" id="bulk-generation-interval" value="<?php echo $value_bulk_generation_interval; ?>" name="ASI_plugin_main_settings[bulk_generation_interval]">
             <p class="btn btn-light-primary font-weight-bolder btn-sm paragraph-interval-value">
                 <span id="value-interval"></span>
             </p>

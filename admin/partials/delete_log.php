@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -11,7 +11,7 @@ if( ! empty( $_GET['action'] ) && ( 'deletelog' == $_GET['action'] ) ) {
         return false;
     } else {
     }
-} elseif( defined( 'MPT_FREEMIUS_UNINSTALL' ) ) {
+} elseif( defined( 'ASI_FREEMIUS_UNINSTALL' ) ) {
 } else {
     return false;
 }
@@ -69,7 +69,7 @@ unlink( $filename );
 
 
 // Redirect without delete arguments
-if( ! defined( 'MPT_FREEMIUS_UNINSTALL' ) ) {
+if( ! defined( 'ASI_FREEMIUS_UNINSTALL' ) ) {
 	wp_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
 	exit;
 }

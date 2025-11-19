@@ -1,4 +1,4 @@
-# Plan de Renombrado: Magic Post Thumbnail → All Sources Images
+﻿# Plan de Renombrado: Magic Post Thumbnail → All Sources Images
 
 ## 📋 Resumen de Cambios
 
@@ -17,8 +17,8 @@
 - [ ] `magic-post-thumbnail.php` → `all-sources-images.php`
 
 #### Constantes PHP
-- [ ] `MAGIC_POST_THUMBNAIL_VERSION` → `ALL_SOURCES_IMAGES_VERSION`
-- [ ] `MPT_FREEMIUS_UNINSTALL` → `ASI_FREEMIUS_UNINSTALL`
+- [ ] `ALL_SOURCES_IMAGES_VERSION` → `ALL_SOURCES_IMAGES_VERSION`
+- [ ] `ASI_FREEMIUS_UNINSTALL` → `ASI_FREEMIUS_UNINSTALL`
 
 #### Plugin Headers
 - [ ] Plugin Name: `All Sources Images`
@@ -33,74 +33,74 @@
 ### 2. **Prefijos de Clases PHP**
 
 #### Clases Principales (includes/)
-- [ ] `Magic_Post_Thumbnail` → `All_Sources_Images`
-- [ ] `Magic_Post_Thumbnail_Loader` → `All_Sources_Images_Loader`
-- [ ] `Magic_Post_Thumbnail_i18n` → `All_Sources_Images_i18n`
-- [ ] `Magic_Post_Thumbnail_Activator` → `All_Sources_Images_Activator`
-- [ ] `Magic_Post_Thumbnail_Deactivator` → `All_Sources_Images_Deactivator`
+- [ ] `All_Sources_Images` → `All_Sources_Images`
+- [ ] `All_Sources_Images_Loader` → `All_Sources_Images_Loader`
+- [ ] `All_Sources_Images_i18n` → `All_Sources_Images_i18n`
+- [ ] `All_Sources_Images_Activator` → `All_Sources_Images_Activator`
+- [ ] `All_Sources_Images_Deactivator` → `All_Sources_Images_Deactivator`
 
 #### Clases Admin (admin/)
-- [ ] `Magic_Post_Thumbnail_Admin` → `All_Sources_Images_Admin`
-- [ ] `Magic_Post_Thumbnail_Generation` → `All_Sources_Images_Generation`
+- [ ] `All_Sources_Images_Admin` → `All_Sources_Images_Admin`
+- [ ] `All_Sources_Images_Generation` → `All_Sources_Images_Generation`
 
 #### Clases Public (public/)
-- [ ] `Magic_Post_Thumbnail_Public` → `All_Sources_Images_Public`
+- [ ] `All_Sources_Images_Public` → `All_Sources_Images_Public`
 
 ---
 
 ### 3. **Prefijos de Funciones PHP**
 
 #### Funciones Globales
-- [ ] `mpt_freemius()` → `asi_freemius()`
-- [ ] `activate_magic_post_thumbnail()` → `activate_all_sources_images()`
-- [ ] `deactivate_magic_post_thumbnail()` → `deactivate_all_sources_images()`
-- [ ] `mpt_freemius_uninstall_cleanup()` → `asi_freemius_uninstall_cleanup()`
+- [ ] `asi_freemius()` → `asi_freemius()`
+- [ ] `activate_All_Sources_Images()` → `activate_all_sources_images()`
+- [ ] `deactivate_All_Sources_Images()` → `deactivate_all_sources_images()`
+- [ ] `ASI_FREEMIUS_UNINSTALL_cleanup()` → `asi_freemius_uninstall_cleanup()`
 
-#### Métodos de Clase (Prefijo MPT_)
-- [ ] `MPT_create_thumb()` → `ASI_create_thumb()`
-- [ ] `MPT_ajax_call()` → `ASI_ajax_call()`
-- [ ] `MPT_monolog_call()` → `ASI_monolog_call()`
-- [ ] `MPT_test_apis()` → `ASI_test_apis()`
-- [ ] `MPT_block_searching_images()` → `ASI_block_searching_images()`
-- [ ] `MPT_block_downloading_image()` → `ASI_block_downloading_image()`
-- [ ] `MPT_Generate()` → `ASI_Generate()`
-- [ ] `MPT_Get_Parameters()` → `ASI_Get_Parameters()`
-- [ ] Todos los métodos con prefijo `MPT_*`
+#### Métodos de Clase (Prefijo ASI_)
+- [ ] `ASI_create_thumb()` → `ASI_create_thumb()`
+- [ ] `ASI_ajax_call()` → `ASI_ajax_call()`
+- [ ] `ASI_monolog_call()` → `ASI_monolog_call()`
+- [ ] `ASI_test_apis()` → `ASI_test_apis()`
+- [ ] `ASI_block_searching_images()` → `ASI_block_searching_images()`
+- [ ] `ASI_block_downloading_image()` → `ASI_block_downloading_image()`
+- [ ] `ASI_Generate()` → `ASI_Generate()`
+- [ ] `ASI_Get_Parameters()` → `ASI_Get_Parameters()`
+- [ ] Todos los métodos con prefijo `ASI_*`
 
 ---
 
 ### 4. **WordPress Options (Base de Datos)**
 
 #### Settings Options
-- [ ] `MPT_plugin_main_settings` → `ASI_plugin_main_settings`
-- [ ] `MPT_plugin_banks_settings` → `ASI_plugin_banks_settings`
-- [ ] `MPT_plugin_compatibility_settings` → `ASI_plugin_compatibility_settings`
-- [ ] `MPT_plugin_rights_settings` → `ASI_plugin_rights_settings`
-- [ ] `MPT_plugin_cron_settings` → `ASI_plugin_cron_settings`
-- [ ] `MPT_plugin_proxy_settings` → `ASI_plugin_proxy_settings`
-- [ ] `MPT_plugin_logs_settings` → `ASI_plugin_logs_settings`
-- [ ] `MPT_plugin_block_settings` → `ASI_plugin_block_settings`
-- [ ] `MPT_plugin_posts_settings` → `ASI_plugin_posts_settings`
-- [ ] `MPT_plugin_interval_settings` → `ASI_plugin_interval_settings`
-- [ ] `MPT_plugin_activation_date` → `ASI_plugin_activation_date`
+- [ ] `ASI_plugin_main_settings` → `ASI_plugin_main_settings`
+- [ ] `ASI_plugin_banks_settings` → `ASI_plugin_banks_settings`
+- [ ] `ASI_plugin_compatibility_settings` → `ASI_plugin_compatibility_settings`
+- [ ] `ASI_plugin_rights_settings` → `ASI_plugin_rights_settings`
+- [ ] `ASI_plugin_cron_settings` → `ASI_plugin_cron_settings`
+- [ ] `ASI_plugin_proxy_settings` → `ASI_plugin_proxy_settings`
+- [ ] `ASI_plugin_logs_settings` → `ASI_plugin_logs_settings`
+- [ ] `ASI_plugin_block_settings` → `ASI_plugin_block_settings`
+- [ ] `ASI_plugin_posts_settings` → `ASI_plugin_posts_settings`
+- [ ] `ASI_plugin_interval_settings` → `ASI_plugin_interval_settings`
+- [ ] `ASI_plugin_activation_date` → `ASI_plugin_activation_date`
 
 #### Métodos Default Options
-- [ ] `MPT_default_options_main_settings()` → `ASI_default_options_main_settings()`
-- [ ] `MPT_default_options_banks_settings()` → `ASI_default_options_banks_settings()`
-- [ ] `MPT_default_options_compatibility_settings()` → `ASI_default_options_compatibility_settings()`
-- [ ] `MPT_default_options_rights_settings()` → `ASI_default_options_rights_settings()`
-- [ ] `MPT_default_options_cron_settings()` → `ASI_default_options_cron_settings()`
-- [ ] `MPT_default_options_proxy_settings()` → `ASI_default_options_proxy_settings()`
-- [ ] `MPT_default_options_logs_settings()` → `ASI_default_options_logs_settings()`
-- [ ] `MPT_default_posts_types()` → `ASI_default_posts_types()`
+- [ ] `ASI_default_options_main_settings()` → `ASI_default_options_main_settings()`
+- [ ] `ASI_default_options_banks_settings()` → `ASI_default_options_banks_settings()`
+- [ ] `ASI_default_options_compatibility_settings()` → `ASI_default_options_compatibility_settings()`
+- [ ] `ASI_default_options_rights_settings()` → `ASI_default_options_rights_settings()`
+- [ ] `ASI_default_options_cron_settings()` → `ASI_default_options_cron_settings()`
+- [ ] `ASI_default_options_proxy_settings()` → `ASI_default_options_proxy_settings()`
+- [ ] `ASI_default_options_logs_settings()` → `ASI_default_options_logs_settings()`
+- [ ] `ASI_default_posts_types()` → `ASI_default_posts_types()`
 
 ---
 
 ### 5. **WordPress Hooks & Actions**
 
 #### Action Hooks
-- [ ] `mpt_freemius_loaded` → `asi_freemius_loaded`
-- [ ] `mpt_generate_scheduled_image` → `asi_generate_scheduled_image`
+- [ ] `ASI_freemius_loaded` → `asi_freemius_loaded`
+- [ ] `ASI_generate_scheduled_image` → `asi_generate_scheduled_image`
 
 #### AJAX Actions
 - [ ] `wp_ajax_generate_image` → `wp_ajax_asi_generate_image`
@@ -108,31 +108,31 @@
 - [ ] `wp_ajax_test_apis` → `wp_ajax_asi_test_apis`
 - [ ] `wp_ajax_block_searching_images` → `wp_ajax_asi_block_searching_images`
 - [ ] `wp_ajax_block_downloading_image` → `wp_ajax_asi_block_downloading_image`
-- [ ] `wp_ajax_mpt_hide_notice` → `wp_ajax_asi_hide_notice`
-- [ ] `wp_ajax_mpt_remind_later` → `wp_ajax_asi_remind_later`
+- [ ] `wp_ajax_asi_hide_notice` → `wp_ajax_asi_hide_notice`
+- [ ] `wp_ajax_asi_remind_later` → `wp_ajax_asi_remind_later`
 
 #### Settings Groups
-- [ ] `MPT-plugin-main-settings` → `ASI-plugin-main-settings`
-- [ ] `MPT-plugin-banks-settings` → `ASI-plugin-banks-settings`
-- [ ] `MPT-plugin-compatibility-settings` → `ASI-plugin-compatibility-settings`
-- [ ] `MPT-plugin-rights-settings` → `ASI-plugin-rights-settings`
-- [ ] `MPT-plugin-cron-settings` → `ASI-plugin-cron-settings`
-- [ ] `MPT-plugin-proxy-settings` → `ASI-plugin-proxy-settings`
-- [ ] `MPT-plugin-logs-settings` → `ASI-plugin-logs-settings`
+- [ ] `ASI-plugin-main-settings` → `ASI-plugin-main-settings`
+- [ ] `ASI-plugin-banks-settings` → `ASI-plugin-banks-settings`
+- [ ] `ASI-plugin-compatibility-settings` → `ASI-plugin-compatibility-settings`
+- [ ] `ASI-plugin-rights-settings` → `ASI-plugin-rights-settings`
+- [ ] `ASI-plugin-cron-settings` → `ASI-plugin-cron-settings`
+- [ ] `ASI-plugin-proxy-settings` → `ASI-plugin-proxy-settings`
+- [ ] `ASI-plugin-logs-settings` → `ASI-plugin-logs-settings`
 
 ---
 
 ### 6. **Capabilities (Permisos WordPress)**
 
-- [ ] `mpt_manage` → `asi_manage`
+- [ ] `ASI_manage` → `asi_manage`
 
 ---
 
 ### 7. **JavaScript Variables & AJAX**
 
 #### Variables Globales JS
-- [ ] `mptAjax` → `asiAjax`
-- [ ] `generationJsVars` → `asiGenerationVars` (opcional)
+- [ ] `asiAjax` → `asiAjax`
+- [ ] `asiGenerationVars` → `asiGenerationVars` (opcional)
 
 #### Archivos JavaScript
 - [ ] `admin/js/magic-post-thumbnail-admin.js` → `admin/js/all-sources-images-admin.js`
@@ -143,10 +143,10 @@
 - [ ] `public/js/magic-post-thumbnail-public.js` → `public/js/all-sources-images-public.js`
 
 #### AJAX Endpoints en JS
-- [ ] `action: 'generate_image'` → `action: 'asi_generate_image'`
-- [ ] `action: 'test_apis'` → `action: 'asi_test_apis'`
-- [ ] `action: 'block_searching_images'` → `action: 'asi_block_searching_images'`
-- [ ] `action: 'block_downloading_image'` → `action: 'asi_block_downloading_image'`
+- [ ] `action: 'asi_generate_image'` → `action: 'asi_generate_image'`
+- [ ] `action: 'asi_test_apis'` → `action: 'asi_test_apis'`
+- [ ] `action: 'asi_block_searching_images'` → `action: 'asi_block_searching_images'`
+- [ ] `action: 'asi_block_downloading_image'` → `action: 'asi_block_downloading_image'`
 
 ---
 
@@ -165,8 +165,8 @@
 ### 9. **Admin Menu & Pages**
 
 #### Menu Slugs
-- [ ] `magic-post-thumbnail-admin-display` → `all-sources-images-admin-display`
-- [ ] `magic-post-thumbnail-admin-display-pricing` → `all-sources-images-admin-display-pricing`
+- [ ] `all-sources-images-admin-display` → `all-sources-images-admin-display`
+- [ ] `all-sources-images-admin-display-pricing` → `all-sources-images-admin-display-pricing`
 
 #### Page Titles
 - [ ] "Magic Post Thumbnail" → "All Sources Images"
@@ -176,7 +176,7 @@
 ### 10. **Archivos de Plantillas**
 
 #### Admin Partials
-- [ ] `admin/partials/magic-post-thumbnail-admin-display.php` → `admin/partials/all-sources-images-admin-display.php`
+- [ ] `admin/partials/all-sources-images-admin-display.php` → `admin/partials/all-sources-images-admin-display.php`
 
 #### Public Partials
 - [ ] `public/partials/magic-post-thumbnail-public-display.php` → `public/partials/all-sources-images-public-display.php`
@@ -186,8 +186,8 @@
 ### 11. **Gutenberg Block**
 
 #### Block Registration
-- [ ] `registerBlockType('mpt/mpt-images')` → `registerBlockType('asi/asi-images')`
-- [ ] Block title: "MPT Images" → "ASI Images"
+- [ ] `registerBlockType('asi/asi-images')` → `registerBlockType('asi/asi-images')`
+- [ ] Block title: "ASI Images" → "ASI Images"
 
 #### Block Directory
 - [ ] `admin/blocks/mpt-images/` → `admin/blocks/asi-images/`
@@ -197,8 +197,8 @@
 ### 12. **Translation/i18n**
 
 #### Text Domain
-- [ ] `'mpt'` → `'all-sources-images'`
-- [ ] `'magic-post-thumbnail'` → `'all-sources-images'`
+- [ ] `'all-sources-images'` → `'all-sources-images'`
+- [ ] `'all-sources-images'` → `'all-sources-images'`
 
 #### Language Files
 - [ ] `languages/magic-post-thumbnail.pot` → `languages/all-sources-images.pot`
@@ -231,7 +231,7 @@
 
 #### Config Freemius
 - [ ] `id` - Necesitarás un nuevo ID si registras en Freemius
-- [ ] `slug`: `'magic-post-thumbnail'` → `'all-sources-images'`
+- [ ] `slug`: `'all-sources-images'` → `'all-sources-images'`
 - [ ] `public_key` - Nuevo key si lo usas
 - [ ] Menu slugs
 
@@ -305,33 +305,33 @@
 
 ```bash
 # Clases
-Magic_Post_Thumbnail → All_Sources_Images
+All_Sources_Images → All_Sources_Images
 
 # Funciones
-mpt_freemius → asi_freemius
-MPT_ → ASI_
+asi_freemius → asi_freemius
+ASI_ → ASI_
 
 # Options
-MPT_plugin_ → ASI_plugin_
-MPT_default_ → ASI_default_
+ASI_plugin_ → ASI_plugin_
+ASI_default_ → ASI_default_
 
 # Text Domain
-'mpt' → 'all-sources-images'
-'magic-post-thumbnail' → 'all-sources-images'
+'all-sources-images' → 'all-sources-images'
+'all-sources-images' → 'all-sources-images'
 
 # Slugs
 magic-post-thumbnail → all-sources-images
 mpt- → asi-
 
 # Variables JS
-mptAjax → asiAjax
+asiAjax → asiAjax
 
 # Actions
-'generate_image' → 'asi_generate_image'
-'test_apis' → 'asi_test_apis'
+'asi_generate_image' → 'asi_generate_image'
+'asi_test_apis' → 'asi_test_apis'
 
 # Capabilities
-mpt_manage → asi_manage
+ASI_manage → asi_manage
 ```
 
 ---

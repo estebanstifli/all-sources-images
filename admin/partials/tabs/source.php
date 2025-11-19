@@ -1,32 +1,14 @@
-<?php
+﻿<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
     header( 'HTTP/1.1 403 Forbidden' );
     exit;
-}
 ?>
 <div class="wrap">
 
 	<?php 
-if ( !$this->mpt_freemius()->is__premium_only() && current_time( 'U' ) < 1764543599 ) {
-    ?>
-			<div class="alert alert-custom alert-default" role="alert">
-			<div class="alert-icon"><span class="svg-icon svg-icon-primary svg-icon-xl"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-					<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-					<rect x="0" y="0" width="24" height="24"></rect>
-					<path d="M7.07744993,12.3040451 C7.72444571,13.0716094 8.54044565,13.6920474 9.46808594,14.1079953 L5,23 L4.5,18 L7.07744993,12.3040451 Z M14.5865511,14.2597864 C15.5319561,13.9019016 16.375416,13.3366121 17.0614026,12.6194459 L19.5,18 L19,23 L14.5865511,14.2597864 Z M12,3.55271368e-14 C12.8284271,3.53749572e-14 13.5,0.671572875 13.5,1.5 L13.5,4 L10.5,4 L10.5,1.5 C10.5,0.671572875 11.1715729,3.56793164e-14 12,3.55271368e-14 Z" fill="#000000" opacity="0.3"></path>
-					<path d="M12,10 C13.1045695,10 14,9.1045695 14,8 C14,6.8954305 13.1045695,6 12,6 C10.8954305,6 10,6.8954305 10,8 C10,9.1045695 10.8954305,10 12,10 Z M12,13 C9.23857625,13 7,10.7614237 7,8 C7,5.23857625 9.23857625,3 12,3 C14.7614237,3 17,5.23857625 17,8 C17,10.7614237 14.7614237,13 12,13 Z" fill="#000000" fill-rule="nonzero"></path>
-					</g>
-			</svg><!--end::Svg Icon--></span>
-			</div>
-			<div class="alert-text">
-					Get a <strong>30% discount for BLACK FRIDAY until November 30</strong> when you upgrade to the <a href="admin.php?page=magic-post-thumbnail-admin-display-pricing">Pro version</a> with the code: <strong>MPTBLACKFRIDAY25</strong>
-			</div>
-			</div>
-	<?php 
-}
-?>
+
 
 	<?php 
 settings_errors();
@@ -35,8 +17,8 @@ settings_errors();
     <form method="post" action="options.php">
 
             <?php 
-settings_fields( 'MPT-plugin-banks-settings' );
-$options = wp_parse_args( get_option( 'MPT_plugin_banks_settings' ), $this->MPT_default_options_banks_settings( FALSE ) );
+settings_fields( 'ASI-plugin-banks-settings' );
+$options = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( FALSE ) );
 // Remove 'envato' from saved options if present (Envato Elements no longer working)
 if ( isset( $options['api_chosen_auto'] ) && is_array( $options['api_chosen_auto'] ) ) {
     unset($options['api_chosen_auto']['envato']);
@@ -48,15 +30,15 @@ if ( isset( $options['api_chosen'] ) && 'envato' === $options['api_chosen'] ) {
     $options['api_chosen'] = '';
 }
 /* Banks for Automatic Bulk */
-$list_api_auto = $this->MPT_banks_name_auto();
+$list_api_auto = $this->ASI_banks_name_auto();
 /* Banks for Manual Search with Gutenberg Block */
 $list_api_manual = array(
-    esc_html__( 'Openverse', 'mpt' ) => array('openverse', true),
-    esc_html__( 'Flickr', 'mpt' )    => array('flickr', true),
-    esc_html__( 'Pixabay', 'mpt' )   => array('pixabay', true),
-    esc_html__( 'Youtube', 'mpt' )   => array('youtube', false),
-    esc_html__( 'Unsplash', 'mpt' )  => array('unsplash', false),
-    esc_html__( 'Pexels', 'mpt' )    => array('pexels', false),
+    esc_html__( 'Openverse', 'all-sources-images' ) => array('openverse', true),
+    esc_html__( 'Flickr', 'all-sources-images' )    => array('flickr', true),
+    esc_html__( 'Pixabay', 'all-sources-images' )   => array('pixabay', true),
+    esc_html__( 'Youtube', 'all-sources-images' )   => array('youtube', false),
+    esc_html__( 'Unsplash', 'all-sources-images' )  => array('unsplash', false),
+    esc_html__( 'Pexels', 'all-sources-images' )    => array('pexels', false),
 );
 ?>
 
@@ -71,7 +53,7 @@ $list_api_manual = array(
                 </div>
                 <div class="alert-text">
                     <?php 
-esc_html_e( 'Choose which database you want to search for pictures. You can select multiple sources, and drag & drop each banks to give priorities on image search.', 'mpt' );
+esc_html_e( 'Choose which database you want to search for pictures. You can select multiple sources, and drag & drop each banks to give priorities on image search.', 'all-sources-images' );
 ?>
                 </div>
             </div>
@@ -81,13 +63,13 @@ esc_html_e( 'Choose which database you want to search for pictures. You can sele
 	              <tr valign="top">
 	                <th scope="row">
 						<label for="hseparator"><?php 
-esc_html_e( 'Image Banks', 'mpt' );
+esc_html_e( 'Image Banks', 'all-sources-images' );
 ?></label>
 	                </th>
 					<td class="chosen_api checkbox-list">
 
 						<h5><?php 
-esc_html_e( 'Automatic', 'mpt' );
+esc_html_e( 'Automatic', 'all-sources-images' );
 ?></h5>
 
 						<ul class="radio-list" id="sortable">
@@ -112,19 +94,18 @@ foreach ( $list_api_auto as $api => $api_code ) {
         $class_disabled = 'checkbox-disabled';
         $checked = '';
     }
-    $ar_list_banks_auto[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . $api_code[0] . '" name="MPT_plugin_banks_settings[api_chosen_auto][' . $api_code[0] . ']"> <span></span> ' . $api . '</label></li>';
+    $ar_list_banks_auto[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . $api_code[0] . '" name="ASI_plugin_banks_settings[api_chosen_auto][' . $api_code[0] . ']"> <span></span> ' . $api . '</label></li>';
 }
 ksort( $ar_list_banks_auto );
 foreach ( $ar_list_banks_auto as $ar_list_banks_val ) {
     echo $ar_list_banks_val;
-}
 ?>
 						</ul>
 	                </td>
 	                <td class="chosen_api checkbox-list">
 
 					   <h5><?php 
-esc_html_e( 'Gutenberg Block', 'mpt' );
+esc_html_e( 'Gutenberg Block', 'all-sources-images' );
 ?></h5>
 
 					   <ul class="radio-list" id="sortable">
@@ -149,12 +130,11 @@ foreach ( $list_api_manual as $api => $api_code ) {
         $class_disabled = 'checkbox-disabled';
         $checked = '';
     }
-    $ar_list_banks_manual[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . $api_code[0] . '" name="MPT_plugin_banks_settings[api_chosen_manual][' . $api_code[0] . ']"> <span></span> ' . $api . '</label></li>';
+    $ar_list_banks_manual[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . $api_code[0] . '" name="ASI_plugin_banks_settings[api_chosen_manual][' . $api_code[0] . ']"> <span></span> ' . $api . '</label></li>';
 }
 ksort( $ar_list_banks_manual );
 foreach ( $ar_list_banks_manual as $ar_list_banks_val ) {
     echo $ar_list_banks_val;
-}
 ?>
 	                  </ul>
 	                </td>
@@ -165,7 +145,7 @@ foreach ( $ar_list_banks_manual as $ar_list_banks_val ) {
 			<hr/>
 
 			<h3><?php 
-esc_html_e( 'Banks Settings', 'mpt' );
+esc_html_e( 'Banks Settings', 'all-sources-images' );
 ?></h3>
 
 			<div id="tabs">
@@ -178,7 +158,6 @@ foreach ( $list_api_auto as $api => $api_code ) {
     }
     echo '<li><a href="#tab-' . $a . '">' . $api . '</a></li>';
     $a++;
-}
 ?>
 				</ul>
 				<?php 
@@ -199,7 +178,6 @@ foreach ( $list_api_auto as $api => $api_code ) {
     echo '</tbody>';
     echo '</table>';
     $a++;
-}
 ?>
 			</div>
 

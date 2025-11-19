@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -13,8 +13,8 @@ if ( ! function_exists( 'add_filter' ) ) {
     <form method="post" action="options.php" id="tabs">
 
         <?php
-            settings_fields( 'MPT-plugin-rights-settings' );
-            $options = wp_parse_args( get_option( 'MPT_plugin_rights_settings' ), $this->MPT_default_options_rights_settings( FALSE ) );
+            settings_fields( 'ASI-plugin-rights-settings' );
+            $options = wp_parse_args( get_option( 'ASI_plugin_rights_settings' ), $this->ASI_default_options_rights_settings( FALSE ) );
         ?>
 
         <table id="general-options" class="form-table">
@@ -22,15 +22,15 @@ if ( ! function_exists( 'add_filter' ) ) {
 
                 <tr valign="top" class="rights">
                     <th scope="row">
-                            <?php esc_html_e( 'Plugin Rights', 'mpt' ); ?>
+                            <?php esc_html_e( 'Plugin Rights', 'all-sources-images' ); ?>
                     </th>
                     <td class="checkbox-list">
                         <label class="checkbox checkbox-disabled"><input checked type="checkbox" disabled> <span></span> administrator</label>
 
-                        <label class="checkbox"><input <?php echo( !empty( $options['rights_editor']) && $options['rights_editor'] == 'true' )? 'checked': ''; ?> name="MPT_plugin_rights_settings[rights_editor]" type="checkbox" value="true"> <span></span> editor</label>
-                        <label class="checkbox"><input <?php echo( !empty( $options['rights_author']) && $options['rights_author'] == 'true' )? 'checked': ''; ?> name="MPT_plugin_rights_settings[rights_author]" type="checkbox" value="true"> <span></span> author</label>
-                        <label class="checkbox"><input <?php echo( !empty( $options['rights_contributor']) && $options['rights_contributor'] == 'true' )? 'checked': ''; ?> name="MPT_plugin_rights_settings[rights_contributor]" type="checkbox" value="true"> <span></span> contributor</label>
-                        <label class="checkbox"><input <?php echo( !empty( $options['rights_subscriber']) && $options['rights_subscriber'] == 'true' )? 'checked': ''; ?> name="MPT_plugin_rights_settings[rights_subscriber]" type="checkbox" value="true"> <span></span> subscriber</label>
+                        <label class="checkbox"><input <?php echo( !empty( $options['rights_editor']) && $options['rights_editor'] == 'true' )? 'checked': ''; ?> name="ASI_plugin_rights_settings[rights_editor]" type="checkbox" value="true"> <span></span> editor</label>
+                        <label class="checkbox"><input <?php echo( !empty( $options['rights_author']) && $options['rights_author'] == 'true' )? 'checked': ''; ?> name="ASI_plugin_rights_settings[rights_author]" type="checkbox" value="true"> <span></span> author</label>
+                        <label class="checkbox"><input <?php echo( !empty( $options['rights_contributor']) && $options['rights_contributor'] == 'true' )? 'checked': ''; ?> name="ASI_plugin_rights_settings[rights_contributor]" type="checkbox" value="true"> <span></span> contributor</label>
+                        <label class="checkbox"><input <?php echo( !empty( $options['rights_subscriber']) && $options['rights_subscriber'] == 'true' )? 'checked': ''; ?> name="ASI_plugin_rights_settings[rights_subscriber]" type="checkbox" value="true"> <span></span> subscriber</label>
                     </td>
 
                     <td colspan="2" class="infos">
@@ -44,7 +44,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                             </svg></span>
                             </div>
                             <div class="alert-text">
-                                <?php esc_html_e( 'Select which role has access to the Magic Post Thumbnail Dashboard', 'mpt' ); ?>
+                                <?php esc_html_e( 'Select which role has access to the Magic Post Thumbnail Dashboard', 'all-sources-images' ); ?>
                             </div>
                         </div>
                     </td>
