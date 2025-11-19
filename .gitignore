@@ -1,0 +1,30 @@
+# WordPress
+.DS_Store
+thumbs.db
+
+# Logs
+*.log
+admin/partials/monolog/logs/*.log
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Composer
+vendor/
+composer.lock
+
+# Node modules (if any)
+node_modules/
+package-lock.json
+
+# Build files
+*.map
+*.min.js
+*.min.css
+
+# System files
+.env
+.env.local
