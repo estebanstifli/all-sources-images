@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const apiKeyInput   = document.querySelector('input[name="ASI_plugin_banks_settings[pixabay][apikey]"]');
     const imagePixabay  = document.querySelector("#resultPixabay img");
 
+    if (!btnPixabay || !resultPixabay || !apiKeyInput || !imagePixabay) {
+        return;
+    }
+
     btnPixabay.addEventListener("click", function() {
 
         imagePixabay.classList.remove("hidden");
@@ -65,6 +69,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const apiKeyInputDalle  = document.querySelector('input[name="ASI_plugin_banks_settings[dallev1][apikey]"]');
     const imageDalle        = document.querySelector("#resultDalle img");
 
+    if (!btnDalle || !resultDalle || !apiKeyInputDalle || !imageDalle) {
+        return;
+    }
+
     btnDalle.addEventListener("click", function() {
 
         imageDalle.classList.remove("hidden");
@@ -102,6 +110,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const apiKeyInputStability  = document.querySelector('input[name="ASI_plugin_banks_settings[stability][apikey]"]');
     const imageStability        = document.querySelector("#resultStability img");
 
+    if (!btnStability || !resultStability || !apiKeyInputStability || !imageStability) {
+        return;
+    }
+
     btnStability.addEventListener("click", function() {
 
         imageStability.classList.remove("hidden");
@@ -135,8 +147,12 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnReplicate    = document.getElementById("btnReplicate");
     const resultReplicate = document.getElementById("resultReplicate");
-    const apiKeyInput     = document.querySelector('input[name="ASI_plugin_banks_settings[replicate][apikey]"]');
+    const apiKeyInput     = document.querySelector('input[name="ASI_plugin_banks_settings[replicate][apitoken]"]');
     const imageReplicate  = document.querySelector("#resultReplicate img");
+
+    if (!btnReplicate || !resultReplicate || !apiKeyInput || !imageReplicate) {
+        return;
+    }
 
     btnReplicate.addEventListener("click", function() {
         // show spinner while testing
@@ -181,10 +197,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Youtube
 document.addEventListener("DOMContentLoaded", function() {
-    const btnYoutube    = document.getElementById("btnYoutube");
+    const btnYoutube    = document.getElementById("btnYouTube");
     const resultYoutube = document.getElementById("resultYoutube");
     const apiKeyInput   = document.querySelector('input[name="ASI_plugin_banks_settings[youtube][apikey]"]');
     const imageYt       = document.querySelector("#resultYoutube img");
+
+    if (!btnYoutube || !resultYoutube || !apiKeyInput || !imageYt) {
+        return;
+    }
 
     btnYoutube.addEventListener("click", function() {
 
@@ -223,6 +243,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const apiKeyInput       = document.querySelector('input[name="ASI_plugin_banks_settings[unsplash][apikey]"]');
     const imageUnsplash     = document.querySelector("#resultUnsplash img");
 
+    if (!btnUnsplash || !resultUnsplash || !apiKeyInput || !imageUnsplash) {
+        return;
+    }
+
     btnUnsplash.addEventListener("click", function() {
 
         imageUnsplash.classList.remove("hidden");
@@ -259,6 +283,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const resultPexels      = document.getElementById("resultPexels");
     const apiKeyInput       = document.querySelector('input[name="ASI_plugin_banks_settings[pexels][apikey]"]');
     const imagePexels       = document.querySelector("#resultPexels img");
+
+    if (!btnPexels || !resultPexels || !apiKeyInput || !imagePexels) {
+        return;
+    }
 
     btnPexels.addEventListener("click", function() {
 
@@ -335,8 +363,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const cxIdInput = document.querySelector('input[name="ASI_plugin_banks_settings[googleimage][cxid]"]');
     const imageGoogleImage = document.querySelector("#resultGoogleImage img");
 
-    if (btnGoogleImage) {
-        btnGoogleImage.addEventListener("click", function() {
+    if (!btnGoogleImage || !resultGoogleImage || !apiKeyInput || !cxIdInput || !imageGoogleImage) {
+        return;
+    }
+
+    btnGoogleImage.addEventListener("click", function() {
             imageGoogleImage.classList.remove("hidden");
 
             fetch(apisTestingAjax.ajaxurl, {
@@ -363,5 +394,4 @@ document.addEventListener("DOMContentLoaded", function() {
                 resultGoogleImage.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
             });
         });
-    }
 });

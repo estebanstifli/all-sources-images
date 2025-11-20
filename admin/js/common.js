@@ -804,10 +804,15 @@ var KTBootstrapSwitch = function() {
 
 
 jQuery(document).ready(function() {
-    KTBootstrapSwitch.init();
+  KTBootstrapSwitch.init();
 
-    // Tabs for settings
-    jQuery('#tabs').tabs();
+  // Tabs for settings (new .asi-tabs plus legacy #tabs containers)
+  jQuery('.asi-tabs, #tabs').each(function() {
+    var $tabs = jQuery(this);
+    if ( $tabs.find('> ul > li').length ) {
+      $tabs.tabs();
+    }
+  });
 });
 
 

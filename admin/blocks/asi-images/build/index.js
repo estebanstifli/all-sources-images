@@ -10,7 +10,7 @@
     const { registerBlockType } = wp.blocks;
     const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl } = wp.components;
     const { useState, useEffect } = wp.element;
-    const { __ } = wp.i18n;
+    const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
 
     // Universal bank configuration - no longer needed since backend normalizes
@@ -44,17 +44,31 @@
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [searchTerm, setSearchTerm] = useState('');
             const [resultsSearch, setResultsSearch] = useState({});
-            const [isSearching, setIsSearching] = useState({});
+            const [searchStatus, setSearchStatus] = useState({});
+            const [timerTick, setTimerTick] = useState(Date.now());
             const defaultBanks = asiAjax.choosed_banks || {};
             const availableBanks = asiAjax.available_banks || {};
             const [sourceMode, setSourceMode] = useState('preset');
             const [customBanks, setCustomBanks] = useState(Object.values(defaultBanks));
             const customBanksKey = customBanks.join('|');
+            const aiSources = (Array.isArray(asiAjax.ai_sources) ? asiAjax.ai_sources : ['dallev1', 'stability', 'replicate'])
+                .map((slug) => (typeof slug === 'string' ? slug.toLowerCase() : slug));
+            const hasActiveSearch = Object.values(searchStatus).some((status) => status && status.active);
 
             useEffect(() => {
                 setResultsSearch({});
-                setIsSearching({});
+                setSearchStatus({});
             }, [sourceMode, customBanksKey]);
+
+            useEffect(() => {
+                if (!hasActiveSearch) {
+                    return;
+                }
+                const intervalId = setInterval(() => {
+                    setTimerTick(Date.now());
+                }, 1000);
+                return () => clearInterval(intervalId);
+            }, [hasActiveSearch]);
 
             function getBankLabel(bankSlug) {
                 if (!bankSlug || typeof bankSlug !== 'string') {
@@ -115,7 +129,17 @@
                 let bankParam = bankName.toLowerCase();
                 if (bankParam === 'openverse') bankParam = 'cc_search';
                 
-                setIsSearching(prev => ({ ...prev, [index]: true }));
+                const isAiSource = aiSources.includes(bankParam);
+                const startedAt = Date.now();
+                setSearchStatus(prev => ({
+                    ...prev,
+                    [index]: {
+                        ...(prev[index] || {}),
+                        active: true,
+                        isAi: isAiSource,
+                        startedAt,
+                    }
+                }));
 
                 const params = new URLSearchParams({
                     action: 'asi_block_searching_images',
@@ -157,11 +181,25 @@
                             }));
                         }
                         
-                        setIsSearching(prev => ({ ...prev, [index]: false }));
+                        setSearchStatus(prev => ({
+                            ...prev,
+                            [index]: {
+                                ...(prev[index] || {}),
+                                active: false,
+                                completedAt: Date.now(),
+                            }
+                        }));
                     })
                     .catch(error => {
                         console.error('Fetch error:', error);
-                        setIsSearching(prev => ({ ...prev, [index]: false }));
+                        setSearchStatus(prev => ({
+                            ...prev,
+                            [index]: {
+                                ...(prev[index] || {}),
+                                active: false,
+                                completedAt: Date.now(),
+                            }
+                        }));
                         setResultsSearch(prev => ({ 
                             ...prev, 
                             [index]: wp.element.createElement('p', null, __('Network error', 'all-sources-images'))
@@ -407,20 +445,30 @@
                         tabs: tabs
                     }, (tab) => {
                         const index = parseInt(tab.name.replace('tab', ''));
+                        const status = searchStatus[index];
+                        const isActive = status && status.active;
+                        const elapsedSeconds = (status && status.startedAt)
+                            ? Math.max(0, Math.floor((timerTick - status.startedAt) / 1000))
+                            : 0;
+                        const baseText = status && status.isAi ? __('Making...', 'all-sources-images') : __('Searching...', 'all-sources-images');
+                        const messageText = (status && status.isAi)
+                            ? sprintf(__('%1$s (%2$ss)', 'all-sources-images'), baseText, elapsedSeconds)
+                            : baseText;
+
                         return wp.element.createElement('div', { 
                             style: { 
                                 minHeight: '400px',
                                 padding: '20px 0'
                             }
                         },
-                            isSearching[index] && wp.element.createElement('p', { 
+                            isActive && wp.element.createElement('p', { 
                                 style: { 
                                     textAlign: 'center',
                                     padding: '40px',
                                     fontSize: '16px',
                                     color: '#666'
                                 }
-                            }, __('Searching...', 'all-sources-images')),
+                            }, messageText),
                             resultsSearch[index] || wp.element.createElement('p', { 
                                 style: { 
                                     textAlign: 'center',

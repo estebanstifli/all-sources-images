@@ -41,7 +41,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 	                            <!--begin::Page Heading-->
 	                            <div class="d-flex align-items-baseline flex-wrap mr-5">
 	                                    <!--begin::Page Title-->
-	                                 <h5 class="text-dark font-weight-bold my-1 mr-5">Magic Post Thumbnail :  <?php echo $title; ?></h5>
+	                                 <h5 class="text-dark font-weight-bold my-1 mr-5">All Sources Images :  <?php echo $title; ?></h5>
 	                                    <!--end::Page Title-->
 	                            </div>
 	                            <!--end::Page Heading-->

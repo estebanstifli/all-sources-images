@@ -5,7 +5,7 @@
 		<!--begin::Logo-->
     <a href="#" class="brand-logo">
         <!--<img alt="Logo" src="<?php echo plugin_dir_url( __FILE__ ) . '../img/icon-settings.png'; ?>" />-->
-        <img alt="Logo Magic Post Thumbnail"  src="<?php echo plugin_dir_url( __FILE__ ) . '../img/logo.png'; ?>" />
+		<img alt="Logo All Sources Images"  src="<?php echo plugin_dir_url( __FILE__ ) . '../img/logo.png'; ?>" />
 
     </a>
 		<!--end::Logo-->

@@ -66,7 +66,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php _e('Access Key', 'magic-post-thumbnail'); ?></td>
     <td id="password-unsplash" class="password">
-        <input type="password" class="regular-text password" name="ASI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr($apikey); ?>" />
+        <input type="password" class="form-control" name="ASI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr($apikey); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
     </td>
 </tr>
@@ -76,8 +76,10 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td>
         <button class="btn btn-primary" id="btnUnsplash" onclick="return false;">
             <?php _e('Test Unsplash Connection', 'magic-post-thumbnail'); ?>
-            <span class="loadersmall"></span>
         </button>
+        <span id="resultUnsplash">
+            <img src="<?php echo plugin_dir_url(__FILE__); ?>../../../img/loader-mpt.gif" width="32" class="hidden" />
+        </span>
     </td>
 </tr>
 
@@ -87,13 +89,13 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
         <select name="ASI_plugin_banks_settings[unsplash][orientation]">
             <?php
             $orientations = array(
-                'all' => __('All Orientations', 'magic-post-thumbnail'),
+                '' => __('All Orientations', 'magic-post-thumbnail'),
                 'landscape' => __('Landscape', 'magic-post-thumbnail'),
                 'portrait' => __('Portrait', 'magic-post-thumbnail'),
                 'squarish' => __('Square', 'magic-post-thumbnail')
             );
             foreach ($orientations as $value => $label) {
-                $selected = ($orientation == $value) ? 'selected="selected"' : '';
+                $selected = ($orientation === $value) ? 'selected="selected"' : '';
                 echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
             }
             ?>
@@ -127,7 +129,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
         <select name="ASI_plugin_banks_settings[unsplash][color]">
             <?php
             $colors = array(
-                'all' => __('All Colors', 'magic-post-thumbnail'),
+                '' => __('All Colors', 'magic-post-thumbnail'),
                 'black_and_white' => __('Black & White', 'magic-post-thumbnail'),
                 'black' => __('Black', 'magic-post-thumbnail'),
                 'white' => __('White', 'magic-post-thumbnail'),
@@ -141,7 +143,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
                 'blue' => __('Blue', 'magic-post-thumbnail')
             );
             foreach ($colors as $value => $label) {
-                $selected = ($color == $value) ? 'selected="selected"' : '';
+                $selected = ($color === $value) ? 'selected="selected"' : '';
                 echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
             }
             ?>

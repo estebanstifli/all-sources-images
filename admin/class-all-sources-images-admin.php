@@ -919,6 +919,19 @@ class All_Sources_Images_Admin {
     }
 
     /**
+     * Codes for AI-based generators
+     *
+     * @since    6.1.8
+     */
+    public function ASI_ai_source_codes() {
+        return array(
+            'dallev1',
+            'stability',
+            'replicate',
+        );
+    }
+
+    /**
      * Get default posts types & categories
      *
      * @since    5.0.0
@@ -1019,10 +1032,11 @@ class All_Sources_Images_Admin {
                 'imgsize' => '1024x1024',
             ),
             'stability'         => array(
-                'apikey'        => '',
-                'model'         => 'sd3.5-large-turbo',
-                'aspect_ratio'  => '16:9',
-                'output_format' => 'jpeg',
+                'apikey'              => '',
+                'model'               => 'sd3-large',
+                'aspect_ratio'        => '16:9',
+                'output_format'       => 'jpeg',
+                'use_negative_prompt' => '',
             ),
             'replicate'         => array(
                 'apikey'        => '',
@@ -1411,7 +1425,7 @@ class All_Sources_Images_Admin {
                 ],
             ], $proxy_args ) );
         } elseif ( 'youtube' === $apiBank ) {
-            $apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&type=video&key={$apiKey}";
+            $apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&type=video&q=asi+test&key={$apiKey}";
             $proxy_args = $this->ASI_get_proxy_args();
             $response = wp_remote_get( $apiUrl, $proxy_args );
             if ( is_wp_error( $response ) ) {
@@ -1421,6 +1435,8 @@ class All_Sources_Images_Admin {
             $data = json_decode( $body, true );
             if ( isset( $data['items'] ) && !empty( $data['items'] ) ) {
                 wp_send_json_success( $body );
+            } elseif ( isset( $data['error']['message'] ) ) {
+                wp_send_json_error( $data['error']['message'] );
             } else {
                 wp_send_json_error( 'No results found or there was an error.' );
             }
@@ -1589,6 +1605,17 @@ class All_Sources_Images_Admin {
         } else {
             // Normalize API response to universal format: always use 'images' array
             $normalized_images = array();
+            $bank_options = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+            $yt_options = isset( $bank_options['youtube'] ) ? $bank_options['youtube'] : array();
+            $yt_quality = isset( $yt_options['thumbnail_quality'] ) ? $yt_options['thumbnail_quality'] : 'high';
+            $yt_quality_fallback = array_unique( array(
+                $yt_quality,
+                'maxresdefault',
+                'standard',
+                'high',
+                'medium',
+                'default'
+            ) );
             
             // Detect bank and extract images + normalize structure
             if (isset($results_thumbs['data']) && is_array($results_thumbs['data'])) {
@@ -1600,6 +1627,68 @@ class All_Sources_Images_Admin {
                         'title' => isset($item['revised_prompt']) ? $item['revised_prompt'] : '',
                         'alt' => isset($item['revised_prompt']) ? $item['revised_prompt'] : '',
                         'caption' => 'DALL-E Generated'
+                    );
+                }
+            } elseif ( 'youtube' === $bank && isset($results_thumbs['items']) && is_array($results_thumbs['items']) ) {
+                foreach ( $results_thumbs['items'] as $item ) {
+                    $thumbnails = isset( $item['snippet']['thumbnails'] ) ? $item['snippet']['thumbnails'] : array();
+                    $chosen_large = '';
+                    foreach ( $yt_quality_fallback as $quality_key ) {
+                        if ( isset( $thumbnails[ $quality_key ]['url'] ) ) {
+                            $chosen_large = $thumbnails[ $quality_key ]['url'];
+                            break;
+                        }
+                    }
+                    $thumb_medium = isset( $thumbnails['medium']['url'] ) ? $thumbnails['medium']['url'] : ( isset( $thumbnails['default']['url'] ) ? $thumbnails['default']['url'] : $chosen_large );
+                    $title = isset( $item['snippet']['title'] ) ? $item['snippet']['title'] : '';
+                    $channel = isset( $item['snippet']['channelTitle'] ) ? $item['snippet']['channelTitle'] : '';
+                    $video_id = isset( $item['id']['videoId'] ) ? $item['id']['videoId'] : '';
+
+                    $normalized_images[] = array(
+                        'url' => $chosen_large,
+                        'thumb' => $thumb_medium,
+                        'title' => $title,
+                        'alt' => $title,
+                        'caption' => $channel,
+                        'video_id' => $video_id,
+                    );
+                }
+            } elseif ( 'flickr' === $bank ) {
+                $photos = array();
+                if ( isset( $results_thumbs['photos']['photo'] ) && is_array( $results_thumbs['photos']['photo'] ) ) {
+                    $photos = $results_thumbs['photos']['photo'];
+                } elseif ( isset( $results_thumbs['photos'] ) && is_array( $results_thumbs['photos'] ) ) {
+                    $photos = $results_thumbs['photos'];
+                }
+
+                foreach ( $photos as $item ) {
+                    $server = isset( $item['server'] ) ? $item['server'] : '';
+                    $id = isset( $item['id'] ) ? $item['id'] : '';
+                    $secret = isset( $item['secret'] ) ? $item['secret'] : '';
+
+                    $large_url = '';
+                    $thumb_url = '';
+                    if ( $server && $id && $secret ) {
+                        $base_url = 'https://live.staticflickr.com/' . $server . '/' . $id . '_' . $secret;
+                        $large_url = $base_url . '_b.jpg';
+                        $thumb_url = $base_url . '_q.jpg';
+                    }
+
+                    if ( empty( $large_url ) && isset( $item['url'] ) ) {
+                        $large_url = $item['url'];
+                    }
+
+                    if ( empty( $thumb_url ) ) {
+                        $thumb_url = $large_url;
+                    }
+
+                    $normalized_images[] = array(
+                        'url' => $large_url,
+                        'thumb' => $thumb_url,
+                        'title' => isset( $item['title'] ) ? $item['title'] : '',
+                        'alt' => isset( $item['title'] ) ? $item['title'] : '',
+                        'caption' => isset( $item['owner'] ) ? $item['owner'] : '',
+                        'photo_id' => $id,
                     );
                 }
             } elseif (isset($results_thumbs['items']) && is_array($results_thumbs['items'])) {
@@ -1646,6 +1735,26 @@ class All_Sources_Images_Admin {
                         'caption' => isset($item['photographer']) ? $item['photographer'] : ''
                     );
                 }
+            } elseif ( 'stability' === $bank && isset( $results_thumbs['image'] ) ) {
+                $stability_options = isset( $bank_options['stability'] ) ? $bank_options['stability'] : array();
+                $format = isset( $stability_options['output_format'] ) ? $stability_options['output_format'] : 'jpeg';
+                $mime_map = array(
+                    'jpeg' => 'image/jpeg',
+                    'jpg'  => 'image/jpeg',
+                    'png'  => 'image/png',
+                    'webp' => 'image/webp',
+                );
+                $mime = isset( $mime_map[ $format ] ) ? $mime_map[ $format ] : 'image/jpeg';
+                $data_uri = 'data:' . $mime . ';base64,' . $results_thumbs['image'];
+                $normalized_images[] = array(
+                    'url'      => $data_uri,
+                    'thumb'    => $data_uri,
+                    'title'    => $search_term,
+                    'alt'      => $search_term,
+                    'caption'  => __( 'Generated with Stability AI', 'all-sources-images' ),
+                    'mime'     => $mime,
+                    'is_data'  => true,
+                );
             }
             
             // Universal response format
@@ -1707,18 +1816,42 @@ class All_Sources_Images_Admin {
         	$url_image			= $result->download_urls->max2000;
         }
         */
-        $tmp = download_url( $url_image );
         $file_array = array();
-        // Check for error
-        if ( is_wp_error( $tmp ) ) {
-            ASI_log( array(
-                'message' => $tmp->get_error_message(),
-                'url'     => $url_image,
-            ), 'GUTENBERG_DOWNLOAD_ERROR' );
-            wp_send_json_error( array(
-                'erreur' => $tmp->get_error_message(),
-            ) );
-            return;
+        $is_data_uri = ( 0 === strpos( $url_image, 'data:image' ) );
+        $tmp = '';
+        if ( $is_data_uri ) {
+            if ( preg_match( '/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/', $url_image, $matches ) ) {
+                $mime_type = $matches[1];
+                $base64_data = str_replace( ' ', '+', $matches[2] );
+                $decoded = base64_decode( $base64_data );
+                if ( false === $decoded ) {
+                    wp_send_json_error( array( 'erreur' => 'Invalid image data.' ) );
+                    return;
+                }
+                $tmp = wp_tempnam( 'stability_block' );
+                if ( false === $tmp ) {
+                    wp_send_json_error( array( 'erreur' => 'Unable to create temporary file.' ) );
+                    return;
+                }
+                file_put_contents( $tmp, $decoded );
+            } else {
+                wp_send_json_error( array( 'erreur' => 'Invalid data URI.' ) );
+                return;
+            }
+        } else {
+            $tmp = download_url( $url_image );
+            // Check for error
+            if ( is_wp_error( $tmp ) ) {
+                ASI_log( array(
+                    'message' => $tmp->get_error_message(),
+                    'url'     => $url_image,
+                ), 'GUTENBERG_DOWNLOAD_ERROR' );
+                wp_send_json_error( array(
+                    'erreur' => $tmp->get_error_message(),
+                ) );
+                return;
+            }
+            $mime_type = '';
         }
         
         $allowed_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
@@ -1732,8 +1865,6 @@ class All_Sources_Images_Admin {
         );
 
         $extension = '';
-        $mime_type = '';
-
         $detected_mime = wp_get_image_mime( $tmp );
         if ( $detected_mime && isset( $mime_map[ $detected_mime ] ) ) {
             $mime_type = $detected_mime;

@@ -20,6 +20,7 @@ $options = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_
 // Remove 'envato' from saved options if present (Envato Elements no longer working)
 if ( isset( $options['api_chosen_auto'] ) && is_array( $options['api_chosen_auto'] ) ) {
     unset($options['api_chosen_auto']['envato']);
+    unset($options['api_chosen_auto']['google_translate']);
 }
 if ( isset( $options['api_chosen_manual'] ) && is_array( $options['api_chosen_manual'] ) ) {
     unset($options['api_chosen_manual']['envato']);
@@ -31,6 +32,60 @@ if ( isset( $options['api_chosen'] ) && 'envato' === $options['api_chosen'] ) {
 $list_api_auto = $this->ASI_banks_name_auto();
 /* Banks for Manual Search with Gutenberg Block */
 $list_api_manual = $this->ASI_banks_name_manual();
+$ai_sources = method_exists( $this, 'ASI_ai_source_codes' ) ? $this->ASI_ai_source_codes() : array('dallev1', 'stability', 'replicate');
+$render_source_badge = function( $slug ) use ( $ai_sources ) {
+    if ( ! in_array( $slug, $ai_sources, true ) ) {
+        return '';
+    }
+
+    return '<span class="asi-source-badge"><span class="asi-source-dot"></span><span class="asi-source-badge__label">' . esc_html__( 'AI', 'all-sources-images' ) . '</span></span>';
+};
+
+$render_checkboxes = function( $items, $option_key ) use ( $options, $render_source_badge ) {
+    if ( empty( $items ) ) {
+        echo '<p class="description">' . esc_html__( 'No sources available yet.', 'all-sources-images' ) . '</p>';
+        return;
+    }
+
+    $default_bank_order = 99;
+    $rendered_list      = array();
+    $selected_options   = ( isset( $options[$option_key] ) && is_array( $options[$option_key] ) ) ? $options[$option_key] : array();
+    $order_api_chosen   = array_keys( $selected_options );
+
+    foreach ( $items as $api => $api_code ) {
+        $slug = isset( $api_code[0] ) ? $api_code[0] : '';
+        if ( 'api_chosen_auto' === $option_key && 'google_translate' === $slug ) {
+            continue;
+        }
+        $checked = ( !empty( $selected_options ) && in_array( $slug, $selected_options, true ) ) ? 'checked="checked"' : '';
+        $key_api_chosen = is_array( $order_api_chosen ) ? array_search( $slug, $order_api_chosen, true ) : false;
+        if ( false === $key_api_chosen || ( isset( $rendered_list[0] ) && 0 == $key_api_chosen ) ) {
+            $key_api_chosen = $default_bank_order;
+            $default_bank_order++;
+        }
+
+        $disabled       = 'disabled';
+        $class_disabled = 'checkbox-disabled';
+        if ( true === $api_code[1] ) {
+            $disabled       = '';
+            $class_disabled = '';
+        } else {
+            $checked = '';
+        }
+
+        $badge_markup = $render_source_badge( $slug );
+
+        $rendered_list[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . esc_attr( $slug ) . '" name="ASI_plugin_banks_settings[' . esc_attr( $option_key ) . '][' . esc_attr( $slug ) . ']"> <span></span> ' . esc_html( $api ) . ' ' . $badge_markup . '</label></li>';
+    }
+
+    ksort( $rendered_list );
+
+    echo '<ul class="radio-list">';
+    foreach ( $rendered_list as $rendered_item ) {
+        echo $rendered_item; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    }
+    echo '</ul>';
+};
 ?>
 
             <div class="alert alert-custom alert-default" role="alert">
@@ -44,7 +99,7 @@ $list_api_manual = $this->ASI_banks_name_manual();
                 </div>
                 <div class="alert-text">
                     <?php 
-esc_html_e( 'Choose which database you want to search for pictures. You can select multiple sources, and drag & drop each banks to give priorities on image search.', 'all-sources-images' );
+esc_html_e( 'Choose the sources you want to use. Drag to set priority. BANK pulls existing photos, AI creates images from prompts.', 'all-sources-images' );
 ?>
                 </div>
             </div>
@@ -53,84 +108,36 @@ esc_html_e( 'Choose which database you want to search for pictures. You can sele
 	            <tbody>
 	              <tr valign="top">
 	                <th scope="row">
-						<label for="hseparator"><?php 
-esc_html_e( 'Image Banks', 'all-sources-images' );
+					<label for="hseparator"><?php 
+esc_html_e( 'Image Sources', 'all-sources-images' );
 ?></label>
 	                </th>
-					<td class="chosen_api checkbox-list">
+				<td class="chosen_api checkbox-list">
 
-						<h5><?php 
+					<h5><?php 
 esc_html_e( 'Automatic', 'all-sources-images' );
 ?></h5>
+                    <p class="description text-muted"><?php 
+esc_html_e( 'Used for bulk runs, scheduling, and integrations.', 'all-sources-images' );
+?></p>
 
-						<ul class="radio-list" id="sortable">
-							<?php 
-$default_bank_order = 99;
-foreach ( $list_api_auto as $api => $api_code ) {
-    $checked = ( isset( $options['api_chosen_auto'] ) && !empty( $options['api_chosen_auto'] ) && in_array( $api_code[0], $options['api_chosen_auto'] ) ? 'checked="checked""' : '' );
-    $order_api_chosen = array_keys( $options['api_chosen_auto'] );
-    $key_api_chosen = array_search( $api_code[0], $order_api_chosen );
-    if ( false === $key_api_chosen || isset( $ar_list_banks_auto[0] ) && 0 == $key_api_chosen ) {
-        $key_api_chosen = $default_bank_order;
-        $default_bank_order++;
-    }
-    $disabled = 'disabled';
-    $class_disabled = 'checkbox-disabled';
-    if ( true === $api_code[1] ) {
-        $disabled = '';
-        $class_disabled = '';
-    }
-    if ( 'disabled' == $disabled ) {
-        $disabled = 'disabled';
-        $class_disabled = 'checkbox-disabled';
-        $checked = '';
-    }
-    $ar_list_banks_auto[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . $api_code[0] . '" name="ASI_plugin_banks_settings[api_chosen_auto][' . $api_code[0] . ']"> <span></span> ' . $api . '</label></li>';
-}
-ksort( $ar_list_banks_auto );
-foreach ( $ar_list_banks_auto as $ar_list_banks_val ) {
-    echo $ar_list_banks_val;
-}
+					<?php 
+$render_checkboxes( $list_api_auto, 'api_chosen_auto' );
 ?>
-						</ul>
 	                </td>
 	                <td class="chosen_api checkbox-list">
 
-					   <h5><?php 
+				   <h5><?php 
 esc_html_e( 'Gutenberg Block', 'all-sources-images' );
 ?></h5>
+                    <p class="description text-muted"><?php 
+esc_html_e( 'Used when picking images manually inside the editor.', 'all-sources-images' );
+?></p>
 
-					   <ul class="radio-list" id="sortable">
-	                      <?php 
-$default_bank_order = 99;
-foreach ( $list_api_manual as $api => $api_code ) {
-    $checked = ( isset( $options['api_chosen_manual'] ) && !empty( $options['api_chosen_manual'] ) && in_array( $api_code[0], $options['api_chosen_manual'] ) ? 'checked="checked""' : '' );
-    $order_api_chosen = array_keys( $options['api_chosen_manual'] );
-    $key_api_chosen = array_search( $api_code[0], $order_api_chosen );
-    if ( false === $key_api_chosen || isset( $ar_list_banks_manual[0] ) && 0 == $key_api_chosen ) {
-        $key_api_chosen = $default_bank_order;
-        $default_bank_order++;
-    }
-    $disabled = 'disabled';
-    $class_disabled = 'checkbox-disabled';
-    if ( true === $api_code[1] ) {
-        $disabled = '';
-        $class_disabled = '';
-    }
-    if ( 'disabled' == $disabled ) {
-        $disabled = 'disabled';
-        $class_disabled = 'checkbox-disabled';
-        $checked = '';
-    }
-    $ar_list_banks_manual[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . $api_code[0] . '" name="ASI_plugin_banks_settings[api_chosen_manual][' . $api_code[0] . ']"> <span></span> ' . $api . '</label></li>';
-}
-ksort( $ar_list_banks_manual );
-foreach ( $ar_list_banks_manual as $ar_list_banks_val ) {
-    echo $ar_list_banks_val;
-}
+				   <?php 
+$render_checkboxes( $list_api_manual, 'api_chosen_manual' );
 ?>
-                     </ul>
-	                </td>
+                 </td>
 	              </tr>
 	            </tbody>
             </table>
@@ -141,7 +148,7 @@ foreach ( $ar_list_banks_manual as $ar_list_banks_val ) {
 esc_html_e( 'Banks Settings', 'all-sources-images' );
 ?></h3>
 
-			<div id="tabs">
+			<div id="tabs" class="asi-tabs">
 				<ul>
 					<?php 
 $a = 0;
@@ -149,7 +156,7 @@ foreach ( $list_api_auto as $api => $api_code ) {
     if ( false === $api_code[1] ) {
         continue;
     }
-    echo '<li><a href="#tab-' . $a . '">' . $api . '</a></li>';
+    echo '<li><a href="#tab-' . $a . '">' . esc_html( $api ) . '</a></li>';
     $a++;
 }
 ?>
@@ -160,13 +167,9 @@ foreach ( $list_api_auto as $api => $api_code ) {
     if ( false === $api_code[1] ) {
         continue;
     }
-    $checked = ( isset( $options['api_chosen'] ) && !empty( $options['api_chosen'] ) && $api_code[0] == $options['api_chosen'] ? '' : 'style="display: none;"' );
-    $executeElseBlock = true;
-    echo '<table id="tab-' . $a . '" class="form-table" ' . $checked . '>';
+    echo '<table id="tab-' . $a . '" class="form-table" >';
     echo '<tbody>';
-    if ( $executeElseBlock ) {
-        include_once 'banks/' . $api_code[0] . '.php';
-    }
+    include_once 'banks/' . $api_code[0] . '.php';
     echo '</tbody>';
     echo '</table>';
     $a++;

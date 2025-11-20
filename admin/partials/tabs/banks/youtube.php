@@ -56,7 +56,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php _e('API Key', 'magic-post-thumbnail'); ?></td>
     <td id="password-youtube" class="password">
-        <input type="password" class="regular-text password" name="ASI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr($apikey); ?>" />
+        <input type="password" class="form-control" name="ASI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr($apikey); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
     </td>
 </tr>
@@ -66,8 +66,10 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td>
         <button class="btn btn-primary" id="btnYouTube" onclick="return false;">
             <?php _e('Test YouTube Connection', 'magic-post-thumbnail'); ?>
-            <span class="loadersmall"></span>
         </button>
+        <span id="resultYoutube">
+            <img src="<?php echo plugin_dir_url(__FILE__); ?>../../../img/loader-mpt.gif" width="32" class="hidden" />
+        </span>
     </td>
 </tr>
 

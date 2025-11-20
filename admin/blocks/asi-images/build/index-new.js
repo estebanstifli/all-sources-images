@@ -1,5 +1,5 @@
 /**
- * Magic Post Thumbnail - Gutenberg Block (Rewritten Clean Version)
+ * All Sources Images - Gutenberg Block (Rewritten Clean Version)
  * 
  * This file replaces the webpack-compiled index.js with a clean, readable version
  */
@@ -218,7 +218,7 @@
 
                 // Modal with search and results
                 isModalOpen && wp.element.createElement(Modal, {
-                    title: 'Magic Post Thumbnail',
+                    title: 'All Sources Images',
                     onRequestClose: () => setIsModalOpen(false),
                     className: 'media-modal-content',
                     style: { maxWidth: '90%', width: '1200px' }

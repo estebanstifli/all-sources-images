@@ -4,6 +4,11 @@ if ( ! function_exists( 'add_filter' ) ) {
 	header( 'HTTP/1.1 403 Forbidden' );
 		exit();
 }
+
+$dalle_options = array();
+if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
+	$dalle_options = $options['dallev1'];
+}
 ?>
 
 <tr valign="top">
@@ -29,7 +34,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-dalle" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[dallev1][apikey]" class="form-control" value="<?php echo( isset( $options['dallev1']['apikey'] ) && !empty( $options['dallev1']['apikey']) )? esc_attr( $options['dallev1']['apikey'] ) : ''; ?>" >
+		<input type="password" name="ASI_plugin_banks_settings[dallev1][apikey]" class="form-control" value="<?php echo( isset( $dalle_options['apikey'] ) && !empty( $dalle_options['apikey']) )? esc_attr( $dalle_options['apikey'] ) : ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -51,14 +56,13 @@ if ( ! function_exists( 'add_filter' ) ) {
 	<td>
 		<select name="ASI_plugin_banks_settings[dallev1][imgsize]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['dallev1']['imgsize'];
+			$selected = isset( $dalle_options['imgsize'] ) ? $dalle_options['imgsize'] : '1024x1024';
 
 			$sizes = array(
 				esc_html__( '1024x1024', 'all-sources-images' )   => '1024x1024',
 				esc_html__( '1792x1024', 'all-sources-images' )   => '1792x1024',
 				esc_html__( '1024x1792', 'all-sources-images' )   => '1024x1792',
 			);
-			ksort( $filetype );
 
 			foreach( $sizes as $name_size => $code_size ) {
 				$choose=($selected == $code_size)?'selected="selected"': '';
@@ -75,7 +79,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ASI_plugin_banks_settings[dallev1][convert_jpg]" type="checkbox" value="true" <?php echo( !empty( $options['dallev1']['convert_jpg'] ) && $options['dallev1']['convert_jpg'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ASI_plugin_banks_settings[dallev1][convert_jpg]" type="checkbox" value="true" <?php echo( !empty( $dalle_options['convert_jpg'] ) && $dalle_options['convert_jpg'] == 'true' )? 'checked': ''; ?>><span></span>
 			<?php esc_html_e( 'Convert to Jpeg image extension', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'DALL-E will create a PNG file, click this option if you want to convert the file to a Jpeg image.', 'all-sources-images' ); ?></p>

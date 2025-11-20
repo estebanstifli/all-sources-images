@@ -1240,38 +1240,72 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             );
         } elseif ( $img_block['api_chosen'] == 'stability' ) {
             $api_key = ( !empty( $options['stability']['apikey'] ) ? $options['stability']['apikey'] : '' );
-            $model = ( !empty( $options['stability']['model'] ) ? $options['stability']['model'] : 'sd3.5-large-turbo' );
+            $model = ( !empty( $options['stability']['model'] ) ? $options['stability']['model'] : 'sd3-large' );
             $aspect_ratio = ( !empty( $options['stability']['aspect_ratio'] ) ? $options['stability']['aspect_ratio'] : '16:9' );
             $output_format = ( !empty( $options['stability']['output_format'] ) ? $options['stability']['output_format'] : 'jpeg' );
-            
-            // Calculate dimensions from aspect ratio
-            $aspect_map = array(
-                '21:9' => array('width' => 2560, 'height' => 1097),
-                '16:9' => array('width' => 2560, 'height' => 1440),
-                '3:2'  => array('width' => 2304, 'height' => 1536),
-                '5:4'  => array('width' => 2048, 'height' => 1638),
-                '1:1'  => array('width' => 2048, 'height' => 2048),
-                '4:5'  => array('width' => 1638, 'height' => 2048),
-                '2:3'  => array('width' => 1536, 'height' => 2304),
-                '9:16' => array('width' => 1440, 'height' => 2560),
-                '9:21' => array('width' => 1097, 'height' => 2560),
+            $use_negative_prompt = ( !empty( $options['stability']['use_negative_prompt'] ) && 'true' === $options['stability']['use_negative_prompt'] );
+
+            $endpoint_map = array(
+                'sd3-large'         => 'sd3',
+                'sd3-large-turbo'   => 'sd3-turbo',
+                'sd3-medium'        => 'sd3',
+                'sd3.5-large-turbo' => 'sd3',
+                'sd3.5-large'       => 'sd3',
+                'core'              => 'core',
+                'ultra'             => 'ultra',
             );
-            $dimensions = isset( $aspect_map[$aspect_ratio] ) ? $aspect_map[$aspect_ratio] : $aspect_map['16:9'];
-            
+            $endpoint = isset( $endpoint_map[$model] ) ? $endpoint_map[$model] : 'sd3';
+
+            $payload = array(
+                'prompt'        => $search,
+                'model'         => $model,
+                'aspect_ratio'  => $aspect_ratio,
+                'output_format' => $output_format,
+            );
+
+            if ( in_array( $endpoint, array('core', 'ultra'), true ) ) {
+                $aspect_map = array(
+                    '21:9' => array('width' => 2560, 'height' => 1097),
+                    '16:9' => array('width' => 2560, 'height' => 1440),
+                    '3:2'  => array('width' => 2304, 'height' => 1536),
+                    '5:4'  => array('width' => 2048, 'height' => 1638),
+                    '1:1'  => array('width' => 2048, 'height' => 2048),
+                    '4:5'  => array('width' => 1638, 'height' => 2048),
+                    '2:3'  => array('width' => 1536, 'height' => 2304),
+                    '9:16' => array('width' => 1440, 'height' => 2560),
+                    '9:21' => array('width' => 1097, 'height' => 2560),
+                );
+                $dimensions = isset( $aspect_map[$aspect_ratio] ) ? $aspect_map[$aspect_ratio] : $aspect_map['16:9'];
+                $payload['width']  = $dimensions['width'];
+                $payload['height'] = $dimensions['height'];
+            }
+
+            if ( $use_negative_prompt ) {
+                $payload['negative_prompt'] = 'blurry, low quality, distorted, disfigured, ugly, low resolution';
+            }
+
+            $boundary = 'ASI-' . wp_generate_password( 24, false );
+            $body = '';
+            foreach ( $payload as $field => $value ) {
+                if ( $value === '' ) {
+                    continue;
+                }
+                $body .= '--' . $boundary . "\r\n";
+                $body .= 'Content-Disposition: form-data; name="' . $field . '"' . "\r\n\r\n";
+                $body .= $value . "\r\n";
+            }
+            $body .= '--' . $boundary . "--\r\n";
+
             $array_parameters = array(
-                'url'     => 'https://api.stability.ai/v2beta/stable-image/generate/' . $model,
+                'url'     => 'https://api.stability.ai/v2beta/stable-image/generate/' . $endpoint,
                 'method'  => 'POST',
-                'timeout' => 30,
+                'timeout' => 60,
                 'headers' => array(
                     'Authorization' => 'Bearer ' . $api_key,
-                    'Accept'        => 'application/json',
+                    'Accept'        => 'image/*',
+                    'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
                 ),
-                'body'    => array(
-                    'prompt'        => $search,
-                    'width'         => $dimensions['width'],
-                    'height'        => $dimensions['height'],
-                    'output_format' => $output_format,
-                ),
+                'body'    => $body,
             );
         } elseif ( $img_block['api_chosen'] == 'flickr' ) {
             $api_key = '63d9c292b9e2dfacd3a73908779d6d6f';
@@ -1338,37 +1372,53 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             );
         } elseif ( $img_block['api_chosen'] == 'pexels' ) {
             $api_key = ( !empty( $options['pexels']['apikey'] ) ? $options['pexels']['apikey'] : '' );
-            $orientation = ( !empty( $options['pexels']['orientation'] ) ? $options['pexels']['orientation'] : '' );
-            $size = ( !empty( $options['pexels']['size'] ) ? $options['pexels']['size'] : 'large' );
-            $color = ( !empty( $options['pexels']['color'] ) ? $options['pexels']['color'] : '' );
+            $orientation = ( !empty( $options['pexels']['orientation'] ) && 'all' !== $options['pexels']['orientation'] ) ? $options['pexels']['orientation'] : '';
+            $size = ( !empty( $options['pexels']['size'] ) && 'all' !== $options['pexels']['size'] ) ? $options['pexels']['size'] : '';
+            $color = ( !empty( $options['pexels']['color'] ) && 'all' !== $options['pexels']['color'] ) ? $options['pexels']['color'] : '';
             $locale = ( !empty( $options['pexels']['locale'] ) ? $options['pexels']['locale'] : 'en-US' );
+            $fallback_search = !empty( $search ) ? $search : ( isset( $img_block['based_on']['title'] ) ? $img_block['based_on']['title'] : '' );
             $array_parameters = array(
                 'url'         => 'https://api.pexels.com/v1/search',
                 'method'      => 'GET',
                 'headers'     => array(
                     'Authorization' => $api_key,
                 ),
-                'query'       => urlencode( $search ),
+                'query'       => $fallback_search,
                 'per_page'    => '15',
-                'orientation' => $orientation,
-                'size'        => $size,
-                'color'       => $color,
                 'locale'      => $locale,
             );
+
+            if ( !empty( $orientation ) ) {
+                $array_parameters['orientation'] = $orientation;
+            }
+
+            if ( !empty( $size ) ) {
+                $array_parameters['size'] = $size;
+            }
+
+            if ( !empty( $color ) ) {
+                $array_parameters['color'] = $color;
+            }
         } elseif ( $img_block['api_chosen'] == 'unsplash' ) {
             $api_key = ( !empty( $options['unsplash']['apikey'] ) ? $options['unsplash']['apikey'] : '' );
-            $orientation = ( !empty( $options['unsplash']['orientation'] ) ? $options['unsplash']['orientation'] : '' );
+            $orientation = ( !empty( $options['unsplash']['orientation'] ) && 'all' !== $options['unsplash']['orientation'] ) ? $options['unsplash']['orientation'] : '';
             $content_filter = ( !empty( $options['unsplash']['content_filter'] ) ? $options['unsplash']['content_filter'] : 'low' );
-            $color = ( !empty( $options['unsplash']['color'] ) ? $options['unsplash']['color'] : '' );
+            $color = ( !empty( $options['unsplash']['color'] ) && 'all' !== $options['unsplash']['color'] ) ? $options['unsplash']['color'] : '';
             $array_parameters = array(
                 'url'            => 'https://api.unsplash.com/search/photos',
                 'query'          => urlencode( $search ),
                 'per_page'       => '15',
-                'orientation'    => $orientation,
                 'content_filter' => $content_filter,
-                'color'          => $color,
                 'client_id'      => $api_key,
             );
+
+            if ( !empty( $orientation ) ) {
+                $array_parameters['orientation'] = $orientation;
+            }
+
+            if ( !empty( $color ) ) {
+                $array_parameters['color'] = $color;
+            }
         } elseif ( $img_block['api_chosen'] == 'cc_search' || $img_block['api_chosen'] == 'openverse' ) {
             $imgtype = ( !empty( $options['cc_search']['imgtype'] ) ? $options['cc_search']['imgtype'] : '' );
             $aspect_ratio = ( !empty( $options['cc_search']['aspect_ratio'] ) ? $options['cc_search']['aspect_ratio'] : '' );
@@ -1476,6 +1526,11 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         }
         
         ASI_log( 'API response received for: ' . $service, 'ASI_GENERATE_RESPONSE' );
+
+        if ( 'pexels' === $service ) {
+            $raw_snippet = is_string( $result ) ? mb_substr( $result, 0, 4000 ) : print_r( $result, true );
+            error_log( '[All Sources Images][Pexels RAW] ' . $raw_snippet );
+        }
         $log = $this->ASI_monolog_call();
         $log->info( 'Source used', array(
             'Service' => $service,
@@ -1562,9 +1617,8 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         /* if( ( TRUE == $get_only_thumb ) && ( $service == 'envato' ) ) { // DISABLED - Envato Elements no longer working
         		return $result_body['results']['search_query_result']['search_payload'];
         	} else */
-        if ( TRUE == $get_only_thumb && 'flickr' != $service ) {
+        if ( TRUE == $get_only_thumb ) {
             return $result_body;
-        } else {
         }
         /* Random Image */
         if ( $selected_image == 'random_result' && $service != 'dallev1' && $service != 'stability' ) {
@@ -1852,6 +1906,14 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 $output_img_urls[1],
                 $output_img_alts[1],
                 $output_img_captions[1]
+            );
+        } elseif ( $service == 'stability' ) {
+            $code = intval( $result['response']['code'] );
+            if ( 200 !== $code ) {
+                return false;
+            }
+            $result_body = array(
+                'image' => base64_encode( $result['body'] ),
             );
         } else {
             $result_body = json_decode( $result['body'], true );

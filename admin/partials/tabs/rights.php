@@ -44,7 +44,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                             </svg></span>
                             </div>
                             <div class="alert-text">
-                                <?php esc_html_e( 'Select which role has access to the Magic Post Thumbnail Dashboard', 'all-sources-images' ); ?>
+                                <?php esc_html_e( 'Select which role has access to the All Sources Images Dashboard', 'all-sources-images' ); ?>
                             </div>
                         </div>
                     </td>
