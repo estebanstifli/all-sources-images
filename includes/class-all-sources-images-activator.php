@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * Fired during plugin activation
@@ -28,11 +28,16 @@ class All_Sources_Images_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
-		if (!get_option('ASI_plugin_activation_date')) {
-			update_option('ASI_plugin_activation_date', time());
+		ASI_log( 'Activator::activate() called', 'ACTIVATOR' );
+		
+		if ( ! get_option( 'ASI_plugin_activation_date' ) ) {
+			$result = update_option( 'ASI_plugin_activation_date', time() );
+			ASI_log( 'Activation date set: ' . ( $result ? 'SUCCESS' : 'FAILED' ), 'ACTIVATOR' );
+		} else {
+			ASI_log( 'Activation date already exists', 'ACTIVATOR' );
 		}
-
+		
+		ASI_log( 'Activator::activate() completed', 'ACTIVATOR' );
 	}
 
 }

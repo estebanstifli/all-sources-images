@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -33,6 +33,14 @@ if ( ! function_exists( 'add_filter' ) ) {
 	<td id="password-googleAPI" class="password">
 		<input type="password" name="ASI_plugin_banks_settings[googleimage][apikey]" class="form-control" value="<?php echo( isset( $options['googleimage']['apikey'] ) && !empty( $options['googleimage']['apikey']) )? trim( $options['googleimage']['apikey'] ): ''; ?>" >
 		<i id="togglePassword"></i>
+	</td>
+</tr>
+<tr valign="top">
+	<td colspan="2">
+		<button class="btn btn-primary" id="btnGoogleImage" onclick="return false;">
+			<?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
+		</button>
+		<span id="resultGoogleImage"><img src="<?php echo plugin_dir_url( __FILE__ ); ?>../../../img/loader-mpt.gif" width="32" class="hidden"/></span>
 	</td>
 </tr>
 

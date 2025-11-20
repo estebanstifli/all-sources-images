@@ -1,14 +1,13 @@
-﻿<?php
+<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
 		exit();
+}
 ?>
 <div class="wrap">
 
         <?php 
-
-        <?php
 
                 $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
                 $value_bulk_generation_interval = ( isset( $options['bulk_generation_interval'] ) )? (int)$options['bulk_generation_interval'] : 0;
@@ -79,7 +78,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                                         </span>
                                 </div>
                         </div>
-                <?php ?>
+                <?php } ?>
 
             </div>
 
@@ -92,7 +91,7 @@ if ( ! function_exists( 'add_filter' ) ) {
             <p class="dalle-wait">
                 <?php esc_html_e( 'Dall-e v3 Generation may take 20 to 40 seconds. Please be patient', 'all-sources-images' ); ?>.
             </p>
-                <?php ?>
+                <?php } ?>
 
             <table class="wp-list-mpt wp-list-table widefat fixed striped posts">
               <thead>
@@ -110,7 +109,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                   foreach( $ids_mpt_generation as $id ) {
                           if( !get_post_status( $id ) )
                                   continue;
-                ?>
+                  ?>
                 <tr id="post-<?php echo $id; ?>" class="post-<?php echo $id; ?>">
                         <th scope="row"></th>
                         <td class="column-title">
@@ -144,7 +143,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                                 </div>
                         </td>
                 </tr>
-                <?php ?>
+                <?php } ?>
 
                 <tr class="successful-generation">
                         <th scope="row"></th>
@@ -161,7 +160,6 @@ if ( ! function_exists( 'add_filter' ) ) {
                 <p><?php esc_html_e( 'Steps to generate images:', 'all-sources-images' ); ?></p>
                 <p><img src="<?php echo plugin_dir_url( __FILE__ ) . '../../img/generation-step-1.png'; ?>" title="<?php esc_html_e( 'Choose your posts', 'all-sources-images' ); ?>" /></p>
                 <p><img src="<?php echo plugin_dir_url( __FILE__ ) . '../../img/generation-step-2.png'; ?>" title="<?php esc_html_e( 'Generate images', 'all-sources-images' ); ?>" /></p>
-        <?php
-        ?>
+        <?php } ?>
 
 </div>

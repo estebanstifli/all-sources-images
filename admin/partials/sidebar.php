@@ -1,4 +1,4 @@
-﻿<!--begin::Aside-->
+<!--begin::Aside-->
 <div class="aside aside-left  aside-fixed  d-flex flex-column flex-row-auto" id="kt_aside">
 	<!--begin::Brand-->
 	<div class="brand flex-column-auto " id="kt_brand">

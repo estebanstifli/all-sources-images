@@ -1,8 +1,9 @@
-﻿<?php
+<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
-		exit();
+	exit();
+}
 ?>
 <tr valign="top">
     <td colspan="2">
@@ -69,7 +70,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                         foreach ( $post_types_default  as $post_type ) {
                                 if( post_type_supports( $post_type->name, 'thumbnail' ) == 'true' ) {
 
-                                        if( !$options['choosed_save_post_post_type'] ) {
+                                        if( !isset($options['choosed_save_post_post_type']) || !$options['choosed_save_post_post_type'] ) {
                                             $checked = 'checked';
                                         } else {
                                             $checked = ( isset( $options['choosed_save_post_post_type'][$post_type->name ] ) )? 'checked' : '';
@@ -80,6 +81,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                                                 <input '. $checked .' name="ASI_plugin_main_settings[choosed_save_post_post_type]['. $post_type->name .']" type="checkbox" value="'. $post_type->name .'"><span></span> '. $post_type->labels->name .'
                                         </label>';
                                 }
+                        }
                         ?>
         </td>
 </tr>
@@ -142,26 +144,10 @@ if ( ! function_exists( 'add_filter' ) ) {
                                                 <input '. $checked .' name="ASI_plugin_main_settings[choosed_wp_insert_post_type]['. $post_type->name .']" type="checkbox" value="'. $post_type->name .'"><span></span> '. $post_type->labels->name .'
                                         </label>';
                                     }
+                            }
                             ?>
             </td>
     </tr>
-
-
-<?php } } else { ?>
-    <tr valign="top" class="wp_insert_post">
-        <th scope="row">
-            <label for="hseparator">
-                <?php esc_html_e( '"WP Insert Post" Hook', 'all-sources-images' ); ?><br/>
-                <small><?php esc_html_e( 'Only available with the pro version', 'all-sources-images' ); ?></small>
-            </label>
-        </th>
-        <td>
-            <label class="checkbox checkbox-disabled checkbox-admin">
-                <input disabled="disabled" data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_wp_insert_post_hook]" id="enable_wp_insert_post_hook" value="disable" />
-            </label>
-        </td>
-    </tr>
-<?php ?>
 
 <tr valign="top" class="based_on_bottom">
     <td colspan="2">
@@ -196,20 +182,6 @@ if ( ! function_exists( 'add_filter' ) ) {
             </label>
         </td>
     </tr>
-<?php } } else {
-?>
-        <tr valign="top">
-            <th scope="row">
-                <label for="hseparator"><?php esc_html_e( 'Strict Search Mode', 'all-sources-images' ); ?></label><br/>
-                <small><?php esc_html_e( 'Only available with the pro version', 'all-sources-images' ); ?></small>
-            </th>
-            <td>
-                <label class="checkbox">
-                    <input disabled="disabled" data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_strict_search]" id="enable_strict_search" value="enable" <?php echo( !empty( $options['enable_strict_search']) && $options['enable_strict_search'] == 'enable' )? 'checked': ''; ?> />
-                </label>
-            </td>
-        </tr>
-<?php ?>
 
 <tr valign="top" class="based_on_bottom">
     <th scope="row">

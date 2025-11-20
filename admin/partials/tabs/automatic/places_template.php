@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
@@ -138,6 +138,7 @@ foreach ( $image_sizes as $image_size ) {
     ?>
                     </option>
                 <?php 
+}
 ?>
             </select> 
         </label>
@@ -164,6 +165,7 @@ foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) {
         ?></option>
             <?php 
     }
+}
 ?>
             </select> 
         </label>
@@ -193,6 +195,7 @@ foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) {
         ?></option>
                 <?php 
     }
+}
 ?>
             </select> 
         </label>
@@ -526,6 +529,7 @@ ksort( $langs );
 foreach ( $langs as $name_lang => $code_lang ) {
     $choose = ( $current_wp_lang == $code_lang ? 'selected="selected"' : '' );
     echo '<option ' . $choose . ' value="' . $code_lang . '">' . $name_lang . '</option>';
+}
 ?>
             </select>
         </td>

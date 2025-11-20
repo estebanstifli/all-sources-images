@@ -1,25 +1,21 @@
-﻿<?php
+<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
     header( 'HTTP/1.1 403 Forbidden' );
     exit;
 }
-$disabled = 'disabled';
-$class_disabled = 'radio-disabled';
-$checkbox_disabled = 'checkbox-disabled';
+$disabled = '';
+$class_disabled = '';
+$checkbox_disabled = '';
 ?>
 <div class="wrap">
-
-    <?php 
-
-
 
     <?php 
 settings_errors();
 ?>
 
-    <form method="post" action="options.php" id="tabs" class="form-images">
+    <form method="post" action="options.php" id="automatic-form" class="form-images">
 
         <?php 
 settings_fields( 'ASI-plugin-main-settings' );

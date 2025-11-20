@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
@@ -348,7 +348,7 @@ if ( !empty( $image_blocks ) ) {
     <tr class="cloneBlock">
         <td colspan="2">
             <?php 
-$cloneID = 'add-image-btn-disabled';
+$cloneID = 'add-image-btn';
 ?>
             <a href="#" class="btn font-weight-bolder btn-light-primary text-uppercase py-4 px-6" style="text-decoration: none;" id="<?php 
 echo $cloneID;

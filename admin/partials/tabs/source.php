@@ -1,14 +1,12 @@
-﻿<?php
+<?php
 
 if ( !function_exists( 'add_filter' ) ) {
     header( 'Status: 403 Forbidden' );
     header( 'HTTP/1.1 403 Forbidden' );
     exit;
+}
 ?>
 <div class="wrap">
-
-	<?php 
-
 
 	<?php 
 settings_errors();
@@ -32,14 +30,7 @@ if ( isset( $options['api_chosen'] ) && 'envato' === $options['api_chosen'] ) {
 /* Banks for Automatic Bulk */
 $list_api_auto = $this->ASI_banks_name_auto();
 /* Banks for Manual Search with Gutenberg Block */
-$list_api_manual = array(
-    esc_html__( 'Openverse', 'all-sources-images' ) => array('openverse', true),
-    esc_html__( 'Flickr', 'all-sources-images' )    => array('flickr', true),
-    esc_html__( 'Pixabay', 'all-sources-images' )   => array('pixabay', true),
-    esc_html__( 'Youtube', 'all-sources-images' )   => array('youtube', false),
-    esc_html__( 'Unsplash', 'all-sources-images' )  => array('unsplash', false),
-    esc_html__( 'Pexels', 'all-sources-images' )    => array('pexels', false),
-);
+$list_api_manual = $this->ASI_banks_name_manual();
 ?>
 
             <div class="alert alert-custom alert-default" role="alert">
@@ -99,6 +90,7 @@ foreach ( $list_api_auto as $api => $api_code ) {
 ksort( $ar_list_banks_auto );
 foreach ( $ar_list_banks_auto as $ar_list_banks_val ) {
     echo $ar_list_banks_val;
+}
 ?>
 						</ul>
 	                </td>
@@ -135,8 +127,9 @@ foreach ( $list_api_manual as $api => $api_code ) {
 ksort( $ar_list_banks_manual );
 foreach ( $ar_list_banks_manual as $ar_list_banks_val ) {
     echo $ar_list_banks_val;
+}
 ?>
-	                  </ul>
+                     </ul>
 	                </td>
 	              </tr>
 	            </tbody>
@@ -158,6 +151,7 @@ foreach ( $list_api_auto as $api => $api_code ) {
     }
     echo '<li><a href="#tab-' . $a . '">' . $api . '</a></li>';
     $a++;
+}
 ?>
 				</ul>
 				<?php 
@@ -171,13 +165,12 @@ foreach ( $list_api_auto as $api => $api_code ) {
     echo '<table id="tab-' . $a . '" class="form-table" ' . $checked . '>';
     echo '<tbody>';
     if ( $executeElseBlock ) {
-        if ( !in_array( $api_code[0], array('youtube', 'unsplash') ) ) {
-            include_once 'banks/' . $api_code[0] . '.php';
-        }
+        include_once 'banks/' . $api_code[0] . '.php';
     }
     echo '</tbody>';
     echo '</table>';
     $a++;
+}
 ?>
 			</div>
 

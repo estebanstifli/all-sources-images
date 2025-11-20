@@ -1,8 +1,8 @@
-﻿# Magic Post Thumbnail - AI Coding Agent Guide
+﻿# All Sources Images - AI Coding Agent Guide
 
 ## Project Overview
 
-Magic Post Thumbnail is a WordPress plugin that automatically generates and retrieves images for posts from multiple sources (Google Images, DALL·E, Stable Diffusion, Pexels, Unsplash, Pixabay, etc.). It can set featured images or insert images into post content via Gutenberg blocks and bulk operations.
+All Sources Images is a WordPress plugin that automatically generates and retrieves images for posts from multiple sources (Google Images, DALL·E, Stable Diffusion, Pexels, Unsplash, Pixabay, etc.). It can set featured images or insert images into post content via Gutenberg blocks and bulk operations.
 
 **Version**: 6.1.6  
 **Type**: WordPress Plugin (Free + Pro with Freemius SDK)  

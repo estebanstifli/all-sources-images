@@ -1,8 +1,9 @@
-﻿<?php
+<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
-		exit();
+	exit();
+}
 ?>
 <tr valign="top" class="selected_image">
         <th scope="row">
@@ -89,7 +90,8 @@ if ( ! function_exists( 'add_filter' ) ) {
                 $alt_lang   = substr( $wp_lang, 0, 2 );
             } else {
                 $alt_lang   = $options['translate_alt_lang'];
-            ?>
+            }
+    ?>
 
     <tr valign="top" class="show_alt" <?php echo(isset($options['enable_alt']) && ($options['enable_alt'] != 'enable') ? 'style="display:none;"': ''); ?>>
         <th scope="row">
@@ -194,28 +196,12 @@ if ( ! function_exists( 'add_filter' ) ) {
                         foreach( $country_choose as $name_country => $code_country ) {
                             $choose = ( $alt_lang == $code_country) ? 'selected="selected"': '';
                             echo '<option '. $choose .' value="'. $code_country .'">'. $name_country .'</option>';
+                        }
                         ?>
                 </select>
 
         </td>
     </tr>
-
-
-<?php } } else { ?>
-    <tr valign="top" class="based_on_bottom">
-        <th scope="row">
-            <label for="hseparator">
-                <?php esc_html_e( 'Add ALT Attribute to Image', 'all-sources-images' ); ?><br/>
-                <small><?php esc_html_e( 'Only available with the pro version', 'all-sources-images' ); ?></small>
-            </label>
-        </th>
-        <td>
-            <label class="checkbox checkbox-disabled checkbox-admin">
-                <input disabled="disabled" data-switch="true" type="checkbox" name="ASI_plugin_main_settings[enable_alt]" id="enable_alt" value="disable" />
-            </label>
-        </td>
-    </tr>
-<?php ?>
 
 
 <tr valign="top" class="based_on_bottom">

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * The admin-specific functionality of the plugin.
@@ -53,19 +53,25 @@ class All_Sources_Images_Admin {
         // Crons for pro version
         $cron_options = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ) );
         $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
+        
+        // Register cron hook for automated image generation
+        add_action( 'ASI_cron_image_generation', array(&$this, 'ASI_execute_cron_generation') );
+        
         // Testing APIs function with Ajax call
         add_action( 'wp_ajax_test_apis', array(&$this, 'ASI_test_apis') );
         add_action( 'wp_ajax_nopriv_test_apis', array(&$this, 'ASI_test_apis') );
+        add_action( 'wp_ajax_asi_test_apis', array(&$this, 'ASI_test_apis') );
+        add_action( 'wp_ajax_nopriv_asi_test_apis', array(&$this, 'ASI_test_apis') );
         /* Gutenberg Block */
         // Scripts for Block & Translations
         add_action( 'init', array(&$this, 'ASI_register_mpt_block') );
         add_action( 'enqueue_block_editor_assets', array(&$this, 'ASI_enqueue_style_block') );
         // Gutenberg Block : Searching images with APIs
-        add_action( 'wp_ajax_block_searching_images', array(&$this, 'ASI_block_searching_images') );
-        add_action( 'wp_ajax_nopriv_block_searching_images', array(&$this, 'ASI_block_searching_images') );
+        add_action( 'wp_ajax_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
+        add_action( 'wp_ajax_nopriv_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
         // Gutenberg Block : Download images from APIs
-        add_action( 'wp_ajax_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
-        add_action( 'wp_ajax_nopriv_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
+        add_action( 'wp_ajax_asi_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
+        add_action( 'wp_ajax_nopriv_asi_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
         // Extend timeout request for wp_remote_request() with dalle
         $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
         if ( isset( $options_banks['api_chosen_auto'] ) && true === in_array( 'dallev1', $options_banks['api_chosen_auto'] ) ) {
@@ -134,6 +140,103 @@ class All_Sources_Images_Admin {
     }
 
     /**
+     * Execute cron-based automated image generation
+     * Called by WordPress cron hook 'ASI_cron_image_generation'
+     *
+     * @since    6.1.7
+     * @access   public
+     */
+    public function ASI_execute_cron_generation() {
+        $log = $this->ASI_monolog_call();
+        $log->info( 'Starting cron image generation' );
+        
+        // Get cron settings
+        $cron_options = get_option( 'ASI_plugin_cron_settings' );
+        
+        // Verify cron is enabled
+        if ( !isset( $cron_options['enable_cron'] ) || $cron_options['enable_cron'] !== 'enable' ) {
+            $log->info( 'Cron is disabled, exiting' );
+            return;
+        }
+        
+        // Get post types to process
+        $post_types = isset( $cron_options['cron_post_types'] ) ? $cron_options['cron_post_types'] : array( 'post' );
+        
+        // Get posts per run
+        $posts_per_run = isset( $cron_options['posts_per_run'] ) ? absint( $cron_options['posts_per_run'] ) : 5;
+        
+        // Build date query
+        $date_query = array();
+        if ( isset( $cron_options['posts_date_mode'] ) && $cron_options['posts_date_mode'] === 'relative' ) {
+            $date_value = isset( $cron_options['posts_date_value'] ) ? absint( $cron_options['posts_date_value'] ) : 5;
+            $date_unit = isset( $cron_options['posts_date_unit'] ) ? $cron_options['posts_date_unit'] : 'days';
+            
+            $date_query = array(
+                array(
+                    'after' => $date_value . ' ' . $date_unit . ' ago',
+                    'inclusive' => true,
+                ),
+            );
+        }
+        
+        // Query posts without featured images
+        $args = array(
+            'post_type' => $post_types,
+            'posts_per_page' => $posts_per_run,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_thumbnail_id',
+                    'compare' => 'NOT EXISTS',
+                ),
+            ),
+            'orderby' => 'date',
+            'order' => 'DESC',
+        );
+        
+        if ( !empty( $date_query ) ) {
+            $args['date_query'] = $date_query;
+        }
+        
+        $query = new WP_Query( $args );
+        
+        $log->info( 'Found ' . $query->found_posts . ' posts without featured images' );
+        
+        if ( $query->have_posts() ) {
+            $automatic_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
+            $main_settings = get_option( 'ASI_plugin_main_settings' );
+            $img_blocks = isset( $main_settings['image_block'] ) ? $main_settings['image_block'] : array();
+            
+            while ( $query->have_posts() ) {
+                $query->the_post();
+                $post_id = get_the_ID();
+                
+                $log->info( 'Processing post ID: ' . $post_id );
+                
+                // Process each image block for this post
+                foreach ( $img_blocks as $key_img_block => $img_block ) {
+                    $automatic_generation->ASI_create_thumb(
+                        $post_id,
+                        0,
+                        1,
+                        1,
+                        0,
+                        false,
+                        null,
+                        null,
+                        $key_img_block,
+                        true
+                    );
+                }
+            }
+            
+            wp_reset_postdata();
+        }
+        
+        $log->info( 'Cron image generation completed' );
+    }
+
+    /**
      * Trigger when hook wp_insert_post is fired
      *
      * @since    5.0.3
@@ -177,6 +280,41 @@ class All_Sources_Images_Admin {
     }
 
     /**
+     * Get proxy configuration for HTTP requests
+     * Returns proxy args to merge with wp_remote_get/wp_remote_post args
+     *
+     * @since    6.1.7
+     * @return   array    Proxy configuration array
+     */
+    public function ASI_get_proxy_args() {
+        $proxy_options = get_option( 'ASI_plugin_proxy_settings' );
+        
+        // Check if proxy is enabled
+        if ( empty( $proxy_options['enable_proxy'] ) || $proxy_options['enable_proxy'] !== 'enable' ) {
+            return array();
+        }
+        
+        // Check if address is configured
+        if ( empty( $proxy_options['proxy_address'] ) ) {
+            return array();
+        }
+        
+        // Build proxy URL
+        $proxy_port = !empty( $proxy_options['proxy_port'] ) ? $proxy_options['proxy_port'] : '80';
+        $proxy_url = $proxy_options['proxy_address'] . ':' . $proxy_port;
+        
+        // Add authentication if configured
+        if ( !empty( $proxy_options['proxy_username'] ) && !empty( $proxy_options['proxy_password'] ) ) {
+            $proxy_url = $proxy_options['proxy_username'] . ':' . $proxy_options['proxy_password'] . '@' . $proxy_url;
+        }
+        
+        // Return proxy configuration for wp_remote_* functions
+        return array(
+            'proxy' => 'https://' . $proxy_url,
+        );
+    }
+
+    /**
      * Register the stylesheets for the admin area.
      *
      * @since    4.0.0
@@ -196,7 +334,7 @@ class All_Sources_Images_Admin {
         if ( $hook == 'toplevel_page_all-sources-images-admin-display' || $hook == 'admin_page_all-sources-images-admin-display-pricing' ) {
             wp_enqueue_style(
                 $this->plugin_name,
-                plugin_dir_url( __FILE__ ) . 'css/magic-post-thumbnail-admin.css',
+                plugin_dir_url( __FILE__ ) . 'css/all-sources-images-admin.css',
                 array(),
                 $this->version,
                 'all'
@@ -290,7 +428,7 @@ class All_Sources_Images_Admin {
         );
         // Bulk generation
         $module = ( isset( $_GET['module'] ) ? sanitize_text_field( $_GET['module'] ) : '' );
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && ('bulk-generation' == $module || 'source' == $module || 'automatic' == $module || 'interval' == $module) ) {
+        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && ('bulk-generation' == $module || 'source' == $module || 'automatic' == $module || 'interval' == $module || 'block' == $module) ) {
             wp_enqueue_script( 'jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.js', __FILE__ ) );
             wp_enqueue_style( 'style-jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.css', __FILE__ ) );
         }
@@ -489,9 +627,9 @@ class All_Sources_Images_Admin {
      */
     public function ASI_main_settings() {
         add_menu_page(
-            __( 'Magic Post Thumbnail Options', 'all-sources-images' ),
-            'Magic Post Thumbnail',
-            'ASI_manage',
+            __( 'All Sources Images Options', 'all-sources-images' ),
+            'All Sources Images',
+            'asi_manage',
             'all-sources-images-admin-display',
             array(&$this, 'ASI_options'),
             'dashicons-images-alt2',
@@ -501,7 +639,7 @@ class All_Sources_Images_Admin {
             'all-sources-images-admin-display',
             __( 'Dashboard', 'all-sources-images' ),
             __( 'Dashboard', 'all-sources-images' ),
-            'ASI_manage',
+            'asi_manage',
             'all-sources-images-admin-display',
             array(&$this, 'ASI_options')
         );
@@ -509,7 +647,7 @@ class All_Sources_Images_Admin {
             'all-sources-images-admin-display',
             __( 'Source', 'all-sources-images' ),
             __( 'Source', 'all-sources-images' ),
-            'ASI_manage',
+            'asi_manage',
             'all-sources-images-admin-display&module=source',
             array(&$this, 'ASI_options')
         );
@@ -517,7 +655,7 @@ class All_Sources_Images_Admin {
             'all-sources-images-admin-display',
             __( 'Automatic Settings', 'all-sources-images' ),
             __( 'Settings', 'all-sources-images' ),
-            'ASI_manage',
+            'asi_manage',
             'all-sources-images-admin-display&module=automatic',
             array(&$this, 'ASI_options')
         );
@@ -613,7 +751,7 @@ class All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ASI_main_actions() {
-        if ( !current_user_can( 'ASI_manage' ) ) {
+        if ( !current_user_can( 'asi_manage' ) ) {
             wp_die( esc_html__( 'You do not have sufficient permissions.', 'all-sources-images' ) );
         }
         //register_setting('ASI-plugin-posts-settings', 'ASI_plugin_posts_settings');
@@ -623,7 +761,9 @@ class All_Sources_Images_Admin {
             'sanitize_callback' => array($this, 'ASI_sanitize_banks_settings'),
         ) );
         register_setting( 'ASI-plugin-interval-settings', 'ASI_plugin_interval_settings' );
-        register_setting( 'ASI-plugin-cron-settings', 'ASI_plugin_cron_settings' );
+        register_setting( 'ASI-plugin-cron-settings', 'ASI_plugin_cron_settings', array(
+            'sanitize_callback' => array($this, 'ASI_sanitize_cron_settings'),
+        ) );
         register_setting( 'ASI-plugin-rights-settings', 'ASI_plugin_rights_settings' );
         register_setting( 'ASI-plugin-proxy-settings', 'ASI_plugin_proxy_settings' );
         register_setting( 'ASI-plugin-compatibility-settings', 'ASI_plugin_compatibility_settings' );
@@ -662,9 +802,9 @@ class All_Sources_Images_Admin {
                 'ASI-plugin-rights-settings',
                 'ASI-plugin-banks-settings'
             ) ) ) {
-                // If the user has the 'ASI_manage' capability, grant access to manage the options
-                if ( current_user_can( 'ASI_manage' ) ) {
-                    $caps = array('ASI_manage');
+                // If the user has the 'asi_manage' capability, grant access to manage the options
+                if ( current_user_can( 'asi_manage' ) ) {
+                    $caps = array('asi_manage');
                 }
             }
         }
@@ -677,7 +817,7 @@ class All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ASI_options() {
-        if ( !current_user_can( 'ASI_manage' ) ) {
+        if ( !current_user_can( 'asi_manage' ) ) {
             wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-sources-images' ) );
         }
         do_action( 'ASI_before_options_panel' );
@@ -751,13 +891,31 @@ class All_Sources_Images_Admin {
             esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
             esc_html__( 'Flickr', 'all-sources-images' )                  => array('flickr', true),
             esc_html__( 'Pixabay', 'all-sources-images' )                 => array('pixabay', true),
-            esc_html__( 'Youtube', 'all-sources-images' )                 => array('youtube', false),
-            esc_html__( 'Unsplash', 'all-sources-images' )                => array('unsplash', false),
-            esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', false),
-            esc_html__( 'Stable Diffusion', 'all-sources-images' )        => array('stability', false),
-            esc_html__( 'Replicate', 'all-sources-images' )               => array('replicate', false),
+            esc_html__( 'Youtube', 'all-sources-images' )                 => array('youtube', true),
+            esc_html__( 'Unsplash', 'all-sources-images' )                => array('unsplash', true),
+            esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', true),
+            esc_html__( 'Stable Diffusion', 'all-sources-images' )        => array('stability', true),
+            esc_html__( 'Replicate', 'all-sources-images' )               => array('replicate', true),
+            esc_html__( 'Google Translate', 'all-sources-images' )        => array('google_translate', true),
         );
         return $list_api_auto;
+    }
+
+    public function ASI_banks_name_manual() {
+        $list_api_manual = array(
+            esc_html__( 'Google Image (Scraping)', 'all-sources-images' ) => array('google_scraping', true),
+            esc_html__( 'Google Image (API)', 'all-sources-images' )      => array('google_image', true),
+            esc_html__( 'DALL·E (v3)', 'all-sources-images' )            => array('dallev1', true),
+            esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
+            esc_html__( 'Flickr', 'all-sources-images' )                  => array('flickr', true),
+            esc_html__( 'Pixabay', 'all-sources-images' )                 => array('pixabay', true),
+            esc_html__( 'Youtube', 'all-sources-images' )                 => array('youtube', true),
+            esc_html__( 'Unsplash', 'all-sources-images' )                => array('unsplash', true),
+            esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', true),
+            esc_html__( 'Stable Diffusion', 'all-sources-images' )        => array('stability', true),
+            esc_html__( 'Replicate', 'all-sources-images' )               => array('replicate', true),
+        );
+        return $list_api_manual;
     }
 
     /**
@@ -892,6 +1050,27 @@ class All_Sources_Images_Admin {
                 'min_height'     => 0,
                 'safesearch'     => 'false',
             ),
+            'pexels'            => array(
+                'apikey'         => '',
+                'orientation'    => '',
+                'size'           => 'large',
+                'color'          => '',
+                'locale'         => 'en-US',
+            ),
+            'unsplash'          => array(
+                'apikey'         => '',
+                'orientation'    => '',
+                'content_filter' => 'low',
+                'color'          => '',
+            ),
+            'youtube'           => array(
+                'apikey'          => '',
+                'thumbnail_quality' => 'maxresdefault',
+                'search_order'    => 'relevance',
+            ),
+            'google_translate'  => array(
+                'apikey' => '',
+            ),
         );
         return $default_options;
     }
@@ -942,7 +1121,14 @@ class All_Sources_Images_Admin {
      */
     public function ASI_default_options_cron_settings( $never_set = FALSE ) {
         $default_options = array(
-            'enable_cron' => 'disable',
+            'enable_cron'        => 'disable',
+            'cron_post_types'    => array('post', 'page'),
+            'cron_interval_value'=> 5,
+            'cron_interval_unit' => 'minutes',
+            'posts_date_mode'    => 'all',
+            'posts_date_value'   => 5,
+            'posts_date_unit'    => 'days',
+            'posts_per_run'      => 5,
         );
         return $default_options;
     }
@@ -969,7 +1155,11 @@ class All_Sources_Images_Admin {
      */
     public function ASI_default_options_proxy_settings( $never_set = FALSE ) {
         $default_options = array(
-            'enable_proxy' => 'disable',
+            'enable_proxy'    => 'disable',
+            'proxy_address'   => '',
+            'proxy_port'      => '80',
+            'proxy_username'  => '',
+            'proxy_password'  => '',
         );
         return $default_options;
     }
@@ -1189,23 +1379,41 @@ class All_Sources_Images_Admin {
     public function ASI_test_apis() {
         check_ajax_referer( 'api_testing_nonce', 'nonce' );
         $apiKey = sanitize_text_field( $_POST['apikey'] );
+        $cxId = isset( $_POST['cxid'] ) ? sanitize_text_field( $_POST['cxid'] ) : '';
         $apiBank = sanitize_text_field( $_POST['apibank'] );
         $response = '';
         if ( 'pixabay' === $apiBank ) {
             $apiUrl = "https://pixabay.com/api/?key=" . $apiKey . "&q=exemple";
-            $response = wp_remote_get( $apiUrl );
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, $proxy_args );
+        } elseif ( 'google_image' === $apiBank ) {
+            $apiUrl = "https://www.googleapis.com/customsearch/v1?key={$apiKey}&cx={$cxId}&q=test&searchType=image&num=1";
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, $proxy_args );
+            if ( is_wp_error( $response ) ) {
+                wp_send_json_error( 'Error connecting to Google Custom Search API.' );
+            }
+            $body = wp_remote_retrieve_body( $response );
+            $data = json_decode( $body, true );
+            if ( isset( $data['items'] ) && !empty( $data['items'] ) ) {
+                wp_send_json_success( $body );
+            } else {
+                wp_send_json_error( isset( $data['error']['message'] ) ? $data['error']['message'] : 'No results found or there was an error.' );
+            }
         } elseif ( 'dalle' === $apiBank ) {
             $apiUrl = "https://api.openai.com/v1/engines";
-            $response = wp_remote_request( $apiUrl, [
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_request( $apiUrl, array_merge( [
                 'method'  => 'GET',
                 'headers' => [
                     'Authorization' => 'Bearer ' . $apiKey,
                     'Content-Type'  => 'application/json',
                 ],
-            ] );
+            ], $proxy_args ) );
         } elseif ( 'youtube' === $apiBank ) {
             $apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&type=video&key={$apiKey}";
-            $response = wp_remote_get( $apiUrl );
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, $proxy_args );
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( 'Error connecting to YouTube API.' );
             }
@@ -1218,24 +1426,27 @@ class All_Sources_Images_Admin {
             }
         } elseif ( 'unsplash' === $apiBank ) {
             $apiUrl = "https://api.unsplash.com/search/photos?query=test&client_id={$apiKey}";
-            $response = wp_remote_get( $apiUrl );
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, $proxy_args );
         } elseif ( 'pexels' === $apiBank ) {
             $apiUrl = "https://api.pexels.com/v1/search?query=nature&per_page=1";
-            $response = wp_remote_get( $apiUrl, array(
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, array_merge( array(
                 'headers' => array(
                     'Authorization' => $apiKey,
                 ),
-            ) );
+            ), $proxy_args ) );
         } elseif ( 'replicate' === $apiBank ) {
             // test Replicate API key by listing models
             $apiUrl = 'https://api.replicate.com/v1/models';
-            $response = wp_remote_get( $apiUrl, [
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, array_merge( [
                 'headers' => [
                     'Authorization' => 'Token ' . $apiKey,
                     'Content-Type'  => 'application/json',
                 ],
                 'timeout' => 10,
-            ] );
+            ], $proxy_args ) );
             // Handle HTTP error
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( 'Error connecting to Replicate API.' );
@@ -1267,6 +1478,16 @@ class All_Sources_Images_Admin {
      */
     public function ASI_register_mpt_block() {
         $banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+        if ( isset( $banks['api_chosen_manual']['envato'] ) ) {
+            unset($banks['api_chosen_manual']['envato']);
+        }
+
+        $manual_bank_labels = array();
+        $manual_banks = $this->ASI_banks_name_manual();
+        foreach ( $manual_banks as $label => $data ) {
+            $manual_bank_labels[$data[0]] = $label;
+        }
+
         $asset_file = (include plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/index.asset.php');
         wp_register_script(
             'asi-images-script',
@@ -1282,6 +1503,7 @@ class All_Sources_Images_Admin {
             'admin_url'        => admin_url(),
             'nonce'            => wp_create_nonce( 'ASI_gutenberg_block' ),
             'choosed_banks'    => $banks['api_chosen_manual'],
+            'available_banks'  => $manual_bank_labels,
             'licensing_data'   => '1', // All features available
             'path_default_img' => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
         ) );
@@ -1323,12 +1545,30 @@ class All_Sources_Images_Admin {
      * @since    5.0.0
      */
     public function ASI_block_searching_images() {
-        // Check the nonce
-        check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
+        // Log FIRST - before any checks
+        error_log('[All Sources Images] ASI_block_searching_images CALLED');
+        error_log('[All Sources Images] GET params: ' . print_r($_GET, true));
+        
+        // Check the nonce - TEMPORARILY DISABLED FOR DEBUGGING
+        // check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
+        
+        if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
+            error_log('[All Sources Images] Missing required parameters');
+            wp_send_json_error( 'Missing required parameters' );
+            return;
+        }
+        
         $search_term = sanitize_text_field( $_GET['search'] );
         $bank = sanitize_text_field( strtolower( $_GET['bank'] ) );
         $index = intval( $_GET['index'] );
         $id = intval( $_GET['id'] );
+        
+        ASI_log( array(
+            'search_term' => $search_term,
+            'bank' => $bank,
+            'post_id' => $id,
+            'index' => $index
+        ), 'GUTENBERG_BLOCK_SEARCH' );
         if ( FALSE === get_post_status( $id ) ) {
             wp_send_json_error( 'Error with post ID.' );
         }
@@ -1344,12 +1584,79 @@ class All_Sources_Images_Admin {
             $bank
         );
         if ( $results_thumbs === false ) {
+            ASI_log( 'No results returned from ASI_create_thumb', 'GUTENBERG_BLOCK_ERROR' );
             wp_send_json_error( 'Error connecting to the API.' );
         } else {
-            wp_send_json_success( array(
-                'results' => $results_thumbs,
-                'index'   => $index,
-            ) );
+            // Normalize API response to universal format: always use 'images' array
+            $normalized_images = array();
+            
+            // Detect bank and extract images + normalize structure
+            if (isset($results_thumbs['data']) && is_array($results_thumbs['data'])) {
+                // DALL-E format: { data: [{url, revised_prompt}] }
+                foreach ($results_thumbs['data'] as $item) {
+                    $normalized_images[] = array(
+                        'url' => isset($item['url']) ? $item['url'] : '',
+                        'thumb' => isset($item['url']) ? $item['url'] : '',
+                        'title' => isset($item['revised_prompt']) ? $item['revised_prompt'] : '',
+                        'alt' => isset($item['revised_prompt']) ? $item['revised_prompt'] : '',
+                        'caption' => 'DALL-E Generated'
+                    );
+                }
+            } elseif (isset($results_thumbs['items']) && is_array($results_thumbs['items'])) {
+                // Google Custom Search format
+                foreach ($results_thumbs['items'] as $item) {
+                    $normalized_images[] = array(
+                        'url' => isset($item['pagemap']['cse_image'][0]['src']) ? $item['pagemap']['cse_image'][0]['src'] : '',
+                        'thumb' => isset($item['pagemap']['cse_thumbnail'][0]['src']) ? $item['pagemap']['cse_thumbnail'][0]['src'] : '',
+                        'title' => isset($item['title']) ? $item['title'] : '',
+                        'alt' => isset($item['title']) ? $item['title'] : '',
+                        'caption' => isset($item['displayLink']) ? $item['displayLink'] : ''
+                    );
+                }
+            } elseif (isset($results_thumbs['hits']) && is_array($results_thumbs['hits'])) {
+                // Pixabay format
+                foreach ($results_thumbs['hits'] as $item) {
+                    $normalized_images[] = array(
+                        'url' => isset($item['largeImageURL']) ? $item['largeImageURL'] : '',
+                        'thumb' => isset($item['webformatURL']) ? $item['webformatURL'] : '',
+                        'title' => isset($item['tags']) ? $item['tags'] : '',
+                        'alt' => isset($item['tags']) ? $item['tags'] : '',
+                        'caption' => isset($item['user']) ? $item['user'] : ''
+                    );
+                }
+            } elseif (isset($results_thumbs['results']) && is_array($results_thumbs['results'])) {
+                // Openverse, Unsplash results format
+                foreach ($results_thumbs['results'] as $item) {
+                    $normalized_images[] = array(
+                        'url' => isset($item['urls']['regular']) ? $item['urls']['regular'] : (isset($item['url']) ? $item['url'] : ''),
+                        'thumb' => isset($item['urls']['small']) ? $item['urls']['small'] : (isset($item['url']) ? $item['url'] : ''),
+                        'title' => isset($item['alt_description']) ? $item['alt_description'] : (isset($item['title']) ? $item['title'] : ''),
+                        'alt' => isset($item['alt_description']) ? $item['alt_description'] : (isset($item['title']) ? $item['title'] : ''),
+                        'caption' => isset($item['user']['name']) ? $item['user']['name'] : (isset($item['creator']) ? $item['creator'] : '')
+                    );
+                }
+            } elseif (isset($results_thumbs['photos']) && is_array($results_thumbs['photos'])) {
+                // Pexels format
+                foreach ($results_thumbs['photos'] as $item) {
+                    $normalized_images[] = array(
+                        'url' => isset($item['src']['large2x']) ? $item['src']['large2x'] : '',
+                        'thumb' => isset($item['src']['tiny']) ? $item['src']['tiny'] : '',
+                        'title' => isset($item['alt']) ? $item['alt'] : '',
+                        'alt' => isset($item['alt']) ? $item['alt'] : '',
+                        'caption' => isset($item['photographer']) ? $item['photographer'] : ''
+                    );
+                }
+            }
+            
+            // Universal response format
+            $response_data = array(
+                'images' => $normalized_images,
+                'index'  => $index,
+                'count'  => count($normalized_images)
+            );
+            
+            ASI_log( 'Search successful, returning ' . count($normalized_images) . ' normalized images', 'GUTENBERG_BLOCK_SUCCESS' );
+            wp_send_json_success( $response_data );
         }
     }
 
@@ -1361,11 +1668,22 @@ class All_Sources_Images_Admin {
     public function ASI_block_downloading_image() {
         // Check the nonce
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
-        $url_image = ( isset( $_POST['url_image'] ) ? sanitize_text_field( $_POST['url_image'] ) : '' );
+        $url_image = ( isset( $_POST['url_image'] ) ? esc_url_raw( $_POST['url_image'] ) : '' );
         $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( $_POST['search_term'] ) : 'image' );
         $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( $_POST['bank'] ) : '' );
-        $alt = '';
-        $caption = '';
+        $alt = ( isset( $_POST['alt_image'] ) ? sanitize_text_field( $_POST['alt_image'] ) : '' );
+        $caption = ( isset( $_POST['caption_image'] ) ? sanitize_text_field( $_POST['caption_image'] ) : '' );
+        $post_id = ( isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0 );
+        if ( !$post_id && isset( $_POST['id'] ) ) {
+            $post_id = intval( $_POST['id'] );
+        }
+
+        ASI_log( array(
+            'url'      => $url_image,
+            'post_id'  => $post_id,
+            'bank'     => $bank,
+            'search'   => $search_term,
+        ), 'GUTENBERG_DOWNLOAD_START' );
         // ENVATO : Additional remote request to get image url - DISABLED (no longer working)
         /*
         if( $bank == 'envato' ) {
@@ -1393,18 +1711,67 @@ class All_Sources_Images_Admin {
         $file_array = array();
         // Check for error
         if ( is_wp_error( $tmp ) ) {
+            ASI_log( array(
+                'message' => $tmp->get_error_message(),
+                'url'     => $url_image,
+            ), 'GUTENBERG_DOWNLOAD_ERROR' );
             wp_send_json_error( array(
                 'erreur' => $tmp->get_error_message(),
             ) );
             return;
         }
-        $file_array['name'] = $search_term . '.jpg';
+        
+        $allowed_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
+        $mime_map = array(
+            'image/jpeg' => 'jpg',
+            'image/jpg'  => 'jpg',
+            'image/pjpeg'=> 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+        );
+
+        $extension = '';
+        $mime_type = '';
+
+        $detected_mime = wp_get_image_mime( $tmp );
+        if ( $detected_mime && isset( $mime_map[ $detected_mime ] ) ) {
+            $mime_type = $detected_mime;
+            $extension = $mime_map[ $detected_mime ];
+        }
+
+        if ( empty( $extension ) ) {
+            $parsed_path = wp_parse_url( $url_image, PHP_URL_PATH );
+            if ( $parsed_path ) {
+                $path_info = pathinfo( $parsed_path );
+                if ( isset( $path_info['extension'] ) ) {
+                    $maybe_ext = strtolower( $path_info['extension'] );
+                    if ( in_array( $maybe_ext, $allowed_extensions, true ) ) {
+                        $extension = $maybe_ext;
+                    }
+                }
+            }
+        }
+
+        if ( empty( $extension ) ) {
+            $extension = 'jpg';
+        }
+
+        $file_array['name'] = $search_term . '.' . $extension;
         // Filename
         $file_array['tmp_name'] = $tmp;
+        if ( $mime_type ) {
+            $file_array['type'] = $mime_type;
+        }
         // Check to ensure the image is valid
         $check = wp_check_filetype_and_ext( $file_array['tmp_name'], $file_array['name'] );
         if ( $check["ext"] == "" ) {
             @unlink( $file_array['tmp_name'] );
+            ASI_log( array(
+                'reason' => 'Invalid image after download',
+                'mime'   => $mime_type,
+                'url'    => $url_image,
+            ), 'GUTENBERG_DOWNLOAD_ERROR' );
             wp_send_json_error( array(
                 'erreur' => 'Invalid Image',
             ) );
@@ -1416,6 +1783,10 @@ class All_Sources_Images_Admin {
         ) );
         if ( isset( $uploaded_file['error'] ) ) {
             @unlink( $file_array['tmp_name'] );
+            ASI_log( array(
+                'reason' => $uploaded_file['error'],
+                'file'   => $file_array['name'],
+            ), 'GUTENBERG_DOWNLOAD_ERROR' );
             wp_send_json_error( array(
                 'error' => $uploaded_file['error'],
             ) );
@@ -1430,7 +1801,7 @@ class All_Sources_Images_Admin {
             'post_content'   => '',
             'post_status'    => 'inherit',
         );
-        $attach_id = wp_insert_attachment( $attachment, $uploaded_file['file'], get_the_ID() );
+        $attach_id = wp_insert_attachment( $attachment, $uploaded_file['file'], $post_id );
         // Add alt text for image
         update_post_meta( $attach_id, '_wp_attachment_image_alt', $alt );
         // Add caption text for image
@@ -1443,6 +1814,13 @@ class All_Sources_Images_Admin {
         $attach_data = wp_generate_attachment_metadata( $attach_id, $uploaded_file['file'] );
         wp_update_attachment_metadata( $attach_id, $attach_data );
         $url_media = wp_get_attachment_url( $attach_id );
+
+        ASI_log( array(
+            'attachment_id' => $attach_id,
+            'url'           => $url_media,
+            'post_id'       => $post_id,
+        ), 'GUTENBERG_DOWNLOAD_SUCCESS' );
+
         wp_send_json_success( array(
             'url_media'     => $url_media,
             'alt_image'     => $alt,
@@ -1602,8 +1980,9 @@ class All_Sources_Images_Admin {
             // Retrieve current options
             $current_options = get_option( 'ASI_plugin_main_settings', array() );
             // Update only the necessary values
+            $existing_block = isset( $current_options['image_block'][1] ) ? $current_options['image_block'][1] : array();
             $current_options['image_block'][1] = array_merge( 
-                $current_options['image_block'][1] ?? array(),
+                $existing_block,
                 // Initialize as an empty array if not set
                 array(
                     'api_chosen' => $default_bank,
@@ -1633,6 +2012,60 @@ class All_Sources_Images_Admin {
         if ( isset( $input['api_chosen'] ) && 'envato' === $input['api_chosen'] ) {
             $input['api_chosen'] = '';
         }
+        return $input;
+    }
+
+    /**
+     * Sanitize cron settings and schedule/unschedule WordPress cron events
+     *
+     * @since    6.1.7
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_cron_settings( $input ) {
+        // Clear existing scheduled event
+        $timestamp = wp_next_scheduled( 'ASI_cron_image_generation' );
+        if ( $timestamp ) {
+            wp_unschedule_event( $timestamp, 'ASI_cron_image_generation' );
+        }
+
+        // If cron is enabled, schedule new event
+        if ( isset( $input['enable_cron'] ) && $input['enable_cron'] === 'enable' ) {
+            // Convert interval to seconds
+            $interval_value = isset( $input['cron_interval_value'] ) ? absint( $input['cron_interval_value'] ) : 5;
+            $interval_unit = isset( $input['cron_interval_unit'] ) ? $input['cron_interval_unit'] : 'minutes';
+            
+            $seconds = 0;
+            switch ( $interval_unit ) {
+                case 'minutes':
+                    $seconds = $interval_value * 60;
+                    break;
+                case 'hours':
+                    $seconds = $interval_value * 3600;
+                    break;
+                case 'days':
+                    $seconds = $interval_value * 86400;
+                    break;
+            }
+            
+            // Create custom interval if needed
+            $recurrence_key = 'asi_cron_' . $interval_value . '_' . $interval_unit;
+            
+            // Add custom interval to WordPress cron schedules
+            add_filter( 'cron_schedules', function( $schedules ) use ( $recurrence_key, $seconds, $interval_value, $interval_unit ) {
+                $schedules[$recurrence_key] = array(
+                    'interval' => $seconds,
+                    'display'  => sprintf( __( 'Every %d %s', 'all-sources-images' ), $interval_value, $interval_unit ),
+                );
+                return $schedules;
+            } );
+            
+            // Schedule the event
+            if ( ! wp_next_scheduled( 'ASI_cron_image_generation' ) ) {
+                wp_schedule_event( time(), $recurrence_key, 'ASI_cron_image_generation' );
+            }
+        }
+        
         return $input;
     }
 

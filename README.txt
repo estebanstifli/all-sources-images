@@ -76,7 +76,7 @@ The plugin allows you to configure some settings for your automatic images : **I
 9. All Sources Images : Crons
 
 == Support ==
-Custom development based on original Magic Post Thumbnail plugin.
+Custom development based on original All Sources Images plugin.
 
 
 == Installation ==
@@ -115,20 +115,20 @@ Contact the plugin administrator for support.
 
 == Upgrade Notice ==
 
-This is a custom development version based on Magic Post Thumbnail 6.1.6.
+This is a custom development version based on All Sources Images 6.1.6.
 
 
 == Changelog ==
 
 = 1.0.0 - December 2025 =
-* Custom development fork based on Magic Post Thumbnail 6.1.6
+* Custom development fork based on All Sources Images 6.1.6
 * Complete rebrand to "All Sources Images"
 * Renamed all functions, classes, and options from MPT/mpt to ASI/asi
 * Maintained all core functionality from original plugin
 * Updated text domain to 'all-sources-images'
 * Removed commercial links and promotional content
 
-Previous changelog history from Magic Post Thumbnail 6.1.6:
+Previous changelog history from All Sources Images 6.1.6:
 
 = 6.1.6 - November 13, 2025 =
 * PRO: Improve compatibility with "Featured Image from URL" (FIFU) plugin - supports both free and premium versions

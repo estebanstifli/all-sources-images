@@ -325,3 +325,43 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 */
+
+
+// Google Image API
+document.addEventListener("DOMContentLoaded", function() {
+    const btnGoogleImage = document.getElementById("btnGoogleImage");
+    const resultGoogleImage = document.getElementById("resultGoogleImage");
+    const apiKeyInput = document.querySelector('input[name="ASI_plugin_banks_settings[googleimage][apikey]"]');
+    const cxIdInput = document.querySelector('input[name="ASI_plugin_banks_settings[googleimage][cxid]"]');
+    const imageGoogleImage = document.querySelector("#resultGoogleImage img");
+
+    if (btnGoogleImage) {
+        btnGoogleImage.addEventListener("click", function() {
+            imageGoogleImage.classList.remove("hidden");
+
+            fetch(apisTestingAjax.ajaxurl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "action=asi_test_apis&apibank=google_image&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value + "&cxid=" + cxIdInput.value
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const parsedData = JSON.parse(data.data);
+                    if (parsedData.items && parsedData.items.length > 0) {
+                        resultGoogleImage.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                    } else {
+                        resultGoogleImage.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                    }
+                } else {
+                    resultGoogleImage.innerHTML = '<span class="text-warning">' + (data.data || apisTestingAjax.error_key) + '</span>';
+                }
+            })
+            .catch(error => {
+                resultGoogleImage.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            });
+        });
+    }
+});

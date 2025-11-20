@@ -8,14 +8,16 @@
           gutenbergEditor = true;
       }
 
-      // Insert Generation button on edit post page
-      displayGenerationButton(gutenbergEditor);
+      // Insert Generation button on edit post page (only if variable exists)
+      if (typeof generationSpecificPostJsVars !== 'undefined') {
+          displayGenerationButton(gutenbergEditor);
 
-      jQuery( "body" ).click(function(e) {
-          setTimeout(function (){
-              displayGenerationButton(gutenbergEditor);
-          }, 1);
-      });
+          jQuery( "body" ).click(function(e) {
+              setTimeout(function (){
+                  displayGenerationButton(gutenbergEditor);
+              }, 500);
+          });
+      }
   }, 1000);
 
 };
@@ -117,14 +119,22 @@ function displayGenerationButton(gutenbergEditor = true) {
                             nonce              : generationSpecificPostJsVars.postgeneration.nonce
                     },
                     success: function( data ) {
+                            console.log('Generate response:', data);
+
+                            // Validate response structure
+                            if (!data || typeof data !== 'object') {
+                                console.error('Invalid response format');
+                                alert('Error: Invalid server response');
+                                return;
+                            }
 
                             // Featured image already exist
-                            if( 'already-done' === data.data.status ) {
+                            if( data.data && 'already-done' === data.data.status ) {
                                 alert( generationSpecificPostJsVars.postgeneration.strNoRewrite );
                                 return;
                             }
 
-                            if ( data.success ) {
+                            if ( data.success && data.data ) {
 
                                     var fifuOn              = generationSpecificPostJsVars.postgeneration.fifu_on;
                                     var classicEditorImage  = jQuery('#postimagediv .inside');
@@ -139,10 +149,19 @@ function displayGenerationButton(gutenbergEditor = true) {
                                         classicEditorImage.html(data.data.postimagediv);
                                     } else {
                                         // Gutemberg editor
-                                        wp.data.dispatch( 'core/editor' ).editPost({ featured_media: data.data.thumbnail_id });
+                                        if (data.data.thumbnail_id) {
+                                            wp.data.dispatch( 'core/editor' ).editPost({ featured_media: data.data.thumbnail_id });
+                                        } else {
+                                            console.error('No thumbnail_id in response:', data.data);
+                                        }
                                     }
 
-                            } else {}
+                            } else {
+                                console.error('Generation failed:', data);
+                                if (data.data && data.data.message) {
+                                    alert('Error: ' + data.data.message);
+                                }
+                            }
                     },
                     error : function( data ) {
                         console.log( 'error :' + data );
@@ -490,7 +509,7 @@ jQuery(document).ready(function() {
         });
 
         // Before form submission, remove the hidden template block
-        $('form#tabs').submit(function() {
+        $('form#automatic-form').submit(function() {
             $('.image-location-template.image-block-0').remove(); // Remove hidden template blocks
         });
 
@@ -813,7 +832,7 @@ function checkButton( selectorSwitch, selectorOptions, noNeedRights = false ) {
 
 
 function checkRights() {
-    var premium_version = false;
+    var premium_version = true;
     
 
     return premium_version;

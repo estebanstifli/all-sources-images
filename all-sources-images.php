@@ -28,31 +28,62 @@ if ( !defined( 'WPINC' ) ) {
 }
 
 /**
+ * Enable debug logging
+ * Set to true to enable detailed logging to debug.log
+ * 
+ * @since 1.0.0
+ */
+define( 'ASI_DEBUG', true );
+
+/**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  */
 define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.0' );
 
 /**
+ * Load helper functions
+ */
+require_once plugin_dir_path( __FILE__ ) . 'includes/asi-helpers.php';
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-all-sources-images-activator.php
  */
-function activate_all_sources_images() {
+function asi_activate_plugin() {
+    ASI_log( 'Plugin activation started', 'ACTIVATION' );
+    try {
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images-activator.php';
-    All_Sources_Images_Activator::activate();
+        All_Sources_Images_Activator::activate();
+        ASI_log( 'Plugin activation completed successfully', 'ACTIVATION' );
+    } catch ( Exception $e ) {
+        ASI_log_error( 'Plugin activation failed', $e );
+        throw $e;
+    }
 }
 
 /**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-all-sources-images-deactivator.php
  */
-function deactivate_all_sources_images() {
+function asi_deactivate_plugin() {
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images-deactivator.php';
     All_Sources_Images_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_all_sources_images' );
-register_deactivation_hook( __FILE__, 'deactivate_all_sources_images' );
+register_activation_hook( __FILE__, 'asi_activate_plugin' );
+register_deactivation_hook( __FILE__, 'asi_deactivate_plugin' );
+
+/**
+ * Log when plugin is successfully activated
+ */
+add_action( 'activated_plugin', function( $plugin ) {
+    if ( $plugin === plugin_basename( __FILE__ ) ) {
+        ASI_log( 'Plugin successfully activated by WordPress', 'ACTIVATION' );
+        ASI_log( 'Current user ID: ' . get_current_user_id(), 'ACTIVATION' );
+        ASI_log( 'User capabilities: ' . print_r( wp_get_current_user()->allcaps, true ), 'ACTIVATION' );
+    }
+} );
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -64,12 +95,16 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images.php';
  * Add capabilities
  */
 function ASI_add_capability() {
-        $options = get_option( 'ASI_plugin_rights_settings' );
-        // Administrators always have the capability
-        $admin_role = get_role( 'administrator' );
-        if ( $admin_role ) {
-            $admin_role->add_cap( 'asi_manage', true );
-        }
+    // Don't log on every request
+    // ASI_log_entry( 'ASI_add_capability' );
+    
+    $options = get_option( 'ASI_plugin_rights_settings' );
+    
+    // Administrators always have the capability
+    $admin_role = get_role( 'administrator' );
+    if ( $admin_role ) {
+        $admin_role->add_cap( 'asi_manage', true );
+    }
         // Manage other roles by adding or removing capabilities according to options
         $roles = array(
             'editor'      => 'rights_editor',
@@ -105,15 +140,31 @@ function ASI_check_hook() {
  * @since    5.0.0
  */
 function ASI_check_capability() {
-        $additional_check = false;
-        // add capability for the cron
-        if ( wp_doing_cron() || true == $additional_check ) {
-            global $current_user;
-            $current_user->add_cap( 'asi_manage' );
-        }
-        if ( current_user_can( 'asi_manage' ) ) {
-            $plugin = new All_Sources_Images();
+    // Don't log on every request to avoid flooding the log
+    // ASI_log_entry( 'ASI_check_capability' );
+    
+    $additional_check = false;
+    // add capability for the cron
+    if ( wp_doing_cron() || true == $additional_check ) {
+        global $current_user;
+        $current_user->add_cap( 'asi_manage' );
+        ASI_log( 'Added asi_manage capability for cron', 'CAPABILITY' );
+    }
+    
+    // CRITICAL: Always allow administrators, even if asi_manage capability not assigned
+    // This prevents blocking the entire WordPress admin
+    if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'asi_manage' ) ) {
+        // User doesn't have permission - just don't load plugin features
+        // DON'T block WordPress or show errors
+        return;
+    }
+    
+    // User has permission - initialize plugin
+    try {
+        $plugin = new All_Sources_Images();
         $plugin->run();
+    } catch ( Exception $e ) {
+        ASI_log_error( 'Failed to initialize plugin', $e );
     }
 }
 
@@ -126,7 +177,7 @@ function ASI_check_capability() {
  *
  * @since    4.0.0
  */
-function run_all_sources_images() {
+function asi_run_plugin() {
     // User role & capacity
     add_action( 'init', 'ASI_add_capability', 1 );
     add_action( 'init', 'ASI_check_capability', 2 );
@@ -134,4 +185,4 @@ function run_all_sources_images() {
     add_action( 'init', 'ASI_check_hook', 5 );
 }
 
-run_all_sources_images();
+asi_run_plugin();
