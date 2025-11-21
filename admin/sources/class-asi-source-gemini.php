@@ -10,7 +10,8 @@ class ASI_Source_Gemini extends ASI_Image_Source {
     }
 
     public function generate( array $context ) {
-        $options   = isset( $context['options']['gemini'] ) ? $context['options']['gemini'] : array();
+        $global_options = isset( $context['options'] ) && is_array( $context['options'] ) ? $context['options'] : array();
+        $options   = isset( $global_options['gemini'] ) ? $global_options['gemini'] : array();
         $api_key   = isset( $options['apikey'] ) ? trim( $options['apikey'] ) : '';
         $model     = ! empty( $options['model'] ) ? $options['model'] : 'gemini-2.5-flash-image';
         $aspect    = ! empty( $options['aspect_ratio'] ) ? $options['aspect_ratio'] : '';
@@ -65,6 +66,9 @@ class ASI_Source_Gemini extends ASI_Image_Source {
             'body'    => wp_json_encode( $payload ),
             'timeout' => 120,
         );
+
+        $translator = $this->get_translator_callable( $context );
+        $source_label = __( 'Gemini', 'all-sources-images' );
 
         if ( ! empty( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ) {
             $proxy_args = $context['proxy_args'];
@@ -125,11 +129,14 @@ class ASI_Source_Gemini extends ASI_Image_Source {
             $log->info( 'Gemini usage metadata', array( 'usage' => $body['usageMetadata'] ) );
         }
 
+        $alt_text = ASI_Source_Text_Helper::build_alt_text( $global_options, $prompt, $source_label, $translator );
+        $caption_text = ASI_Source_Text_Helper::build_caption( $global_options, '', $source_label );
+
         return array(
             'url_results' => 'data:' . $mime_type . ';base64,' . $base64_data,
             'file_media'  => $this->build_memory_response( $binary, $mime_type ),
-            'alt_img'     => $prompt,
-            'caption_img' => '',
+            'alt_img'     => $alt_text,
+            'caption_img' => $caption_text,
             'raw_response' => $body,
         );
     }
@@ -170,5 +177,13 @@ class ASI_Source_Gemini extends ASI_Image_Source {
         );
 
         return array_keys( (array) $models );
+    }
+
+    private function get_translator_callable( array $context ) {
+        if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_translate_text' ) ) {
+            return array( $context['generation'], 'ASI_translate_text' );
+        }
+
+        return null;
     }
 }

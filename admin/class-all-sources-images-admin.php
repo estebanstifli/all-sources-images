@@ -1,5 +1,44 @@
 <?php
 
+if ( ! class_exists( 'ASI_Image_Source' ) ) {
+    require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-image-source.php';
+}
+
+if ( ! class_exists( 'ASI_Source_Youtube' ) ) {
+    $youtube_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-youtube.php';
+    if ( file_exists( $youtube_source_path ) ) {
+        require_once $youtube_source_path;
+    }
+}
+
+if ( ! class_exists( 'ASI_Source_Google_Image' ) ) {
+    $google_image_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-google-image.php';
+    if ( file_exists( $google_image_source_path ) ) {
+        require_once $google_image_source_path;
+    }
+}
+
+if ( ! class_exists( 'ASI_Source_Dallev1' ) ) {
+    $dalle_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-dallev1.php';
+    if ( file_exists( $dalle_source_path ) ) {
+        require_once $dalle_source_path;
+    }
+}
+
+if ( ! class_exists( 'ASI_Source_Stability' ) ) {
+    $stability_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-stability.php';
+    if ( file_exists( $stability_source_path ) ) {
+        require_once $stability_source_path;
+    }
+}
+
+if ( ! class_exists( 'ASI_Source_Replicate' ) ) {
+    $replicate_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-replicate.php';
+    if ( file_exists( $replicate_source_path ) ) {
+        require_once $replicate_source_path;
+    }
+}
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -891,6 +930,7 @@ class All_Sources_Images_Admin {
             esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
             esc_html__( 'Flickr', 'all-sources-images' )                  => array('flickr', true),
             esc_html__( 'Pixabay', 'all-sources-images' )                 => array('pixabay', true),
+            esc_html__( 'GIPHY', 'all-sources-images' )                   => array('giphy', true),
             esc_html__( 'Youtube', 'all-sources-images' )                 => array('youtube', true),
             esc_html__( 'Unsplash', 'all-sources-images' )                => array('unsplash', true),
             esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', true),
@@ -911,6 +951,7 @@ class All_Sources_Images_Admin {
             esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
             esc_html__( 'Flickr', 'all-sources-images' )                  => array('flickr', true),
             esc_html__( 'Pixabay', 'all-sources-images' )                 => array('pixabay', true),
+            esc_html__( 'GIPHY', 'all-sources-images' )                   => array('giphy', true),
             esc_html__( 'Youtube', 'all-sources-images' )                 => array('youtube', true),
             esc_html__( 'Unsplash', 'all-sources-images' )                => array('unsplash', true),
             esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', true),
@@ -1029,9 +1070,10 @@ class All_Sources_Images_Admin {
                 'search_country' => 'en',
                 'img_color'      => '',
                 'filetype'       => '',
-                'imgsz'          => '',
+                'imgsz'          => 'large',
                 'imgtype'        => '',
                 'safe'           => 'moderate',
+                'rights'         => array(),
             ),
             'dallev1'           => array(
                 'apikey'  => '',
@@ -1090,6 +1132,14 @@ class All_Sources_Images_Admin {
                 'color'          => '',
                 'locale'         => 'en-US',
             ),
+            'giphy'             => array(
+                'apikey'    => '',
+                'rating'    => 'g',
+                'lang'      => 'en',
+                'limit'     => 25,
+                'media_type'=> 'gifs',
+                'bundle'    => '',
+            ),
             'unsplash'          => array(
                 'apikey'         => '',
                 'orientation'    => '',
@@ -1097,9 +1147,13 @@ class All_Sources_Images_Admin {
                 'color'          => '',
             ),
             'youtube'           => array(
-                'apikey'          => '',
-                'thumbnail_quality' => 'maxresdefault',
-                'search_order'    => 'relevance',
+                'apikey'            => '',
+                'thumbnail_quality' => 'high',
+                'search_order'      => 'relevance',
+                'video_duration'    => 'any',
+                'safe_search'       => 'moderate',
+                'max_results'       => 5,
+                'region_code'       => '',
             ),
             'google_translate'  => array(
                 'apikey' => '',
@@ -1420,49 +1474,136 @@ class All_Sources_Images_Admin {
             $proxy_args = $this->ASI_get_proxy_args();
             $response = wp_remote_get( $apiUrl, $proxy_args );
         } elseif ( 'google_image' === $apiBank ) {
-            $apiUrl = "https://www.googleapis.com/customsearch/v1?key={$apiKey}&cx={$cxId}&q=test&searchType=image&num=1";
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, $proxy_args );
-            if ( is_wp_error( $response ) ) {
-                wp_send_json_error( 'Error connecting to Google Custom Search API.' );
+            if ( ! class_exists( 'ASI_Source_Google_Image' ) ) {
+                wp_send_json_error( __( 'Google Image source is unavailable.', 'all-sources-images' ) );
             }
-            $body = wp_remote_retrieve_body( $response );
-            $data = json_decode( $body, true );
-            if ( isset( $data['items'] ) && !empty( $data['items'] ) ) {
-                wp_send_json_success( $body );
-            } else {
-                wp_send_json_error( isset( $data['error']['message'] ) ? $data['error']['message'] : 'No results found or there was an error.' );
+
+            if ( empty( $cxId ) ) {
+                wp_send_json_error( __( 'CX ID is required for Google Custom Search.', 'all-sources-images' ) );
             }
+
+            $default_options   = $this->ASI_default_options_banks_settings( true );
+            $google_defaults   = isset( $default_options['googleimage'] ) ? $default_options['googleimage'] : array();
+            $google_options    = array_merge( $google_defaults, array(
+                'apikey' => $apiKey,
+                'cxid'   => $cxId,
+                'imgsz'  => isset( $google_defaults['imgsz'] ) ? $google_defaults['imgsz'] : 'large',
+            ) );
+            $proxy_args        = $this->ASI_get_proxy_args();
+
+            $source  = new ASI_Source_Google_Image();
+            $context = array(
+                'options'        => array( 'googleimage' => $google_options ),
+                'search'         => 'asi test',
+                'proxy_args'     => $proxy_args,
+                'generation'     => $this,
+                'get_only_thumb' => true,
+            );
+
+            $result = $source->generate( $context );
+
+            if ( is_wp_error( $result ) ) {
+                wp_send_json_error( $result->get_error_message() );
+            }
+
+            if ( isset( $result['items'] ) && ! empty( $result['items'] ) ) {
+                wp_send_json_success( wp_json_encode( $result ) );
+            }
+
+            wp_send_json_error( __( 'No results found or there was an error.', 'all-sources-images' ) );
         } elseif ( 'dalle' === $apiBank ) {
-            $apiUrl = "https://api.openai.com/v1/engines";
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_request( $apiUrl, array_merge( [
-                'method'  => 'GET',
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $apiKey,
-                    'Content-Type'  => 'application/json',
-                ],
-            ], $proxy_args ) );
+            if ( ! class_exists( 'ASI_Source_Dallev1' ) ) {
+                wp_send_json_error( __( 'DALL·E source is unavailable.', 'all-sources-images' ) );
+            }
+
+            if ( empty( $apiKey ) ) {
+                wp_send_json_error( __( 'API key is required.', 'all-sources-images' ) );
+            }
+
+            $default_options = $this->ASI_default_options_banks_settings( true );
+            $dalle_defaults  = isset( $default_options['dallev1'] ) ? $default_options['dallev1'] : array();
+            $dalle_options   = array_merge( $dalle_defaults, array( 'apikey' => $apiKey ) );
+            $proxy_args      = $this->ASI_get_proxy_args();
+
+            $source  = new ASI_Source_Dallev1();
+            $context = array(
+                'options'        => array( 'dallev1' => $dalle_options ),
+                'search'         => 'asi dalle test',
+                'proxy_args'     => $proxy_args,
+                'get_only_thumb' => true,
+            );
+
+            $result = $source->generate( $context );
+
+            if ( is_wp_error( $result ) ) {
+                wp_send_json_error( $result->get_error_message() );
+            }
+
+            if ( isset( $result['data'] ) && ! empty( $result['data'] ) ) {
+                wp_send_json_success( wp_json_encode( $result ) );
+            }
+
+            wp_send_json_error( __( 'No results found or there was an error.', 'all-sources-images' ) );
         } elseif ( 'youtube' === $apiBank ) {
-            $apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&type=video&q=asi+test&key={$apiKey}";
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, $proxy_args );
-            if ( is_wp_error( $response ) ) {
-                wp_send_json_error( 'Error connecting to YouTube API.' );
+            if ( ! class_exists( 'ASI_Source_Youtube' ) ) {
+                wp_send_json_error( __( 'YouTube source is unavailable.', 'all-sources-images' ) );
             }
-            $body = wp_remote_retrieve_body( $response );
-            $data = json_decode( $body, true );
-            if ( isset( $data['items'] ) && !empty( $data['items'] ) ) {
-                wp_send_json_success( $body );
-            } elseif ( isset( $data['error']['message'] ) ) {
-                wp_send_json_error( $data['error']['message'] );
-            } else {
-                wp_send_json_error( 'No results found or there was an error.' );
+
+            $default_options  = $this->ASI_default_options_banks_settings( true );
+            $youtube_defaults = isset( $default_options['youtube'] ) ? $default_options['youtube'] : array();
+            $youtube_options  = array_merge( $youtube_defaults, array( 'apikey' => $apiKey, 'max_results' => 1 ) );
+            $proxy_args       = $this->ASI_get_proxy_args();
+
+            $source  = new ASI_Source_Youtube();
+            $context = array(
+                'options'        => array( 'youtube' => $youtube_options ),
+                'search'         => 'asi test',
+                'proxy_args'     => $proxy_args,
+                'generation'     => $this,
+                'get_only_thumb' => true,
+            );
+
+            $result = $source->generate( $context );
+
+            if ( is_wp_error( $result ) ) {
+                wp_send_json_error( $result->get_error_message() );
             }
+
+            if ( isset( $result['items'] ) && ! empty( $result['items'] ) ) {
+                wp_send_json_success( wp_json_encode( $result ) );
+            }
+
+            wp_send_json_error( __( 'No results found or there was an error.', 'all-sources-images' ) );
         } elseif ( 'unsplash' === $apiBank ) {
             $apiUrl = "https://api.unsplash.com/search/photos?query=test&client_id={$apiKey}";
             $proxy_args = $this->ASI_get_proxy_args();
             $response = wp_remote_get( $apiUrl, $proxy_args );
+        } elseif ( 'giphy' === $apiBank ) {
+            if ( empty( $apiKey ) ) {
+                wp_send_json_error( __( 'API key is required.', 'all-sources-images' ) );
+            }
+            $query_args = array(
+                'api_key' => $apiKey,
+                'q'       => 'asi test',
+                'limit'   => 1,
+                'rating'  => 'pg',
+                'lang'    => 'en',
+            );
+            $apiUrl = add_query_arg( $query_args, 'https://api.giphy.com/v1/gifs/search' );
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, $proxy_args );
+            if ( is_wp_error( $response ) ) {
+                wp_send_json_error( __( 'Error connecting to the API.', 'all-sources-images' ) );
+            }
+            $status_code = wp_remote_retrieve_response_code( $response );
+            $body = wp_remote_retrieve_body( $response );
+            if ( 200 !== $status_code ) {
+                $decoded = json_decode( $body, true );
+                $message = isset( $decoded['meta']['msg'] ) ? $decoded['meta']['msg'] : __( 'Unexpected GIPHY API response.', 'all-sources-images' );
+                wp_send_json_error( $message, $status_code );
+            }
+            wp_send_json_success( $body );
+            return;
         } elseif ( 'pexels' === $apiBank ) {
             $apiUrl = "https://api.pexels.com/v1/search?query=nature&per_page=1";
             $proxy_args = $this->ASI_get_proxy_args();
@@ -1471,6 +1612,35 @@ class All_Sources_Images_Admin {
                     'Authorization' => $apiKey,
                 ),
             ), $proxy_args ) );
+        } elseif ( 'stability' === $apiBank ) {
+            if ( empty( $apiKey ) ) {
+                wp_send_json_error( __( 'API key is required.', 'all-sources-images' ) );
+            }
+
+            $proxy_args    = $this->ASI_get_proxy_args();
+            $request_args  = array(
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Accept'        => 'application/json',
+                ),
+                'timeout' => 20,
+            );
+            $response      = wp_remote_get( 'https://api.stability.ai/v1/user/account', array_merge( $request_args, $proxy_args ) );
+
+            if ( is_wp_error( $response ) ) {
+                wp_send_json_error( __( 'Error connecting to Stability AI.', 'all-sources-images' ) );
+            }
+
+            $code = wp_remote_retrieve_response_code( $response );
+            $body = wp_remote_retrieve_body( $response );
+
+            if ( 200 === $code ) {
+                wp_send_json_success( $body );
+            }
+
+            $decoded = json_decode( $body, true );
+            $message = isset( $decoded['message'] ) ? $decoded['message'] : __( 'Unexpected Stability AI response.', 'all-sources-images' );
+            wp_send_json_error( $message, $code );
         } elseif ( 'replicate' === $apiBank ) {
             // test Replicate API key by listing models
             $apiUrl = 'https://api.replicate.com/v1/models';
@@ -1707,7 +1877,63 @@ class All_Sources_Images_Admin {
             ) );
             
             // Detect bank and extract images + normalize structure
-            if (isset($results_thumbs['data']) && is_array($results_thumbs['data'])) {
+            if ( 'giphy' === $bank && isset( $results_thumbs['data'] ) && is_array( $results_thumbs['data'] ) ) {
+                foreach ( $results_thumbs['data'] as $item ) {
+                    if ( empty( $item ) || ! is_array( $item ) ) {
+                        continue;
+                    }
+
+                    $images      = isset( $item['images'] ) && is_array( $item['images'] ) ? $item['images'] : array();
+                    $large_url   = '';
+                    $thumb_url   = '';
+                    $large_keys  = array( 'downsized_large', 'original', 'downsized', 'fixed_height', 'fixed_width' );
+                    $thumb_keys  = array( 'fixed_height_small', 'fixed_width_small', 'fixed_height', 'fixed_width', 'downsized_still', 'downsized_small' );
+
+                    foreach ( $large_keys as $key ) {
+                        if ( isset( $images[ $key ]['url'] ) && '' !== $images[ $key ]['url'] ) {
+                            $large_url = $images[ $key ]['url'];
+                            break;
+                        }
+                    }
+
+                    foreach ( $thumb_keys as $key ) {
+                        if ( isset( $images[ $key ]['url'] ) && '' !== $images[ $key ]['url'] ) {
+                            $thumb_url = $images[ $key ]['url'];
+                            break;
+                        }
+                    }
+
+                    if ( empty( $large_url ) && isset( $item['url'] ) ) {
+                        $large_url = $item['url'];
+                    }
+
+                    if ( empty( $large_url ) ) {
+                        continue;
+                    }
+
+                    if ( empty( $thumb_url ) ) {
+                        $thumb_url = $large_url;
+                    }
+
+                    $caption = '';
+                    if ( isset( $item['user']['display_name'] ) && '' !== $item['user']['display_name'] ) {
+                        $caption = $item['user']['display_name'];
+                    } elseif ( isset( $item['username'] ) ) {
+                        $caption = $item['username'];
+                    }
+
+                    $normalized_images[] = array(
+                        'url'      => $large_url,
+                        'thumb'    => $thumb_url,
+                        'title'    => isset( $item['title'] ) ? $item['title'] : '',
+                        'alt'      => isset( $item['title'] ) ? $item['title'] : '',
+                        'caption'  => $caption,
+                        'source'   => isset( $item['url'] ) ? $item['url'] : '',
+                        'rating'   => isset( $item['rating'] ) ? $item['rating'] : '',
+                        'media_id' => isset( $item['id'] ) ? $item['id'] : '',
+                    );
+                }
+            } elseif (isset($results_thumbs['data']) && is_array($results_thumbs['data'])) {
                 // DALL-E format: { data: [{url, revised_prompt}] }
                 foreach ($results_thumbs['data'] as $item) {
                     $normalized_images[] = array(
@@ -1783,12 +2009,36 @@ class All_Sources_Images_Admin {
             } elseif (isset($results_thumbs['items']) && is_array($results_thumbs['items'])) {
                 // Google Custom Search format
                 foreach ($results_thumbs['items'] as $item) {
+                    $large_url = '';
+                    if (isset($item['pagemap']['cse_image'][0]['src']) && '' !== $item['pagemap']['cse_image'][0]['src']) {
+                        $large_url = $item['pagemap']['cse_image'][0]['src'];
+                    } elseif (isset($item['link']) && '' !== $item['link']) {
+                        $large_url = $item['link'];
+                    }
+
+                    if ('' === $large_url) {
+                        continue;
+                    }
+
+                    $thumb_url = '';
+                    if (isset($item['pagemap']['cse_thumbnail'][0]['src']) && '' !== $item['pagemap']['cse_thumbnail'][0]['src']) {
+                        $thumb_url = $item['pagemap']['cse_thumbnail'][0]['src'];
+                    } elseif (isset($item['image']['thumbnailLink']) && '' !== $item['image']['thumbnailLink']) {
+                        $thumb_url = $item['image']['thumbnailLink'];
+                    } else {
+                        $thumb_url = $large_url;
+                    }
+
+                    $title = isset($item['title']) ? $item['title'] : '';
+                    $caption = isset($item['displayLink']) ? $item['displayLink'] : '';
+
                     $normalized_images[] = array(
-                        'url' => isset($item['pagemap']['cse_image'][0]['src']) ? $item['pagemap']['cse_image'][0]['src'] : '',
-                        'thumb' => isset($item['pagemap']['cse_thumbnail'][0]['src']) ? $item['pagemap']['cse_thumbnail'][0]['src'] : '',
-                        'title' => isset($item['title']) ? $item['title'] : '',
-                        'alt' => isset($item['title']) ? $item['title'] : '',
-                        'caption' => isset($item['displayLink']) ? $item['displayLink'] : ''
+                        'url' => $large_url,
+                        'thumb' => $thumb_url,
+                        'title' => $title,
+                        'alt' => $title,
+                        'caption' => $caption,
+                        'source' => isset($item['link']) ? $item['link'] : ''
                     );
                 }
             } elseif (isset($results_thumbs['hits']) && is_array($results_thumbs['hits'])) {

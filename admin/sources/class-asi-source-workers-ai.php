@@ -10,7 +10,8 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
     }
 
     public function generate( array $context ) {
-        $options         = isset( $context['options']['workers_ai'] ) ? $context['options']['workers_ai'] : array();
+        $global_options  = isset( $context['options'] ) && is_array( $context['options'] ) ? $context['options'] : array();
+        $options         = isset( $global_options['workers_ai'] ) ? $global_options['workers_ai'] : array();
         $account_id      = isset( $options['account_id'] ) ? trim( $options['account_id'] ) : '';
         $api_token       = isset( $options['api_token'] ) ? trim( $options['api_token'] ) : '';
         $model           = isset( $options['model'] ) ? trim( $options['model'] ) : '@cf/black-forest-labs/flux-1-schnell';
@@ -58,6 +59,9 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
             'body'    => wp_json_encode( $payload ),
             'timeout' => 120,
         );
+
+        $translator = $this->get_translator_callable( $context );
+        $source_label = __( 'Cloudflare Workers AI', 'all-sources-images' );
 
         if ( isset( $proxy_args['headers'] ) && is_array( $proxy_args['headers'] ) ) {
             $request_args['headers'] = array_merge( $request_args['headers'], $proxy_args['headers'] );
@@ -110,11 +114,14 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
             return new WP_Error( 'asi_workers_ai_decode_error', __( 'Unable to decode Workers AI image data.', 'all-sources-images' ) );
         }
 
+        $alt_text = ASI_Source_Text_Helper::build_alt_text( $global_options, $prompt, $source_label, $translator );
+        $caption_text = ASI_Source_Text_Helper::build_caption( $global_options, __( 'Generated with Cloudflare Workers AI', 'all-sources-images' ), $source_label );
+
         return array(
             'url_results'  => 'data:' . $mime . ';base64,' . $base64,
             'file_media'   => $this->build_memory_response( $binary, $mime ),
-            'alt_img'      => $prompt,
-            'caption_img'  => __( 'Generated with Cloudflare Workers AI', 'all-sources-images' ),
+            'alt_img'      => $alt_text,
+            'caption_img'  => $caption_text,
             'raw_response' => $body,
         );
     }
@@ -162,5 +169,13 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
         }
 
         return array( $image_string, $mime );
+    }
+
+    private function get_translator_callable( array $context ) {
+        if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_translate_text' ) ) {
+            return array( $context['generation'], 'ASI_translate_text' );
+        }
+
+        return null;
     }
 }

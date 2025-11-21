@@ -407,6 +407,59 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+// GIPHY
+document.addEventListener("DOMContentLoaded", function() {
+    const btnGiphy    = document.getElementById("btnGiphy");
+    const resultGiphy = document.getElementById("resultGiphy");
+    const apiKeyInput = document.querySelector('input[name="ASI_plugin_banks_settings[giphy][apikey]"]');
+    const imageGiphy  = document.querySelector("#resultGiphy img");
+
+    if (!btnGiphy || !resultGiphy || !apiKeyInput || !imageGiphy) {
+        return;
+    }
+
+    btnGiphy.addEventListener("click", function() {
+
+        imageGiphy.classList.remove("hidden");
+
+        fetch(apisTestingAjax.ajaxurl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                action:  "asi_test_apis",
+                apibank: "giphy",
+                nonce:   apisTestingAjax.nonce,
+                apikey:  apiKeyInput.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                const rawMessage = (data && data.data) ? data.data : apisTestingAjax.error_testing;
+                const safeMessage = rawMessage.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                resultGiphy.innerHTML = '<span class="text-warning">' + safeMessage + '</span>';
+                return;
+            }
+            try {
+                const parsed = JSON.parse(data.data);
+                if (data.success && parsed.data && parsed.data.length > 0) {
+                    resultGiphy.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                } else {
+                    resultGiphy.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                }
+            } catch (e) {
+                resultGiphy.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            }
+        })
+        .catch(() => {
+            resultGiphy.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+        });
+    });
+});
+
+
+
+
 
 // Envato Elements - DISABLED (no longer working)
 /*
