@@ -143,6 +143,96 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
+// Gemini
+document.addEventListener("DOMContentLoaded", function() {
+    const btnGemini          = document.getElementById("btnGemini");
+    const resultGemini       = document.getElementById("resultGemini");
+    const apiKeyInputGemini  = document.querySelector('input[name="ASI_plugin_banks_settings[gemini][apikey]"]');
+    const imageGemini        = document.querySelector("#resultGemini img");
+
+    if (!btnGemini || !resultGemini || !apiKeyInputGemini || !imageGemini) {
+        return;
+    }
+
+    btnGemini.addEventListener("click", function() {
+
+        imageGemini.classList.remove("hidden");
+
+        fetch(apisTestingAjax.ajaxurl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                action:  "asi_test_apis",
+                apibank: "gemini",
+                nonce:   apisTestingAjax.nonce,
+                apikey:  apiKeyInputGemini.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            try {
+                const parsed = JSON.parse(data.data);
+                if (data.success && parsed.models && parsed.models.length > 0) {
+                    resultGemini.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                } else {
+                    resultGemini.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                }
+            } catch (e) {
+                resultGemini.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            }
+        })
+        .catch(() => {
+            resultGemini.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+        });
+    });
+});
+
+
+// Cloudflare Workers AI
+document.addEventListener("DOMContentLoaded", function() {
+    const btnWorkersAI      = document.getElementById("btnWorkersAI");
+    const resultWorkersAI   = document.getElementById("resultWorkersAI");
+    const tokenInputWorkers = document.querySelector('input[name="ASI_plugin_banks_settings[workers_ai][api_token]"]');
+    const accountInput      = document.querySelector('input[name="ASI_plugin_banks_settings[workers_ai][account_id]"]');
+    const imageWorkersAI    = document.querySelector("#resultWorkersAI img");
+
+    if (!btnWorkersAI || !resultWorkersAI || !tokenInputWorkers || !accountInput || !imageWorkersAI) {
+        return;
+    }
+
+    btnWorkersAI.addEventListener("click", function() {
+
+        imageWorkersAI.classList.remove("hidden");
+
+        fetch(apisTestingAjax.ajaxurl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                action:     "asi_test_apis",
+                apibank:    "workers_ai",
+                nonce:      apisTestingAjax.nonce,
+                apikey:     tokenInputWorkers.value,
+                account_id: accountInput.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                resultWorkersAI.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+            } else {
+                const errorMessage = data.data ? data.data : apisTestingAjax.error_key;
+                resultWorkersAI.innerHTML = '<span class="text-warning">' + errorMessage + '</span>';
+            }
+        })
+        .catch(() => {
+            resultWorkersAI.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+        });
+    });
+});
+
+
+
 // Replicate
 document.addEventListener("DOMContentLoaded", function() {
     const btnReplicate    = document.getElementById("btnReplicate");

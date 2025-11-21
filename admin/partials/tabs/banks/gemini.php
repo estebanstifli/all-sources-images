@@ -1,0 +1,118 @@
+<?php
+if ( ! function_exists( 'add_filter' ) ) {
+    header( 'Status: 403 Forbidden' );
+    header( 'HTTP/1.1 403 Forbidden' );
+    exit();
+}
+
+$gemini_options = isset( $options['gemini'] ) ? $options['gemini'] : array();
+$selected_model = isset( $gemini_options['model'] ) ? $gemini_options['model'] : 'gemini-2.5-flash-image';
+$selected_ratio = isset( $gemini_options['aspect_ratio'] ) ? $gemini_options['aspect_ratio'] : '1:1';
+$selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['image_size'] : '';
+?>
+
+<tr valign="top">
+    <td colspan="2" class="source-logo source-logo--text">
+        <strong><?php esc_html_e( 'Gemini (Google AI)', 'all-sources-images' ); ?></strong>
+    </td>
+</tr>
+
+<tr valign="top">
+    <td colspan="2">
+        <div class="update-nag">
+            <?php esc_html_e( 'Provide a Google AI Studio API key with access to the Gemini Image models. Requests are billed directly by Google.', 'all-sources-images' ); ?>
+        </div>
+        <div class="update-nag">
+            <?php printf( wp_kses_post( __( 'Need a key? Create one in <a href="%s" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.', 'all-sources-images' ) ), esc_url( 'https://aistudio.google.com/app/apikey' ) ); ?>
+        </div>
+    </td>
+</tr>
+
+<tr valign="top">
+    <th scope="row">
+        <label for="gemini-apikey"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
+    </th>
+    <td id="password-gemini" class="password">
+        <input id="gemini-apikey" type="password" name="ASI_plugin_banks_settings[gemini][apikey]" class="form-control" value="<?php echo isset( $gemini_options['apikey'] ) ? esc_attr( $gemini_options['apikey'] ) : ''; ?>" />
+        <i id="togglePassword"></i>
+    </td>
+</tr>
+
+<tr valign="top">
+    <td colspan="2">
+        <button class="btn btn-primary" id="btnGemini" onclick="return false;">
+            <?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
+        </button>
+        <span id="resultGemini"><img src="<?php echo plugin_dir_url( __FILE__ ); ?>../../../img/loader-mpt.gif" width="32" class="hidden"/></span>
+    </td>
+</tr>
+
+<tr valign="top">
+    <th scope="row">
+        <label for="gemini-model"><?php esc_html_e( 'Model', 'all-sources-images' ); ?></label>
+    </th>
+    <td>
+        <select name="ASI_plugin_banks_settings[gemini][model]" id="gemini-model" class="form-control form-control-lg">
+            <?php
+            $models = apply_filters(
+                'asi_gemini_supported_models',
+                array(
+                    'gemini-2.5-flash-image'         => esc_html__( 'Gemini 2.5 Flash Image (Nano Banana)', 'all-sources-images' ),
+                    'gemini-2.5-flash-preview-image' => esc_html__( 'Gemini 2.5 Flash Image Preview', 'all-sources-images' ),
+                    'gemini-3-pro-image-preview'     => esc_html__( 'Gemini 3 Pro Image Preview (4K capable)', 'all-sources-images' ),
+                )
+            );
+            foreach ( $models as $value => $label ) {
+                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $value ), esc_html( $label ), selected( $selected_model, $value, false ) );
+            }
+            ?>
+        </select>
+        <p class="description"><?php esc_html_e( 'Only the image-ready Nano Banana models are listed here. If Google adds new versions you can extend the list with the asi_gemini_supported_models filter.', 'all-sources-images' ); ?></p>
+    </td>
+</tr>
+
+<tr valign="top">
+    <th scope="row">
+        <label for="gemini-aspect"><?php esc_html_e( 'Aspect ratio', 'all-sources-images' ); ?></label>
+    </th>
+    <td>
+        <select name="ASI_plugin_banks_settings[gemini][aspect_ratio]" id="gemini-aspect" class="form-control form-control-lg">
+            <?php
+            $ratios = array(
+                '1:1'  => esc_html__( 'Square (1:1)', 'all-sources-images' ),
+                '16:9' => esc_html__( 'Landscape (16:9)', 'all-sources-images' ),
+                '3:2'  => esc_html__( 'Photo (3:2)', 'all-sources-images' ),
+                '4:5'  => esc_html__( 'Portrait (4:5)', 'all-sources-images' ),
+                '9:16' => esc_html__( 'Vertical (9:16)', 'all-sources-images' ),
+            );
+            foreach ( $ratios as $value => $label ) {
+                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $value ), esc_html( $label ), selected( $selected_ratio, $value, false ) );
+            }
+            ?>
+        </select>
+        <p class="description"><?php esc_html_e( 'Optional. Leave square to let Gemini decide the best framing.', 'all-sources-images' ); ?></p>
+    </td>
+</tr>
+
+<tr valign="top">
+    <th scope="row">
+        <label for="gemini-size"><?php esc_html_e( 'Image size', 'all-sources-images' ); ?></label>
+    </th>
+    <td>
+        <select name="ASI_plugin_banks_settings[gemini][image_size]" id="gemini-size" class="form-control form-control-lg">
+            <?php
+            $sizes = array(
+                ''         => esc_html__( 'Auto (model default)', 'all-sources-images' ),
+                '1024x1024'=> '1024 × 1024',
+                '1152x896' => '1152 × 896',
+                '896x1152' => '896 × 1152',
+                '1536x1536'=> '1536 × 1536',
+            );
+            foreach ( $sizes as $value => $label ) {
+                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $value ), esc_html( $label ), selected( $selected_size, $value, false ) );
+            }
+            ?>
+        </select>
+        <p class="description"><?php esc_html_e( 'Optional. Some models only support up to 1 MP. Leave blank to stick with Google defaults.', 'all-sources-images' ); ?></p>
+    </td>
+</tr>

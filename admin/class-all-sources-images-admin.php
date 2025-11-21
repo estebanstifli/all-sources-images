@@ -896,6 +896,8 @@ class All_Sources_Images_Admin {
             esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', true),
             esc_html__( 'Stable Diffusion', 'all-sources-images' )        => array('stability', true),
             esc_html__( 'Replicate', 'all-sources-images' )               => array('replicate', true),
+            esc_html__( 'Gemini (Google AI)', 'all-sources-images' )      => array('gemini', true),
+            esc_html__( 'Cloudflare Workers AI', 'all-sources-images' )   => array('workers_ai', true),
             esc_html__( 'Google Translate', 'all-sources-images' )        => array('google_translate', true),
         );
         return $list_api_auto;
@@ -914,6 +916,8 @@ class All_Sources_Images_Admin {
             esc_html__( 'Pexels', 'all-sources-images' )                  => array('pexels', true),
             esc_html__( 'Stable Diffusion', 'all-sources-images' )        => array('stability', true),
             esc_html__( 'Replicate', 'all-sources-images' )               => array('replicate', true),
+            esc_html__( 'Gemini (Google AI)', 'all-sources-images' )      => array('gemini', true),
+            esc_html__( 'Cloudflare Workers AI', 'all-sources-images' )   => array('workers_ai', true),
         );
         return $list_api_manual;
     }
@@ -928,6 +932,8 @@ class All_Sources_Images_Admin {
             'dallev1',
             'stability',
             'replicate',
+            'gemini',
+            'workers_ai',
         );
     }
 
@@ -1043,6 +1049,19 @@ class All_Sources_Images_Admin {
                 'model'         => 'black-forest-labs/flux-schnell',
                 'output_format' => 'webp',
                 'aspect_ratio'  => '16:9',
+            ),
+            'gemini'            => array(
+                'apikey'       => '',
+                'model'        => 'gemini-2.5-flash-image',
+                'aspect_ratio' => '1:1',
+                'image_size'   => '',
+            ),
+            'workers_ai'        => array(
+                'account_id'      => '',
+                'api_token'       => '',
+                'model'           => '@cf/black-forest-labs/flux-1-schnell',
+                'steps'           => 4,
+                'negative_prompt' => '',
             ),
             'cc_search'         => array(
                 'source'       => 1,
@@ -1476,6 +1495,65 @@ class All_Sources_Images_Admin {
             } else {
                 wp_send_json_error( 'Unexpected status: ' . $code, $code );
             }
+        } elseif ( 'gemini' === $apiBank ) {
+            if ( empty( $apiKey ) ) {
+                wp_send_json_error( __( 'API key is required.', 'all-sources-images' ) );
+            }
+            $apiUrl = add_query_arg( array(
+                'key'      => $apiKey,
+                'pageSize' => 1,
+            ), 'https://generativelanguage.googleapis.com/v1beta/models' );
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, array_merge( array(
+                'timeout' => 15,
+            ), $proxy_args ) );
+            if ( is_wp_error( $response ) ) {
+                wp_send_json_error( 'Error connecting to Gemini API.' );
+            }
+            $code = wp_remote_retrieve_response_code( $response );
+            $body = wp_remote_retrieve_body( $response );
+            if ( 200 === $code ) {
+                wp_send_json_success( $body );
+            }
+            $decoded = json_decode( $body, true );
+            $message = isset( $decoded['error']['message'] ) ? $decoded['error']['message'] : __( 'Unexpected Gemini API response.', 'all-sources-images' );
+            wp_send_json_error( $message, $code );
+        } elseif ( 'workers_ai' === $apiBank ) {
+            $account_id = isset( $_POST['account_id'] ) ? sanitize_text_field( $_POST['account_id'] ) : '';
+            if ( empty( $account_id ) ) {
+                wp_send_json_error( __( 'Account ID is required.', 'all-sources-images' ) );
+            }
+            if ( empty( $apiKey ) ) {
+                wp_send_json_error( __( 'API token is required.', 'all-sources-images' ) );
+            }
+            $apiUrl = sprintf( 'https://api.cloudflare.com/client/v4/accounts/%s/ai/models/search', rawurlencode( $account_id ) );
+            $request_args = array(
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type'  => 'application/json',
+                ),
+                'timeout' => 15,
+            );
+            $proxy_args = $this->ASI_get_proxy_args();
+            $response = wp_remote_get( $apiUrl, array_merge( $request_args, $proxy_args ) );
+            if ( is_wp_error( $response ) ) {
+                wp_send_json_error( __( 'Error connecting to Cloudflare Workers AI.', 'all-sources-images' ) );
+            }
+            $code = wp_remote_retrieve_response_code( $response );
+            $body = wp_remote_retrieve_body( $response );
+            if ( 200 === $code ) {
+                wp_send_json_success( $body );
+            }
+            $decoded = json_decode( $body, true );
+            $message = '';
+            if ( isset( $decoded['errors'][0]['message'] ) ) {
+                $message = $decoded['errors'][0]['message'];
+            } elseif ( isset( $decoded['messages'][0] ) ) {
+                $message = $decoded['messages'][0];
+            } else {
+                $message = __( 'Unexpected Workers AI response.', 'all-sources-images' );
+            }
+            wp_send_json_error( $message, $code );
         } else {
             $response = '';
             wp_send_json_error( 'Unknown API bank: ' . $apiBank );
@@ -1522,6 +1600,7 @@ class All_Sources_Images_Admin {
             'available_banks'  => $manual_bank_labels,
             'licensing_data'   => '1', // All features available
             'path_default_img' => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
+            'ai_sources'       => $this->ASI_ai_source_codes(),
         ) );
         // Locate character strings
         wp_set_script_translations( 'asi-images-script', 'all-sources-images', plugin_dir_path( __DIR__ ) . 'languages' );
@@ -1599,6 +1678,16 @@ class All_Sources_Images_Admin {
             $search_term,
             $bank
         );
+        if ( $results_thumbs !== false ) {
+            $response_preview = json_encode( $results_thumbs );
+            if ( strlen( $response_preview ) > 1200 ) {
+                $response_preview = substr( $response_preview, 0, 1200 ) . '...';
+            }
+            ASI_log( array(
+                'bank'             => $bank,
+                'response_preview' => $response_preview,
+            ), 'GUTENBERG_BLOCK_RESPONSE' );
+        }
         if ( $results_thumbs === false ) {
             ASI_log( 'No results returned from ASI_create_thumb', 'GUTENBERG_BLOCK_ERROR' );
             wp_send_json_error( 'Error connecting to the API.' );
@@ -1755,6 +1844,59 @@ class All_Sources_Images_Admin {
                     'mime'     => $mime,
                     'is_data'  => true,
                 );
+            } elseif ( 'gemini' === $bank && isset( $results_thumbs['candidates'] ) && is_array( $results_thumbs['candidates'] ) ) {
+                foreach ( $results_thumbs['candidates'] as $candidate ) {
+                    if ( empty( $candidate['content']['parts'] ) || ! is_array( $candidate['content']['parts'] ) ) {
+                        continue;
+                    }
+                    foreach ( $candidate['content']['parts'] as $part ) {
+                        if ( empty( $part['inline_data']['data'] ) ) {
+                            continue;
+                        }
+                        $mime = isset( $part['inline_data']['mime_type'] ) ? $part['inline_data']['mime_type'] : 'image/png';
+                        $data_uri = 'data:' . $mime . ';base64,' . $part['inline_data']['data'];
+                        $normalized_images[] = array(
+                            'url'      => $data_uri,
+                            'thumb'    => $data_uri,
+                            'title'    => $search_term,
+                            'alt'      => $search_term,
+                            'caption'  => __( 'Generated with Google Gemini', 'all-sources-images' ),
+                            'mime'     => $mime,
+                            'is_data'  => true,
+                        );
+                    }
+                }
+            } elseif ( 'workers_ai' === $bank && is_array( $results_thumbs ) ) {
+                $image_payload = '';
+                if ( isset( $results_thumbs['result']['image'] ) ) {
+                    $image_payload = $results_thumbs['result']['image'];
+                } elseif ( isset( $results_thumbs['result']['images'][0] ) ) {
+                    $image_payload = $results_thumbs['result']['images'][0];
+                } elseif ( isset( $results_thumbs['result']['output'][0] ) ) {
+                    $image_payload = $results_thumbs['result']['output'][0];
+                }
+
+                if ( is_string( $image_payload ) && $image_payload !== '' ) {
+                    $mime    = 'image/png';
+                    $data_uri = $image_payload;
+                    if ( 0 !== strpos( $image_payload, 'data:' ) ) {
+                        $data_uri = 'data:' . $mime . ';base64,' . $image_payload;
+                    } else {
+                        if ( preg_match( '/^data:([^;]+);base64,/', $image_payload, $matches ) ) {
+                            $mime = $matches[1];
+                        }
+                    }
+
+                    $normalized_images[] = array(
+                        'url'      => $data_uri,
+                        'thumb'    => $data_uri,
+                        'title'    => $search_term,
+                        'alt'      => $search_term,
+                        'caption'  => __( 'Generated with Cloudflare Workers AI', 'all-sources-images' ),
+                        'mime'     => $mime,
+                        'is_data'  => true,
+                    );
+                }
             }
             
             // Universal response format
@@ -1777,7 +1919,12 @@ class All_Sources_Images_Admin {
     public function ASI_block_downloading_image() {
         // Check the nonce
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
-        $url_image = ( isset( $_POST['url_image'] ) ? esc_url_raw( $_POST['url_image'] ) : '' );
+        $raw_url_image = isset( $_POST['url_image'] ) ? wp_unslash( $_POST['url_image'] ) : '';
+        if ( 0 === strpos( $raw_url_image, 'data:image' ) ) {
+            $url_image = $raw_url_image;
+        } else {
+            $url_image = esc_url_raw( $raw_url_image );
+        }
         $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( $_POST['search_term'] ) : 'image' );
         $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( $_POST['bank'] ) : '' );
         $alt = ( isset( $_POST['alt_image'] ) ? sanitize_text_field( $_POST['alt_image'] ) : '' );

@@ -8,7 +8,7 @@
     'use strict';
 
     const { registerBlockType } = wp.blocks;
-    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl } = wp.components;
+    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner } = wp.components;
     const { useState, useEffect } = wp.element;
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
@@ -46,12 +46,13 @@
             const [resultsSearch, setResultsSearch] = useState({});
             const [searchStatus, setSearchStatus] = useState({});
             const [timerTick, setTimerTick] = useState(Date.now());
+            const [isDownloading, setIsDownloading] = useState(false);
             const defaultBanks = asiAjax.choosed_banks || {};
             const availableBanks = asiAjax.available_banks || {};
             const [sourceMode, setSourceMode] = useState('preset');
             const [customBanks, setCustomBanks] = useState(Object.values(defaultBanks));
             const customBanksKey = customBanks.join('|');
-            const aiSources = (Array.isArray(asiAjax.ai_sources) ? asiAjax.ai_sources : ['dallev1', 'stability', 'replicate'])
+            const aiSources = (Array.isArray(asiAjax.ai_sources) ? asiAjax.ai_sources : ['dallev1', 'stability', 'replicate', 'gemini'])
                 .map((slug) => (typeof slug === 'string' ? slug.toLowerCase() : slug));
             const hasActiveSearch = Object.values(searchStatus).some((status) => status && status.active);
 
@@ -294,7 +295,11 @@
 
             // Download image and insert into post
             function downloadAndUseImage(url, alt, caption, bank) {
-                console.log('Downloading:', url);
+                if (isDownloading) {
+                    return;
+                }
+
+                setIsDownloading(true);
 
                 const postId = wp.data.select('core/editor').getCurrentPostId();
 
@@ -331,7 +336,8 @@
                             alert('Error downloading image');
                         }
                     })
-                    .fail(() => alert('Network error'));
+                    .fail(() => alert('Network error'))
+                    .always(() => setIsDownloading(false));
             }
 
             // Build tabs for each bank
@@ -364,10 +370,44 @@
                 // Modal with search and results
                 isModalOpen && wp.element.createElement(Modal, {
                     title: 'All Sources Images',
-                    onRequestClose: () => setIsModalOpen(false),
+                    onRequestClose: () => {
+                        setIsModalOpen(false);
+                        setIsDownloading(false);
+                    },
                     className: 'media-modal-content asi-modal',
                     style: { maxWidth: '95%' }
                 },
+                    isDownloading && wp.element.createElement('div', {
+                        className: 'asi-download-overlay',
+                        style: {
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 100000,
+                            color: '#fff'
+                        }
+                    },
+                        wp.element.createElement(Spinner, {
+                            style: {
+                                transform: 'scale(1.5)',
+                                marginBottom: '10px'
+                            }
+                        }),
+                        wp.element.createElement('p', {
+                            style: {
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                margin: 0
+                            }
+                        }, __('Downloading image…', 'all-sources-images'))
+                    ),
                     // Search container
                     wp.element.createElement('div', { style: { marginBottom: '20px' } },
                         wp.element.createElement(SelectControl, {

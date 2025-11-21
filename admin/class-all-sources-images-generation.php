@@ -1,5 +1,10 @@
 <?php
 
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-image-source.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-manager.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-gemini.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-workers-ai.php';
+
 /**
  * The functionalities for ASI Images generation
  *
@@ -27,6 +32,20 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
     private $version;
 
     /**
+     * Lazy-loaded source manager used to resolve modular image providers.
+     *
+     * @var ASI_Source_Manager|null
+     */
+    private $source_manager = null;
+
+    /**
+     * Track if built-in sources have already been registered.
+     *
+     * @var bool
+     */
+    private $sources_registered = false;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    4.0.0
@@ -51,6 +70,45 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 10,
                 3
             );
+        }
+    }
+
+    /**
+     * Retrieve the shared source manager and register built-in sources on demand.
+     *
+     * @return ASI_Source_Manager|null
+     */
+    private function ASI_get_source_manager_instance() {
+        if ( ! class_exists( 'ASI_Source_Manager' ) ) {
+            return null;
+        }
+
+        if ( null === $this->source_manager ) {
+            $this->source_manager = ASI_Source_Manager::instance();
+        }
+
+        if ( false === $this->sources_registered ) {
+            $this->ASI_register_builtin_sources();
+            $this->sources_registered = true;
+        }
+
+        return $this->source_manager;
+    }
+
+    /**
+     * Register core sources shipped with the plugin.
+     */
+    private function ASI_register_builtin_sources() {
+        if ( ! $this->source_manager ) {
+            return;
+        }
+
+        if ( class_exists( 'ASI_Source_Gemini' ) && ! $this->source_manager->has_source( 'gemini' ) ) {
+            $this->source_manager->register_source( new ASI_Source_Gemini() );
+        }
+
+        if ( class_exists( 'ASI_Source_Workers_AI' ) && ! $this->source_manager->has_source( 'workers_ai' ) ) {
+            $this->source_manager->register_source( new ASI_Source_Workers_AI() );
         }
     }
 
@@ -480,6 +538,35 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
         }
         if ( TRUE == $get_only_thumb ) {
+            $source_manager = $this->ASI_get_source_manager_instance();
+            if ( $source_manager && $source_manager->has_source( $img_block['api_chosen'] ) ) {
+                $source = $source_manager->get_source( $img_block['api_chosen'] );
+                $result = $source->generate( array(
+                    'img_block'      => $img_block,
+                    'options'        => $options,
+                    'search'         => $search,
+                    'log'            => $log,
+                    'post_id'        => $id,
+                    'get_only_thumb' => true,
+                    'selected_image' => $img_block['selected_image'],
+                    'proxy_args'     => $this->ASI_get_proxy_args(),
+                ) );
+                if ( is_wp_error( $result ) ) {
+                    $log->error( 'Source generation failed', array(
+                        'post'  => $id,
+                        'error' => $result->get_error_message(),
+                    ) );
+                    ASI_log( array(
+                        'post'    => $id,
+                        'bank'    => $img_block['api_chosen'],
+                        'message' => $result->get_error_message(),
+                        'data'    => $result->get_error_data(),
+                    ), 'GUTENBERG_BLOCK_SOURCE_ERROR' );
+                    return false;
+                }
+                return $result;
+            }
+
             /* SET ALL PARAMETERS */
             $array_parameters = $this->ASI_Get_Parameters( $img_block, $options, $search );
             
@@ -498,7 +585,6 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 return false;
             }
             $result_body = $this->ASI_Generate(
-                //$options['api_chosen'],
                 $img_block['api_chosen'],
                 $api_url,
                 $array_parameters,
@@ -514,9 +600,48 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'post' => $id,
             ) );
             $last_bank_element = end( $options_banks['api_chosen_auto'] );
+            $proxy_args = $this->ASI_get_proxy_args();
             foreach ( $options_banks['api_chosen_auto'] as $bank ) {
                 // Reset options according new image bank
                 $options['api_chosen'] = $bank;
+
+                $source_manager = $this->ASI_get_source_manager_instance();
+                if ( $source_manager && $source_manager->has_source( $bank ) ) {
+                    $context_block = $img_block;
+                    $context_block['api_chosen'] = $bank;
+                    $source = $source_manager->get_source( $bank );
+                    $result = $source->generate( array(
+                        'img_block'      => $context_block,
+                        'options'        => $options,
+                        'search'         => $search,
+                        'log'            => $log,
+                        'post_id'        => $id,
+                        'get_only_thumb' => false,
+                        'selected_image' => $context_block['selected_image'],
+                        'proxy_args'     => $proxy_args,
+                    ) );
+
+                    if ( is_wp_error( $result ) ) {
+                        $log->info( 'No results with ' . $bank, array(
+                            'post'  => $id,
+                            'error' => $result->get_error_message(),
+                        ) );
+                        if ( $bank === $last_bank_element ) {
+                            $log->info( 'No image found with all banks selected', array(
+                                'post' => $id,
+                            ) );
+                            return false;
+                        }
+                        continue;
+                    }
+
+                    $url_results = $result['url_results'];
+                    $file_media = $result['file_media'];
+                    $alt_img = isset( $result['alt_img'] ) ? $result['alt_img'] : '';
+                    $caption_img = isset( $result['caption_img'] ) ? $result['caption_img'] : '';
+                    break;
+                }
+
                 $array_parameters = $this->ASI_Get_Parameters( $options, $options, $search );
                 $api_url = $array_parameters['url'];
                 unset($array_parameters['url']);
@@ -817,6 +942,29 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $log,
         $id
     ) {
+        $source_manager = $this->ASI_get_source_manager_instance();
+        if ( $source_manager && $source_manager->has_source( $img_block['api_chosen'] ) ) {
+            $source = $source_manager->get_source( $img_block['api_chosen'] );
+            $result = $source->generate( array(
+                'img_block'      => $img_block,
+                'options'        => $options,
+                'search'         => $search,
+                'log'            => $log,
+                'post_id'        => $id,
+                'get_only_thumb' => false,
+                'selected_image' => $img_block['selected_image'],
+                'proxy_args'     => $this->ASI_get_proxy_args(),
+            ) );
+            if ( is_wp_error( $result ) ) {
+                $log->error( 'Source generation failed', array(
+                    'post'  => $id,
+                    'error' => $result->get_error_message(),
+                ) );
+                return false;
+            }
+            return $result;
+        }
+
         // Set all parameters
         $array_parameters = $this->ASI_Get_Parameters( $img_block, $options, $search );
         $api_url = ( isset( $array_parameters['url'] ) ? $array_parameters['url'] : null );
