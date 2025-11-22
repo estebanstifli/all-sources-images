@@ -24,7 +24,10 @@ session_start();
 
 
 // Check the file
-$dir    = ABSPATH . 'wp-content/uploads/magic-post-thumbnail/logs/';
+$dir    = ASI_ensure_logs_dir();
+if ( false === $dir ) {
+    return false;
+}
 $files  = @scandir( $dir );
 $result = '';
 

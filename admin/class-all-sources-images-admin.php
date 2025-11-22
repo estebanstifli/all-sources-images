@@ -1279,13 +1279,20 @@ class All_Sources_Images_Admin {
      * @since    4.0.0
      */
     private function ASI_log_file( $check = false ) {
-        $filename = ABSPATH . 'wp-content/uploads/magic-post-thumbnail/logs/';
-        $files = @scandir( $filename );
+        $logs_dir = ASI_ensure_logs_dir();
+        if ( false === $logs_dir ) {
+            if ( true === $check ) {
+                return false;
+            }
+            return false;
+        }
+
+        $files = @scandir( $logs_dir );
         $result = '';
         if ( !empty( $files ) ) {
             foreach ( $files as $key => $value ) {
                 if ( !in_array( $value, array('.', '..'), true ) ) {
-                    if ( !is_dir( $value ) && strstr( $value, '.log' ) ) {
+                    if ( !is_dir( $logs_dir . $value ) && strstr( $value, '.log' ) ) {
                         $result = $value;
                     }
                 }
@@ -1309,11 +1316,16 @@ class All_Sources_Images_Admin {
         $main_settings = get_option( 'ASI_plugin_logs_settings' );
         // Check if logs enabled
         if ( !empty( $main_settings['logs'] ) && true == $main_settings['logs'] ) {
+            $logs_dir = ASI_ensure_logs_dir();
+            if ( false === $logs_dir ) {
+                require_once dirname( __FILE__ ) . '/partials/monolog/nologs.php';
+                return new Nolog();
+            }
             require_once dirname( __FILE__ ) . '/partials/monolog/vendor/autoload.php';
             $log = new Monolog\Logger('ASI_logger');
             $logfile = $this->ASI_log_file();
             // Now add some handlers
-            $log->pushHandler( new Monolog\Handler\StreamHandler(ABSPATH . 'wp-content/uploads/magic-post-thumbnail/logs/' . $logfile, Monolog\Logger::DEBUG) );
+            $log->pushHandler( new Monolog\Handler\StreamHandler($logs_dir . $logfile, Monolog\Logger::DEBUG) );
             $log->pushHandler( new Monolog\Handler\FirePHPHandler() );
         } else {
             require_once dirname( __FILE__ ) . '/partials/monolog/nologs.php';

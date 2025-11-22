@@ -19,11 +19,12 @@ if ( ! function_exists( 'add_filter' ) ) {
             // Get the log file
             $current_file = $this->ASI_log_file( true );
 
-            if( false !== $current_file ) {
-                $log_file     = ABSPATH . 'wp-content/uploads/magic-post-thumbnail/logs/' . $current_file;
-                $file_content = file_get_contents( $log_file );
+            $logs_dir = ASI_ensure_logs_dir();
+            if( false !== $current_file && false !== $logs_dir ) {
+                $log_file     = $logs_dir . $current_file;
+                $file_content = file_exists( $log_file ) ? file_get_contents( $log_file ) : esc_html__( 'No log yet', 'all-sources-images' );
             } else {
-                $file_content =esc_html__( 'No log yet', 'all-sources-images' );;
+                $file_content = esc_html__( 'No log yet', 'all-sources-images' );
             }
 
         ?>
@@ -47,7 +48,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                         <td>
                             <pre id="logs-block" class="text-white bg-dark"><?php echo $file_content; ?></pre>
                             <?php
-                                if( false !== $current_file ) {
+                                if( false !== $current_file && false !== $logs_dir ) {
                                     $download_file_URL = esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'downloadlog' ), admin_url( 'admin.php?page=all-sources-images-admin-display&module=logs' ) ), 'download_log' ) );
                                     $delete_file       = esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'deletelog' ), admin_url( 'admin.php?page=all-sources-images-admin-display&module=logs' ) ), 'delete_log' ) );
                             ?>

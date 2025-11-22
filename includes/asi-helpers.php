@@ -87,3 +87,38 @@ function ASI_log_error( $message, $exception = null ) {
 	
 	ASI_log( $error_message, 'ERROR' );
 }
+
+if ( ! function_exists( 'ASI_get_logs_dir' ) ) {
+	/**
+	 * Retrieve the absolute path to the plugin's logs directory within uploads.
+	 *
+	 * @since 6.1.7
+	 * @return string Absolute path ending with trailing slash.
+	 */
+	function ASI_get_logs_dir() {
+		$upload_dir = wp_upload_dir();
+		$base_dir   = isset( $upload_dir['basedir'] ) && ! empty( $upload_dir['basedir'] )
+			? $upload_dir['basedir']
+			: WP_CONTENT_DIR . '/uploads';
+		return trailingslashit( wp_normalize_path( $base_dir ) ) . 'magic-post-thumbnail/logs/';
+	}
+}
+
+if ( ! function_exists( 'ASI_ensure_logs_dir' ) ) {
+	/**
+	 * Ensure the logs directory exists and is writable.
+	 *
+	 * @since 6.1.7
+	 * @return string|false Absolute path when available; false on failure.
+	 */
+	function ASI_ensure_logs_dir() {
+		$dir = ASI_get_logs_dir();
+		if ( ! file_exists( $dir ) ) {
+			if ( ! wp_mkdir_p( $dir ) ) {
+				ASI_log( 'Unable to create logs directory: ' . $dir, 'LOGS_DIR' );
+				return false;
+			}
+		}
+		return $dir;
+	}
+}

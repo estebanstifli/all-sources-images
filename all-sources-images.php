@@ -34,6 +34,7 @@ if ( !defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 define( 'ASI_DEBUG', true );
+define('ASI_DIAGNOSTIC_TOKEN', 'amigomio1234'); // Replace with a unique token for your installation
 
 /**
  * Currently plugin version.

@@ -29,6 +29,9 @@ class All_Sources_Images_Activator {
 	 */
 	public static function activate() {
 		ASI_log( 'Activator::activate() called', 'ACTIVATOR' );
+		if ( false === ASI_ensure_logs_dir() ) {
+			ASI_log( 'Unable to prepare logs directory during activation', 'ACTIVATOR' );
+		}
 		
 		if ( ! get_option( 'ASI_plugin_activation_date' ) ) {
 			$result = update_option( 'ASI_plugin_activation_date', time() );

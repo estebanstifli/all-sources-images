@@ -1,164 +1,513 @@
 <?php
 /**
- * Diagnostic script for All Sources Images plugin
- * Upload to wp-content/plugins/all-sources-images/ and access via browser
- * URL: https://casaydinero.es/wp-content/plugins/all-sources-images/diagnostic.php
+ * Automated diagnostics for All Sources Images.
+ *
+ * Quick usage examples:
+ *  - Web:  https://example.com/wp-content/plugins/all-sources-images/diagnostic.php?busqueda=perros&sources_no_ia=auto&notify=errors
+ *  - Cron: php diagnostic.php busqueda="tech news" sources_no_ia=all sources_ia=auto notify=always email=you@site.com format=text
+ *
+ * Query/CLI parameters:
+ *  - busqueda        : Keyword to test (default: "nature landscape").
+ *  - sources_no_ia   : non-AI sources (all | auto | comma list | none).
+ *  - sources_ia      : AI sources (same accepted values as above).
+ *  - email           : Comma/semicolon separated recipient list (fallback: admin_email).
+ *  - notify          : always | errors | never (default: errors -> notify only on failures).
+ *  - format          : html | text | json (default html for web, text for CLI).
+ *  - token           : Optional shared secret. If ASI_DIAGNOSTIC_TOKEN constant or asi_diagnostic_token option is set, requests must provide it.
  */
 
-// Prevent direct access without WordPress
-if (!defined('ABSPATH')) {
-    define('DIAGNOSTICS_STANDALONE', true);
+define( 'ASI_DIAGNOSTIC_START', microtime( true ) );
+
+// Bootstrap WordPress when the script is executed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+    $wp_load_path = dirname( __DIR__, 3 ) . '/wp-load.php';
+    if ( file_exists( $wp_load_path ) ) {
+        require_once $wp_load_path;
+    } else {
+        http_response_code( 500 );
+        echo 'Unable to locate wp-load.php. Please run this script from inside a WordPress installation.';
+        exit;
+    }
 }
 
-echo "<h1>All Sources Images - Diagnostic Report</h1>";
-echo "<style>body{font-family:monospace;padding:20px;} .pass{color:green;} .fail{color:red;} .warn{color:orange;}</style>";
+if ( ! function_exists( 'wp_mail' ) ) {
+    require_once ABSPATH . WPINC . '/pluggable.php';
+}
 
-// Check 1: File encoding (BOM detection)
-echo "<h2>1. File Encoding Check (BOM Detection)</h2>";
-$files_to_check = array(
-    'all-sources-images.php',
-    'includes/class-all-sources-images.php',
-    'includes/class-all-sources-images-activator.php',
-    'includes/class-all-sources-images-loader.php',
-    'includes/asi-helpers.php',
-    'admin/class-all-sources-images-admin.php',
-    'admin/class-all-sources-images-generation.php',
+// Ensure core plugin classes are available even if the plugin is inactive.
+if ( ! class_exists( 'All_Sources_Images_Admin' ) ) {
+    require_once __DIR__ . '/admin/class-all-sources-images-admin.php';
+}
+if ( ! class_exists( 'All_Sources_Images_Generation' ) ) {
+    require_once __DIR__ . '/admin/class-all-sources-images-generation.php';
+}
+
+$plugin_name    = 'all-sources-images';
+$plugin_version = defined( 'ALL_SOURCES_IMAGES_VERSION' ) ? ALL_SOURCES_IMAGES_VERSION : '1.0.0';
+$generation     = new All_Sources_Images_Generation( $plugin_name, $plugin_version );
+$params         = asi_diag_collect_params();
+
+asi_diag_guard_token( $params );
+
+$search_term = sanitize_text_field( $params['busqueda'] );
+if ( '' === $search_term ) {
+    $search_term = 'nature landscape';
+}
+
+$notify_mode = asi_diag_resolve_notify_mode( $params['notify'] );
+$format      = asi_diag_resolve_format( $params['format'] );
+$recipients  = asi_diag_resolve_recipients( $params['email'] );
+if ( empty( $recipients ) ) {
+    $admin_email = get_option( 'admin_email' );
+    if ( $admin_email && is_email( $admin_email ) ) {
+        $recipients = array( $admin_email );
+    }
+}
+
+$options_main  = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $generation->ASI_default_options_main_settings( true ) );
+$options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $generation->ASI_default_options_banks_settings( true ) );
+$options_cron  = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ), $generation->ASI_default_options_cron_settings( true ) );
+$merged_options = array_merge( $options_main, $options_banks, $options_cron );
+$proxy_args      = $generation->ASI_get_proxy_args();
+
+$available_codes = asi_diag_extract_codes( $generation->ASI_banks_name_auto() );
+$ai_codes        = array_values( array_unique( array_map( 'sanitize_key', $generation->ASI_ai_source_codes() ) ) );
+$non_ai_codes    = array_values( array_diff( $available_codes, $ai_codes ) );
+
+$selected_non_ai = asi_diag_resolve_sources( $params['sources_no_ia'], 'non_ai', $options_banks, $non_ai_codes, $ai_codes );
+$selected_ai     = asi_diag_resolve_sources( $params['sources_ia'], 'ai', $options_banks, $non_ai_codes, $ai_codes );
+$targets         = array_values( array_unique( array_merge( $selected_non_ai, $selected_ai ) ) );
+
+if ( empty( $targets ) ) {
+    asi_diag_render_and_exit( array(
+        'generated_at' => current_time( 'mysql' ),
+        'search_term'  => $search_term,
+        'results'      => array(),
+        'error_count'  => 0,
+        'warning_count'=> 0,
+        'duration_ms'  => asi_diag_duration_ms(),
+        'message'      => 'No sources selected. Provide sources_no_ia or sources_ia parameters.',
+    ), $format );
+}
+
+$source_manager = asi_diag_get_source_manager( $generation );
+if ( ! $source_manager ) {
+    asi_diag_render_and_exit( array(
+        'generated_at' => current_time( 'mysql' ),
+        'search_term'  => $search_term,
+        'results'      => array(),
+        'error_count'  => 1,
+        'warning_count'=> 0,
+        'duration_ms'  => asi_diag_duration_ms(),
+        'message'      => 'Unable to initialize source manager.',
+    ), $format, 500 );
+}
+
+$results = array();
+foreach ( $targets as $bank ) {
+    $category      = in_array( $bank, $ai_codes, true ) ? 'ai' : 'non_ai';
+    $results[]     = asi_diag_run_check( $generation, $source_manager, $bank, $search_term, $category, $merged_options, $proxy_args );
+}
+
+$error_count   = count( array_filter( $results, function( $item ) {
+    return isset( $item['status'] ) && 'error' === $item['status'];
+} ) );
+$warning_count = count( array_filter( $results, function( $item ) {
+    return isset( $item['status'] ) && 'warning' === $item['status'];
+} ) );
+$status_label  = $error_count > 0 ? 'Errors detected' : ( $warning_count > 0 ? 'Warnings detected' : 'All good' );
+
+$summary = array(
+    'generated_at'  => current_time( 'mysql' ),
+    'site'          => get_home_url(),
+    'search_term'   => $search_term,
+    'results'       => $results,
+    'error_count'   => $error_count,
+    'warning_count' => $warning_count,
+    'ok_count'      => count( $results ) - $error_count - $warning_count,
+    'duration_ms'   => asi_diag_duration_ms(),
+    'status_label'  => $status_label,
+    'notify_mode'   => $notify_mode,
 );
 
-$bom_found = false;
-foreach ($files_to_check as $file) {
-    $filepath = __DIR__ . '/' . $file;
-    if (file_exists($filepath)) {
-        $contents = file_get_contents($filepath);
-        $first_bytes = substr($contents, 0, 3);
-        $has_bom = ($first_bytes === "\xEF\xBB\xBF");
-        
-        if ($has_bom) {
-            echo "<p class='fail'>✗ FAIL: <strong>$file</strong> has UTF-8 BOM</p>";
-            $bom_found = true;
-        } else {
-            echo "<p class='pass'>✓ PASS: <strong>$file</strong> is clean</p>";
+$should_email = false;
+if ( 'always' === $notify_mode ) {
+    $should_email = true;
+} elseif ( 'errors' === $notify_mode && ( $error_count > 0 || $warning_count > 0 ) ) {
+    $should_email = true;
+}
+
+if ( $should_email && ! empty( $recipients ) ) {
+    asi_diag_send_email( $recipients, $summary );
+}
+
+asi_diag_render_and_exit( $summary, $format );
+
+// -----------------------------------------------------------------------------
+// Helper functions
+// -----------------------------------------------------------------------------
+
+function asi_diag_collect_params() {
+    $defaults = array(
+        'busqueda'      => '',
+        'sources_no_ia' => 'auto',
+        'sources_ia'    => 'auto',
+        'email'         => '',
+        'notify'        => 'errors',
+        'format'        => '',
+        'token'         => '',
+    );
+    $params = $defaults;
+    $request = $_REQUEST ?? array();
+    foreach ( $request as $key => $value ) {
+        if ( ! is_scalar( $value ) ) {
+            continue;
         }
-        
-        // Check for whitespace before <?php
-        if (preg_match('/^[\s\n\r]+<\?php/', $contents)) {
-            echo "<p class='fail'>✗ FAIL: <strong>$file</strong> has whitespace before &lt;?php tag</p>";
+        $params[ $key ] = trim( (string) $value );
+    }
+    if ( PHP_SAPI === 'cli' && ! empty( $GLOBALS['argv'] ) ) {
+        foreach ( $GLOBALS['argv'] as $index => $argument ) {
+            if ( 0 === $index ) {
+                continue;
+            }
+            if ( false !== strpos( $argument, '=' ) ) {
+                list( $key, $value ) = explode( '=', $argument, 2 );
+                $params[ trim( $key ) ] = trim( $value );
+            }
         }
+    }
+    return $params;
+}
+
+function asi_diag_guard_token( array $params ) {
+    $expected = '';
+    if ( defined( 'ASI_DIAGNOSTIC_TOKEN' ) && ASI_DIAGNOSTIC_TOKEN ) {
+        $expected = ASI_DIAGNOSTIC_TOKEN;
     } else {
-        echo "<p class='warn'>⚠ WARNING: <strong>$file</strong> not found</p>";
-    }
-}
-
-if (!$bom_found) {
-    echo "<p class='pass'><strong>✓ All files are clean (no BOM detected)</strong></p>";
-}
-
-// Check 2: PHP syntax errors
-echo "<h2>2. PHP Syntax Check</h2>";
-foreach ($files_to_check as $file) {
-    $filepath = __DIR__ . '/' . $file;
-    if (file_exists($filepath)) {
-        $output = array();
-        $return_var = 0;
-        exec("php -l " . escapeshellarg($filepath) . " 2>&1", $output, $return_var);
-        
-        if ($return_var === 0) {
-            echo "<p class='pass'>✓ PASS: <strong>$file</strong> - No syntax errors</p>";
-        } else {
-            echo "<p class='fail'>✗ FAIL: <strong>$file</strong> - " . implode("<br>", $output) . "</p>";
+        $stored = get_option( 'asi_diagnostic_token' );
+        if ( is_string( $stored ) ) {
+            $expected = $stored;
         }
     }
+    if ( '' === $expected ) {
+        return;
+    }
+    $provided = isset( $params['token'] ) ? (string) $params['token'] : '';
+    if ( $provided === '' || ! hash_equals( $expected, $provided ) ) {
+        http_response_code( 403 );
+        exit( 'Invalid diagnostic token.' );
+    }
 }
 
-// Check 3: WordPress environment (if available)
-echo "<h2>3. WordPress Environment Check</h2>";
-if (defined('DIAGNOSTICS_STANDALONE')) {
-    echo "<p class='warn'>⚠ WordPress not loaded (standalone mode)</p>";
-    echo "<p>To run full diagnostics, add this to your wp-config.php temporarily:</p>";
-    echo "<pre>define('WP_DEBUG', true);\ndefine('WP_DEBUG_LOG', true);\ndefine('WP_DEBUG_DISPLAY', false);</pre>";
-} else {
-    // WordPress is loaded
-    echo "<p class='pass'>✓ WordPress is loaded</p>";
-    
-    // Check plugin activation status
-    if (is_plugin_active('all-sources-images/all-sources-images.php')) {
-        echo "<p class='pass'>✓ Plugin is ACTIVE</p>";
+function asi_diag_resolve_notify_mode( $value ) {
+    $value = strtolower( trim( (string) $value ) );
+    if ( in_array( $value, array( 'always', 'siempre', 'all', '1', 'true' ), true ) ) {
+        return 'always';
+    }
+    if ( in_array( $value, array( 'never', 'nunca', '0', 'false', 'off' ), true ) ) {
+        return 'never';
+    }
+    if ( in_array( $value, array( 'errors', 'errores', 'only_errors' ), true ) ) {
+        return 'errors';
+    }
+    return 'errors';
+}
+
+function asi_diag_resolve_format( $value ) {
+    $value = strtolower( trim( (string) $value ) );
+    if ( in_array( $value, array( 'json', 'text', 'html' ), true ) ) {
+        return $value;
+    }
+    return PHP_SAPI === 'cli' ? 'text' : 'html';
+}
+
+function asi_diag_resolve_recipients( $value ) {
+    if ( empty( $value ) ) {
+        return array();
+    }
+    $parts = preg_split( '/[,;\s]+/', $value );
+    $valid = array();
+    foreach ( $parts as $email ) {
+        $email = trim( $email );
+        if ( $email && is_email( $email ) ) {
+            $valid[] = $email;
+        }
+    }
+    return array_values( array_unique( $valid ) );
+}
+
+function asi_diag_extract_codes( array $banks_map ) {
+    $codes = array();
+    foreach ( $banks_map as $data ) {
+        if ( is_array( $data ) && ! empty( $data[0] ) ) {
+            $codes[] = sanitize_key( $data[0] );
+        }
+    }
+    return array_values( array_unique( $codes ) );
+}
+
+function asi_diag_resolve_sources( $raw, $category, $bank_options, $non_ai_codes, $ai_codes ) {
+    $allowed = ( 'ai' === $category ) ? $ai_codes : $non_ai_codes;
+    if ( empty( $allowed ) ) {
+        return array();
+    }
+    $raw = strtolower( trim( (string) $raw ) );
+    if ( '' === $raw || in_array( $raw, array( 'none', 'ninguna', '0', 'false' ), true ) ) {
+        return array();
+    }
+    if ( in_array( $raw, array( 'all', 'todos', '*', 'todo' ), true ) ) {
+        return $allowed;
+    }
+    $selected = array();
+    if ( in_array( $raw, array( 'auto', 'selected', 'seleccionados', 'default' ), true ) ) {
+        $auto = isset( $bank_options['api_chosen_auto'] ) ? (array) $bank_options['api_chosen_auto'] : array();
+        $manual = isset( $bank_options['api_chosen_manual'] ) ? (array) $bank_options['api_chosen_manual'] : array();
+        $selected = array_merge( $auto, $manual );
     } else {
-        echo "<p class='fail'>✗ Plugin is NOT ACTIVE</p>";
+        $selected = preg_split( '/[\s,;|]+/', $raw );
     }
-    
-    // Check capabilities
-    global $current_user;
-    wp_get_current_user();
-    echo "<p>Current user: <strong>" . $current_user->user_login . "</strong></p>";
-    echo "<p>Has 'asi_manage' capability: " . (current_user_can('asi_manage') ? '<span class="pass">YES</span>' : '<span class="fail">NO</span>') . "</p>";
-    echo "<p>Has 'manage_options' capability: " . (current_user_can('manage_options') ? '<span class="pass">YES</span>' : '<span class="fail">NO</span>') . "</p>";
-    
-    // Check plugin options
-    $main_settings = get_option('ASI_plugin_main_settings');
-    echo "<p>ASI_plugin_main_settings exists: " . ($main_settings ? '<span class="pass">YES</span>' : '<span class="warn">NO (not initialized yet)</span>') . "</p>";
+    $selected = array_map( 'sanitize_key', array_filter( array_map( 'trim', $selected ) ) );
+    $selected = array_values( array_intersect( $selected, $allowed ) );
+    return $selected;
 }
 
-// Check 4: File permissions
-echo "<h2>4. File Permissions Check</h2>";
-foreach ($files_to_check as $file) {
-    $filepath = __DIR__ . '/' . $file;
-    if (file_exists($filepath)) {
-        $perms = fileperms($filepath);
-        $perms_string = substr(sprintf('%o', $perms), -4);
-        $readable = is_readable($filepath);
-        
-        if ($readable) {
-            echo "<p class='pass'>✓ <strong>$file</strong> - Permissions: $perms_string (readable)</p>";
-        } else {
-            echo "<p class='fail'>✗ <strong>$file</strong> - Permissions: $perms_string (NOT readable)</p>";
-        }
+function asi_diag_get_source_manager( $generation ) {
+    try {
+        $reflection = new ReflectionClass( $generation );
+        $method     = $reflection->getMethod( 'ASI_get_source_manager_instance' );
+        $method->setAccessible( true );
+        return $method->invoke( $generation );
+    } catch ( Exception $e ) {
+        error_log( '[All Sources Images][Diagnostics] Unable to access source manager: ' . $e->getMessage() );
+        return null;
     }
 }
 
-// Check 5: PHP version and extensions
-echo "<h2>5. Server Environment</h2>";
-echo "<p>PHP Version: <strong>" . phpversion() . "</strong> " . (version_compare(phpversion(), '7.3.0', '>=') ? '<span class="pass">(✓ OK)</span>' : '<span class="fail">(✗ Requires 7.3+)</span>') . "</p>";
-echo "<p>WordPress Version: <strong>" . (defined('DIAGNOSTICS_STANDALONE') ? 'N/A (standalone)' : get_bloginfo('version')) . "</strong></p>";
+function asi_diag_run_check( $generation, $source_manager, $bank, $search_term, $category, $options, $proxy_args ) {
+    $result = array(
+        'bank'        => $bank,
+        'category'    => $category,
+        'status'      => 'skipped',
+        'message'     => '',
+        'duration_ms' => 0,
+    );
 
-$required_extensions = array('curl', 'json', 'mbstring', 'gd');
-echo "<p>Required PHP Extensions:</p><ul>";
-foreach ($required_extensions as $ext) {
-    $loaded = extension_loaded($ext);
-    echo "<li class='" . ($loaded ? 'pass' : 'fail') . "'>" . ($loaded ? '✓' : '✗') . " $ext</li>";
-}
-echo "</ul>";
-
-// Check 6: Recent errors in debug.log (if accessible)
-echo "<h2>6. Recent Debug Log Entries</h2>";
-$debug_log_path = dirname(dirname(dirname(__DIR__))) . '/debug.log';
-if (file_exists($debug_log_path)) {
-    $log_contents = file_get_contents($debug_log_path);
-    $log_lines = explode("\n", $log_contents);
-    $recent_asi_errors = array();
-    
-    // Get last 50 lines
-    $recent_lines = array_slice($log_lines, -50);
-    
-    foreach ($recent_lines as $line) {
-        if (stripos($line, 'all-sources') !== false || stripos($line, 'all_sources') !== false || stripos($line, 'ASI_') !== false) {
-            $recent_asi_errors[] = $line;
-        }
+    if ( ! $source_manager || ! $source_manager->has_source( $bank ) ) {
+        $result['status']  = 'skipped';
+        $result['message'] = 'Source not registered.';
+        return $result;
     }
-    
-    if (count($recent_asi_errors) > 0) {
-        echo "<p class='warn'>Found " . count($recent_asi_errors) . " recent entries related to this plugin:</p>";
-        echo "<pre style='background:#f5f5f5;padding:10px;overflow:auto;'>";
-        foreach ($recent_asi_errors as $error) {
-            echo htmlspecialchars($error) . "\n";
+
+    $source = $source_manager->get_source( $bank );
+    if ( ! $source ) {
+        $result['status']  = 'skipped';
+        $result['message'] = 'Unable to load source handler.';
+        return $result;
+    }
+
+    $context = array(
+        'img_block'      => array(
+            'api_chosen'    => $bank,
+            'based_on'      => 'title',
+            'selected_image'=> 'random_result',
+        ),
+        'options'        => $options,
+        'search'         => $search_term,
+        'log'            => null,
+        'post_id'        => 0,
+        'get_only_thumb' => true,
+        'selected_image' => 'random_result',
+        'proxy_args'     => $proxy_args,
+        'generation'     => $generation,
+        'page'           => 1,
+    );
+
+    $start    = microtime( true );
+    $response = $source->generate( $context );
+    $result['duration_ms'] = round( ( microtime( true ) - $start ) * 1000, 2 );
+
+    if ( is_wp_error( $response ) ) {
+        $result['status']  = 'error';
+        $result['message'] = $response->get_error_message();
+        $data = $response->get_error_data();
+        if ( $data ) {
+            $result['details'] = $data;
         }
-        echo "</pre>";
+        return $result;
+    }
+
+    if ( empty( $response ) ) {
+        $result['status']  = 'warning';
+        $result['message'] = 'Empty response.';
+        return $result;
+    }
+
+    $items = asi_diag_estimate_items( $response );
+    if ( null === $items ) {
+        $result['status']  = 'ok';
+        $result['message'] = 'Response received.';
+    } elseif ( $items > 0 ) {
+        $result['status']  = 'ok';
+        $result['message'] = sprintf( '%d items returned.', $items );
+        $result['items']   = $items;
     } else {
-        echo "<p class='pass'>No errors found in debug.log related to this plugin</p>";
+        $result['status']  = 'warning';
+        $result['message'] = 'No results returned.';
+        $result['items']   = 0;
     }
-} else {
-    echo "<p class='warn'>Debug log not found at: $debug_log_path</p>";
-    echo "<p>Enable debug logging in wp-config.php</p>";
+
+    $result['preview'] = asi_diag_preview_payload( $response );
+    return $result;
 }
 
-echo "<hr><p><small>Generated: " . date('Y-m-d H:i:s') . "</small></p>";
+function asi_diag_estimate_items( $payload ) {
+    if ( ! is_array( $payload ) ) {
+        return null;
+    }
+    foreach ( array( 'images', 'items', 'photos', 'data', 'results' ) as $key ) {
+        if ( isset( $payload[ $key ] ) && is_array( $payload[ $key ] ) ) {
+            return count( $payload[ $key ] );
+        }
+    }
+    return null;
+}
+
+function asi_diag_preview_payload( $payload ) {
+    if ( is_array( $payload ) ) {
+        $encoded = wp_json_encode( $payload );
+        if ( is_string( $encoded ) ) {
+            return asi_diag_truncate( $encoded, 600 );
+        }
+    }
+    if ( is_string( $payload ) ) {
+        return asi_diag_truncate( $payload, 300 );
+    }
+    return '';
+}
+
+function asi_diag_send_email( array $recipients, array $summary ) {
+    $subject = sprintf(
+        '[All Sources Images] %s (%s errors, %s warnings)',
+        $summary['status_label'],
+        $summary['error_count'],
+        $summary['warning_count']
+    );
+    $body    = asi_diag_render_html( $summary );
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    wp_mail( $recipients, $subject, $body, $headers );
+}
+
+function asi_diag_render_and_exit( array $summary, $format, $status_code = 200 ) {
+    if ( ! headers_sent() ) {
+        http_response_code( $status_code );
+    }
+    if ( 'json' === $format ) {
+        header( 'Content-Type: application/json; charset=utf-8' );
+        echo wp_json_encode( $summary, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+    } elseif ( 'text' === $format ) {
+        header( 'Content-Type: text/plain; charset=utf-8' );
+        echo asi_diag_render_text( $summary );
+    } else {
+        header( 'Content-Type: text/html; charset=utf-8' );
+        echo asi_diag_render_html( $summary );
+    }
+    exit;
+}
+
+function asi_diag_render_html( array $summary ) {
+    $results = $summary['results'] ?? array();
+    ob_start();
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>All Sources Images · Diagnostics</title>
+        <style>
+            body { font-family: Arial, sans-serif; background:#f7f7f9; color:#1b1b1f; margin:0; padding:32px; }
+            h1 { margin-top:0; }
+            table { width:100%; border-collapse:collapse; margin-top:24px; background:#fff; }
+            th, td { padding:10px 12px; border-bottom:1px solid #e2e4ea; text-align:left; }
+            th { background:#f0f2f7; font-size:13px; text-transform:uppercase; letter-spacing:0.04em; }
+            .status-ok { color:#1b873f; font-weight:600; }
+            .status-warning { color:#b78103; font-weight:600; }
+            .status-error { color:#c53d3d; font-weight:600; }
+            .status-skipped { color:#687078; }
+            small { color:#555; }
+        </style>
+    </head>
+    <body>
+        <h1>All Sources Images · Diagnostics</h1>
+        <p><strong>Site:</strong> <?php echo esc_html( $summary['site'] ?? get_home_url() ); ?> ·
+           <strong>Generated:</strong> <?php echo esc_html( $summary['generated_at'] ?? current_time( 'mysql' ) ); ?> ·
+           <strong>Search:</strong> "<?php echo esc_html( $summary['search_term'] ?? '' ); ?>" ·
+           <strong>Duration:</strong> <?php echo esc_html( $summary['duration_ms'] ?? 0 ); ?> ms</p>
+        <p><strong>Status:</strong> <?php echo esc_html( $summary['status_label'] ?? 'n/a' ); ?> ·
+           <strong>Totals:</strong> OK <?php echo intval( $summary['ok_count'] ?? 0 ); ?> ·
+           Warnings <?php echo intval( $summary['warning_count'] ?? 0 ); ?> ·
+           Errors <?php echo intval( $summary['error_count'] ?? 0 ); ?></p>
+        <?php if ( empty( $results ) ) : ?>
+            <p>No sources were tested. Review parameters "sources_no_ia" / "sources_ia".</p>
+        <?php else : ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Message</th>
+                        <th>Items</th>
+                        <th>Time (ms)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ( $results as $row ) :
+                    $status = strtolower( $row['status'] );
+                ?>
+                    <tr>
+                        <td><?php echo esc_html( $row['bank'] ); ?></td>
+                        <td><?php echo esc_html( strtoupper( $row['category'] ) ); ?></td>
+                        <td class="status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( strtoupper( $row['status'] ) ); ?></td>
+                        <td><?php echo esc_html( $row['message'] ); ?></td>
+                        <td><?php echo isset( $row['items'] ) ? intval( $row['items'] ) : '—'; ?></td>
+                        <td><?php echo esc_html( $row['duration_ms'] ); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+        <p><small>Notification mode: <?php echo esc_html( $summary['notify_mode'] ?? 'errors' ); ?></small></p>
+    </body>
+    </html>
+    <?php
+    return trim( ob_get_clean() );
+}
+
+function asi_diag_render_text( array $summary ) {
+    $lines   = array();
+    $lines[] = 'All Sources Images :: Diagnostics';
+    $lines[] = 'Site: ' . ( $summary['site'] ?? get_home_url() );
+    $lines[] = 'Generated: ' . ( $summary['generated_at'] ?? current_time( 'mysql' ) );
+    $lines[] = 'Search: "' . ( $summary['search_term'] ?? '' ) . '"';
+    $lines[] = 'Status: ' . ( $summary['status_label'] ?? 'n/a' );
+    $lines[] = sprintf( 'Totals -> OK:%d  Warnings:%d  Errors:%d', intval( $summary['ok_count'] ?? 0 ), intval( $summary['warning_count'] ?? 0 ), intval( $summary['error_count'] ?? 0 ) );
+    $lines[] = str_repeat( '-', 48 );
+    foreach ( $summary['results'] ?? array() as $row ) {
+        $lines[] = sprintf( '[%s] %s (%s) -> %s', strtoupper( $row['status'] ), $row['bank'], $row['category'], $row['message'] );
+    }
+    return implode( PHP_EOL, $lines ) . PHP_EOL;
+}
+
+function asi_diag_duration_ms() {
+    return round( ( microtime( true ) - ASI_DIAGNOSTIC_START ) * 1000, 2 );
+}
+
+function asi_diag_truncate( $text, $length ) {
+    if ( ! is_string( $text ) ) {
+        return '';
+    }
+    if ( function_exists( 'mb_substr' ) ) {
+        return mb_substr( $text, 0, $length );
+    }
+    return substr( $text, 0, $length );
+}
