@@ -104,6 +104,24 @@
     transform: scale(1.02);
 }
 
+.asi-media-card--downloaded img {
+    filter: grayscale(0.5) saturate(0.6) brightness(0.8) blur(0.5px);
+    transform: none !important;
+}
+
+.asi-media-card--downloaded {
+    position: relative;
+    overflow: hidden;
+}
+
+.asi-media-card--downloaded::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 44, 16, 0.45);
+    pointer-events: none;
+}
+
 /* Hover overlay */
 .asi-media-overlay {
     position: absolute;
@@ -166,6 +184,37 @@
     padding: 3px 8px;
     border-radius: 999px;
     box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
+}
+
+.asi-download-stamp {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    z-index: 2;
+    color: #ecfdf5;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.asi-download-stamp__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    border: 3px solid rgba(52, 211, 153, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+    background: rgba(5, 46, 22, 0.75);
+    box-shadow: 0 12px 25px rgba(6, 78, 59, 0.45);
 }
 
 /* Unlock gate visuals */
@@ -303,14 +352,7 @@
 }
 
 .asi-standalone-wrapper {
-    margin-top: 20px;
-}
-
-.asi-media-browser-wrap .asi-standalone-wrapper {
-    background: #fff;
-    border: 1px solid #dcdcde;
-    padding: 20px;
-    border-radius: 8px;
+    margin-top: 0;
 }
 
 .asi-inline-explorer {
@@ -319,7 +361,9 @@
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 12px 35px rgba(15, 19, 28, 0.08);
-    margin-top: 10px;
+    margin-top: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .asi-download-notice {
@@ -327,7 +371,7 @@
 }
 
 .asi-media-browser-wrap {
-    max-width: 1200px;
+    max-width: none;
 }
 
 @media (max-width: 900px) {

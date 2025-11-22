@@ -9,11 +9,12 @@
 
     const { registerBlockType } = wp.blocks;
     const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner, TextareaControl, Notice } = wp.components;
-    const { useState, useEffect, useRef, useCallback } = wp.element;
+            const { useState, useEffect, useRef, useCallback } = wp.element;
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
 
     const PAGINATED_BANKS = new Set(['unsplash', 'pixabay', 'pexels', 'openverse', 'cc_search', 'flickr', 'google_image', 'giphy']);
+    const LAST_SEARCH_STORAGE_KEY = 'asiImagesLastSearch';
 
     function normalizeBankSlug(slug) {
         if (!slug || typeof slug !== 'string') {
@@ -57,7 +58,11 @@
             const [timerTick, setTimerTick] = useState(Date.now());
             const [isDownloading, setIsDownloading] = useState(false);
             const [downloadedImages, setDownloadedImages] = useState({});
+                const [hasRenderedCachedResults, setHasRenderedCachedResults] = useState(false);
             const [notification, setNotification] = useState(null);
+            const lastDownloadedRef = useRef(null);
+            const skipNextResetRef = useRef(false);
+            const hydrationReadyRef = useRef(false);
             const buildEmptySettingsState = () => ({
                 isOpen: false,
                 bank: '',
@@ -79,12 +84,15 @@
             const aiSources = (Array.isArray(asiAjax.ai_sources) ? asiAjax.ai_sources : ['dallev1', 'stability', 'replicate', 'gemini'])
                 .map((slug) => (typeof slug === 'string' ? slug.toLowerCase() : slug));
             const hasActiveSearch = Object.values(searchStatus).some((status) => status && status.active);
+            const hasAnyStoredResults = Object.values(resultsSearch).some((entry) => entry && Array.isArray(entry.items) && entry.items.length > 0);
+            const showingCachedResults = hasRenderedCachedResults && hasAnyStoredResults && !hasActiveSearch;
             const isBlockMode = !isStandaloneMode;
             const wrapperProps = useBlockProps(isStandaloneMode ? { className: 'asi-standalone-wrapper' } : {});
             const isExplorerVisible = isBlockMode ? isModalOpen : true;
 
             const masonryInstances = useRef(new Map());
             const masonryFrameRef = useRef(null);
+            const masonryRetryTimeoutRef = useRef(null);
             const sentinelObserverRef = useRef(null);
 
             const bankSupportsPagination = useCallback((slug) => PAGINATED_BANKS.has(normalizeBankSlug(slug)), []);
@@ -136,6 +144,71 @@
                 setNotification({ status, message, key: Date.now(), text: message });
             };
 
+            const persistLastSearch = useCallback((payloadResults) => {
+                if (typeof window === 'undefined' || !window.localStorage) {
+                    return;
+                }
+                try {
+                    const payload = {
+                        searchTerm,
+                        sourceMode,
+                        customBanks,
+                        results: payloadResults,
+                        timestamp: Date.now()
+                    };
+                    window.localStorage.setItem(LAST_SEARCH_STORAGE_KEY, JSON.stringify(payload));
+                } catch (error) {
+                    console.warn('ASI: unable to persist last search', error);
+                }
+            }, [searchTerm, sourceMode, customBanks]);
+
+            const hydrateFromStorage = useCallback(() => {
+                if (typeof window === 'undefined' || !window.localStorage) {
+                    hydrationReadyRef.current = true;
+                    return;
+                }
+                try {
+                    const existing = window.localStorage.getItem(LAST_SEARCH_STORAGE_KEY);
+                    if (!existing) {
+                        hydrationReadyRef.current = true;
+                        return;
+                    }
+                    const parsed = JSON.parse(existing);
+                    if (!parsed || !parsed.searchTerm) {
+                        hydrationReadyRef.current = true;
+                        return;
+                    }
+                    skipNextResetRef.current = true;
+                    if (parsed.sourceMode === 'custom' && Array.isArray(parsed.customBanks)) {
+                        setSourceMode('custom');
+                        setCustomBanks(parsed.customBanks);
+                    }
+                    setSearchTerm(parsed.searchTerm || '');
+                    if (parsed.results && typeof parsed.results === 'object') {
+                        setResultsSearch(parsed.results);
+                        setHasRenderedCachedResults(true);
+                    }
+                } catch (error) {
+                    console.warn('ASI: unable to restore last search', error);
+                } finally {
+                    hydrationReadyRef.current = true;
+                }
+            }, [setSourceMode, setCustomBanks]);
+
+            useEffect(() => {
+                hydrateFromStorage();
+            }, [hydrateFromStorage]);
+
+            useEffect(() => {
+                if (!searchTerm) {
+                    return;
+                }
+                if (!resultsSearch || Object.keys(resultsSearch).length === 0) {
+                    return;
+                }
+                persistLastSearch(resultsSearch);
+            }, [resultsSearch, searchTerm, persistLastSearch]);
+
             const requestMasonryLayout = useCallback(() => {
                 if (typeof window === 'undefined') {
                     return;
@@ -168,8 +241,16 @@
             }, []);
 
             useEffect(() => {
+                if (!hydrationReadyRef.current) {
+                    return;
+                }
+                if (skipNextResetRef.current) {
+                    skipNextResetRef.current = false;
+                    return;
+                }
                 setResultsSearch({});
                 setSearchStatus({});
+                setHasRenderedCachedResults(false);
             }, [sourceMode, customBanksKey]);
 
             useEffect(() => {
@@ -194,17 +275,17 @@
                 };
             }, [destroyMasonryInstances]);
 
-            useEffect(() => {
-                if (!isExplorerVisible) {
-                    return;
-                }
+            const initializeMasonry = useCallback(() => {
                 if (typeof window === 'undefined' || typeof window.MiniMasonry === 'undefined') {
-                    return;
+                    return false;
+                }
+                const grids = document.querySelectorAll('.asi-media-grid');
+                const gridCount = grids.length;
+                if (!gridCount) {
+                    return false;
                 }
 
-                const grids = document.querySelectorAll('.asi-media-grid');
                 const activeIds = new Set();
-
                 grids.forEach((grid) => {
                     if (!grid) {
                         return;
@@ -242,7 +323,48 @@
                 });
 
                 requestMasonryLayout();
-            }, [resultsSearch, isExplorerVisible, requestMasonryLayout]);
+                return true;
+            }, [requestMasonryLayout]);
+
+            useEffect(() => {
+                if (!isExplorerVisible) {
+                    return;
+                }
+                let attempts = 0;
+                const maxAttempts = 10;
+
+                const tryInitialize = () => {
+                    if (!isExplorerVisible) {
+                        return;
+                    }
+                    const ready = initializeMasonry();
+                    if (!ready && attempts < maxAttempts) {
+                        attempts += 1;
+                        if (typeof window !== 'undefined') {
+                            masonryRetryTimeoutRef.current = window.setTimeout(tryInitialize, 120);
+                        }
+                    }
+                };
+
+                tryInitialize();
+                return () => {
+                    attempts = maxAttempts;
+                    if (masonryRetryTimeoutRef.current && typeof window !== 'undefined') {
+                        window.clearTimeout(masonryRetryTimeoutRef.current);
+                        masonryRetryTimeoutRef.current = null;
+                    }
+                };
+            }, [resultsSearch, isExplorerVisible, initializeMasonry]);
+
+            useEffect(() => {
+                if (!isExplorerVisible) {
+                    return;
+                }
+                const timer = setTimeout(() => {
+                    requestMasonryLayout();
+                }, 200);
+                return () => clearTimeout(timer);
+            }, [isExplorerVisible, requestMasonryLayout]);
 
             // sentinel observer effect moved below fetchNextPage definition
 
@@ -293,6 +415,8 @@
                     window.alert(__('Select at least one source before searching.', 'all-sources-images'));
                     return;
                 }
+
+                setHasRenderedCachedResults(false);
 
                 entries.forEach(([key, bankName], index) => {
                     searchSingleBank(bankName, index, postId);
@@ -351,8 +475,6 @@
                 fetch(`${asiAjax.ajax_url}?${params.toString()}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Response for', bankName, ':', data);
-                        
                         if (data.success && data.data && data.data.images) {
                             const images = data.data.images;
                             const pagination = data.data.pagination || {};
@@ -486,12 +608,13 @@
                 const largeUrl = image.url;
                 const altText = image.alt || image.title || 'Image';
                 const caption = image.caption || '';
+                const cardClass = 'asi-media-card' + (isDownloaded ? ' asi-media-card--downloaded' : '');
 
                 return wp.element.createElement('li', {
                     className: 'attachment mpt-attachment asi-media-item',
                     onClick: () => onImageClick(largeUrl, altText, caption, bankName, image)
                 },
-                    wp.element.createElement('div', { className: 'asi-media-card' },
+                    wp.element.createElement('div', { className: cardClass },
                         wp.element.createElement('img', {
                             src: thumbUrl,
                             alt: altText,
@@ -502,9 +625,15 @@
                                 }
                             }
                         }),
+                        isDownloaded ? wp.element.createElement('div', {
+                            className: 'asi-download-stamp',
+                            'aria-label': __('Image already downloaded', 'all-sources-images')
+                        },
+                            wp.element.createElement('span', { className: 'asi-download-stamp__icon' }, '✓'),
+                            wp.element.createElement('span', { className: 'asi-download-stamp__text' }, __('Downloaded', 'all-sources-images'))
+                        ) : null,
                         wp.element.createElement('div', { className: 'asi-media-overlay' },
                             wp.element.createElement('span', { className: 'asi-media-author' }, caption || __('Unknown author', 'all-sources-images')),
-                                isDownloaded ? wp.element.createElement('span', { className: 'asi-download-badge' }, __('Downloaded', 'all-sources-images')) : null,
                             wp.element.createElement('button', {
                                 type: 'button',
                                 className: 'mpt-settings-button asi-settings-button',
@@ -599,6 +728,11 @@
                 jQuery.post(asiAjax.ajax_url, data)
                     .done(response => {
                         if (response.success) {
+                            lastDownloadedRef.current = response.data;
+                            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                                const event = new CustomEvent('asi:image:downloaded', { detail: response.data });
+                                window.dispatchEvent(event);
+                            }
                             if (isBlockMode) {
                                 const newBlock = wp.blocks.createBlock('core/image', {
                                     id: response.data.id_media,
@@ -891,6 +1025,12 @@
                         }, __('Search', 'all-sources-images'))
                     ),
 
+                        showingCachedResults ? wp.element.createElement(Notice, {
+                            status: 'info',
+                            isDismissible: false,
+                            className: 'asi-cached-results-notice'
+                        }, __('Showing images from your last search. Run a new search to refresh the gallery.', 'all-sources-images')) : null,
+
                     // Tabs for each bank
                     hasBanks ? wp.element.createElement(TabPanel, {
                         className: 'mpt-tab-panel',
@@ -949,7 +1089,11 @@
                                     fontSize: '16px',
                                     color: '#999'
                                 }
-                            }, __('Click Search to load images', 'all-sources-images'))),
+                            }, hasRenderedCachedResults
+                                ? (hasAnyStoredResults
+                                    ? __('No saved results for this source from your last search. Run a new search to refresh it.', 'all-sources-images')
+                                    : __('Your last search returned no images. Try a different keyword.', 'all-sources-images'))
+                                : __('Click Search to load images', 'all-sources-images'))),
                             showLoadMoreSpinner ? wp.element.createElement('div', {
                                 style: {
                                     textAlign: 'center',
@@ -1083,5 +1227,12 @@
         if (wp.element && typeof wp.element.render === 'function') {
             wp.element.render(element, target);
         }
+
+        window.ASIImagesExplorerGetLastDownload = function() {
+            if (!lastDownloadedRef.current) {
+                return null;
+            }
+            return Object.assign({}, lastDownloadedRef.current);
+        };
     };
 })();
