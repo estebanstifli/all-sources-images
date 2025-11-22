@@ -13,15 +13,7 @@
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
 
-    // Universal bank configuration - no longer needed since backend normalizes
-    function getBankConfig(bank) {
-        return {
-            imgKey: 'thumb',
-            imgLarge: 'url', 
-            altKey: 'alt',
-            captionKey: 'caption'
-        };
-    }
+    const PAGINATED_BANKS = new Set(['unsplash']);
 
     // Helper to get nested object value by path string
     function getNestedValue(obj, path) {
@@ -58,6 +50,9 @@
 
             const masonryInstances = useRef(new Map());
             const masonryFrameRef = useRef(null);
+            const sentinelObserverRef = useRef(null);
+
+            const bankSupportsPagination = useCallback((slug) => PAGINATED_BANKS.has(slug), []);
 
             const requestMasonryLayout = useCallback(() => {
                 if (typeof window === 'undefined') {
@@ -144,8 +139,8 @@
                         instance = new window.MiniMasonry({
                             container: grid,
                             baseWidth: 260,
-                            gutterX: 16,
-                            gutterY: 16,
+                            gutterX: 0,
+                            gutterY: 0,
                             surroundingGutter: false,
                         });
                         masonryInstances.current.set(gridId, instance);
@@ -166,6 +161,8 @@
 
                 requestMasonryLayout();
             }, [resultsSearch, isModalOpen, requestMasonryLayout]);
+
+            // sentinel observer effect moved below fetchNextPage definition
 
             function getBankLabel(bankSlug) {
                 if (!bankSlug || typeof bankSlug !== 'string') {
@@ -221,22 +218,41 @@
             }
 
             // Search a single bank
-            function searchSingleBank(bankName, index, postId) {
+            function searchSingleBank(bankName, index, postId, page = 1, append = false) {
                 // Normalize bank name
                 let bankParam = bankName.toLowerCase();
                 if (bankParam === 'openverse') bankParam = 'cc_search';
                 
                 const isAiSource = aiSources.includes(bankParam);
+                const supportsPagination = bankSupportsPagination(bankParam);
+                const isInitialRequest = !append;
                 const startedAt = Date.now();
-                setSearchStatus(prev => ({
-                    ...prev,
-                    [index]: {
-                        ...(prev[index] || {}),
-                        active: true,
-                        isAi: isAiSource,
-                        startedAt,
-                    }
-                }));
+                if (isInitialRequest) {
+                    setSearchStatus(prev => ({
+                        ...prev,
+                        [index]: {
+                            ...(prev[index] || {}),
+                            active: true,
+                            isAi: isAiSource,
+                            startedAt,
+                        }
+                    }));
+                }
+
+                setResultsSearch(prev => {
+                    const previous = prev[index] || {};
+                    return {
+                        ...prev,
+                        [index]: {
+                            items: isInitialRequest ? [] : (previous.items || []),
+                            page: isInitialRequest ? 0 : (previous.page || 0),
+                            hasMore: isInitialRequest ? supportsPagination : previous.hasMore,
+                            loadingMore: true,
+                            error: null,
+                            bank: bankParam
+                        }
+                    };
+                });
 
                 const params = new URLSearchParams({
                     action: 'asi_block_searching_images',
@@ -246,6 +262,9 @@
                     id: postId,
                     nonce: asiAjax.nonce
                 });
+                if (supportsPagination) {
+                    params.append('page', page);
+                }
 
                 fetch(`${asiAjax.ajax_url}?${params.toString()}`)
                     .then(response => response.json())
@@ -253,56 +272,131 @@
                         console.log('Response for', bankName, ':', data);
                         
                         if (data.success && data.data && data.data.images) {
-                            const config = getBankConfig(bankParam);
                             const images = data.data.images;
-                            
-                            console.log('Extracted images:', images.length);
-                            if (images.length > 0) {
-                                console.log('First image:', images[0]);
-                            }
+                            const pagination = data.data.pagination || {};
+                            const returnedPage = pagination.page ? parseInt(pagination.page, 10) : page;
+                            const hasMore = supportsPagination ? !!pagination.has_more : false;
 
-                            if (images.length > 0) {
-                                const imageElements = renderImageGrid(images, config, bankParam, requestMasonryLayout);
-                                setResultsSearch(prev => ({ ...prev, [index]: imageElements }));
-                            } else {
-                                setResultsSearch(prev => ({ 
-                                    ...prev, 
-                                    [index]: wp.element.createElement('p', null, __('No results found', 'all-sources-images'))
-                                }));
-                            }
+                            setResultsSearch(prev => {
+                                const previous = prev[index] || {};
+                                const mergedItems = append ? [ ...(previous.items || []), ...images ] : images;
+                                return {
+                                    ...prev,
+                                    [index]: {
+                                        items: mergedItems,
+                                        page: returnedPage,
+                                        hasMore: hasMore,
+                                        loadingMore: false,
+                                        error: images.length === 0 ? __('No results found', 'all-sources-images') : null,
+                                        bank: bankParam
+                                    }
+                                };
+                            });
+                            requestMasonryLayout();
                         } else {
                             console.error('Invalid response format:', data);
                             setResultsSearch(prev => ({ 
                                 ...prev, 
-                                [index]: wp.element.createElement('p', null, __('Error loading results', 'all-sources-images'))
+                                [index]: {
+                                    ...(prev[index] || {}),
+                                    loadingMore: false,
+                                    error: __('Error loading results', 'all-sources-images'),
+                                    items: (prev[index] && prev[index].items) ? prev[index].items : [],
+                                    hasMore: false,
+                                    page: prev[index] ? prev[index].page : 0,
+                                    bank: bankParam
+                                }
                             }));
                         }
                         
-                        setSearchStatus(prev => ({
-                            ...prev,
-                            [index]: {
-                                ...(prev[index] || {}),
-                                active: false,
-                                completedAt: Date.now(),
-                            }
-                        }));
+                        if (isInitialRequest) {
+                            setSearchStatus(prev => ({
+                                ...prev,
+                                [index]: {
+                                    ...(prev[index] || {}),
+                                    active: false,
+                                    completedAt: Date.now(),
+                                }
+                            }));
+                        }
                     })
                     .catch(error => {
                         console.error('Fetch error:', error);
-                        setSearchStatus(prev => ({
-                            ...prev,
-                            [index]: {
-                                ...(prev[index] || {}),
-                                active: false,
-                                completedAt: Date.now(),
-                            }
-                        }));
+                        if (isInitialRequest) {
+                            setSearchStatus(prev => ({
+                                ...prev,
+                                [index]: {
+                                    ...(prev[index] || {}),
+                                    active: false,
+                                    completedAt: Date.now(),
+                                }
+                            }));
+                        }
                         setResultsSearch(prev => ({ 
                             ...prev, 
-                            [index]: wp.element.createElement('p', null, __('Network error', 'all-sources-images'))
+                            [index]: {
+                                ...(prev[index] || {}),
+                                loadingMore: false,
+                                error: __('Network error', 'all-sources-images'),
+                                items: (prev[index] && prev[index].items) ? prev[index].items : [],
+                                hasMore: false,
+                                page: prev[index] ? prev[index].page : 0,
+                                bank: bankParam
+                            }
                         }));
                     });
             }
+
+            const fetchNextPage = useCallback((bankName, index) => {
+                if (!bankSupportsPagination(bankName)) {
+                    return;
+                }
+                const entry = resultsSearch[index];
+                if (!entry || entry.loadingMore || !entry.hasMore) {
+                    return;
+                }
+                const postId = wp.data.select('core/editor').getCurrentPostId();
+                const nextPage = (entry.page || 1) + 1;
+                searchSingleBank(bankName, index, postId, nextPage, true);
+            }, [resultsSearch, bankSupportsPagination]);
+
+            useEffect(() => {
+                if (sentinelObserverRef.current) {
+                    sentinelObserverRef.current.disconnect();
+                    sentinelObserverRef.current = null;
+                }
+                if (!isModalOpen || typeof IntersectionObserver === 'undefined') {
+                    return;
+                }
+                const rootElement = document.querySelector('.asi-modal .components-modal__content');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const bankAttr = entry.target.getAttribute('data-bank');
+                            const indexAttr = entry.target.getAttribute('data-index');
+                            const parsedIndex = indexAttr ? parseInt(indexAttr, 10) : Number.NaN;
+                            if (bankAttr && !Number.isNaN(parsedIndex)) {
+                                fetchNextPage(bankAttr, parsedIndex);
+                            }
+                        }
+                    });
+                }, {
+                    root: rootElement || null,
+                    rootMargin: '250px',
+                    threshold: 0
+                });
+                sentinelObserverRef.current = observer;
+                const sentinels = document.querySelectorAll('.asi-infinite-sentinel');
+                sentinels.forEach(node => observer.observe(node));
+                return () => {
+                    if (sentinelObserverRef.current) {
+                        sentinelObserverRef.current.disconnect();
+                        sentinelObserverRef.current = null;
+                    } else {
+                        observer.disconnect();
+                    }
+                };
+            }, [resultsSearch, isModalOpen, fetchNextPage]);
 
             // Image item component - MUST be defined outside map to use hooks properly
             function ImageGridItem({ image, bankName, onImageClick, onImageLoad }) {
@@ -357,24 +451,32 @@
             }
 
             // Render image grid
-            function renderImageGrid(images, config, bankName) {
+            function renderImageGrid(images, bankName, index, options = {}) {
+                const hasMore = options.hasMore;
                 const licensing = asiAjax.licensing_data || '0';
                 const displayImages = (licensing !== '1') ? images.slice(0, 6) : images;
 
-                return wp.element.createElement('ul', {
-                    className: 'media-grid asi-media-grid',
-                    role: 'list',
-                    'data-bank': bankName
-                },
-                    displayImages.map((image, idx) => {
-                        return wp.element.createElement(ImageGridItem, {
-                            key: idx,
-                            image: image,
-                            bankName: bankName,
-                            onImageClick: downloadAndUseImage,
-                            onImageLoad: requestMasonryLayout
-                        });
-                    })
+                return wp.element.createElement(wp.element.Fragment, null,
+                    wp.element.createElement('ul', {
+                        className: 'media-grid asi-media-grid',
+                        role: 'list',
+                        'data-bank': bankName
+                    },
+                        displayImages.map((image, idx) => {
+                            return wp.element.createElement(ImageGridItem, {
+                                key: idx,
+                                image: image,
+                                bankName: bankName,
+                                onImageClick: downloadAndUseImage,
+                                onImageLoad: requestMasonryLayout
+                            });
+                        })
+                    ),
+                    (bankSupportsPagination(bankName) && hasMore) ? wp.element.createElement('div', {
+                        className: 'asi-infinite-sentinel',
+                        'data-bank': bankName,
+                        'data-index': index
+                    }) : null
                 );
             }
 
@@ -570,6 +672,9 @@
                         tabs: tabs
                     }, (tab) => {
                         const index = parseInt(tab.name.replace('tab', ''));
+                        const activeBankEntries = Object.entries(activeBanks);
+                        const activeBankEntry = activeBankEntries[index] || [];
+                        const bankSlug = activeBankEntry[1] || '';
                         const status = searchStatus[index];
                         const isActive = status && status.active;
                         const elapsedSeconds = (status && status.startedAt)
@@ -579,6 +684,10 @@
                         const messageText = (status && status.isAi)
                             ? sprintf(__('%1$s (%2$ss)', 'all-sources-images'), baseText, elapsedSeconds)
                             : baseText;
+                        const resultEntry = resultsSearch[index];
+                        const hasImages = resultEntry && Array.isArray(resultEntry.items) && resultEntry.items.length > 0;
+                        const errorMessage = resultEntry && resultEntry.error;
+                        const showLoadMoreSpinner = resultEntry && resultEntry.loadingMore && !isActive && hasImages;
 
                         return wp.element.createElement('div', { 
                             style: { 
@@ -594,14 +703,27 @@
                                     color: '#666'
                                 }
                             }, messageText),
-                            resultsSearch[index] || wp.element.createElement('p', { 
+                            hasImages ? renderImageGrid(resultEntry.items, bankSlug, index, { hasMore: resultEntry.hasMore }) : (errorMessage ? wp.element.createElement('p', {
+                                style: {
+                                    textAlign: 'center',
+                                    padding: '40px',
+                                    fontSize: '16px',
+                                    color: '#cc0000'
+                                }
+                            }, errorMessage) : wp.element.createElement('p', { 
                                 style: { 
                                     textAlign: 'center',
                                     padding: '40px',
                                     fontSize: '16px',
                                     color: '#999'
                                 }
-                            }, __('Click Search to load images', 'all-sources-images'))
+                            }, __('Click Search to load images', 'all-sources-images'))),
+                            showLoadMoreSpinner ? wp.element.createElement('div', {
+                                style: {
+                                    textAlign: 'center',
+                                    padding: '15px'
+                                }
+                            }, wp.element.createElement(Spinner, null)) : null
                         );
                     }) : wp.element.createElement('p', {
                         style: {

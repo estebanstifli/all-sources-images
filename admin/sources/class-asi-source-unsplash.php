@@ -17,6 +17,7 @@ class ASI_Source_Unsplash extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( empty( $api_key ) ) {
             return new WP_Error( 'asi_unsplash_missing_key', __( 'Unsplash API key is missing.', 'all-sources-images' ) );
@@ -27,7 +28,7 @@ class ASI_Source_Unsplash extends ASI_Image_Source {
         }
 
         $endpoint    = 'https://api.unsplash.com/search/photos';
-        $query_args  = $this->build_query_args( $bank_options, $api_key, $search_term );
+        $query_args  = $this->build_query_args( $bank_options, $api_key, $search_term, $page );
         $request_url = add_query_arg( $query_args, $endpoint );
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
@@ -116,7 +117,7 @@ class ASI_Source_Unsplash extends ASI_Image_Source {
         return '';
     }
 
-    private function build_query_args( array $bank_options, $api_key, $search_term ) {
+    private function build_query_args( array $bank_options, $api_key, $search_term, $page = 1 ) {
         $content_filter = ! empty( $bank_options['content_filter'] ) ? $bank_options['content_filter'] : 'low';
         $orientation    = ! empty( $bank_options['orientation'] ) && 'all' !== $bank_options['orientation'] ? $bank_options['orientation'] : '';
         $color          = ! empty( $bank_options['color'] ) && 'all' !== $bank_options['color'] ? $bank_options['color'] : '';
@@ -126,6 +127,7 @@ class ASI_Source_Unsplash extends ASI_Image_Source {
             'per_page'       => 15,
             'client_id'      => $api_key,
             'content_filter' => $content_filter,
+            'page'           => max( 1, intval( $page ) ),
         );
 
         if ( ! empty( $orientation ) ) {

@@ -425,7 +425,8 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $key_img_block = null,
         $avoid_revision = null,
         $include_datas = null,
-        $button_autogenerate = false
+        $button_autogenerate = false,
+        $additional_context = array()
     ) {
         ASI_log( array(
             'id' => $id,
@@ -599,6 +600,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                     'selected_image' => $img_block['selected_image'],
                     'proxy_args'     => $this->ASI_get_proxy_args(),
                     'generation'     => $this,
+                    'page'           => isset( $additional_context['page'] ) ? max( 1, intval( $additional_context['page'] ) ) : 1,
                 ) );
                 if ( is_wp_error( $result ) ) {
                     $log->error( 'Source generation failed', array(

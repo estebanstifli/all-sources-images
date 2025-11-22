@@ -1839,6 +1839,7 @@ class All_Sources_Images_Admin {
         $bank = sanitize_text_field( strtolower( $_GET['bank'] ) );
         $index = intval( $_GET['index'] );
         $id = intval( $_GET['id'] );
+        $page = isset( $_GET['page'] ) ? max( 1, intval( $_GET['page'] ) ) : 1;
         
         ASI_log( array(
             'search_term' => $search_term,
@@ -1858,7 +1859,12 @@ class All_Sources_Images_Admin {
             '1',
             TRUE,
             $search_term,
-            $bank
+            $bank,
+            null,
+            null,
+            null,
+            false,
+            array( 'page' => $page )
         );
         if ( $results_thumbs !== false ) {
             $response_preview = json_encode( $results_thumbs );
@@ -1888,6 +1894,11 @@ class All_Sources_Images_Admin {
                 'default'
             ) );
             
+            $pagination_data = array(
+                'page'        => $page,
+                'has_more'    => false,
+                'total_pages' => null,
+            );
             // Detect bank and extract images + normalize structure
             if ( 'giphy' === $bank && isset( $results_thumbs['data'] ) && is_array( $results_thumbs['data'] ) ) {
                 foreach ( $results_thumbs['data'] as $item ) {
@@ -2066,6 +2077,11 @@ class All_Sources_Images_Admin {
                 }
             } elseif (isset($results_thumbs['results']) && is_array($results_thumbs['results'])) {
                 // Openverse, Unsplash results format
+                if ( 'unsplash' === $bank && isset( $results_thumbs['total_pages'] ) ) {
+                    $total_pages = intval( $results_thumbs['total_pages'] );
+                    $pagination_data['total_pages'] = $total_pages;
+                    $pagination_data['has_more'] = ( $page < $total_pages );
+                }
                 foreach ($results_thumbs['results'] as $item) {
                     $normalized_images[] = array(
                         'url' => isset($item['urls']['regular']) ? $item['urls']['regular'] : (isset($item['url']) ? $item['url'] : ''),
@@ -2163,9 +2179,11 @@ class All_Sources_Images_Admin {
             
             // Universal response format
             $response_data = array(
-                'images' => $normalized_images,
-                'index'  => $index,
-                'count'  => count($normalized_images)
+                'images'     => $normalized_images,
+                'index'      => $index,
+                'count'      => count($normalized_images),
+                'pagination' => $pagination_data,
+                'bank'       => $bank,
             );
             
             ASI_log( 'Search successful, returning ' . count($normalized_images) . ' normalized images', 'GUTENBERG_BLOCK_SUCCESS' );
