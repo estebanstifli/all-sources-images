@@ -23,13 +23,14 @@ class ASI_Source_Openverse extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( '' === trim( $search_term ) ) {
             return new WP_Error( 'asi_openverse_missing_query', __( 'No search query available for Openverse.', 'all-sources-images' ) );
         }
 
         $endpoint    = 'https://api.openverse.engineering/v1/images/';
-        $query_args  = $this->build_query_args( $bank_options, $search_term );
+        $query_args  = $this->build_query_args( $bank_options, $search_term, $page );
         $request_url = add_query_arg( $query_args, $endpoint );
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
@@ -139,7 +140,7 @@ class ASI_Source_Openverse extends ASI_Image_Source {
         return '';
     }
 
-    private function build_query_args( array $bank_options, $search_term ) {
+    private function build_query_args( array $bank_options, $search_term, $page = 1 ) {
         $imgtype      = ! empty( $bank_options['imgtype'] ) ? $bank_options['imgtype'] : '';
         $aspect_ratio = ! empty( $bank_options['aspect_ratio'] ) ? $bank_options['aspect_ratio'] : '';
         $sources      = $this->get_source_list();
@@ -148,6 +149,7 @@ class ASI_Source_Openverse extends ASI_Image_Source {
             'q'         => $search_term,
             'page_size' => 20, // API caps anonymous traffic to 20
             'source'    => implode( ',', $sources ),
+            'page'      => max( 1, intval( $page ) ),
         );
 
         if ( ! empty( $imgtype ) ) {

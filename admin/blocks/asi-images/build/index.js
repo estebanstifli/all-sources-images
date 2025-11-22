@@ -8,12 +8,23 @@
     'use strict';
 
     const { registerBlockType } = wp.blocks;
-    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner } = wp.components;
+    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner, TextareaControl } = wp.components;
     const { useState, useEffect, useRef, useCallback } = wp.element;
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
 
-    const PAGINATED_BANKS = new Set(['unsplash']);
+    const PAGINATED_BANKS = new Set(['unsplash', 'pixabay', 'pexels', 'openverse', 'cc_search', 'flickr', 'google_image', 'giphy']);
+
+    function normalizeBankSlug(slug) {
+        if (!slug || typeof slug !== 'string') {
+            return '';
+        }
+        const lower = slug.toLowerCase();
+        if (lower === 'openverse') {
+            return 'cc_search';
+        }
+        return lower;
+    }
 
     // Helper to get nested object value by path string
     function getNestedValue(obj, path) {
@@ -39,6 +50,19 @@
             const [searchStatus, setSearchStatus] = useState({});
             const [timerTick, setTimerTick] = useState(Date.now());
             const [isDownloading, setIsDownloading] = useState(false);
+            const buildEmptySettingsState = () => ({
+                isOpen: false,
+                bank: '',
+                image: null,
+                extension: 'jpg',
+                values: {
+                    fileName: '',
+                    title: '',
+                    alt: '',
+                    caption: '',
+                },
+            });
+            const [settingsPanel, setSettingsPanel] = useState(() => buildEmptySettingsState());
             const defaultBanks = asiAjax.choosed_banks || {};
             const availableBanks = asiAjax.available_banks || {};
             const [sourceMode, setSourceMode] = useState('preset');
@@ -52,7 +76,7 @@
             const masonryFrameRef = useRef(null);
             const sentinelObserverRef = useRef(null);
 
-            const bankSupportsPagination = useCallback((slug) => PAGINATED_BANKS.has(slug), []);
+            const bankSupportsPagination = useCallback((slug) => PAGINATED_BANKS.has(normalizeBankSlug(slug)), []);
 
             const requestMasonryLayout = useCallback(() => {
                 if (typeof window === 'undefined') {
@@ -399,7 +423,7 @@
             }, [resultsSearch, isModalOpen, fetchNextPage]);
 
             // Image item component - MUST be defined outside map to use hooks properly
-            function ImageGridItem({ image, bankName, onImageClick, onImageLoad }) {
+            function ImageGridItem({ image, bankName, onImageClick, onImageLoad, onSettingsClick }) {
                 const thumbUrl = image.thumb || image.url;
                 const largeUrl = image.url;
                 const altText = image.alt || image.title || 'Image';
@@ -407,7 +431,7 @@
 
                 return wp.element.createElement('li', {
                     className: 'attachment mpt-attachment asi-media-item',
-                    onClick: () => onImageClick(largeUrl, altText, caption, bankName)
+                    onClick: () => onImageClick(largeUrl, altText, caption, bankName, image)
                 },
                     wp.element.createElement('div', { className: 'asi-media-card' },
                         wp.element.createElement('img', {
@@ -427,7 +451,9 @@
                                 className: 'mpt-settings-button asi-settings-button',
                                 onClick: (e) => {
                                     e.stopPropagation();
-                                    console.log('Settings clicked for image by:', caption);
+                                    if (typeof onSettingsClick === 'function') {
+                                        onSettingsClick(image, bankName);
+                                    }
                                 },
                                 'aria-label': __('Open image settings', 'all-sources-images')
                             },
@@ -468,7 +494,8 @@
                                 image: image,
                                 bankName: bankName,
                                 onImageClick: downloadAndUseImage,
-                                onImageLoad: requestMasonryLayout
+                                onImageLoad: requestMasonryLayout,
+                                onSettingsClick: (img, bank) => openSettingsPanel(img, bank)
                             });
                         })
                     ),
@@ -481,7 +508,7 @@
             }
 
             // Download image and insert into post
-            function downloadAndUseImage(url, alt, caption, bank) {
+            function downloadAndUseImage(url, alt, caption, bank, imageMeta = null, overrides = {}) {
                 if (isDownloading) {
                     return;
                 }
@@ -490,11 +517,18 @@
 
                 const postId = wp.data.select('core/editor').getCurrentPostId();
 
+                const effectiveAlt = overrides.alt !== undefined ? overrides.alt : alt;
+                const effectiveCaption = overrides.caption !== undefined ? overrides.caption : caption;
+                const effectiveTitle = overrides.title !== undefined ? overrides.title : '';
+                const effectiveFileName = overrides.fileName !== undefined ? overrides.fileName : '';
+
                 const data = {
                     action: 'asi_block_downloading_image',
                     url_image: url,
-                    alt_image: alt,
-                    caption_image: caption,
+                    alt_image: effectiveAlt,
+                    caption_image: effectiveCaption,
+                    title_image: effectiveTitle,
+                    file_name: effectiveFileName,
                     bank: bank,
                     search_term: searchTerm,
                     post_id: postId,
@@ -525,6 +559,111 @@
                     })
                     .fail(() => alert('Network error'))
                     .always(() => setIsDownloading(false));
+            }
+
+            function deriveFilenameParts(image) {
+                const fallbackBase = 'asi-image';
+                const mimeMap = {
+                    'image/jpeg': 'jpg',
+                    'image/jpg': 'jpg',
+                    'image/png': 'png',
+                    'image/webp': 'webp',
+                    'image/gif': 'gif',
+                };
+                let extension = 'jpg';
+                let base = fallbackBase;
+
+                if (image && image.mime && mimeMap[image.mime]) {
+                    extension = mimeMap[image.mime];
+                }
+
+                if (image && image.url && image.url.indexOf('data:image') !== 0) {
+                    const cleanUrl = image.url.split('?')[0].split('#')[0];
+                    const parts = cleanUrl.split('/');
+                    const lastPart = parts.length ? parts[parts.length - 1] : '';
+                    if (lastPart) {
+                        const dotIndex = lastPart.lastIndexOf('.');
+                        if (dotIndex > 0) {
+                            base = lastPart.slice(0, dotIndex);
+                            const maybeExt = lastPart.slice(dotIndex + 1).toLowerCase();
+                            if (maybeExt) {
+                                extension = maybeExt;
+                            }
+                        } else {
+                            base = lastPart;
+                        }
+                    }
+                }
+
+                base = base || fallbackBase;
+                base = base.replace(/[^a-zA-Z0-9-_]/g, '-');
+                extension = extension.replace(/[^a-z0-9]/g, '') || 'jpg';
+
+                return { base, extension };
+            }
+
+            function openSettingsPanel(image, bankName) {
+                if (!image) {
+                    return;
+                }
+                const { base, extension } = deriveFilenameParts(image);
+                setSettingsPanel({
+                    isOpen: true,
+                    bank: bankName,
+                    image: image,
+                    extension: extension,
+                    values: {
+                        fileName: base,
+                        title: image.title || '',
+                        alt: image.alt || image.title || __('Image', 'all-sources-images'),
+                        caption: image.caption || '',
+                    },
+                });
+            }
+
+            function closeSettingsPanel() {
+                setSettingsPanel(buildEmptySettingsState());
+            }
+
+            function handleSettingsValueChange(field, value) {
+                setSettingsPanel((prev) => ({
+                    ...prev,
+                    values: {
+                        ...prev.values,
+                        [field]: value,
+                    },
+                }));
+            }
+
+            function handleAddAttribution() {
+                if (!settingsPanel.image) {
+                    return;
+                }
+                const authorName = settingsPanel.image.caption || __('Unknown author', 'all-sources-images');
+                const sourceUrl = settingsPanel.image.source || settingsPanel.image.url || '';
+                let generated = __('Photo attribution unavailable', 'all-sources-images');
+                if (sourceUrl) {
+                    generated = sprintf(__('Photo by <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>', 'all-sources-images'), sourceUrl, authorName);
+                } else {
+                    generated = sprintf(__('Photo by %s', 'all-sources-images'), authorName);
+                }
+                handleSettingsValueChange('caption', generated);
+            }
+
+            function handleSettingsDownload() {
+                if (!settingsPanel.image) {
+                    return;
+                }
+                const overrides = {
+                    alt: settingsPanel.values.alt,
+                    caption: settingsPanel.values.caption,
+                    title: settingsPanel.values.title,
+                    fileName: settingsPanel.values.fileName,
+                };
+                const image = settingsPanel.image;
+                const bank = settingsPanel.bank;
+                closeSettingsPanel();
+                downloadAndUseImage(image.url, image.alt || image.title || '', image.caption || '', bank, image, overrides);
             }
 
             // Build tabs for each bank
@@ -560,6 +699,7 @@
                     onRequestClose: () => {
                         setIsModalOpen(false);
                         setIsDownloading(false);
+                        closeSettingsPanel();
                     },
                     className: 'media-modal-content asi-modal',
                     style: { maxWidth: '95%' }
@@ -732,7 +872,85 @@
                             fontSize: '16px',
                             color: '#777'
                         }
-                    }, __('Select at least one source to preview results.', 'all-sources-images'))
+                    }, __('Select at least one source to preview results.', 'all-sources-images')),
+                    settingsPanel.isOpen && wp.element.createElement('div', {
+                        className: 'asi-settings-backdrop'
+                    },
+                        wp.element.createElement('div', {
+                            className: 'asi-settings-dialog'
+                        },
+                            wp.element.createElement('div', {
+                                className: 'asi-settings-preview'
+                            },
+                                settingsPanel.image ? wp.element.createElement('img', {
+                                    src: settingsPanel.image.thumb || settingsPanel.image.url,
+                                    alt: settingsPanel.values.alt || __('Selected image', 'all-sources-images')
+                                }) : null
+                            ),
+                            wp.element.createElement('div', {
+                                className: 'asi-settings-form'
+                            },
+                                wp.element.createElement('div', {
+                                    className: 'asi-settings-field'
+                                },
+                                    wp.element.createElement('label', {
+                                        className: 'asi-settings-label'
+                                    }, __('Filename', 'all-sources-images')),
+                                    wp.element.createElement('div', {
+                                        className: 'asi-filename-field'
+                                    },
+                                        wp.element.createElement('input', {
+                                            type: 'text',
+                                            value: settingsPanel.values.fileName,
+                                            onChange: (event) => handleSettingsValueChange('fileName', event.target.value),
+                                            className: 'asi-filename-input'
+                                        }),
+                                        settingsPanel.extension ? wp.element.createElement('span', {
+                                            className: 'asi-filename-extension'
+                                        }, `.${settingsPanel.extension}`) : null
+                                    )
+                                ),
+                                wp.element.createElement(TextControl, {
+                                    label: __('Title', 'all-sources-images'),
+                                    value: settingsPanel.values.title,
+                                    onChange: (value) => handleSettingsValueChange('title', value)
+                                }),
+                                wp.element.createElement(TextControl, {
+                                    label: __('Alt Text', 'all-sources-images'),
+                                    value: settingsPanel.values.alt,
+                                    onChange: (value) => handleSettingsValueChange('alt', value)
+                                }),
+                                wp.element.createElement('div', {
+                                    className: 'asi-settings-caption-group'
+                                },
+                                    wp.element.createElement(TextareaControl, {
+                                        label: __('Caption', 'all-sources-images'),
+                                        value: settingsPanel.values.caption,
+                                        onChange: (value) => handleSettingsValueChange('caption', value)
+                                    }),
+                                    wp.element.createElement('button', {
+                                        type: 'button',
+                                        className: 'asi-attribution-link',
+                                        onClick: handleAddAttribution
+                                    }, __('Add Photo Attribution', 'all-sources-images'))
+                                ),
+                                wp.element.createElement('div', {
+                                    className: 'asi-settings-actions'
+                                },
+                                    wp.element.createElement(Button, {
+                                        isSecondary: true,
+                                        onClick: closeSettingsPanel,
+                                        disabled: isDownloading
+                                    }, __('Cancel', 'all-sources-images')),
+                                    wp.element.createElement(Button, {
+                                        isPrimary: true,
+                                        onClick: handleSettingsDownload,
+                                        disabled: isDownloading
+                                    }, __('Download', 'all-sources-images'))
+                                )
+                            )
+                        )
+                    )
                 )
             );
         },

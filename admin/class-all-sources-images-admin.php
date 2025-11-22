@@ -1898,9 +1898,26 @@ class All_Sources_Images_Admin {
                 'page'        => $page,
                 'has_more'    => false,
                 'total_pages' => null,
+                'total'       => null,
             );
             // Detect bank and extract images + normalize structure
             if ( 'giphy' === $bank && isset( $results_thumbs['data'] ) && is_array( $results_thumbs['data'] ) ) {
+                if ( isset( $results_thumbs['pagination'] ) && is_array( $results_thumbs['pagination'] ) ) {
+                    $giphy_pagination = $results_thumbs['pagination'];
+                    $limit_option = isset( $bank_options['giphy']['limit'] ) ? intval( $bank_options['giphy']['limit'] ) : 25;
+                    $limit_option = max( 1, min( 50, $limit_option ) );
+                    $offset = isset( $giphy_pagination['offset'] ) ? max( 0, intval( $giphy_pagination['offset'] ) ) : ( ( $page - 1 ) * $limit_option );
+                    $batch_count = isset( $giphy_pagination['count'] ) ? max( 0, intval( $giphy_pagination['count'] ) ) : count( $results_thumbs['data'] );
+                    $pagination_data['page'] = max( 1, intval( floor( $offset / $limit_option ) + 1 ) );
+                    if ( isset( $giphy_pagination['total_count'] ) ) {
+                        $total_count = max( 0, intval( $giphy_pagination['total_count'] ) );
+                        $pagination_data['total'] = $total_count;
+                        $pagination_data['total_pages'] = (int) ceil( $total_count / $limit_option );
+                        $pagination_data['has_more'] = ( $offset + $batch_count ) < $total_count;
+                    } else {
+                        $pagination_data['has_more'] = ( $batch_count >= $limit_option );
+                    }
+                }
                 foreach ( $results_thumbs['data'] as $item ) {
                     if ( empty( $item ) || ! is_array( $item ) ) {
                         continue;
@@ -1999,6 +2016,19 @@ class All_Sources_Images_Admin {
                     $photos = $results_thumbs['photos'];
                 }
 
+                if ( isset( $results_thumbs['photos'] ) && is_array( $results_thumbs['photos'] ) ) {
+                    if ( isset( $results_thumbs['photos']['page'] ) ) {
+                        $pagination_data['page'] = max( 1, intval( $results_thumbs['photos']['page'] ) );
+                    }
+                    if ( isset( $results_thumbs['photos']['pages'] ) ) {
+                        $pagination_data['total_pages'] = intval( $results_thumbs['photos']['pages'] );
+                        $pagination_data['has_more'] = ( $pagination_data['page'] < $pagination_data['total_pages'] );
+                    }
+                    if ( isset( $results_thumbs['photos']['total'] ) ) {
+                        $pagination_data['total'] = intval( $results_thumbs['photos']['total'] );
+                    }
+                }
+
                 foreach ( $photos as $item ) {
                     $server = isset( $item['server'] ) ? $item['server'] : '';
                     $id = isset( $item['id'] ) ? $item['id'] : '';
@@ -2031,6 +2061,29 @@ class All_Sources_Images_Admin {
                 }
             } elseif (isset($results_thumbs['items']) && is_array($results_thumbs['items'])) {
                 // Google Custom Search format
+                if ( 'google_image' === $bank ) {
+                    $request_info = array();
+                    if ( isset( $results_thumbs['queries']['request'][0] ) ) {
+                        $request_info = $results_thumbs['queries']['request'][0];
+                    }
+                    $start_index = isset( $request_info['startIndex'] ) ? intval( $request_info['startIndex'] ) : 1;
+                    $count_per_page = isset( $request_info['count'] ) ? intval( $request_info['count'] ) : count( $results_thumbs['items'] );
+                    if ( $count_per_page <= 0 ) {
+                        $count_per_page = max( 1, count( $results_thumbs['items'] ) );
+                    }
+                    $current_page = ( $count_per_page > 0 ) ? intval( floor( max( 0, $start_index - 1 ) / $count_per_page ) + 1 ) : $page;
+                    $pagination_data['page'] = max( 1, $current_page );
+                    $total_results = null;
+                    if ( isset( $results_thumbs['searchInformation']['totalResults'] ) ) {
+                        $total_results = intval( $results_thumbs['searchInformation']['totalResults'] );
+                        $pagination_data['total'] = $total_results;
+                    }
+                    if ( null !== $total_results && $count_per_page > 0 ) {
+                        $max_considered = min( $total_results, 100 );
+                        $pagination_data['total_pages'] = (int) ceil( $max_considered / $count_per_page );
+                    }
+                    $pagination_data['has_more'] = ! empty( $results_thumbs['queries']['nextPage'] );
+                }
                 foreach ($results_thumbs['items'] as $item) {
                     $large_url = '';
                     if (isset($item['pagemap']['cse_image'][0]['src']) && '' !== $item['pagemap']['cse_image'][0]['src']) {
@@ -2066,6 +2119,24 @@ class All_Sources_Images_Admin {
                 }
             } elseif (isset($results_thumbs['hits']) && is_array($results_thumbs['hits'])) {
                 // Pixabay format
+                if ( 'pixabay' === $bank ) {
+                    $total_hits = isset( $results_thumbs['totalHits'] ) ? intval( $results_thumbs['totalHits'] ) : null;
+                    $requested_per_page = isset( $results_thumbs['per_page'] ) ? intval( $results_thumbs['per_page'] ) : 200;
+                    if ( $requested_per_page <= 0 ) {
+                        $requested_per_page = max( 1, count( $results_thumbs['hits'] ) );
+                    }
+                    $pagination_data['page'] = $page;
+                    if ( null !== $total_hits ) {
+                        $pagination_data['total'] = $total_hits;
+                        if ( $requested_per_page > 0 ) {
+                            $total_pages = (int) ceil( $total_hits / $requested_per_page );
+                            $pagination_data['total_pages'] = $total_pages;
+                            $pagination_data['has_more'] = ( $page < $total_pages );
+                        }
+                    } else {
+                        $pagination_data['has_more'] = ( count( $results_thumbs['hits'] ) >= $requested_per_page );
+                    }
+                }
                 foreach ($results_thumbs['hits'] as $item) {
                     $normalized_images[] = array(
                         'url' => isset($item['largeImageURL']) ? $item['largeImageURL'] : '',
@@ -2077,10 +2148,34 @@ class All_Sources_Images_Admin {
                 }
             } elseif (isset($results_thumbs['results']) && is_array($results_thumbs['results'])) {
                 // Openverse, Unsplash results format
-                if ( 'unsplash' === $bank && isset( $results_thumbs['total_pages'] ) ) {
-                    $total_pages = intval( $results_thumbs['total_pages'] );
-                    $pagination_data['total_pages'] = $total_pages;
-                    $pagination_data['has_more'] = ( $page < $total_pages );
+                if ( 'unsplash' === $bank ) {
+                    if ( isset( $results_thumbs['total'] ) ) {
+                        $pagination_data['total'] = intval( $results_thumbs['total'] );
+                    }
+                    if ( isset( $results_thumbs['total_pages'] ) ) {
+                        $total_pages = intval( $results_thumbs['total_pages'] );
+                        $pagination_data['total_pages'] = $total_pages;
+                        $pagination_data['has_more'] = ( $page < $total_pages );
+                    }
+                } elseif ( in_array( $bank, array( 'cc_search', 'openverse' ), true ) ) {
+                    if ( isset( $results_thumbs['page'] ) ) {
+                        $pagination_data['page'] = max( 1, intval( $results_thumbs['page'] ) );
+                    }
+                    $total_results = null;
+                    if ( isset( $results_thumbs['result_count'] ) ) {
+                        $total_results = intval( $results_thumbs['result_count'] );
+                    } elseif ( isset( $results_thumbs['count'] ) ) {
+                        $total_results = intval( $results_thumbs['count'] );
+                    }
+                    if ( null !== $total_results ) {
+                        $pagination_data['total'] = $total_results;
+                    }
+                    if ( isset( $results_thumbs['page_count'] ) ) {
+                        $pagination_data['total_pages'] = intval( $results_thumbs['page_count'] );
+                        $pagination_data['has_more'] = ( $pagination_data['page'] < $pagination_data['total_pages'] );
+                    } else {
+                        $pagination_data['has_more'] = ! empty( $results_thumbs['next'] );
+                    }
                 }
                 foreach ($results_thumbs['results'] as $item) {
                     $normalized_images[] = array(
@@ -2093,6 +2188,25 @@ class All_Sources_Images_Admin {
                 }
             } elseif (isset($results_thumbs['photos']) && is_array($results_thumbs['photos'])) {
                 // Pexels format
+                if ( 'pexels' === $bank ) {
+                    $current_page = isset( $results_thumbs['page'] ) ? max( 1, intval( $results_thumbs['page'] ) ) : $page;
+                    $per_page = isset( $results_thumbs['per_page'] ) ? intval( $results_thumbs['per_page'] ) : count( $results_thumbs['photos'] );
+                    $total_results = isset( $results_thumbs['total_results'] ) ? intval( $results_thumbs['total_results'] ) : null;
+                    $pagination_data['page'] = $current_page;
+                    if ( null !== $total_results ) {
+                        $pagination_data['total'] = $total_results;
+                        if ( $per_page > 0 ) {
+                            $pagination_data['total_pages'] = (int) ceil( $total_results / $per_page );
+                        }
+                    }
+                    if ( ! empty( $results_thumbs['next_page'] ) ) {
+                        $pagination_data['has_more'] = true;
+                    } elseif ( isset( $pagination_data['total_pages'] ) ) {
+                        $pagination_data['has_more'] = ( $current_page < $pagination_data['total_pages'] );
+                    } else {
+                        $pagination_data['has_more'] = ! empty( $results_thumbs['photos'] );
+                    }
+                }
                 foreach ($results_thumbs['photos'] as $item) {
                     $normalized_images[] = array(
                         'url' => isset($item['src']['large2x']) ? $item['src']['large2x'] : '',
@@ -2205,10 +2319,17 @@ class All_Sources_Images_Admin {
         } else {
             $url_image = esc_url_raw( $raw_url_image );
         }
-        $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( $_POST['search_term'] ) : 'image' );
-        $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( $_POST['bank'] ) : '' );
-        $alt = ( isset( $_POST['alt_image'] ) ? sanitize_text_field( $_POST['alt_image'] ) : '' );
-        $caption = ( isset( $_POST['caption_image'] ) ? sanitize_text_field( $_POST['caption_image'] ) : '' );
+        $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : 'image' );
+        $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( wp_unslash( $_POST['bank'] ) ) : '' );
+        $alt = ( isset( $_POST['alt_image'] ) ? sanitize_text_field( wp_unslash( $_POST['alt_image'] ) ) : '' );
+        $raw_caption = ( isset( $_POST['caption_image'] ) ? wp_unslash( $_POST['caption_image'] ) : '' );
+        $caption = wp_kses_post( $raw_caption );
+        $title_image = ( isset( $_POST['title_image'] ) ? sanitize_text_field( wp_unslash( $_POST['title_image'] ) ) : '' );
+        $file_name_raw = ( isset( $_POST['file_name'] ) ? wp_unslash( $_POST['file_name'] ) : '' );
+        $file_name_base = sanitize_file_name( $file_name_raw );
+        if ( '' !== $file_name_base && false !== strpos( $file_name_base, '.' ) ) {
+            $file_name_base = sanitize_file_name( pathinfo( $file_name_base, PATHINFO_FILENAME ) );
+        }
         $post_id = ( isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0 );
         if ( !$post_id && isset( $_POST['id'] ) ) {
             $post_id = intval( $_POST['id'] );
@@ -2315,7 +2436,12 @@ class All_Sources_Images_Admin {
             $extension = 'jpg';
         }
 
-        $file_array['name'] = $search_term . '.' . $extension;
+        $sanitized_search = sanitize_file_name( $search_term );
+        if ( empty( $sanitized_search ) ) {
+            $sanitized_search = 'asi-image';
+        }
+        $final_file_base = ! empty( $file_name_base ) ? $file_name_base : $sanitized_search;
+        $file_array['name'] = $final_file_base . '.' . $extension;
         // Filename
         $file_array['tmp_name'] = $tmp;
         if ( $mime_type ) {
@@ -2352,10 +2478,11 @@ class All_Sources_Images_Admin {
         }
         // Insert image into the media library.
         $wp_upload_dir = wp_upload_dir();
+        $default_title = preg_replace( '/\.[^.]+$/', '', basename( $uploaded_file['file'] ) );
         $attachment = array(
             'guid'           => $wp_upload_dir['url'] . '/' . basename( $uploaded_file['file'] ),
             'post_mime_type' => $check['type'],
-            'post_title'     => preg_replace( '/\\.[^.]+$/', '', basename( $uploaded_file['file'] ) ),
+            'post_title'     => ( ! empty( $title_image ) ? $title_image : $default_title ),
             'post_content'   => '',
             'post_status'    => 'inherit',
         );

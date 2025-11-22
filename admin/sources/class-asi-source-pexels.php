@@ -17,6 +17,7 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $search_term    = $this->resolve_search_term( $context );
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( empty( $api_key ) ) {
             return new WP_Error( 'asi_pexels_missing_key', __( 'Pexels API key is missing.', 'all-sources-images' ) );
@@ -27,7 +28,7 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         }
 
         $endpoint    = 'https://api.pexels.com/v1/search';
-        $query_args  = $this->build_query_args( $search_term, $bank_options );
+        $query_args  = $this->build_query_args( $search_term, $bank_options, $page );
         $request_url = add_query_arg( $query_args, $endpoint );
         $request_args = $this->merge_proxy_args( array(
             'headers' => array(
@@ -124,11 +125,12 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         return '';
     }
 
-    private function build_query_args( $search, array $bank_options ) {
+    private function build_query_args( $search, array $bank_options, $page = 1 ) {
         $args = array(
             'query'    => $search,
             'per_page' => '15',
             'locale'   => ! empty( $bank_options['locale'] ) ? $bank_options['locale'] : 'en-US',
+            'page'     => max( 1, intval( $page ) ),
         );
 
         if ( ! empty( $bank_options['orientation'] ) && 'all' !== $bank_options['orientation'] ) {

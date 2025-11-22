@@ -17,6 +17,7 @@ class ASI_Source_Giphy extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $search_term    = $this->resolve_search_term( $context );
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( empty( $api_key ) ) {
             return new WP_Error( 'asi_giphy_missing_key', __( 'GIPHY API key is missing.', 'all-sources-images' ) );
@@ -27,7 +28,7 @@ class ASI_Source_Giphy extends ASI_Image_Source {
         }
 
         $endpoint    = $this->get_endpoint( $bank_options );
-        $query_args  = $this->build_query_args( $bank_options, $api_key, $search_term );
+        $query_args  = $this->build_query_args( $bank_options, $api_key, $search_term, $page );
         $request_url = add_query_arg( $query_args, $endpoint );
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
@@ -133,19 +134,21 @@ class ASI_Source_Giphy extends ASI_Image_Source {
         return 'https://api.giphy.com/v1/gifs/search';
     }
 
-    private function build_query_args( array $bank_options, $api_key, $search ) {
+    private function build_query_args( array $bank_options, $api_key, $search, $page = 1 ) {
         $limit = isset( $bank_options['limit'] ) ? intval( $bank_options['limit'] ) : 25;
         $limit = max( 1, min( 50, $limit ) );
         $rating = isset( $bank_options['rating'] ) ? strtolower( $bank_options['rating'] ) : 'g';
         $lang   = isset( $bank_options['lang'] ) ? strtolower( $bank_options['lang'] ) : 'en';
+        $page   = max( 1, intval( $page ) );
 
         $trimmed_search = function_exists( 'mb_substr' ) ? mb_substr( $search, 0, 50 ) : substr( $search, 0, 50 );
+        $offset = ( $page - 1 ) * $limit;
 
         $args = array(
             'api_key' => $api_key,
             'q'       => $trimmed_search,
             'limit'   => $limit,
-            'offset'  => 0,
+            'offset'  => $offset,
             'rating'  => $rating,
             'lang'    => $lang,
         );

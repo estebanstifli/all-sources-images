@@ -20,6 +20,7 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( empty( $api_key ) || empty( $cx_id ) ) {
             return new WP_Error( 'asi_google_image_missing_key', __( 'Google Custom Search key or CX ID is missing.', 'all-sources-images' ) );
@@ -29,7 +30,7 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
             return new WP_Error( 'asi_google_image_missing_query', __( 'No search query available for Google Images.', 'all-sources-images' ) );
         }
 
-        $query_args   = $this->build_query_args( $bank_options, $api_key, $cx_id, $search_term );
+        $query_args   = $this->build_query_args( $bank_options, $api_key, $cx_id, $search_term, $page );
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
             'method'             => 'GET',
@@ -137,7 +138,7 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
         return '';
     }
 
-    private function build_query_args( array $bank_options, $api_key, $cx_id, $search_term ) {
+    private function build_query_args( array $bank_options, $api_key, $cx_id, $search_term, $page = 1 ) {
         $country  = ! empty( $bank_options['search_country'] ) ? $bank_options['search_country'] : 'en';
         $img_color = ! empty( $bank_options['img_color'] ) ? $bank_options['img_color'] : '';
         $filetype = ! empty( $bank_options['filetype'] ) ? $bank_options['filetype'] : '';
@@ -149,6 +150,7 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
         }
 
         $rights = $this->build_rights_filter( $bank_options );
+        $page    = max( 1, intval( $page ) );
 
         $args = array(
             'key'        => $api_key,
@@ -159,7 +161,12 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
             'hl'         => $country,
             'safe'       => $safe,
             'userIp'     => isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( $_SERVER['SERVER_ADDR'] ) : '0.0.0.0',
+            'start'      => 1,
         );
+
+        $calculated_start = ( ( $page - 1 ) * $args['num'] ) + 1;
+        // Google Custom Search only returns up to start index 91
+        $args['start'] = max( 1, min( $calculated_start, 91 ) );
 
         if ( ! empty( $img_color ) ) {
             $args['imgDominantColor'] = $img_color;

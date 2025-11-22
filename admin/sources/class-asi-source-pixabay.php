@@ -17,6 +17,7 @@ class ASI_Source_Pixabay extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( empty( $api_key ) ) {
             return new WP_Error( 'asi_pixabay_missing_key', __( 'Pixabay API key is missing.', 'all-sources-images' ) );
@@ -27,7 +28,7 @@ class ASI_Source_Pixabay extends ASI_Image_Source {
         }
 
         $endpoint    = 'https://pixabay.com/api/';
-        $query_args  = $this->build_query_args( $bank_options, $api_key, $search_term );
+        $query_args  = $this->build_query_args( $bank_options, $api_key, $search_term, $page );
         $request_url = add_query_arg( $query_args, $endpoint );
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
@@ -113,7 +114,7 @@ class ASI_Source_Pixabay extends ASI_Image_Source {
         return '';
     }
 
-    private function build_query_args( array $bank_options, $api_key, $search_term ) {
+    private function build_query_args( array $bank_options, $api_key, $search_term, $page = 1 ) {
         $img_type   = ! empty( $bank_options['imgtype'] ) ? $bank_options['imgtype'] : 'all';
         $language   = ! empty( $bank_options['search_country'] ) ? $bank_options['search_country'] : 'en';
         $orientation = ! empty( $bank_options['orientation'] ) ? $bank_options['orientation'] : 'all';
@@ -128,6 +129,7 @@ class ASI_Source_Pixabay extends ASI_Image_Source {
             'image_type' => $img_type,
             'per_page'   => 200,
             'safesearch' => ( 'true' === $safe || true === $safe ) ? 'true' : 'false',
+            'page'       => max( 1, intval( $page ) ),
         );
 
         if ( 'all' !== $orientation ) {

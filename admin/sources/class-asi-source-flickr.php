@@ -20,6 +20,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
 
         if ( empty( $api_key ) ) {
             return new WP_Error( 'asi_flickr_missing_key', __( 'Flickr API key is missing.', 'all-sources-images' ) );
@@ -29,7 +30,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
             return new WP_Error( 'asi_flickr_missing_query', __( 'No search query available for Flickr.', 'all-sources-images' ) );
         }
 
-        $query_args   = $this->build_search_query( $bank_options, $api_key, $search_term );
+        $query_args   = $this->build_search_query( $bank_options, $api_key, $search_term, $page );
         $search_data  = $this->perform_rest_request( $query_args, $proxy_args, 'asi_flickr_http_error' );
 
         if ( is_wp_error( $search_data ) ) {
@@ -103,12 +104,13 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         return '';
     }
 
-    private function build_search_query( array $bank_options, $api_key, $search_term ) {
+    private function build_search_query( array $bank_options, $api_key, $search_term, $page = 1 ) {
         return array(
             'method'         => 'flickr.photos.search',
             'api_key'        => $api_key,
             'text'           => $search_term,
             'per_page'       => 16,
+            'page'           => max( 1, intval( $page ) ),
             'format'         => 'json',
             'nojsoncallback' => '1',
             'privacy_filter' => '1',
