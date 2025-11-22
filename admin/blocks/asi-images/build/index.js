@@ -8,7 +8,7 @@
     'use strict';
 
     const { registerBlockType } = wp.blocks;
-    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner, TextareaControl } = wp.components;
+    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner, TextareaControl, Notice } = wp.components;
     const { useState, useEffect, useRef, useCallback } = wp.element;
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
@@ -43,13 +43,21 @@
         },
 
         edit: function(props) {
-            const { attributes, setAttributes } = props;
-            const [isModalOpen, setIsModalOpen] = useState(false);
+            const {
+                attributes = {},
+                setAttributes = () => {},
+                mode = 'block',
+                standaloneOptions = {},
+            } = props;
+            const isStandaloneMode = (mode === 'standalone');
+            const [isModalOpen, setIsModalOpen] = useState(isStandaloneMode && standaloneOptions.openOnLoad ? true : false);
             const [searchTerm, setSearchTerm] = useState('');
             const [resultsSearch, setResultsSearch] = useState({});
             const [searchStatus, setSearchStatus] = useState({});
             const [timerTick, setTimerTick] = useState(Date.now());
             const [isDownloading, setIsDownloading] = useState(false);
+            const [downloadedImages, setDownloadedImages] = useState({});
+            const [notification, setNotification] = useState(null);
             const buildEmptySettingsState = () => ({
                 isOpen: false,
                 bank: '',
@@ -71,12 +79,62 @@
             const aiSources = (Array.isArray(asiAjax.ai_sources) ? asiAjax.ai_sources : ['dallev1', 'stability', 'replicate', 'gemini'])
                 .map((slug) => (typeof slug === 'string' ? slug.toLowerCase() : slug));
             const hasActiveSearch = Object.values(searchStatus).some((status) => status && status.active);
+            const isBlockMode = !isStandaloneMode;
+            const wrapperProps = useBlockProps(isStandaloneMode ? { className: 'asi-standalone-wrapper' } : {});
+            const isExplorerVisible = isBlockMode ? isModalOpen : true;
 
             const masonryInstances = useRef(new Map());
             const masonryFrameRef = useRef(null);
             const sentinelObserverRef = useRef(null);
 
             const bankSupportsPagination = useCallback((slug) => PAGINATED_BANKS.has(normalizeBankSlug(slug)), []);
+
+            const resolvePostId = useCallback(() => {
+                if (isBlockMode && wp && wp.data && typeof wp.data.select === 'function') {
+                    const editorStore = wp.data.select('core/editor');
+                    if (editorStore && typeof editorStore.getCurrentPostId === 'function') {
+                        const currentId = parseInt(editorStore.getCurrentPostId(), 10);
+                        if (!Number.isNaN(currentId)) {
+                            return currentId;
+                        }
+                    }
+                }
+                if (standaloneOptions && typeof standaloneOptions.postId !== 'undefined') {
+                    const provided = parseInt(standaloneOptions.postId, 10);
+                    if (!Number.isNaN(provided)) {
+                        return provided;
+                    }
+                }
+                if (typeof asiAjax !== 'undefined' && typeof asiAjax.default_post_id !== 'undefined') {
+                    const fallback = parseInt(asiAjax.default_post_id, 10);
+                    if (!Number.isNaN(fallback)) {
+                        return fallback;
+                    }
+                }
+                return 0;
+            }, [isBlockMode, standaloneOptions]);
+
+            const buildImageKey = (bankSlug, image) => {
+                const normalizedBank = normalizeBankSlug(bankSlug) || 'default';
+                if (image && image.url) {
+                    return normalizedBank + '::' + image.url;
+                }
+                return normalizedBank + '::' + JSON.stringify(image || {});
+            };
+
+            const markImageDownloaded = (bankSlug, image) => {
+                const key = buildImageKey(bankSlug, image);
+                setDownloadedImages((prev) => {
+                    if (prev[key]) {
+                        return prev;
+                    }
+                    return Object.assign({}, prev, { [key]: true });
+                });
+            };
+
+            const showNotification = (status, message) => {
+                setNotification({ status, message, key: Date.now(), text: message });
+            };
 
             const requestMasonryLayout = useCallback(() => {
                 if (typeof window === 'undefined') {
@@ -125,10 +183,10 @@
             }, [hasActiveSearch]);
 
             useEffect(() => {
-                if (!isModalOpen) {
+                if (!isExplorerVisible) {
                     destroyMasonryInstances();
                 }
-            }, [isModalOpen, destroyMasonryInstances]);
+            }, [isExplorerVisible, destroyMasonryInstances]);
 
             useEffect(() => {
                 return () => {
@@ -137,7 +195,7 @@
             }, [destroyMasonryInstances]);
 
             useEffect(() => {
-                if (!isModalOpen) {
+                if (!isExplorerVisible) {
                     return;
                 }
                 if (typeof window === 'undefined' || typeof window.MiniMasonry === 'undefined') {
@@ -184,7 +242,7 @@
                 });
 
                 requestMasonryLayout();
-            }, [resultsSearch, isModalOpen, requestMasonryLayout]);
+            }, [resultsSearch, isExplorerVisible, requestMasonryLayout]);
 
             // sentinel observer effect moved below fetchNextPage definition
 
@@ -227,7 +285,7 @@
 
             // Search all configured banks
             function searchAllBanks() {
-                const postId = wp.data.select('core/editor').getCurrentPostId();
+                const postId = resolvePostId();
                 const banks = getActiveBanks();
                 const entries = Object.entries(banks);
 
@@ -379,17 +437,17 @@
                 if (!entry || entry.loadingMore || !entry.hasMore) {
                     return;
                 }
-                const postId = wp.data.select('core/editor').getCurrentPostId();
+                const postId = resolvePostId();
                 const nextPage = (entry.page || 1) + 1;
                 searchSingleBank(bankName, index, postId, nextPage, true);
-            }, [resultsSearch, bankSupportsPagination]);
+            }, [resultsSearch, bankSupportsPagination, resolvePostId]);
 
             useEffect(() => {
                 if (sentinelObserverRef.current) {
                     sentinelObserverRef.current.disconnect();
                     sentinelObserverRef.current = null;
                 }
-                if (!isModalOpen || typeof IntersectionObserver === 'undefined') {
+                if (!isExplorerVisible || typeof IntersectionObserver === 'undefined') {
                     return;
                 }
                 const rootElement = document.querySelector('.asi-modal .components-modal__content');
@@ -420,10 +478,10 @@
                         observer.disconnect();
                     }
                 };
-            }, [resultsSearch, isModalOpen, fetchNextPage]);
+            }, [resultsSearch, isExplorerVisible, fetchNextPage]);
 
             // Image item component - MUST be defined outside map to use hooks properly
-            function ImageGridItem({ image, bankName, onImageClick, onImageLoad, onSettingsClick }) {
+            function ImageGridItem({ image, bankName, onImageClick, onImageLoad, onSettingsClick, isDownloaded }) {
                 const thumbUrl = image.thumb || image.url;
                 const largeUrl = image.url;
                 const altText = image.alt || image.title || 'Image';
@@ -446,6 +504,7 @@
                         }),
                         wp.element.createElement('div', { className: 'asi-media-overlay' },
                             wp.element.createElement('span', { className: 'asi-media-author' }, caption || __('Unknown author', 'all-sources-images')),
+                                isDownloaded ? wp.element.createElement('span', { className: 'asi-download-badge' }, __('Downloaded', 'all-sources-images')) : null,
                             wp.element.createElement('button', {
                                 type: 'button',
                                 className: 'mpt-settings-button asi-settings-button',
@@ -479,6 +538,7 @@
             // Render image grid
             function renderImageGrid(images, bankName, index, options = {}) {
                 const hasMore = options.hasMore;
+                const isDownloadedFn = typeof options.isDownloaded === 'function' ? options.isDownloaded : () => false;
                 const licensing = asiAjax.licensing_data || '0';
                 const displayImages = (licensing !== '1') ? images.slice(0, 6) : images;
 
@@ -495,7 +555,8 @@
                                 bankName: bankName,
                                 onImageClick: downloadAndUseImage,
                                 onImageLoad: requestMasonryLayout,
-                                onSettingsClick: (img, bank) => openSettingsPanel(img, bank)
+                                onSettingsClick: (img, bank) => openSettingsPanel(img, bank),
+                                isDownloaded: isDownloadedFn(image)
                             });
                         })
                     ),
@@ -515,7 +576,7 @@
 
                 setIsDownloading(true);
 
-                const postId = wp.data.select('core/editor').getCurrentPostId();
+                const postId = resolvePostId();
 
                 const effectiveAlt = overrides.alt !== undefined ? overrides.alt : alt;
                 const effectiveCaption = overrides.caption !== undefined ? overrides.caption : caption;
@@ -538,26 +599,42 @@
                 jQuery.post(asiAjax.ajax_url, data)
                     .done(response => {
                         if (response.success) {
-                            // Insert image block
-                            const newBlock = wp.blocks.createBlock('core/image', {
-                                id: response.data.id_media,
-                                url: response.data.url_media,
-                                alt: response.data.alt_image,
-                                caption: response.data.caption_image
-                            });
+                            if (isBlockMode) {
+                                const newBlock = wp.blocks.createBlock('core/image', {
+                                    id: response.data.id_media,
+                                    url: response.data.url_media,
+                                    alt: response.data.alt_image,
+                                    caption: response.data.caption_image
+                                });
 
-                            const selectedBlockClientId = wp.data.select('core/block-editor').getSelectedBlockClientId();
-                            
-                            // Replace the ASI block with the new image block and select it
-                            wp.data.dispatch('core/block-editor').replaceBlock(selectedBlockClientId, newBlock);
-                            wp.data.dispatch('core/block-editor').selectBlock(newBlock.clientId);
+                                const selectedBlockClientId = wp.data.select('core/block-editor').getSelectedBlockClientId();
+                                wp.data.dispatch('core/block-editor').replaceBlock(selectedBlockClientId, newBlock);
+                                wp.data.dispatch('core/block-editor').selectBlock(newBlock.clientId);
 
-                            setIsModalOpen(false);
+                                setIsModalOpen(false);
+                            } else {
+                                if (imageMeta) {
+                                    markImageDownloaded(bank, imageMeta);
+                                }
+                                showNotification('success', __('Image saved to the media library.', 'all-sources-images'));
+                            }
                         } else {
-                            alert('Error downloading image');
+                            const message = __('Error downloading image', 'all-sources-images');
+                            if (isStandaloneMode) {
+                                showNotification('error', message);
+                            } else {
+                                alert(message);
+                            }
                         }
                     })
-                    .fail(() => alert('Network error'))
+                    .fail(() => {
+                        const message = __('Network error', 'all-sources-images');
+                        if (isStandaloneMode) {
+                            showNotification('error', message);
+                        } else {
+                            alert(message);
+                        }
+                    })
                     .always(() => setIsDownloading(false));
             }
 
@@ -676,34 +753,37 @@
             const hasBanks = tabs.length > 0;
             const availableBankEntries = Object.entries(availableBanks);
 
-            return wp.element.createElement('div', useBlockProps(),
+            return wp.element.createElement('div', wrapperProps,
                 // Block toolbar
-                wp.element.createElement(BlockControls, null,
+                isBlockMode ? wp.element.createElement(BlockControls, null,
                     wp.element.createElement(AlignmentToolbar, {
                         value: attributes.alignment,
                         onChange: (newAlignment) => setAttributes({ alignment: newAlignment || 'none' })
                     })
-                ),
+                ) : null,
 
-                // Button to open modal
-                wp.element.createElement('div', { className: 'button-center' },
+                isBlockMode ? wp.element.createElement('div', { className: 'button-center' },
                     wp.element.createElement(Button, {
                         isPrimary: true,
                         onClick: () => setIsModalOpen(true)
                     }, __('Search for Images', 'all-sources-images'))
-                ),
+                ) : null,
 
-                // Modal with search and results
-                isModalOpen && wp.element.createElement(Modal, {
-                    title: 'All Sources Images',
-                    onRequestClose: () => {
-                        setIsModalOpen(false);
-                        setIsDownloading(false);
-                        closeSettingsPanel();
-                    },
-                    className: 'media-modal-content asi-modal',
-                    style: { maxWidth: '95%' }
-                },
+                (isBlockMode ? isModalOpen : true) && (function(){
+                    const containerProps = isBlockMode ? {
+                        title: 'All Sources Images',
+                        onRequestClose: () => {
+                            setIsModalOpen(false);
+                            setIsDownloading(false);
+                            closeSettingsPanel();
+                            setNotification(null);
+                        },
+                        className: 'media-modal-content asi-modal',
+                        style: { maxWidth: '95%' }
+                    } : {
+                        className: 'asi-inline-explorer'
+                    };
+                    return wp.element.createElement(isBlockMode ? Modal : 'div', containerProps,
                     isDownloading && wp.element.createElement('div', {
                         className: 'asi-download-overlay',
                         style: {
@@ -735,6 +815,12 @@
                             }
                         }, __('Downloading image…', 'all-sources-images'))
                     ),
+                    notification ? wp.element.createElement(Notice, {
+                        status: notification.status || 'info',
+                        onRemove: () => setNotification(null),
+                        isDismissible: true,
+                        className: 'asi-download-notice'
+                    }, notification.message || notification.text || '') : null,
                     // Search container
                     wp.element.createElement('div', { style: { marginBottom: '20px' } },
                         wp.element.createElement(SelectControl, {
@@ -843,7 +929,13 @@
                                     color: '#666'
                                 }
                             }, messageText),
-                            hasImages ? renderImageGrid(resultEntry.items, bankSlug, index, { hasMore: resultEntry.hasMore }) : (errorMessage ? wp.element.createElement('p', {
+                            hasImages ? renderImageGrid(resultEntry.items, bankSlug, index, {
+                                hasMore: resultEntry.hasMore,
+                                isDownloaded: (img) => {
+                                    const key = buildImageKey(bankSlug, img);
+                                    return !!downloadedImages[key];
+                                }
+                            }) : (errorMessage ? wp.element.createElement('p', {
                                 style: {
                                     textAlign: 'center',
                                     padding: '40px',
@@ -951,7 +1043,8 @@
                             )
                         )
                     )
-                )
+                    );
+                })()
             );
         },
 
@@ -959,4 +1052,36 @@
             return null;
         }
     });
+
+    window.ASIImagesExplorerMount = function(rootId, options) {
+        if (!rootId || !document) {
+            return;
+        }
+        const target = document.getElementById(rootId);
+        if (!target || !wp || !wp.blocks) {
+            return;
+        }
+        const blockType = wp.blocks.getBlockType('asi/asi-images');
+        if (!blockType || typeof blockType.edit !== 'function') {
+            return;
+        }
+        const elementProps = {
+            attributes: { alignment: 'none' },
+            setAttributes: () => {},
+            mode: 'standalone',
+            standaloneOptions: options || {},
+            clientId: 'asi-standalone'
+        };
+        let element = wp.element.createElement(blockType.edit, elementProps);
+        if (wp.blockEditor && wp.blockEditor.BlockEditContext && wp.blockEditor.BlockEditContext.Provider) {
+            element = wp.element.createElement(
+                wp.blockEditor.BlockEditContext.Provider,
+                { value: { clientId: 'asi-standalone', name: 'asi/asi-images', attributes: elementProps.attributes, isSelected: true } },
+                element
+            );
+        }
+        if (wp.element && typeof wp.element.render === 'function') {
+            wp.element.render(element, target);
+        }
+    };
 })();

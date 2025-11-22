@@ -78,6 +78,13 @@ class All_Sources_Images_Admin {
     private $version;
 
     /**
+     * Hook suffix for the Media submenu page.
+     *
+     * @var string
+     */
+    private $media_picker_hook = '';
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    4.0.0
@@ -105,6 +112,8 @@ class All_Sources_Images_Admin {
         // Scripts for Block & Translations
         add_action( 'init', array(&$this, 'ASI_register_mpt_block') );
         add_action( 'enqueue_block_editor_assets', array(&$this, 'ASI_enqueue_style_block') );
+        add_action( 'admin_menu', array( $this, 'ASI_register_media_picker_page' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'ASI_enqueue_media_picker_assets' ) );
         // Gutenberg Block : Searching images with APIs
         add_action( 'wp_ajax_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
         add_action( 'wp_ajax_nopriv_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
@@ -1765,6 +1774,13 @@ class All_Sources_Images_Admin {
         $script_dependencies = $asset_file['dependencies'];
         $script_dependencies[] = 'asi-minimasonry';
 
+        wp_register_style(
+            'asi-images-editor-style',
+            plugins_url( 'blocks/asi-images/build/asi-images-editor.css', __FILE__ ),
+            array(),
+            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/asi-images-editor.css' )
+        );
+
         wp_register_script(
             'asi-images-script',
             plugins_url( 'blocks/asi-images/build/index.js', __FILE__ ),
@@ -1774,6 +1790,7 @@ class All_Sources_Images_Admin {
         register_block_type( 'asi/asi-images', array(
             'editor_script' => 'asi-images-script',
         ) );
+        $default_post_id = apply_filters( 'asi_media_picker_default_post_id', 0 );
         wp_localize_script( 'asi-images-script', 'asiAjax', array(
             'ajax_url'         => admin_url( 'admin-ajax.php' ),
             'admin_url'        => admin_url(),
@@ -1783,6 +1800,7 @@ class All_Sources_Images_Admin {
             'licensing_data'   => '1', // All features available
             'path_default_img' => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
             'ai_sources'       => $this->ASI_ai_source_codes(),
+            'default_post_id'  => $default_post_id,
         ) );
         // Locate character strings
         wp_set_script_translations( 'asi-images-script', 'all-sources-images', plugin_dir_path( __DIR__ ) . 'languages' );
@@ -1808,12 +1826,47 @@ class All_Sources_Images_Admin {
      * @since    5.0.0
      */
     public function ASI_enqueue_style_block() {
-        wp_enqueue_style(
-            'asi-images-editor-style',
-            plugins_url( 'blocks/asi-images/build/asi-images-editor.css', __FILE__ ),
-            array(),
-            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/asi-images-editor.css' )
+        wp_enqueue_style( 'asi-images-editor-style' );
+    }
+
+    /**
+     * Register Media submenu page for standalone image explorer.
+     */
+    public function ASI_register_media_picker_page() {
+        $this->media_picker_hook = add_submenu_page(
+            'upload.php',
+            __( 'All Sources Images', 'all-sources-images' ),
+            __( 'All Sources Images', 'all-sources-images' ),
+            'upload_files',
+            'asi-media-browser',
+            array( $this, 'ASI_render_media_picker_page' )
         );
+    }
+
+    /**
+     * Render container for the standalone explorer.
+     */
+    public function ASI_render_media_picker_page() {
+        echo '<div class="wrap asi-media-browser-wrap">';
+        echo '<h1>' . esc_html__( 'All Sources Images', 'all-sources-images' ) . '</h1>';
+        echo '<p class="description">' . esc_html__( 'Search and download media from your connected sources without leaving the Media Library.', 'all-sources-images' ) . '</p>';
+        echo '<div id="asi-media-picker-root"></div>';
+        echo '</div>';
+    }
+
+    /**
+     * Enqueue assets when viewing the standalone explorer page.
+     */
+    public function ASI_enqueue_media_picker_assets( $hook ) {
+        if ( empty( $this->media_picker_hook ) || $hook !== $this->media_picker_hook ) {
+            return;
+        }
+
+        wp_enqueue_style( 'asi-images-editor-style' );
+        wp_enqueue_script( 'asi-images-script' );
+
+        $inline = 'document.addEventListener("DOMContentLoaded",function(){if(window.ASIImagesExplorerMount){var fallbackId=0;var asiData=window.asiAjax||{};if(typeof asiData.default_post_id!=="undefined"){var parsed=parseInt(asiData.default_post_id,10);if(!isNaN(parsed)){fallbackId=parsed;}}window.ASIImagesExplorerMount("asi-media-picker-root",{openOnLoad:true,postId:fallbackId});}});';
+        wp_add_inline_script( 'asi-images-script', $inline, 'after' );
     }
 
     /**
@@ -1847,7 +1900,7 @@ class All_Sources_Images_Admin {
             'post_id' => $id,
             'index' => $index
         ), 'GUTENBERG_BLOCK_SEARCH' );
-        if ( FALSE === get_post_status( $id ) ) {
+        if ( 0 !== $id && FALSE === get_post_status( $id ) ) {
             wp_send_json_error( 'Error with post ID.' );
         }
         $REST_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
