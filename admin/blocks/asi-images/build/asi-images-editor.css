@@ -1,0 +1,178 @@
+/* ASI Gutenberg Masonry Styles */
+
+.mpt-tab-panel {
+    margin-top: 15px;
+}
+
+.mpt-tab-panel .components-tab-panel__tabs {
+    gap: 4px;
+}
+
+.mpt-tab-panel .components-tab-panel__tabs-item {
+    border: 1px solid #dcdcde;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    background: #f6f7f7;
+    font-weight: 500;
+}
+
+.mpt-tab-panel .components-tab-panel__tabs-item.active-tab {
+    background-color: #fff;
+    border-color: #b0b0b2;
+}
+
+.button-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+/* Masonry grid */
+.asi-media-grid {
+    position: relative;
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 1400px;
+    min-height: 240px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.asi-media-grid:not(.asi-masonry-ready) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    opacity: 0.4;
+    transform: translateY(8px);
+}
+
+.asi-media-grid.asi-masonry-ready {
+    opacity: 1;
+    transform: none;
+}
+
+.asi-media-grid .asi-media-item {
+    list-style: none;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+
+.asi-media-grid.asi-masonry-ready .asi-media-item {
+    position: absolute;
+    will-change: transform;
+}
+
+.asi-media-grid:not(.asi-masonry-ready) .asi-media-item {
+    position: relative;
+}
+
+/* Image cards */
+.asi-media-card {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f7f7f9;
+    box-shadow: 0 8px 30px rgba(21, 25, 36, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.asi-media-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.25s ease;
+}
+
+.asi-media-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 45px rgba(21, 25, 36, 0.15);
+}
+
+.asi-media-card:hover img {
+    transform: scale(1.02);
+}
+
+/* Hover overlay */
+.asi-media-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(8, 12, 20, 0) 0%, rgba(8, 12, 20, 0.85) 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.asi-media-card:hover .asi-media-overlay {
+    opacity: 1;
+}
+
+.asi-media-author {
+    font-size: 13px;
+    font-weight: 500;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.asi-settings-button {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 999px;
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.asi-settings-button svg {
+    pointer-events: none;
+}
+
+.asi-settings-button:hover,
+.asi-settings-button:focus-visible {
+    background: rgba(0, 0, 0, 0.75);
+    transform: scale(1.08);
+}
+
+/* Unlock gate visuals */
+.unlock-pro {
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    top: 175px;
+    background: rgba(255, 255, 255, 0.65);
+    z-index: 9;
+    padding: 13px 0 22px;
+    width: 50%;
+    min-width: 350px;
+    font-size: 18px;
+    border-radius: 5px;
+    font-weight: 700;
+}
+
+.unlock-pro a {
+    text-decoration: none;
+}
+
+.unlock-pro a:hover {
+    text-decoration: initial;
+}
+
+.unlock-pro img {
+    vertical-align: -40%;
+}

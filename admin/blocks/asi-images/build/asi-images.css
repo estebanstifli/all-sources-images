@@ -28,9 +28,27 @@
 /* Fichier editor.css */
 .media-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-auto-rows: 10px;
+    grid-auto-flow: dense;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.media-grid .attachment {
+    width: 100% !important;
+    margin: 0 !important;
+    float: none !important;
+    display: block;
+}
+
+.media-grid .attachment .thumbnail,
+.media-grid .attachment img {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
 }
 
 .blue-grid {
@@ -66,12 +84,12 @@
 }
 
 .wp-core-ui .attachment.mpt-attachment {
-    width: 100%;
-    min-width: 200px;
+    position: relative;
+    cursor: pointer;
 }
 
 .results-search > .media-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    /* Heredar estilos del .media-grid padre */
 }
 
 .results-search .attachment .thumbnail {

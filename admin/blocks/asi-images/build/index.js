@@ -9,7 +9,7 @@
 
     const { registerBlockType } = wp.blocks;
     const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner } = wp.components;
-    const { useState, useEffect } = wp.element;
+    const { useState, useEffect, useRef, useCallback } = wp.element;
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
 
@@ -56,6 +56,40 @@
                 .map((slug) => (typeof slug === 'string' ? slug.toLowerCase() : slug));
             const hasActiveSearch = Object.values(searchStatus).some((status) => status && status.active);
 
+            const masonryInstances = useRef(new Map());
+            const masonryFrameRef = useRef(null);
+
+            const requestMasonryLayout = useCallback(() => {
+                if (typeof window === 'undefined') {
+                    return;
+                }
+                if (masonryFrameRef.current) {
+                    window.cancelAnimationFrame(masonryFrameRef.current);
+                }
+                masonryFrameRef.current = window.requestAnimationFrame(() => {
+                    masonryInstances.current.forEach((instance) => {
+                        if (instance && typeof instance.layout === 'function') {
+                            instance.layout();
+                        }
+                    });
+                });
+            }, []);
+
+            const destroyMasonryInstances = useCallback(() => {
+                masonryInstances.current.forEach((instance) => {
+                    if (instance && typeof instance.destroy === 'function') {
+                        instance.destroy();
+                    }
+                });
+                masonryInstances.current.clear();
+                if (typeof document !== 'undefined') {
+                    document.querySelectorAll('.asi-media-grid').forEach((grid) => {
+                        grid.classList.remove('asi-masonry-ready');
+                        grid.removeAttribute('data-masonry-id');
+                    });
+                }
+            }, []);
+
             useEffect(() => {
                 setResultsSearch({});
                 setSearchStatus({});
@@ -70,6 +104,68 @@
                 }, 1000);
                 return () => clearInterval(intervalId);
             }, [hasActiveSearch]);
+
+            useEffect(() => {
+                if (!isModalOpen) {
+                    destroyMasonryInstances();
+                }
+            }, [isModalOpen, destroyMasonryInstances]);
+
+            useEffect(() => {
+                return () => {
+                    destroyMasonryInstances();
+                };
+            }, [destroyMasonryInstances]);
+
+            useEffect(() => {
+                if (!isModalOpen) {
+                    return;
+                }
+                if (typeof window === 'undefined' || typeof window.MiniMasonry === 'undefined') {
+                    return;
+                }
+
+                const grids = document.querySelectorAll('.asi-media-grid');
+                const activeIds = new Set();
+
+                grids.forEach((grid) => {
+                    if (!grid) {
+                        return;
+                    }
+                    let gridId = grid.getAttribute('data-masonry-id');
+                    if (!gridId) {
+                        gridId = `asi-grid-${Math.random().toString(16).slice(2)}`;
+                        grid.setAttribute('data-masonry-id', gridId);
+                    }
+                    activeIds.add(gridId);
+
+                    let instance = masonryInstances.current.get(gridId);
+                    if (!instance) {
+                        instance = new window.MiniMasonry({
+                            container: grid,
+                            baseWidth: 260,
+                            gutterX: 16,
+                            gutterY: 16,
+                            surroundingGutter: false,
+                        });
+                        masonryInstances.current.set(gridId, instance);
+                    } else if (typeof instance.layout === 'function') {
+                        instance.layout();
+                    }
+                    grid.classList.add('asi-masonry-ready');
+                });
+
+                masonryInstances.current.forEach((instance, key) => {
+                    if (!activeIds.has(key)) {
+                        if (instance && typeof instance.destroy === 'function') {
+                            instance.destroy();
+                        }
+                        masonryInstances.current.delete(key);
+                    }
+                });
+
+                requestMasonryLayout();
+            }, [resultsSearch, isModalOpen, requestMasonryLayout]);
 
             function getBankLabel(bankSlug) {
                 if (!bankSlug || typeof bankSlug !== 'string') {
@@ -166,7 +262,7 @@
                             }
 
                             if (images.length > 0) {
-                                const imageElements = renderImageGrid(images, config, bankParam);
+                                const imageElements = renderImageGrid(images, config, bankParam, requestMasonryLayout);
                                 setResultsSearch(prev => ({ ...prev, [index]: imageElements }));
                             } else {
                                 setResultsSearch(prev => ({ 
@@ -208,87 +304,76 @@
                     });
             }
 
+            // Image item component - MUST be defined outside map to use hooks properly
+            function ImageGridItem({ image, bankName, onImageClick, onImageLoad }) {
+                const thumbUrl = image.thumb || image.url;
+                const largeUrl = image.url;
+                const altText = image.alt || image.title || 'Image';
+                const caption = image.caption || '';
+
+                return wp.element.createElement('li', {
+                    className: 'attachment mpt-attachment asi-media-item',
+                    onClick: () => onImageClick(largeUrl, altText, caption, bankName)
+                },
+                    wp.element.createElement('div', { className: 'asi-media-card' },
+                        wp.element.createElement('img', {
+                            src: thumbUrl,
+                            alt: altText,
+                            loading: 'lazy',
+                            onLoad: () => {
+                                if (typeof onImageLoad === 'function') {
+                                    onImageLoad();
+                                }
+                            }
+                        }),
+                        wp.element.createElement('div', { className: 'asi-media-overlay' },
+                            wp.element.createElement('span', { className: 'asi-media-author' }, caption || __('Unknown author', 'all-sources-images')),
+                            wp.element.createElement('button', {
+                                type: 'button',
+                                className: 'mpt-settings-button asi-settings-button',
+                                onClick: (e) => {
+                                    e.stopPropagation();
+                                    console.log('Settings clicked for image by:', caption);
+                                },
+                                'aria-label': __('Open image settings', 'all-sources-images')
+                            },
+                                wp.element.createElement('svg', {
+                                    width: '16',
+                                    height: '16',
+                                    viewBox: '0 0 16 16',
+                                    fill: 'currentColor'
+                                },
+                                    wp.element.createElement('path', { 
+                                        d: 'M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z'
+                                    }),
+                                    wp.element.createElement('path', {
+                                        d: 'M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z'
+                                    })
+                                )
+                            )
+                        )
+                    )
+                );
+            }
+
             // Render image grid
             function renderImageGrid(images, config, bankName) {
                 const licensing = asiAjax.licensing_data || '0';
                 const displayImages = (licensing !== '1') ? images.slice(0, 6) : images;
 
-                return wp.element.createElement('ul', { 
-                    className: 'media-grid',
-                    style: { 
-                        listStyle: 'none',
-                        padding: 0,
-                        margin: 0,
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                        gap: '15px'
-                    }
+                return wp.element.createElement('ul', {
+                    className: 'media-grid asi-media-grid',
+                    role: 'list',
+                    'data-bank': bankName
                 },
                     displayImages.map((image, idx) => {
-                        // Direct access - backend normalized the structure
-                        const thumbUrl = image.thumb || image.url;
-                        const largeUrl = image.url;
-                        const altText = image.alt || image.title || 'Image';
-                        const caption = image.caption || '';
-
-                        return wp.element.createElement('li', {
+                        return wp.element.createElement(ImageGridItem, {
                             key: idx,
-                            className: 'attachment mpt-attachment',
-                            style: { 
-                                position: 'relative',
-                                overflow: 'hidden',
-                                borderRadius: '4px',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                transition: 'transform 0.2s',
-                                cursor: 'pointer',
-                                backgroundColor: '#f0f0f0'
-                            },
-                            onMouseEnter: (e) => e.currentTarget.style.transform = 'scale(1.05)',
-                            onMouseLeave: (e) => e.currentTarget.style.transform = 'scale(1)',
-                            onClick: () => downloadAndUseImage(largeUrl, altText, caption, bankName)
-                        },
-                            wp.element.createElement('div', { 
-                                className: 'thumbnail',
-                                style: {
-                                    width: '100%',
-                                    paddingBottom: '100%', // Square aspect ratio
-                                    position: 'relative'
-                                }
-                            },
-                                wp.element.createElement('img', {
-                                    src: thumbUrl,
-                                    alt: altText,
-                                    style: { 
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'cover'
-                                    }
-                                })
-                            ),
-                            // Button overlay
-                            wp.element.createElement('div', {
-                                className: 'img-result',
-                                style: {
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                    color: 'white',
-                                    padding: '8px',
-                                    textAlign: 'center',
-                                    fontSize: '12px',
-                                    fontWeight: 'bold',
-                                    opacity: 0,
-                                    transition: 'opacity 0.2s'
-                                },
-                                onMouseEnter: (e) => e.currentTarget.style.opacity = '1',
-                                onMouseLeave: (e) => e.currentTarget.style.opacity = '0'
-                            }, __('Use this image', 'all-sources-images'))
-                        );
+                            image: image,
+                            bankName: bankName,
+                            onImageClick: downloadAndUseImage,
+                            onImageLoad: requestMasonryLayout
+                        });
                     })
                 );
             }
@@ -319,17 +404,17 @@
                         if (response.success) {
                             // Insert image block
                             const newBlock = wp.blocks.createBlock('core/image', {
+                                id: response.data.id_media,
                                 url: response.data.url_media,
                                 alt: response.data.alt_image,
                                 caption: response.data.caption_image
                             });
 
                             const selectedBlockClientId = wp.data.select('core/block-editor').getSelectedBlockClientId();
-                            const blocks = wp.data.select('core/block-editor').getBlocks();
-                            const indexBlock = blocks.findIndex(block => block.clientId === selectedBlockClientId) + 1;
-
-                            wp.data.dispatch('core/block-editor').insertBlock(newBlock, indexBlock);
-                            wp.data.dispatch('core/block-editor').removeBlock(selectedBlockClientId);
+                            
+                            // Replace the ASI block with the new image block and select it
+                            wp.data.dispatch('core/block-editor').replaceBlock(selectedBlockClientId, newBlock);
+                            wp.data.dispatch('core/block-editor').selectBlock(newBlock.clientId);
 
                             setIsModalOpen(false);
                         } else {

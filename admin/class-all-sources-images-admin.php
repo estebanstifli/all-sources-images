@@ -1753,10 +1753,22 @@ class All_Sources_Images_Admin {
         }
 
         $asset_file = (include plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/index.asset.php');
+
+        wp_register_script(
+            'asi-minimasonry',
+            plugins_url( 'blocks/asi-images/build/minimasonry.min.js', __FILE__ ),
+            array(),
+            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/minimasonry.min.js' ),
+            true
+        );
+
+        $script_dependencies = $asset_file['dependencies'];
+        $script_dependencies[] = 'asi-minimasonry';
+
         wp_register_script(
             'asi-images-script',
             plugins_url( 'blocks/asi-images/build/index.js', __FILE__ ),
-            $asset_file['dependencies'],
+            $script_dependencies,
             $asset_file['version']
         );
         register_block_type( 'asi/asi-images', array(
@@ -1798,9 +1810,9 @@ class All_Sources_Images_Admin {
     public function ASI_enqueue_style_block() {
         wp_enqueue_style(
             'asi-images-editor-style',
-            plugins_url( 'blocks/asi-images/build/asi-images.css', __FILE__ ),
+            plugins_url( 'blocks/asi-images/build/asi-images-editor.css', __FILE__ ),
             array(),
-            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/asi-images.css' )
+            filemtime( plugin_dir_path( __FILE__ ) . 'blocks/asi-images/build/asi-images-editor.css' )
         );
     }
 
