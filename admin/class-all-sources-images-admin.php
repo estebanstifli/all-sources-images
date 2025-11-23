@@ -2076,12 +2076,12 @@ class All_Sources_Images_Admin {
      * @since    5.0.0
      */
     public function ASI_block_searching_images() {
-        // Log FIRST - before any checks
-        error_log('[All Sources Images] ASI_block_searching_images CALLED');
-        error_log('[All Sources Images] GET params: ' . print_r($_GET, true));
-        
-        // Check the nonce - TEMPORARILY DISABLED FOR DEBUGGING
-        // check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
+        if ( defined( 'ASI_DEBUG' ) && ASI_DEBUG ) {
+            error_log( '[All Sources Images] ASI_block_searching_images CALLED' );
+            error_log( '[All Sources Images] GET params: ' . print_r( wp_unslash( $_GET ), true ) );
+        }
+
+        check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
         
         if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
             error_log('[All Sources Images] Missing required parameters');
