@@ -336,31 +336,194 @@ class All_Sources_Images_Admin {
      * @return   array    Proxy configuration array
      */
     public function ASI_get_proxy_args() {
-        $proxy_options = get_option( 'ASI_plugin_proxy_settings' );
-        
-        // Check if proxy is enabled
-        if ( empty( $proxy_options['enable_proxy'] ) || $proxy_options['enable_proxy'] !== 'enable' ) {
+        $proxy_options = $this->ASI_get_proxy_settings();
+        $mode = $this->ASI_get_effective_proxy_mode( $proxy_options );
+
+        if ( 'legacy' !== $mode ) {
             return array();
         }
-        
-        // Check if address is configured
+
         if ( empty( $proxy_options['proxy_address'] ) ) {
             return array();
         }
-        
-        // Build proxy URL
-        $proxy_port = !empty( $proxy_options['proxy_port'] ) ? $proxy_options['proxy_port'] : '80';
-        $proxy_url = $proxy_options['proxy_address'] . ':' . $proxy_port;
-        
-        // Add authentication if configured
-        if ( !empty( $proxy_options['proxy_username'] ) && !empty( $proxy_options['proxy_password'] ) ) {
+
+        $proxy_host = preg_replace( '#^https?://#i', '', trim( $proxy_options['proxy_address'] ) );
+        $proxy_port = ! empty( $proxy_options['proxy_port'] ) ? $proxy_options['proxy_port'] : '80';
+        $proxy_url  = $proxy_host . ':' . $proxy_port;
+
+        if ( ! empty( $proxy_options['proxy_username'] ) && ! empty( $proxy_options['proxy_password'] ) ) {
             $proxy_url = $proxy_options['proxy_username'] . ':' . $proxy_options['proxy_password'] . '@' . $proxy_url;
         }
-        
-        // Return proxy configuration for wp_remote_* functions
+
         return array(
             'proxy' => 'https://' . $proxy_url,
         );
+    }
+
+    private function ASI_get_proxy_settings() {
+        static $cache = null;
+        if ( null === $cache ) {
+            $cache = wp_parse_args( get_option( 'ASI_plugin_proxy_settings' ), $this->ASI_default_options_proxy_settings( false ) );
+        }
+        return $cache;
+    }
+
+    private function ASI_get_effective_proxy_mode( $options = null ) {
+        if ( null === $options ) {
+            $options = $this->ASI_get_proxy_settings();
+        }
+
+        if ( empty( $options['enable_proxy'] ) || 'enable' !== $options['enable_proxy'] ) {
+            return 'disabled';
+        }
+
+        $mode = isset( $options['proxy_mode'] ) ? $options['proxy_mode'] : 'legacy';
+        if ( ! in_array( $mode, array( 'legacy', 'cloudflare' ), true ) ) {
+            $mode = 'legacy';
+        }
+
+        return $mode;
+    }
+
+    public function ASI_current_proxy_mode() {
+        return $this->ASI_get_effective_proxy_mode();
+    }
+
+    private function ASI_get_cloudflare_bootstrap( $options = null ) {
+        if ( null === $options ) {
+            $options = $this->ASI_get_proxy_settings();
+        }
+
+        $worker_url = isset( $options['cloudflare_worker_url'] ) ? trim( $options['cloudflare_worker_url'] ) : '';
+        $token      = isset( $options['cloudflare_token'] ) ? trim( $options['cloudflare_token'] ) : '';
+
+        if ( empty( $worker_url ) ) {
+            return new WP_Error( 'asi_proxy_missing_worker', __( 'Cloudflare worker URL is not configured.', 'all-sources-images' ) );
+        }
+
+        if ( empty( $token ) ) {
+            return new WP_Error( 'asi_proxy_missing_token', __( 'Cloudflare worker token is not configured.', 'all-sources-images' ) );
+        }
+
+        return array(
+            'worker_url' => $worker_url,
+            'token'      => $token,
+        );
+    }
+
+    private function ASI_get_cloudflare_service_map() {
+        return array(
+            'pixabay'        => array( 'key_location' => 'query',  'key_name' => 'key' ),
+            'pexels'         => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+            'unsplash'       => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+            'giphy'          => array( 'key_location' => 'query',  'key_name' => 'api_key' ),
+            'flickr'         => array( 'key_location' => 'query',  'key_name' => 'api_key' ),
+            'openverse'      => array( 'key_location' => 'none' ),
+            'cc_search'      => array( 'key_location' => 'none' ),
+            'youtube'        => array( 'key_location' => 'query',  'key_name' => 'key' ),
+            'google_scraping'=> array( 'key_location' => 'none' ),
+            'google_image'   => array( 'key_location' => 'query',  'key_name' => 'key' ),
+            'pixabay_video'  => array( 'key_location' => 'query',  'key_name' => 'key' ),
+            'dallev1'        => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+            'stability'      => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+            'replicate'      => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+            'gemini'         => array( 'key_location' => 'query',  'key_name' => 'key' ),
+            'workers_ai'     => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+            'google_translate'=> array( 'key_location' => 'query', 'key_name' => 'key' ),
+            'cloudflare_ai'  => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
+        );
+    }
+
+    private function ASI_strip_credentials_from_request( $service, &$url, array &$args ) {
+        $map = $this->ASI_get_cloudflare_service_map();
+        if ( empty( $map[ $service ] ) ) {
+            return;
+        }
+
+        $config = $map[ $service ];
+        if ( 'header' === $config['key_location'] && ! empty( $config['key_name'] ) ) {
+            if ( isset( $args['headers'][ $config['key_name'] ] ) ) {
+                unset( $args['headers'][ $config['key_name'] ] );
+            }
+        }
+
+        if ( 'query' === $config['key_location'] && ! empty( $config['key_name'] ) ) {
+            $url = remove_query_arg( $config['key_name'], $url );
+        }
+    }
+
+    private function ASI_merge_http_args( array $base, array $extra ) {
+        if ( empty( $extra ) ) {
+            return $base;
+        }
+
+        if ( isset( $extra['headers'] ) ) {
+            if ( isset( $base['headers'] ) && is_array( $base['headers'] ) ) {
+                $base['headers'] = array_merge( $base['headers'], $extra['headers'] );
+            } else {
+                $base['headers'] = $extra['headers'];
+            }
+            unset( $extra['headers'] );
+        }
+
+        return array_merge( $base, $extra );
+    }
+
+    private function ASI_prepare_http_args( array $args ) {
+        if ( empty( $args['method'] ) ) {
+            $args['method'] = 'GET';
+        }
+        $args['method'] = strtoupper( $args['method'] );
+        return $args;
+    }
+
+    private function ASI_remote_request_via_cloudflare( $service, $url, array $args, array $options ) {
+        $bootstrap = $this->ASI_get_cloudflare_bootstrap( $options );
+        if ( is_wp_error( $bootstrap ) ) {
+            return $bootstrap;
+        }
+
+        $this->ASI_strip_credentials_from_request( $service, $url, $args );
+
+        $worker_url = untrailingslashit( $bootstrap['worker_url'] );
+        $final_url  = add_query_arg( array(
+            'servicio' => $service,
+            'token'    => $bootstrap['token'],
+            'url'      => $url,
+        ), $worker_url );
+
+        unset( $args['proxy'] );
+
+        return wp_remote_request( $final_url, $args );
+    }
+
+    public function ASI_remote_request( $service, $url, array $args = array() ) {
+        $args = $this->ASI_prepare_http_args( $args );
+        $options = $this->ASI_get_proxy_settings();
+        $mode = $this->ASI_get_effective_proxy_mode( $options );
+
+        if ( 'cloudflare' === $mode && ! empty( $service ) ) {
+            $map = $this->ASI_get_cloudflare_service_map();
+            if ( isset( $map[ $service ] ) ) {
+                $response = $this->ASI_remote_request_via_cloudflare( $service, $url, $args, $options );
+                return $response;
+            }
+        }
+
+        $proxy_args = $this->ASI_get_proxy_args();
+        $args = $this->ASI_merge_http_args( $args, $proxy_args );
+
+        return wp_remote_request( $url, $args );
+    }
+
+    public function ASI_remote_get( $service, $url, array $args = array() ) {
+        $args['method'] = 'GET';
+        return $this->ASI_remote_request( $service, $url, $args );
+    }
+
+    public function ASI_remote_post( $service, $url, array $args = array() ) {
+        $args['method'] = 'POST';
+        return $this->ASI_remote_request( $service, $url, $args );
     }
 
     /**
@@ -1253,10 +1416,13 @@ class All_Sources_Images_Admin {
     public function ASI_default_options_proxy_settings( $never_set = FALSE ) {
         $default_options = array(
             'enable_proxy'    => 'disable',
+            'proxy_mode'      => 'legacy',
             'proxy_address'   => '',
             'proxy_port'      => '80',
             'proxy_username'  => '',
             'proxy_password'  => '',
+            'cloudflare_worker_url' => '',
+            'cloudflare_token'      => '',
         );
         return $default_options;
     }
@@ -1493,8 +1659,7 @@ class All_Sources_Images_Admin {
         $response = '';
         if ( 'pixabay' === $apiBank ) {
             $apiUrl = "https://pixabay.com/api/?key=" . $apiKey . "&q=exemple";
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, $proxy_args );
+            $response = $this->ASI_remote_get( 'pixabay', $apiUrl );
         } elseif ( 'google_image' === $apiBank ) {
             if ( ! class_exists( 'ASI_Source_Google_Image' ) ) {
                 wp_send_json_error( __( 'Google Image source is unavailable.', 'all-sources-images' ) );
@@ -1598,8 +1763,7 @@ class All_Sources_Images_Admin {
             wp_send_json_error( __( 'No results found or there was an error.', 'all-sources-images' ) );
         } elseif ( 'unsplash' === $apiBank ) {
             $apiUrl = "https://api.unsplash.com/search/photos?query=test&client_id={$apiKey}";
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, $proxy_args );
+            $response = $this->ASI_remote_get( 'unsplash', $apiUrl );
         } elseif ( 'giphy' === $apiBank ) {
             if ( empty( $apiKey ) ) {
                 wp_send_json_error( __( 'API key is required.', 'all-sources-images' ) );
@@ -1612,8 +1776,7 @@ class All_Sources_Images_Admin {
                 'lang'    => 'en',
             );
             $apiUrl = add_query_arg( $query_args, 'https://api.giphy.com/v1/gifs/search' );
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, $proxy_args );
+            $response = $this->ASI_remote_get( 'giphy', $apiUrl );
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( __( 'Error connecting to the API.', 'all-sources-images' ) );
             }
@@ -1628,18 +1791,16 @@ class All_Sources_Images_Admin {
             return;
         } elseif ( 'pexels' === $apiBank ) {
             $apiUrl = "https://api.pexels.com/v1/search?query=nature&per_page=1";
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, array_merge( array(
+            $response = $this->ASI_remote_get( 'pexels', $apiUrl, array(
                 'headers' => array(
                     'Authorization' => $apiKey,
                 ),
-            ), $proxy_args ) );
+            ) );
         } elseif ( 'stability' === $apiBank ) {
             if ( empty( $apiKey ) ) {
                 wp_send_json_error( __( 'API key is required.', 'all-sources-images' ) );
             }
 
-            $proxy_args    = $this->ASI_get_proxy_args();
             $request_args  = array(
                 'headers' => array(
                     'Authorization' => 'Bearer ' . $apiKey,
@@ -1647,7 +1808,7 @@ class All_Sources_Images_Admin {
                 ),
                 'timeout' => 20,
             );
-            $response      = wp_remote_get( 'https://api.stability.ai/v1/user/account', array_merge( $request_args, $proxy_args ) );
+            $response      = $this->ASI_remote_get( 'stability', 'https://api.stability.ai/v1/user/account', $request_args );
 
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( __( 'Error connecting to Stability AI.', 'all-sources-images' ) );
@@ -1666,14 +1827,13 @@ class All_Sources_Images_Admin {
         } elseif ( 'replicate' === $apiBank ) {
             // test Replicate API key by listing models
             $apiUrl = 'https://api.replicate.com/v1/models';
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, array_merge( [
-                'headers' => [
+            $response = $this->ASI_remote_get( 'replicate', $apiUrl, array(
+                'headers' => array(
                     'Authorization' => 'Token ' . $apiKey,
                     'Content-Type'  => 'application/json',
-                ],
+                ),
                 'timeout' => 10,
-            ], $proxy_args ) );
+            ) );
             // Handle HTTP error
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( 'Error connecting to Replicate API.' );
@@ -1695,10 +1855,9 @@ class All_Sources_Images_Admin {
                 'key'      => $apiKey,
                 'pageSize' => 1,
             ), 'https://generativelanguage.googleapis.com/v1beta/models' );
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, array_merge( array(
+            $response = $this->ASI_remote_get( 'gemini', $apiUrl, array(
                 'timeout' => 15,
-            ), $proxy_args ) );
+            ) );
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( 'Error connecting to Gemini API.' );
             }
@@ -1726,8 +1885,7 @@ class All_Sources_Images_Admin {
                 ),
                 'timeout' => 15,
             );
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_get( $apiUrl, array_merge( $request_args, $proxy_args ) );
+            $response = $this->ASI_remote_get( 'workers_ai', $apiUrl, $request_args );
             if ( is_wp_error( $response ) ) {
                 wp_send_json_error( __( 'Error connecting to Cloudflare Workers AI.', 'all-sources-images' ) );
             }

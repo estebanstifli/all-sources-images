@@ -41,7 +41,7 @@ class ASI_Source_Openverse extends ASI_Image_Source {
             'sslverify'          => false,
         ), $proxy_args );
 
-        $response = wp_remote_request( $request_url, $request_args );
+        $response = $this->request_with_proxy( $this->get_slug(), $request_url, $request_args, $context );
 
         if ( $log ) {
             $log->info( 'Openverse request', array(

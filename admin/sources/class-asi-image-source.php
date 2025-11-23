@@ -44,4 +44,22 @@ abstract class ASI_Image_Source {
             ),
         );
     }
+
+    protected function request_with_proxy( $service, $url, array $request_args, array $context, $method = 'GET' ) {
+        $request_args['method'] = strtoupper( $method );
+
+        if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_remote_request' ) ) {
+            return $context['generation']->ASI_remote_request( $service, $url, $request_args );
+        }
+
+        $proxy_args = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
+        return wp_remote_request( $url, array_merge( $request_args, $proxy_args ) );
+    }
+
+        protected function is_cloudflare_proxy_enabled( array $context ) {
+            if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_current_proxy_mode' ) ) {
+                return 'cloudflare' === $context['generation']->ASI_current_proxy_mode();
+            }
+            return false;
+        }
 }

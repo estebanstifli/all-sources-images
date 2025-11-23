@@ -23,8 +23,9 @@ class ASI_Source_Replicate extends ASI_Image_Source {
         $log            = isset( $context['log'] ) ? $context['log'] : null;
         $translator     = $this->get_translator_callable( $context );
         $source_label   = __( 'Replicate', 'all-sources-images' );
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( '' === $api_token ) {
+        if ( '' === $api_token && ! $using_cloudflare ) {
             return new WP_Error( 'asi_replicate_missing_token', __( 'Replicate API token is missing.', 'all-sources-images' ) );
         }
 
@@ -39,7 +40,7 @@ class ASI_Source_Replicate extends ASI_Image_Source {
         $timeout          = max( 30, min( 300, $timeout ) );
         $polling_interval = max( 1, min( 10, $polling_interval ) );
 
-        $version_id = $this->resolve_version_id( $model, $version_setting, $api_token, $proxy_args );
+        $version_id = $this->resolve_version_id( $model, $version_setting, $api_token, $proxy_args, $context );
         if ( is_wp_error( $version_id ) ) {
             return $version_id;
         }
@@ -58,16 +59,20 @@ class ASI_Source_Replicate extends ASI_Image_Source {
             $request_body['webhook'] = esc_url_raw( $bank_options['webhook_url'] );
         }
 
+        $headers = array(
+            'Content-Type' => 'application/json',
+        );
+        if ( ! empty( $api_token ) ) {
+            $headers['Authorization'] = 'Token ' . $api_token;
+        }
+
         $request_args = $this->merge_proxy_args( array(
             'timeout' => $timeout,
-            'headers' => array(
-                'Authorization' => 'Token ' . $api_token,
-                'Content-Type'  => 'application/json',
-            ),
+            'headers' => $headers,
             'body'    => wp_json_encode( $request_body ),
         ), $proxy_args );
 
-        $response = wp_remote_post( self::API_ENDPOINT, $request_args );
+        $response = $this->request_with_proxy( 'replicate', self::API_ENDPOINT, $request_args, $context, 'POST' );
 
         if ( $log ) {
             $log->info( 'Replicate prediction created', array(
@@ -88,7 +93,7 @@ class ASI_Source_Replicate extends ASI_Image_Source {
             return new WP_Error( 'asi_replicate_http_error', $message, array( 'status' => $status_code ) );
         }
 
-        $prediction = $this->poll_prediction( $payload, $api_token, $proxy_args, $timeout, $polling_interval, $log );
+        $prediction = $this->poll_prediction( $payload, $api_token, $proxy_args, $timeout, $polling_interval, $log, $context );
         if ( is_wp_error( $prediction ) ) {
             return $prediction;
         }
@@ -168,7 +173,7 @@ class ASI_Source_Replicate extends ASI_Image_Source {
         return $payload;
     }
 
-    private function resolve_version_id( $model, $version_setting, $api_token, array $proxy_args ) {
+    private function resolve_version_id( $model, $version_setting, $api_token, array $proxy_args, array $context ) {
         $version_setting = trim( $version_setting );
         if ( '' !== $version_setting && 0 !== strcasecmp( $version_setting, 'latest' ) ) {
             return $version_setting;
@@ -190,15 +195,19 @@ class ASI_Source_Replicate extends ASI_Image_Source {
         }
 
         $endpoint = sprintf( 'https://api.replicate.com/v1/models/%s/%s', rawurlencode( $owner ), rawurlencode( $slug ) );
+        $headers = array(
+            'Content-Type' => 'application/json',
+        );
+        if ( ! empty( $api_token ) ) {
+            $headers['Authorization'] = 'Token ' . $api_token;
+        }
+
         $request_args = $this->merge_proxy_args( array(
             'timeout' => 20,
-            'headers' => array(
-                'Authorization' => 'Token ' . $api_token,
-                'Content-Type'  => 'application/json',
-            ),
+            'headers' => $headers,
         ), $proxy_args );
 
-        $response = wp_remote_get( $endpoint, $request_args );
+        $response = $this->request_with_proxy( 'replicate', $endpoint, $request_args, $context );
         if ( is_wp_error( $response ) ) {
             return $response;
         }
@@ -214,7 +223,7 @@ class ASI_Source_Replicate extends ASI_Image_Source {
         return $payload['latest_version']['id'];
     }
 
-    private function poll_prediction( array $prediction, $api_token, array $proxy_args, $timeout, $interval, $log ) {
+    private function poll_prediction( array $prediction, $api_token, array $proxy_args, $timeout, $interval, $log, array $context ) {
         if ( empty( $prediction['urls']['get'] ) ) {
             return new WP_Error( 'asi_replicate_missing_poll_url', __( 'Replicate prediction is missing the polling URL.', 'all-sources-images' ) );
         }
@@ -225,15 +234,19 @@ class ASI_Source_Replicate extends ASI_Image_Source {
 
         while ( time() < $deadline && in_array( $status, array( 'starting', 'processing', 'queued' ), true ) ) {
             sleep( $interval );
+            $headers = array(
+                'Content-Type' => 'application/json',
+            );
+            if ( ! empty( $api_token ) ) {
+                $headers['Authorization'] = 'Token ' . $api_token;
+            }
+
             $request_args = $this->merge_proxy_args( array(
                 'timeout' => 20,
-                'headers' => array(
-                    'Authorization' => 'Token ' . $api_token,
-                    'Content-Type'  => 'application/json',
-                ),
+                'headers' => $headers,
             ), $proxy_args );
 
-            $response = wp_remote_get( $prediction['urls']['get'], $request_args );
+            $response = $this->request_with_proxy( 'replicate', $prediction['urls']['get'], $request_args, $context );
             if ( is_wp_error( $response ) ) {
                 return $response;
             }

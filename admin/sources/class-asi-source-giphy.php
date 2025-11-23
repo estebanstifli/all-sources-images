@@ -18,8 +18,9 @@ class ASI_Source_Giphy extends ASI_Image_Source {
         $search_term    = $this->resolve_search_term( $context );
         $log            = isset( $context['log'] ) ? $context['log'] : null;
         $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) ) {
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_giphy_missing_key', __( 'GIPHY API key is missing.', 'all-sources-images' ) );
         }
 
@@ -39,7 +40,7 @@ class ASI_Source_Giphy extends ASI_Image_Source {
             'sslverify'          => false,
         ), $proxy_args );
 
-        $response = wp_remote_request( $request_url, $request_args );
+        $response = $this->request_with_proxy( 'giphy', $request_url, $request_args, $context );
 
         if ( $log ) {
             $log->info( 'GIPHY request', array(

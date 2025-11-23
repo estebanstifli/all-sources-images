@@ -714,8 +714,8 @@ jQuery(document).ready(function() {
     hideAPIKey("#password-replicate");
     hideAPIKey("#password-youtube");
     hideAPIKey("#password-pexels");
-    // hideAPIKey("#password-envato"); // DISABLED - Envato Elements no longer working
     hideAPIKey("#password-openai");
+    hideAPIKey("#password-giphy");
 
 
 

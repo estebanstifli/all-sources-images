@@ -20,11 +20,12 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
         $prompt          = isset( $context['search'] ) ? $context['search'] : '';
         $log             = isset( $context['log'] ) ? $context['log'] : null;
         $proxy_args      = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
         if ( empty( $account_id ) ) {
             return new WP_Error( 'asi_workers_ai_missing_account', __( 'Cloudflare Account ID is missing.', 'all-sources-images' ) );
         }
-        if ( empty( $api_token ) ) {
+        if ( empty( $api_token ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_workers_ai_missing_token', __( 'Cloudflare API token is missing.', 'all-sources-images' ) );
         }
         if ( empty( $prompt ) ) {
@@ -51,11 +52,15 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
             $payload['negative_prompt'] = $negative_prompt;
         }
 
+        $headers = array(
+            'Content-Type' => 'application/json',
+        );
+        if ( ! empty( $api_token ) ) {
+            $headers['Authorization'] = 'Bearer ' . $api_token;
+        }
+
         $request_args = array(
-            'headers' => array(
-                'Authorization' => 'Bearer ' . $api_token,
-                'Content-Type'  => 'application/json',
-            ),
+            'headers' => $headers,
             'body'    => wp_json_encode( $payload ),
             'timeout' => 120,
         );
@@ -72,7 +77,7 @@ class ASI_Source_Workers_AI extends ASI_Image_Source {
         }
 
         $endpoint = sprintf( 'https://api.cloudflare.com/client/v4/accounts/%s/ai/run/%s', rawurlencode( $account_id ), ltrim( $model_slug, '/' ) );
-        $response = wp_remote_post( $endpoint, $request_args );
+        $response = $this->request_with_proxy( 'workers_ai', $endpoint, $request_args, $context, 'POST' );
 
         if ( $log ) {
             $log->info( 'Workers AI request', array(

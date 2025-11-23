@@ -18,8 +18,9 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $search_term    = $this->resolve_search_term( $context );
         $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) ) {
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_pexels_missing_key', __( 'Pexels API key is missing.', 'all-sources-images' ) );
         }
 
@@ -30,10 +31,13 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         $endpoint    = 'https://api.pexels.com/v1/search';
         $query_args  = $this->build_query_args( $search_term, $bank_options, $page );
         $request_url = add_query_arg( $query_args, $endpoint );
+        $headers = array();
+        if ( ! empty( $api_key ) ) {
+            $headers['Authorization'] = $api_key;
+        }
+
         $request_args = $this->merge_proxy_args( array(
-            'headers' => array(
-                'Authorization' => $api_key,
-            ),
+            'headers' => $headers,
             'timeout'             => 30,
             'method'              => 'GET',
             'redirection'         => 9,
@@ -42,7 +46,7 @@ class ASI_Source_Pexels extends ASI_Image_Source {
             'sslverify'           => false,
         ), $proxy_args );
 
-        $response = wp_remote_request( $request_url, $request_args );
+        $response = $this->request_with_proxy( 'pexels', $request_url, $request_args, $context );
 
         if ( $log ) {
             $log->info( 'Pexels request', array(

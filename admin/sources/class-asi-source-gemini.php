@@ -18,6 +18,7 @@ class ASI_Source_Gemini extends ASI_Image_Source {
         $imageSize = ! empty( $options['image_size'] ) ? strtoupper( $options['image_size'] ) : '';
         $prompt    = isset( $context['search'] ) ? $context['search'] : '';
         $log       = isset( $context['log'] ) ? $context['log'] : null;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
         $allowed_models = $this->get_supported_model_slugs();
         if ( ! in_array( $model, $allowed_models, true ) ) {
@@ -27,7 +28,7 @@ class ASI_Source_Gemini extends ASI_Image_Source {
             $model = 'gemini-2.5-flash-image';
         }
 
-        if ( empty( $api_key ) ) {
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_gemini_missing_key', __( 'Gemini API key is missing.', 'all-sources-images' ) );
         }
 
@@ -58,11 +59,15 @@ class ASI_Source_Gemini extends ASI_Image_Source {
             }
         }
 
+        $headers = array(
+            'Content-Type' => 'application/json',
+        );
+        if ( ! empty( $api_key ) ) {
+            $headers['x-goog-api-key'] = $api_key;
+        }
+
         $request_args = array(
-            'headers' => array(
-                'Content-Type'   => 'application/json',
-                'x-goog-api-key' => $api_key,
-            ),
+            'headers' => $headers,
             'body'    => wp_json_encode( $payload ),
             'timeout' => 120,
         );
@@ -80,7 +85,7 @@ class ASI_Source_Gemini extends ASI_Image_Source {
         }
 
         $endpoint = sprintf( 'https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent', $model );
-        $response = wp_remote_post( $endpoint, $request_args );
+        $response = $this->request_with_proxy( 'gemini', $endpoint, $request_args, $context, 'POST' );
 
         if ( $log ) {
             $log->info( 'Gemini request', array(

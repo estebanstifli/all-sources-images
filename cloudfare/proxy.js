@@ -2,71 +2,39 @@
 // Este Worker maneja la autenticación y reenvío de solicitudes
 // basándose en el parámetro 'servicio'.
 
-// ⚠️ Define tu token de autenticación para el plugin (puedes moverlo a un Secret si es necesario)
-const AUTH_TOKEN_SECRETO = "MI_TOKEN_SECRETO_PARA_PLUGINS"; 
-
 // =======================================================================
 // === CONFIGURACIÓN DE SERVICIOS Y AUTENTICACIÓN ===
 // Define dónde debe inyectarse la API Key para cada servicio
-// 'key_location': 'query' (URL) o 'header' (Authorization)
-// 'key_name_in_api': Nombre del parámetro en la URL o la cabecera
-// 'env_key_name': Nombre del Secret configurado en el panel de Cloudflare
+// 'key_location': 'query' (URL), 'header' o 'none'
+// 'key_name_in_api': Nombre del parámetro/cabecera
+// 'auth_prefix': Prefijo opcional (p.ej. "Bearer ")
+// 'env_key_name': Nombre del Secret configurado en Cloudflare
 // =======================================================================
 const SERVICE_CONFIGS = {
-    // Bancos de Imágenes / APIs conocidas
-    "Pixabay": { 
-        key_location: 'query', 
-        key_name_in_api: 'key', 
-        env_key_name: 'PIXABAY_API_KEY' 
-    },
-    "Pexels": { 
-        key_location: 'header', 
-        key_name_in_api: 'Authorization', 
-        auth_prefix: '', // Pexels usa la clave directamente como encabezado
-        env_key_name: 'PEXELS_API_KEY' 
-    },
-    "Unsplash": { 
-        key_location: 'header', 
-        key_name_in_api: 'Authorization', 
-        auth_prefix: 'Client-ID ', 
-        env_key_name: 'UNSPLASH_API_KEY' 
-    },
-    "GIPHY": { 
-        key_location: 'query', 
-        key_name_in_api: 'api_key', 
-        env_key_name: 'GIPHY_API_KEY' 
-    },
-    "Flickr": { 
-        key_location: 'query', 
-        key_name_in_api: 'api_key', 
-        env_key_name: 'FLICKR_API_KEY' 
-    },
+    // Bancos clásicos
+    pixabay:      { key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'PIXABAY_API_KEY' },
+    pexels:       { key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: '',            env_key_name: 'PEXELS_API_KEY' },
+    unsplash:     { key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: 'Client-ID ',  env_key_name: 'UNSPLASH_API_KEY' },
+    giphy:        { key_location: 'query',  key_name_in_api: 'api_key',    env_key_name: 'GIPHY_API_KEY' },
+    flickr:       { key_location: 'query',  key_name_in_api: 'api_key',    env_key_name: 'FLICKR_API_KEY' },
+    openverse:    { key_location: 'none' },
+    cc_search:    { key_location: 'none' },
+    youtube:      { key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'YOUTUBE_API_KEY' },
+    google_scraping: { key_location: 'none' },
+    google_image: { key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'GOOGLE_IMAGE_API_KEY' },
+    pixabay_video:{ key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'PIXABAY_API_KEY' },
 
-    // Servicios de IA / Google
-    "Gemini": { 
-        key_location: 'query', 
-        key_name_in_api: 'key', 
-        env_key_name: 'GEMINI_API_KEY' 
-    },
-    "ReplicateAI": {
-        key_location: 'header',
-        key_name_in_api: 'Authorization',
-        auth_prefix: 'Token ',
-        env_key_name: 'REPLICATE_API_KEY'
-    },
-    
-    // Servicios que no requieren API Key (ej. scraping o APIs públicas)
-    "Openverse": { 
-        key_location: 'none' 
-    },
-    "Youtube": { 
-        key_location: 'none' 
-    },
-    // Nota: Para Google Image (API), Stable Diffusion, DALL·E, Cloudflare Workers AI,
-    // debes añadir sus configuraciones específicas (header o query) aquí.
-
+    // IA / modelos
+    dallev1:      { key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: 'Bearer ',     env_key_name: 'DALLE_API_KEY' },
+    stability:    { key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: 'Bearer ',     env_key_name: 'STABILITY_API_KEY' },
+    replicate:    { key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: 'Token ',      env_key_name: 'REPLICATE_API_KEY' },
+    gemini:       { key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'GEMINI_API_KEY' },
+    workers_ai:   { key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: 'Bearer ',     env_key_name: 'WORKERS_AI_API_TOKEN' },
+    google_translate: { key_location: 'query', key_name_in_api: 'key',     env_key_name: 'GOOGLE_TRANSLATE_API_KEY' },
+    cloudflare_ai:{ key_location: 'header', key_name_in_api: 'Authorization', auth_prefix: 'Bearer ',     env_key_name: 'WORKERS_AI_API_TOKEN' },
 };
 
+const DEFAULT_ALLOWED_HEADERS = 'Content-Type, Token, X-Requested-With';
 
 export default {
     async fetch(request, env) {
@@ -82,7 +50,7 @@ export default {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Token', // Permitir cabecera 'Token'
+                    'Access-Control-Allow-Headers': DEFAULT_ALLOWED_HEADERS,
                 }
             });
         }
@@ -93,19 +61,24 @@ export default {
         
         // Se puede enviar en la URL o en la cabecera X-Auth-Token
         const incomingToken = url.searchParams.get('token') || request.headers.get('Token'); 
-        const serviceName = url.searchParams.get('servicio');
+        const rawService = url.searchParams.get('servicio');
         const destinationUrl = url.searchParams.get('url');
         
         // 2. Validación de Parámetros Fijos
         
-        if (incomingToken !== AUTH_TOKEN_SECRETO) {
+        if (!env.PLUGIN_AUTH_TOKEN) {
+            return new Response('Token del plugin no configurado en Cloudflare.', { status: 500 });
+        }
+
+        if (incomingToken !== env.PLUGIN_AUTH_TOKEN) {
             return new Response('Token de autenticación inválido.', { status: 403 });
         }
-        
-        if (!serviceName || !destinationUrl) {
+
+        if (!rawService || !destinationUrl) {
             return new Response('Parámetros "servicio" o "url" faltantes.', { status: 400 });
         }
 
+        const serviceName = rawService.toLowerCase();
         const config = SERVICE_CONFIGS[serviceName];
         if (!config) {
             return new Response(`Servicio "${serviceName}" no reconocido.`, { status: 404 });
@@ -118,13 +91,17 @@ export default {
         
         // Eliminar cabeceras de autenticación propias (si se enviaron en las cabeceras)
         headers.delete('Token'); 
+        headers.delete('token');
+        headers.delete('host');
+        headers.delete('content-length');
+        headers.delete('accept-encoding');
 
         // 4. INYECCIÓN DINÁMICA DE LA API KEY (Autenticación)
         const apiKey = config.env_key_name ? env[config.env_key_name] : null;
 
         if (config.key_location === 'query' && apiKey) {
             // Inyectar la clave en los parámetros de la URL
-            finalUrl.searchParams.append(config.key_name_in_api, apiKey);
+            finalUrl.searchParams.set(config.key_name_in_api, apiKey);
 
         } else if (config.key_location === 'header' && apiKey) {
             // Inyectar la clave en la cabecera HTTP
@@ -139,18 +116,15 @@ export default {
         // 5. Reenvío de la Solicitud (Proxy)
         
         // Crear una nueva solicitud con el método, cuerpo y cabeceras originales
-        const requestOptions = {
+        const requestOptions = new Request(finalUrl.toString(), {
             method: request.method,
-            headers: headers,
-        };
-
-        // Incluir el cuerpo de la solicitud solo para POST o PUT
-        if (request.method === 'POST' || request.method === 'PUT') {
-            requestOptions.body = request.body;
-        }
+            headers,
+            body: (request.method === 'GET' || request.method === 'HEAD') ? undefined : request.body,
+            redirect: 'follow',
+        });
 
         // Reenviar la solicitud a la URL final
-        const response = await fetch(finalUrl.toString(), requestOptions);
+        const response = await fetch(requestOptions);
         
         // 6. Devolver la Respuesta TAL CUAL
         
@@ -159,6 +133,7 @@ export default {
         const responseHeaders = new Headers(response.headers);
         responseHeaders.set('Access-Control-Allow-Origin', '*');
         responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        responseHeaders.set('Access-Control-Allow-Headers', DEFAULT_ALLOWED_HEADERS);
 
         return new Response(response.body, {
             status: response.status,

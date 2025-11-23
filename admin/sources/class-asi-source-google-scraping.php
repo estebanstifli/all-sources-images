@@ -36,7 +36,7 @@ class ASI_Source_Google_Scraping extends ASI_Image_Source {
             ),
         ), $proxy_args );
 
-        $response = wp_remote_request( $request_url, $request_args );
+        $response = $this->request_with_proxy( 'google_scraping', $request_url, $request_args, $context );
 
         if ( $log ) {
             $log->info( 'Google scraping request', array(

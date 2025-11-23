@@ -21,8 +21,9 @@ class ASI_Source_Stability extends ASI_Image_Source {
         $log            = isset( $context['log'] ) ? $context['log'] : null;
         $translator     = $this->get_translator_callable( $context );
         $source_label   = __( 'Stability AI', 'all-sources-images' );
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( '' === $api_key ) {
+        if ( '' === $api_key && ! $using_cloudflare ) {
             return new WP_Error( 'asi_stability_missing_key', __( 'Stability AI API key is missing.', 'all-sources-images' ) );
         }
 
@@ -35,18 +36,22 @@ class ASI_Source_Stability extends ASI_Image_Source {
         $body     = $this->build_multipart_body( $payload, $boundary );
         $mime     = $this->map_mime_type( isset( $payload['output_format'] ) ? $payload['output_format'] : 'jpeg' );
 
+        $headers = array(
+            'Accept'       => 'image/*',
+            'Content-Type' => 'multipart/form-data; boundary=' . $boundary,
+        );
+        if ( ! empty( $api_key ) ) {
+            $headers['Authorization'] = 'Bearer ' . $api_key;
+        }
+
         $request_args = $this->merge_proxy_args( array(
             'timeout' => 60,
             'method'  => 'POST',
-            'headers' => array(
-                'Authorization' => 'Bearer ' . $api_key,
-                'Accept'        => 'image/*',
-                'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
-            ),
+            'headers' => $headers,
             'body'    => $body,
         ), $proxy_args );
 
-        $response = wp_remote_post( self::BASE_ENDPOINT . $endpoint, $request_args );
+        $response = $this->request_with_proxy( 'stability', self::BASE_ENDPOINT . $endpoint, $request_args, $context, 'POST' );
 
         if ( $log ) {
             $log->info( 'Stability request', array(

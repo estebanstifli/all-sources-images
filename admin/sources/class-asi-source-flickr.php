@@ -21,8 +21,9 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
         $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) ) {
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_flickr_missing_key', __( 'Flickr API key is missing.', 'all-sources-images' ) );
         }
 
@@ -31,7 +32,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         }
 
         $query_args   = $this->build_search_query( $bank_options, $api_key, $search_term, $page );
-        $search_data  = $this->perform_rest_request( $query_args, $proxy_args, 'asi_flickr_http_error' );
+        $search_data  = $this->perform_rest_request( $query_args, $proxy_args, 'asi_flickr_http_error', $context );
 
         if ( is_wp_error( $search_data ) ) {
             return $search_data;
@@ -166,7 +167,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
             'photo_id'       => $photo['id'],
             'format'         => 'json',
             'nojsoncallback' => '1',
-        ), $proxy_args, 'asi_flickr_sizes_error' );
+        ), $proxy_args, 'asi_flickr_size_error', $context );
 
         if ( is_wp_error( $sizes ) ) {
             return '';
@@ -205,7 +206,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
             'user_id'        => $photo['owner'],
             'format'         => 'json',
             'nojsoncallback' => '1',
-        ), $proxy_args, 'asi_flickr_author_error' );
+        ), $proxy_args, 'asi_flickr_author_error', $context );
 
         if ( is_wp_error( $person ) ) {
             return '';
@@ -220,7 +221,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         return '';
     }
 
-    private function perform_rest_request( array $params, array $proxy_args, $error_code ) {
+    private function perform_rest_request( array $params, array $proxy_args, $error_code, array $context ) {
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
             'method'             => 'GET',
@@ -231,7 +232,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         ), $proxy_args );
 
         $url      = add_query_arg( $params, self::API_ENDPOINT );
-        $response = wp_remote_request( $url, $request_args );
+        $response = $this->request_with_proxy( $this->get_slug(), $url, $request_args, $context );
 
         if ( is_wp_error( $response ) ) {
             return $response;

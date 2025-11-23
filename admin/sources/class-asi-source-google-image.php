@@ -21,9 +21,14 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
         $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) || empty( $cx_id ) ) {
-            return new WP_Error( 'asi_google_image_missing_key', __( 'Google Custom Search key or CX ID is missing.', 'all-sources-images' ) );
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
+            return new WP_Error( 'asi_google_image_missing_key', __( 'Google Custom Search key is missing.', 'all-sources-images' ) );
+        }
+
+        if ( empty( $cx_id ) ) {
+            return new WP_Error( 'asi_google_image_missing_cx', __( 'Google Custom Search CX ID is missing.', 'all-sources-images' ) );
         }
 
         if ( '' === trim( $search_term ) ) {
@@ -41,7 +46,7 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
         ), $proxy_args );
 
         $request_url = add_query_arg( $query_args, self::API_ENDPOINT );
-        $response    = wp_remote_request( $request_url, $request_args );
+        $response    = $this->request_with_proxy( 'google_image', $request_url, $request_args, $context );
 
         if ( $log ) {
             $log->info( 'Google Image request', array(

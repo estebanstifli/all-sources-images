@@ -8,8 +8,8 @@
     'use strict';
 
     const { registerBlockType } = wp.blocks;
-    const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner, TextareaControl, Notice } = wp.components;
-            const { useState, useEffect, useRef, useCallback } = wp.element;
+        const { Button, Modal, TextControl, TabPanel, SelectControl, CheckboxControl, Spinner, TextareaControl, Notice } = wp.components;
+            const { useState, useEffect, useRef, useCallback, useMemo } = wp.element;
     const { __, sprintf } = wp.i18n;
     const { useBlockProps, BlockControls, AlignmentToolbar } = wp.blockEditor;
 
@@ -60,6 +60,7 @@
             const [downloadedImages, setDownloadedImages] = useState({});
                 const [hasRenderedCachedResults, setHasRenderedCachedResults] = useState(false);
             const [notification, setNotification] = useState(null);
+            const [activeTab, setActiveTab] = useState('tab0');
             const lastDownloadedRef = useRef(null);
             const skipNextResetRef = useRef(false);
             const hydrationReadyRef = useRef(false);
@@ -81,6 +82,7 @@
             const [sourceMode, setSourceMode] = useState('preset');
             const [customBanks, setCustomBanks] = useState(Object.values(defaultBanks));
             const customBanksKey = customBanks.join('|');
+            const activeBanks = useMemo(() => getActiveBanks(), [sourceMode, customBanksKey]);
             const aiSources = (Array.isArray(asiAjax.ai_sources) ? asiAjax.ai_sources : ['dallev1', 'stability', 'replicate', 'gemini'])
                 .map((slug) => (typeof slug === 'string' ? slug.toLowerCase() : slug));
             const hasActiveSearch = Object.values(searchStatus).some((status) => status && status.active);
@@ -89,6 +91,17 @@
             const isBlockMode = !isStandaloneMode;
             const wrapperProps = useBlockProps(isStandaloneMode ? { className: 'asi-standalone-wrapper' } : {});
             const isExplorerVisible = isBlockMode ? isModalOpen : true;
+            const tabs = useMemo(() => {
+                return Object.entries(activeBanks).map(([key, value], index) => ({
+                    name: `tab${index}`,
+                    title: getBankLabel(value),
+                    className: `tab-${index}`
+                }));
+            }, [activeBanks]);
+            const tabsKey = useMemo(() => tabs.map((tab) => tab.name).join('|'), [tabs]);
+            const hasBanks = tabs.length > 0;
+            const availableBankEntries = Object.entries(availableBanks);
+            const activeBankEntries = useMemo(() => Object.entries(activeBanks), [activeBanks]);
 
             const masonryInstances = useRef(new Map());
             const masonryFrameRef = useRef(null);
@@ -264,6 +277,19 @@
             }, [hasActiveSearch]);
 
             useEffect(() => {
+                if (!tabs || tabs.length === 0) {
+                    if (activeTab !== 'tab0') {
+                        setActiveTab('tab0');
+                    }
+                    return;
+                }
+                const exists = tabs.some((tab) => tab.name === activeTab);
+                if (!exists) {
+                    setActiveTab(tabs[0].name);
+                }
+            }, [tabs, activeTab]);
+
+            useEffect(() => {
                 if (!isExplorerVisible) {
                     destroyMasonryInstances();
                 }
@@ -354,7 +380,7 @@
                         masonryRetryTimeoutRef.current = null;
                     }
                 };
-            }, [resultsSearch, isExplorerVisible, initializeMasonry]);
+            }, [resultsSearch, isExplorerVisible, initializeMasonry, activeTab]);
 
             useEffect(() => {
                 if (!isExplorerVisible) {
@@ -364,7 +390,7 @@
                     requestMasonryLayout();
                 }, 200);
                 return () => clearTimeout(timer);
-            }, [isExplorerVisible, requestMasonryLayout]);
+            }, [isExplorerVisible, requestMasonryLayout, activeTab]);
 
             // sentinel observer effect moved below fetchNextPage definition
 
@@ -408,7 +434,7 @@
             // Search all configured banks
             function searchAllBanks() {
                 const postId = resolvePostId();
-                const banks = getActiveBanks();
+                const banks = activeBanks;
                 const entries = Object.entries(banks);
 
                 if (entries.length === 0) {
@@ -600,7 +626,7 @@
                         observer.disconnect();
                     }
                 };
-            }, [resultsSearch, isExplorerVisible, fetchNextPage]);
+            }, [resultsSearch, isExplorerVisible, fetchNextPage, activeTab]);
 
             // Image item component - MUST be defined outside map to use hooks properly
             function ImageGridItem({ image, bankName, onImageClick, onImageLoad, onSettingsClick, isDownloaded }) {
@@ -876,17 +902,6 @@
                 closeSettingsPanel();
                 downloadAndUseImage(image.url, image.alt || image.title || '', image.caption || '', bank, image, overrides);
             }
-
-            // Build tabs for each bank
-            const activeBanks = getActiveBanks();
-            const tabs = Object.entries(activeBanks).map(([key, value], index) => ({
-                name: `tab${index}`,
-                title: getBankLabel(value),
-                className: `tab-${index}`
-            }));
-            const hasBanks = tabs.length > 0;
-            const availableBankEntries = Object.entries(availableBanks);
-
             return wp.element.createElement('div', wrapperProps,
                 // Block toolbar
                 isBlockMode ? wp.element.createElement(BlockControls, null,
@@ -1035,10 +1050,19 @@
                     hasBanks ? wp.element.createElement(TabPanel, {
                         className: 'mpt-tab-panel',
                         activeClass: 'active-tab',
-                        tabs: tabs
+                        key: tabsKey,
+                        tabs: tabs,
+                        initialTabName: activeTab,
+                        onSelect: (tabName) => {
+                            setActiveTab(tabName);
+                            if (typeof window !== 'undefined') {
+                                window.setTimeout(() => requestMasonryLayout(), 50);
+                            } else {
+                                requestMasonryLayout();
+                            }
+                        }
                     }, (tab) => {
                         const index = parseInt(tab.name.replace('tab', ''));
-                        const activeBankEntries = Object.entries(activeBanks);
                         const activeBankEntry = activeBankEntries[index] || [];
                         const bankSlug = activeBankEntry[1] || '';
                         const status = searchStatus[index];

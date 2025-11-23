@@ -1442,14 +1442,14 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             do {
                 usleep( 500000 );
                 // wait 0.5s
-                $proxy_args = $this->ASI_get_proxy_args();
-                $resp = wp_remote_get( $getUrl, array_merge( array(
+                $request_args = array(
                     'headers' => array(
                         'Authorization' => 'Token ' . $apiToken,
                         'Content-Type'  => 'application/json',
                     ),
                     'timeout' => 10,
-                ), $proxy_args ) );
+                );
+                $resp = $this->ASI_remote_get( 'replicate', $getUrl, $request_args );
                 // DEBUG
                 /*
                 			$log->info( 'Replicate polling status', [
@@ -1649,17 +1649,15 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'sslverify'          => false,
             );
         }
-        // Proxy settings
         $proxy_args = $this->ASI_get_proxy_args();
-        $defaults = array_merge( $defaults, $proxy_args );
-        
         ASI_log( array(
-            'service' => $service,
-            'url' => $url,
-            'has_proxy' => !empty($proxy_args)
+            'service'     => $service,
+            'url'         => $url,
+            'has_proxy'   => ! empty( $proxy_args ),
+            'proxy_mode'  => $this->ASI_current_proxy_mode(),
         ), 'HTTP_REQUEST' );
-        
-        $result = wp_remote_request( $url, $defaults );
+
+        $result = $this->ASI_remote_request( $service, $url, $defaults );
         
         $response_code = is_wp_error( $result ) ? 'ERROR' : wp_remote_retrieve_response_code( $result );
         $body_preview = '';
@@ -1932,11 +1930,10 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'format' => 'text',
             );
             
-            $proxy_args = $this->ASI_get_proxy_args();
-            $response = wp_remote_post( $url, array_merge( array(
+            $response = $this->ASI_remote_post( 'google_translate', $url, array(
                 'body'    => $params,
                 'timeout' => 10,
-            ), $proxy_args ) );
+            ) );
             
             if ( is_wp_error( $response ) ) {
                 $log->error( 'Google Translate API error', array(
@@ -1967,10 +1964,9 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         );
         
         $url = add_query_arg( $params, $url );
-        $proxy_args = $this->ASI_get_proxy_args();
-        $response = wp_remote_get( $url, array_merge( array(
+        $response = $this->ASI_remote_get( 'google_scraping', $url, array(
             'timeout' => 10,
-        ), $proxy_args ) );
+        ) );
         
         if ( is_wp_error( $response ) ) {
             $log->error( 'Google Translate scraping error', array(

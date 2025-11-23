@@ -20,8 +20,9 @@ class ASI_Source_Dallev1 extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) ) {
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_dalle_missing_key', __( 'OpenAI API key is missing.', 'all-sources-images' ) );
         }
 
@@ -30,18 +31,22 @@ class ASI_Source_Dallev1 extends ASI_Image_Source {
         }
 
         $payload      = $this->build_payload( $search_term, $img_size );
+        $headers = array(
+            'Content-Type' => 'application/json',
+        );
+        if ( ! empty( $api_key ) ) {
+            $headers['Authorization'] = 'Bearer ' . $api_key;
+        }
+
         $request_args = $this->merge_proxy_args( array(
             'timeout'     => 45,
             'redirection' => 2,
             'method'      => 'POST',
-            'headers'     => array(
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $api_key,
-            ),
+            'headers'     => $headers,
             'body'        => wp_json_encode( $payload ),
         ), $proxy_args );
 
-        $response = wp_remote_request( self::API_ENDPOINT, $request_args );
+        $response = $this->request_with_proxy( 'dallev1', self::API_ENDPOINT, $request_args, $context );
 
         if ( $log ) {
             $log->info( 'DALL·E request', array(

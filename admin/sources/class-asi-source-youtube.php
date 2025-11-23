@@ -19,8 +19,9 @@ class ASI_Source_Youtube extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
+        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) ) {
+        if ( empty( $api_key ) && ! $using_cloudflare ) {
             return new WP_Error( 'asi_youtube_missing_key', __( 'YouTube API key is missing.', 'all-sources-images' ) );
         }
 
@@ -38,7 +39,7 @@ class ASI_Source_Youtube extends ASI_Image_Source {
             'sslverify'          => false,
         ), $proxy_args );
 
-        $response = wp_remote_request( add_query_arg( $query_args, self::API_ENDPOINT ), $request_args );
+        $response = $this->request_with_proxy( 'youtube', add_query_arg( $query_args, self::API_ENDPOINT ), $request_args, $context );
 
         if ( $log ) {
             $log->info( 'YouTube request', array(
