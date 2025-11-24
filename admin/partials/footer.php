@@ -21,7 +21,6 @@
       ?>
 			<a href="https://wordpress.org/support/plugin/magic-post-thumbnail/" target="_blank" class="nav-link pl-0 pr-5"><?php esc_html_e( 'Support Forum', 'all-sources-images' ); ?></a>
       <a href="<?php echo $contact_url; ?>" class="nav-link pl-0 pr-5"><?php esc_html_e( 'Contact Us', 'all-sources-images' ); ?></a>
-      <a href="https://wordpress.org/support/plugin/magic-post-thumbnail/reviews/" target="_blank" class="nav-link pl-0 pr-5"><?php esc_html_e( 'Leave a review', 'all-sources-images' ); ?></a>
     </div>
 		<!--end::Copyright-->
 

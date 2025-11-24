@@ -126,10 +126,6 @@ class All_Sources_Images_Admin {
         if ( isset( $options_banks['api_chosen_auto'] ) && true === in_array( 'dallev1', $options_banks['api_chosen_auto'] ) ) {
             add_filter( 'http_request_timeout', array(&$this, 'ASI_custom_http_request_timeout') );
         }
-        // Show & Hide notice for asking reviews
-        add_action( 'admin_notices', array(&$this, 'ASI_show_notice') );
-        add_action( 'wp_ajax_asi_hide_notice', array(&$this, 'ASI_hide_notice') );
-        add_action( 'wp_ajax_asi_remind_later', array(&$this, 'ASI_remind_later') );
         // Migration v5 to v6
         add_action( 'init', array(&$this, 'ASI_migration') );
     }
@@ -2794,55 +2790,11 @@ class All_Sources_Images_Admin {
      *
      * @since    5.2.6
      */
-    public function ASI_show_notice() {
-        $activation_date = get_option( 'ASI_plugin_activation_date' );
-        $hide_notice = get_option( 'ASI_hide_notice' );
-        if ( !$activation_date ) {
-            update_option( 'ASI_plugin_activation_date', time() );
-            return false;
-        }
-        $days_since_activation = (time() - $activation_date) / (60 * 60 * 24);
-        if ( $days_since_activation > 7 && !$hide_notice ) {
-            ?>
-			<div class="notice notice-success is-dismissible " id="mpt-rating-notice">
-                <p><?php 
-            esc_html_e( 'Do you enjoy using Magic Post Thumbnail? If so, please consider giving it a 5-star rating on WordPress.org. Your support helps others discover our plugin and means a lot to us!', 'all-sources-images' );
-            ?></p>
-                <p>
-                    <a href="#" id="mpt-rate" class="button button-primary"><?php 
-            esc_html_e( 'Sure!', 'all-sources-images' );
-            ?></a>
-                    <a href="#" id="mpt-hide-notice" class="button"><?php 
-            esc_html_e( 'No, thanks', 'all-sources-images' );
-            ?></a>
-                </p>
-            </div>
-			<?php 
-        }
-    }
 
-    /**
-     * Hide notice for review
-     *
-     * @since    5.2.6
-     */
-    public function ASI_hide_notice() {
-        update_option( 'ASI_hide_notice', 1 );
-        wp_die();
-    }
 
-    /**
-     * Show notice div later
-     *
-     * @since    5.2.6
-     */
-    public function ASI_remind_later() {
-        $delay = ( isset( $_POST['delay'] ) ? intval( $_POST['delay'] ) : 30 );
-        $new_time = time() + $delay * 24 * 60 * 60;
-        // Délai en jours
-        update_option( 'ASI_plugin_activation_date', $new_time );
-        wp_die();
-    }
+
+
+
 
     /**
      * Upgrade plugin : options updated
