@@ -2,8 +2,6 @@
 
 /**
  * The public-facing functionality of the plugin.
- *
- * @link       https://magic-post-thumbnail.com/
  * @since      1.0.0
  *
  * @package    All_Sources_Images
@@ -18,7 +16,6 @@
  *
  * @package    All_Sources_Images
  * @subpackage All_Sources_Images/public
- * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
 class All_Sources_Images_Public {
 

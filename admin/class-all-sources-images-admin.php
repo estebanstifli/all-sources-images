@@ -483,13 +483,12 @@ class All_Sources_Images_Admin {
             return $bootstrap;
         }
 
-        $this->ASI_strip_credentials_from_request( $service, $url, $args );
-
-        $worker_url = untrailingslashit( $bootstrap['worker_url'] );
-        $final_url  = add_query_arg( array(
+        $worker_url      = untrailingslashit( $bootstrap['worker_url'] );
+        $encoded_url_b64 = base64_encode( $url );
+        $final_url       = add_query_arg( array(
             'servicio' => $service,
             'token'    => $bootstrap['token'],
-            'url'      => $url,
+            'url_b64'  => $encoded_url_b64,
         ), $worker_url );
 
         unset( $args['proxy'] );
@@ -1285,6 +1284,7 @@ class All_Sources_Images_Admin {
                 'aspect_ratio' => 'tall',
             ),
             'flickr'            => array(
+                'apikey'  => '',
                 'rights'  => '',
                 'imgtype' => 7,
             ),

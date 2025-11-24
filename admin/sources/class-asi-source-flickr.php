@@ -6,7 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ASI_Source_Flickr extends ASI_Image_Source {
 
     const API_ENDPOINT     = 'https://api.flickr.com/services/rest/';
-    const DEFAULT_API_KEY  = '63d9c292b9e2dfacd3a73908779d6d6f';
 
     public function get_slug() {
         return 'flickr';
@@ -91,8 +90,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
 
     private function resolve_api_key( array $bank_options ) {
         $option_key = isset( $bank_options['apikey'] ) ? trim( $bank_options['apikey'] ) : '';
-        $api_key    = ! empty( $option_key ) ? $option_key : self::DEFAULT_API_KEY;
-        return apply_filters( 'asi_flickr_api_key', $api_key );
+        return apply_filters( 'asi_flickr_api_key', $option_key );
     }
 
     private function resolve_search_term( array $context ) {

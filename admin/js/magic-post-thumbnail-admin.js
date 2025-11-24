@@ -716,6 +716,7 @@ jQuery(document).ready(function() {
     hideAPIKey("#password-pexels");
     hideAPIKey("#password-openai");
     hideAPIKey("#password-giphy");
+    hideAPIKey("#password-flickr");
 
 
 

@@ -34,7 +34,7 @@ if ( !defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 if ( ! defined( 'ASI_DEBUG' ) ) {
-    define( 'ASI_DEBUG', false );
+    define( 'ASI_DEBUG', true );
 }
 
 if ( ! defined( 'ASI_DIAGNOSTIC_TOKEN' ) ) {

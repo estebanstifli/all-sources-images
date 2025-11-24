@@ -10,7 +10,6 @@ if ( ! function_exists( 'add_filter' ) ) {
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link       https://magic-post-thumbnail.com/
  * @since      4.0.0
  *
  * @package    All_Sources_Images

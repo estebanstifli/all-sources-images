@@ -23,7 +23,6 @@ require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-replicate.p
  *
  * @package    All_Sources_Images
  * @subpackage All_Sources_Images/admin
- * @author     Magic Post Thumbnail <contact@magic-post-thumbnail.com>
  */
 class All_Sources_Images_Generation extends All_Sources_Images_Admin {
     /**

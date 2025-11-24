@@ -62,7 +62,19 @@ export default {
         // Se puede enviar en la URL o en la cabecera X-Auth-Token
         const incomingToken = url.searchParams.get('token') || request.headers.get('Token'); 
         const rawService = url.searchParams.get('servicio');
-        const destinationUrl = url.searchParams.get('url');
+        let destinationUrl = url.searchParams.get('url');
+        const destinationUrlBase64 = url.searchParams.get('url_b64');
+        if (destinationUrlBase64 && destinationUrlBase64 !== 'null' && destinationUrlBase64 !== 'undefined') {
+            try {
+                const normalizedB64 = destinationUrlBase64.replace(/ /g, '+');
+                destinationUrl = atob(normalizedB64);
+            } catch (error) {
+                // fall back to plain URL if provided
+                if (!destinationUrl) {
+                    return new Response('URL base64 decode failed.', { status: 400 });
+                }
+            }
+        }
         
         // 2. Validación de Parámetros Fijos
         

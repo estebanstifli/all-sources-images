@@ -132,9 +132,7 @@ $verified   = false;
 						$account_url    = remove_query_arg( 'ids_mpt_generation', add_query_arg( 'module', 'account', $this->ASI_current_url() ) );
 					?>
 					<span class="plugin-infos">
-						<a href="https://magic-post-thumbnail.com/account/" target="_blank" title="<?php esc_html_e( 'Connect to pro account' ); ?>">
-							<?php esc_html_e( 'Pro Account', 'all-sources-images' ); ?>
-						</a>
+						<?php esc_html_e( 'Pro Account', 'all-sources-images' ); ?>
 					</span>
 
 				<?php } ?>
@@ -223,10 +221,7 @@ $verified   = false;
 						<span class="text-dark text-hover-primary font-weight-bold font-size-h4 mb-3">
 							<?php esc_html_e( 'Tutorials', 'all-sources-images' ); ?>
 						</span>
-						<div class="text-dark-75">
-							<a href="https://magic-post-thumbnail.com/docs/" target="_blank">
-	                <?php esc_html_e( 'Documentation', 'all-sources-images' ); ?>
-	            </a><br/>
+				<div class="text-dark-75">
               <?php
 				// Get language
 				/*
@@ -243,9 +238,7 @@ $verified   = false;
 				}*/
                 printf( __( '<a href="%s" target="_blank">Youtube Tutorial</a>', 'all-sources-images' ), 'https://www.youtube.com/watch?v=mC6qimwnT4E' );
               ?><br/>
-	            <a href="https://magic-post-thumbnail.com/docs/faq/" target="_blank">
-	                <?php esc_html_e( 'Frequently Asked Questions', 'all-sources-images' ); ?>
-	            </a>
+	            <?php esc_html_e( 'Frequently Asked Questions', 'all-sources-images' ); ?>
 						</div>
 					</div>
 				</div>
@@ -335,9 +328,7 @@ $verified   = false;
 							<?php esc_html_e( 'Donate', 'all-sources-images' ); ?>
 						</span>
 						<div class="text-dark-75">
-                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=contact%40magic-post-thumbnail.com&item_name=Donation+for+Magic+Post+Thumbnail&currency_code=EUR&source=url" target="_blank" >
-                    <?php esc_html_e( 'Make a donation', 'all-sources-images' ); ?>
-                </a><br/>
+                <?php esc_html_e( 'Support development', 'all-sources-images' ); ?>
             </div>
 					</div>
 				</div>

@@ -12,6 +12,19 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 <tr valign="top">
 	<th scope="row">
+		<label for="ASI_plugin_banks_settings_flickr_apikey"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
+	</th>
+	<td id="password-flickr" class="password">
+		<input type="password" id="ASI_plugin_banks_settings_flickr_apikey" name="ASI_plugin_banks_settings[flickr][apikey]" class="form-control" value="<?php echo ( isset( $options['flickr']['apikey'] ) && ! empty( $options['flickr']['apikey'] ) ) ? esc_attr( $options['flickr']['apikey'] ) : ''; ?>" />
+		<i id="togglePassword"></i>
+		<p class="description">
+			<?php esc_html_e( 'Create a Flickr App at flickr.com/services/apps/create/ to obtain your API key. Each site needs its own key.', 'all-sources-images' ); ?>
+		</p>
+	</td>
+</tr>
+
+<tr valign="top">
+	<th scope="row">
 		<label for="hseparator"><?php _e( 'Rights', 'all-sources-images' ); ?></label>
 	</th>
 	<td class="checkbox-list">
