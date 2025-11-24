@@ -694,8 +694,6 @@
             function renderImageGrid(images, bankName, index, options = {}) {
                 const hasMore = options.hasMore;
                 const isDownloadedFn = typeof options.isDownloaded === 'function' ? options.isDownloaded : () => false;
-                const licensing = asiAjax.licensing_data || '0';
-                const displayImages = (licensing !== '1') ? images.slice(0, 6) : images;
 
                 return wp.element.createElement(wp.element.Fragment, null,
                     wp.element.createElement('ul', {
@@ -703,7 +701,7 @@
                         role: 'list',
                         'data-bank': bankName
                     },
-                        displayImages.map((image, idx) => {
+                        images.map((image, idx) => {
                             return wp.element.createElement(ImageGridItem, {
                                 key: idx,
                                 image: image,

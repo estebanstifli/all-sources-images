@@ -16,8 +16,6 @@ if ( ! function_exists( 'add_filter' ) ) {
  * @subpackage All_Sources_Images/admin/partials
  */
 
-$include_template = true;
-
 $module = ( isset( $_GET['module'] ) ) ? sanitize_text_field( $_GET['module'] ) : 'default';
 
 switch ( $module ) {
@@ -53,10 +51,6 @@ switch ( $module ) {
         $title = esc_html__( 'Settings [Proxy]', 'all-sources-images' );
         $tab   = 'proxy.php';
         break;
-    case 'affiliation':
-        $title = esc_html__( 'Miscellaneous [Affiliation]', 'all-sources-images' );
-        $tab   = 'affiliation.php';
-        break;
     case 'compatibility':
         $title = esc_html__( 'Miscellaneous [Compatibility]', 'all-sources-images' );
         $tab   = 'compatibility.php';
@@ -77,28 +71,13 @@ switch ( $module ) {
         $title = esc_html__( 'Bulk Generation with interval', 'all-sources-images' );
         $tab   = 'generation_choice.php';
         break;
-    case 'account':
-        $title = esc_html__( 'Account', 'all-sources-images' );
-        $tab   = 'account.php';
-        //$include_template = false;
-        break;
-    case 'contact':
-        $title = esc_html__( 'Contact', 'all-sources-images' );
-        $tab   = 'contact.php';
-        break;
     default:
         $title = esc_html__( 'Dashboard', 'all-sources-images' );
         $tab   = 'dashboard.php';
 }
 
-
-//Bug with account page, remove header & footer template
-if( TRUE === $include_template ) {
-    include_once( 'header.php' );
-    include_once( 'tabs/' . $tab );
-    include_once( 'footer.php' );
-} else {
-    include_once( 'tabs/' . $tab );
-}
+include_once( 'header.php' );
+include_once( 'tabs/' . $tab );
+include_once( 'footer.php' );
 
 ?>

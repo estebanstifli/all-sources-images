@@ -11,7 +11,6 @@ if( ! empty( $_GET['action'] ) && ( 'deletelog' == $_GET['action'] ) ) {
         return false;
     } else {
     }
-} elseif( defined( 'ASI_FREEMIUS_UNINSTALL' ) ) {
 } else {
     return false;
 }
@@ -70,11 +69,8 @@ session_write_close();
 // Disable cache
 unlink( $filename );
 
-
 // Redirect without delete arguments
-if( ! defined( 'ASI_FREEMIUS_UNINSTALL' ) ) {
-	wp_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
-	exit;
-}
+wp_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
+exit;
 
 ?>

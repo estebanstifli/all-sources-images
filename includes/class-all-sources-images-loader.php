@@ -120,9 +120,6 @@ class All_Sources_Images_Loader {
 		foreach ( $this->actions as $hook ) {
 			add_action( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
 		}
-                
-
-    do_action( 'ASI_freemius_loaded' );
 	}
 
 }
