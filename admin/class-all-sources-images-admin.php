@@ -777,14 +777,6 @@ class All_Sources_Images_Admin {
             'no_interval'       => esc_html__( 'No interval', 'all-sources-images' ),
             'per_minute'        => esc_html__( 'per minute', 'all-sources-images' ),
             'per_hour'          => esc_html__( 'per hour', 'all-sources-images' ),
-            'rate_notice'       => sprintf(
-                '<p>%s</p><p><a href="%s" target="_blank" class="button button-primary">%s</a> <a href="#" id="mpt-remind-later" class="button">%s</a> <a href="#" id="mpt-already-done" class="button">%s</a></p>',
-                esc_html__( 'Thank you! We\'d be thrilled if you could rate us 5 stars on WordPress.org. Your positive feedback will help others find and benefit from Magic Post Thumbnail!', 'all-sources-images' ),
-                esc_url( 'https://wordpress.org/support/plugin/magic-post-thumbnail/reviews/?filter=5#new-post' ),
-                esc_html__( 'Yes, I\'ll rate it with 5-stars', 'all-sources-images' ),
-                esc_html__( 'No, maybe later', 'all-sources-images' ),
-                esc_html__( 'I\'ve already done it', 'all-sources-images' )
-            ),
         );
         wp_localize_script( $this->plugin_name, 'translationsJsVars', $translations_var );
         wp_localize_script( 'common-mpt', 'translationsJsVars', $translations_var );

@@ -19,7 +19,6 @@
       <?php
           $contact_url    = remove_query_arg( 'ids_mpt_generation', add_query_arg( 'module', 'contact', $this->ASI_current_url() ) );
       ?>
-			<a href="https://wordpress.org/support/plugin/magic-post-thumbnail/" target="_blank" class="nav-link pl-0 pr-5"><?php esc_html_e( 'Support Forum', 'all-sources-images' ); ?></a>
       <a href="<?php echo $contact_url; ?>" class="nav-link pl-0 pr-5"><?php esc_html_e( 'Contact Us', 'all-sources-images' ); ?></a>
     </div>
 		<!--end::Copyright-->
