@@ -191,6 +191,7 @@
                         hydrationReadyRef.current = true;
                         return;
                     }
+                    // Skip multiple resets during hydration - we'll reset the flag after a delay
                     skipNextResetRef.current = true;
                     if (parsed.sourceMode === 'custom' && Array.isArray(parsed.customBanks)) {
                         setSourceMode('custom');
@@ -201,6 +202,10 @@
                         setResultsSearch(parsed.results);
                         setHasRenderedCachedResults(true);
                     }
+                    // Reset the skip flag after all state updates have been processed
+                    setTimeout(() => {
+                        skipNextResetRef.current = false;
+                    }, 100);
                 } catch (error) {
                     console.warn('ASI: unable to restore last search', error);
                 } finally {
@@ -258,7 +263,7 @@
                     return;
                 }
                 if (skipNextResetRef.current) {
-                    skipNextResetRef.current = false;
+                    // Don't reset the flag here - let the timeout in hydrateFromStorage handle it
                     return;
                 }
                 setResultsSearch({});
