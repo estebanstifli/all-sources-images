@@ -1,0 +1,25 @@
+.asi-media-control,
+.asi-media-preview img,
+.asi-media-placeholder,
+.asi-media-actions .elementor-button {
+    box-sizing: border-box;
+}
+.asi-media-control{
+    border: 1px dashed #c3c4c7;
+    padding: 12px;
+    text-align: center;
+}
+.asi-media-preview img{
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 10px;
+}
+.asi-media-placeholder{
+    color: #555;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+.asi-media-actions .elementor-button{
+    margin: 0 5px;
+}

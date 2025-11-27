@@ -115,6 +115,8 @@ class All_Sources_Images_Admin {
         add_action( 'admin_menu', array( $this, 'ASI_register_media_picker_page' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'ASI_enqueue_media_picker_assets' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'ASI_enqueue_media_modal_assets' ) );
+        add_action( 'enqueue_block_editor_assets', array( $this, 'ASI_enqueue_media_modal_assets' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'ASI_enqueue_front_media_modal_assets' ) );
         // Gutenberg Block : Searching images with APIs
         add_action( 'wp_ajax_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
         add_action( 'wp_ajax_nopriv_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
@@ -128,6 +130,13 @@ class All_Sources_Images_Admin {
         }
         // Migration v5 to v6
         add_action( 'init', array(&$this, 'ASI_migration') );
+        add_action( 'plugins_loaded', array( $this, 'ASI_maybe_boot_elementor' ), 20 );
+
+        if ( did_action( 'elementor/loaded' ) ) {
+            $this->ASI_maybe_boot_elementor();
+        } else {
+            add_action( 'elementor/init', array( $this, 'ASI_maybe_boot_elementor' ) );
+        }
     }
 
     /**
@@ -2032,22 +2041,49 @@ class All_Sources_Images_Admin {
     /**
      * Enqueue integration script for the WordPress media modal so we can inject the explorer tab.
      */
-    public function ASI_enqueue_media_modal_assets( $hook ) {
-        if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+    public function ASI_enqueue_media_modal_assets( $hook = null ) {
+        if ( ! current_user_can( 'upload_files' ) ) {
             return;
         }
 
-        wp_enqueue_media();
+        if ( function_exists( 'wp_enqueue_media' ) ) {
+            wp_enqueue_media();
+        }
+
+        $this->ASI_prepare_media_modal_scripts();
+    }
+
+    /**
+     * Ensure the media modal integration is also loaded on the front-end (Elementor, etc.).
+     */
+    public function ASI_enqueue_front_media_modal_assets() {
+        if ( ! is_user_logged_in() || ! current_user_can( 'upload_files' ) ) {
+            return;
+        }
+
+        if ( function_exists( 'wp_enqueue_media' ) ) {
+            wp_enqueue_media();
+        }
+
+        $this->ASI_prepare_media_modal_scripts();
+    }
+
+    /**
+     * Shared loader for styles and scripts needed by the media modal tab.
+     */
+    private function ASI_prepare_media_modal_scripts() {
         wp_enqueue_style( 'asi-images-editor-style' );
         wp_enqueue_script( 'asi-images-script' );
 
-        wp_register_script(
-            'asi-media-modal',
-            plugins_url( 'js/asi-media-modal.js', __FILE__ ),
-            array( 'jquery', 'media-views', 'asi-images-script' ),
-            $this->version,
-            true
-        );
+        if ( ! wp_script_is( 'asi-media-modal', 'registered' ) ) {
+            wp_register_script(
+                'asi-media-modal',
+                plugins_url( 'js/asi-media-modal.js', __FILE__ ),
+                array( 'jquery', 'media-views', 'asi-images-script' ),
+                $this->version,
+                true
+            );
+        }
 
         wp_localize_script( 'asi-media-modal', 'asiMediaModal', array(
             'tabLabel' => __( 'All Sources Images', 'all-sources-images' ),
@@ -2056,6 +2092,22 @@ class All_Sources_Images_Admin {
         ) );
 
         wp_enqueue_script( 'asi-media-modal' );
+    }
+
+    /**
+     * Initialize the Elementor integration if necessary.
+     */
+    public function ASI_maybe_boot_elementor() {
+        if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+            return;
+        }
+
+        if ( class_exists( 'ASI_Elementor_Integration' ) ) {
+            return;
+        }
+
+        require_once plugin_dir_path( __FILE__ ) . 'elementor/class-asi-elementor-integration.php';
+        new ASI_Elementor_Integration( $this->version );
     }
 
     /**
