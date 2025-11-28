@@ -138,3 +138,126 @@
     background: #005a87;
     border-color: #005a87;
 }
+
+/* =============================================
+   Custom Bank Picker - Checkbox Styles for Elementor/Media Modal
+   ============================================= */
+
+.asi-custom-bank-picker {
+    box-sizing: border-box;
+}
+
+.asi-custom-bank-picker *,
+.asi-custom-bank-picker *::before,
+.asi-custom-bank-picker *::after {
+    box-sizing: border-box;
+}
+
+/* Grid container for checkboxes */
+.asi-custom-bank-picker > div {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 4px !important;
+}
+
+/* Base control wrapper - this gets the padding */
+.asi-custom-bank-picker .components-base-control {
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    border-radius: 4px !important;
+    transition: background 0.15s ease !important;
+}
+
+.asi-custom-bank-picker .components-base-control:hover {
+    background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.asi-custom-bank-picker .components-base-control__field {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* The main label element - only left padding */
+.asi-custom-bank-picker .components-checkbox-control__label {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 8px !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    width: 100% !important;
+}
+
+/* Input container that holds the checkbox */
+.asi-custom-bank-picker .components-checkbox-control__input-container {
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+}
+
+/* Hide the default WP checkbox SVG icon */
+.asi-custom-bank-picker .components-checkbox-control__input-container svg {
+    display: none !important;
+}
+
+/* The actual checkbox input */
+.asi-custom-bank-picker .components-checkbox-control__input-container input[type="checkbox"],
+.asi-custom-bank-picker input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #8c8f94 !important;
+    border-radius: 2px !important;
+    background: #fff !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+.asi-custom-bank-picker input[type="checkbox"]:checked {
+    background: #2271b1 !important;
+    border-color: #2271b1 !important;
+}
+
+.asi-custom-bank-picker input[type="checkbox"]:checked::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 1px !important;
+    left: 4px !important;
+    width: 5px !important;
+    height: 9px !important;
+    border: solid #fff !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
+    display: block !important;
+}
+
+.asi-custom-bank-picker input[type="checkbox"]:focus {
+    outline: 2px solid #2271b1 !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+}
+
+/* Label text span */
+.asi-custom-bank-picker .components-checkbox-control__label > span:last-child {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: #1e1e1e !important;
+    line-height: 16px !important;
+}

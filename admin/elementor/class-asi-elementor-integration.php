@@ -111,19 +111,36 @@ class ASI_Elementor_Integration {
                 'api_chosen_manual' => array( 'pixabay' ),
             ) );
             
+            // Build available banks list (same as admin class)
+            $manual_bank_labels = array(
+                'google_scraping' => __( 'Google Image (Scraping)', 'all-sources-images' ),
+                'google_image'    => __( 'Google Image (API)', 'all-sources-images' ),
+                'dallev1'         => __( 'DALL·E (v3)', 'all-sources-images' ),
+                'cc_search'       => __( 'Openverse', 'all-sources-images' ),
+                'flickr'          => __( 'Flickr', 'all-sources-images' ),
+                'pixabay'         => __( 'Pixabay', 'all-sources-images' ),
+                'giphy'           => __( 'GIPHY', 'all-sources-images' ),
+                'youtube'         => __( 'Youtube', 'all-sources-images' ),
+                'unsplash'        => __( 'Unsplash', 'all-sources-images' ),
+                'pexels'          => __( 'Pexels', 'all-sources-images' ),
+                'stability'       => __( 'Stable Diffusion', 'all-sources-images' ),
+                'replicate'       => __( 'Replicate', 'all-sources-images' ),
+                'gemini'          => __( 'Gemini (Google AI)', 'all-sources-images' ),
+                'workers_ai'      => __( 'Cloudflare Workers AI', 'all-sources-images' ),
+            );
+            
+            // AI sources list
+            $ai_sources = array( 'dallev1', 'stability', 'replicate', 'gemini', 'workers_ai' );
+            
             wp_localize_script( 'asi-images-script', 'asiAjax', array(
                 'ajax_url'         => admin_url( 'admin-ajax.php' ),
                 'admin_url'        => admin_url(),
                 'nonce'            => wp_create_nonce( 'ASI_gutenberg_block' ),
                 'choosed_banks'    => isset( $banks['api_chosen_manual'] ) ? $banks['api_chosen_manual'] : array( 'pixabay' ),
-                'available_banks'  => array(
-                    'pixabay'   => 'Pixabay',
-                    'pexels'    => 'Pexels',
-                    'unsplash'  => 'Unsplash',
-                ),
+                'available_banks'  => $manual_bank_labels,
                 'licensing_data'   => '1',
                 'path_default_img' => plugin_dir_url( __FILE__ ) . '../blocks/asi-images/img/',
-                'ai_sources'       => array(),
+                'ai_sources'       => $ai_sources,
                 'default_post_id'  => 0,
             ) );
         }
