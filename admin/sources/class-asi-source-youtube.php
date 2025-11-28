@@ -19,9 +19,9 @@ class ASI_Source_Youtube extends ASI_Image_Source {
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
-        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
 
-        if ( empty( $api_key ) && ! $using_cloudflare ) {
+        // YouTube does NOT support Cloudflare fallback - API key is always required
+        if ( empty( $api_key ) ) {
             return new WP_Error( 'asi_youtube_missing_key', __( 'YouTube API key is missing.', 'all-sources-images' ) );
         }
 
@@ -39,7 +39,8 @@ class ASI_Source_Youtube extends ASI_Image_Source {
             'sslverify'          => false,
         ), $proxy_args );
 
-        $response = $this->request_with_proxy( 'youtube', add_query_arg( $query_args, self::API_ENDPOINT ), $request_args, $context );
+        // YouTube uses direct request or legacy proxy only (no Cloudflare fallback)
+        $response = $this->request_with_proxy( 'youtube', add_query_arg( $query_args, self::API_ENDPOINT ), $request_args, $context, 'GET', false );
 
         if ( $log ) {
             $log->info( 'YouTube request', array(
@@ -209,23 +210,6 @@ class ASI_Source_Youtube extends ASI_Image_Source {
         }
 
         return $response;
-    }
-
-    private function merge_proxy_args( array $base_args, array $proxy_args ) {
-        if ( empty( $proxy_args ) ) {
-            return $base_args;
-        }
-
-        if ( isset( $proxy_args['headers'] ) && is_array( $proxy_args['headers'] ) ) {
-            if ( isset( $base_args['headers'] ) ) {
-                $base_args['headers'] = array_merge( $base_args['headers'], $proxy_args['headers'] );
-            } else {
-                $base_args['headers'] = $proxy_args['headers'];
-            }
-            unset( $proxy_args['headers'] );
-        }
-
-        return array_merge( $base_args, $proxy_args );
     }
 
     private function get_translator_callable( array $context ) {

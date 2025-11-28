@@ -18,8 +18,6 @@ settings_errors();
 settings_fields( 'ASI-plugin-proxy-settings' );
 $options = wp_parse_args( get_option( 'ASI_plugin_proxy_settings' ), $this->ASI_default_options_proxy_settings( FALSE ) );
 $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_proxy'] === 'enable' );
-$saved_mode = isset( $options['proxy_mode'] ) ? $options['proxy_mode'] : '';
-$proxy_mode = in_array( $saved_mode, array( 'legacy', 'cloudflare' ), true ) ? $saved_mode : 'legacy';
 ?>
 
 		<!-- Info Alert -->
@@ -37,13 +35,32 @@ $proxy_mode = in_array( $saved_mode, array( 'legacy', 'cloudflare' ), true ) ? $
 			</div>
 		</div>
 
+		<!-- Cloudflare Fallback Info -->
+		<div class="alert alert-custom alert-light-primary fade show mb-10" role="alert">
+			<div class="alert-icon">
+				<i class="flaticon-info"></i>
+			</div>
+			<div class="alert-text">
+				<strong><?php esc_html_e( 'Automatic Cloudflare Fallback', 'all-sources-images' ); ?></strong>
+				<p><?php esc_html_e( 'For the following image sources, if you do not configure your own API key, the plugin will automatically use our Cloudflare proxy to fetch images:', 'all-sources-images' ); ?></p>
+				<ul style="margin-left: 20px; list-style: disc;">
+					<li>Pixabay</li>
+					<li>Pexels</li>
+					<li>Unsplash</li>
+					<li>Flickr</li>
+					<li>GIPHY</li>
+				</ul>
+				<p><?php esc_html_e( 'This allows you to use these sources without registering for your own API keys. However, for better performance and higher rate limits, we recommend configuring your own API keys.', 'all-sources-images' ); ?></p>
+			</div>
+		</div>
+
 		<table id="general-options" class="form-table tabs-content">
 			<tbody>
 				<!-- Enable Proxy -->
 				<tr>
 					<td style="width: 20%;">
 						<label for="enable_proxy">
-							<?php esc_html_e( 'Enable Proxy', 'all-sources-images' ); ?>
+							<?php esc_html_e( 'Enable Custom Proxy', 'all-sources-images' ); ?>
 						</label>
 					</td>
 					<td style="width: 15%;">
@@ -54,7 +71,7 @@ $proxy_mode = in_array( $saved_mode, array( 'legacy', 'cloudflare' ), true ) ? $
 					</td>
 					<td style="width: 65%;">
 						<p class="description">
-							<?php esc_html_e( 'Enable proxy server for all API requests. Useful if image banks APIs are blocked in your region.', 'all-sources-images' ); ?>
+							<?php esc_html_e( 'Enable a custom HTTPS proxy server for all API requests. Useful if image banks APIs are blocked in your region.', 'all-sources-images' ); ?>
 						</p>
 					</td>
 				</tr>
@@ -64,27 +81,6 @@ $proxy_mode = in_array( $saved_mode, array( 'legacy', 'cloudflare' ), true ) ? $
 		<!-- Proxy Settings (shown when enabled) -->
 		<div id="proxy-settings-container" style="display: <?php echo $is_proxy_enabled ? 'block' : 'none'; ?>;">
 			<table class="form-table tabs-content">
-				<tbody>
-					<tr>
-						<td style="width: 20%;">
-							<label for="proxy_mode">
-								<?php esc_html_e( 'Proxy Mode', 'all-sources-images' ); ?>
-							</label>
-						</td>
-						<td style="width: 80%;" colspan="2">
-							<select id="proxy_mode" name="ASI_plugin_proxy_settings[proxy_mode]" class="regular-text">
-								<option value="legacy" <?php selected( $proxy_mode, 'legacy' ); ?>><?php esc_html_e( 'Legacy HTTPS proxy (host:port)', 'all-sources-images' ); ?></option>
-								<option value="cloudflare" <?php selected( $proxy_mode, 'cloudflare' ); ?>><?php esc_html_e( 'Cloudflare Worker (inject API keys)', 'all-sources-images' ); ?></option>
-							</select>
-							<p class="description">
-								<?php esc_html_e( 'Select the transport layer that should wrap all outbound API requests once proxy is enabled.', 'all-sources-images' ); ?>
-							</p>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-
-			<table class="form-table tabs-content asi-proxy-mode-section" data-proxy-mode="legacy" style="display: <?php echo ( 'legacy' === $proxy_mode ) ? 'table' : 'none'; ?>;">
 				<tbody>
 					<!-- Proxy Address -->
 					<tr>
@@ -147,37 +143,6 @@ $proxy_mode = in_array( $saved_mode, array( 'legacy', 'cloudflare' ), true ) ? $
 					</tr>
 				</tbody>
 			</table>
-
-			<table class="form-table tabs-content asi-proxy-mode-section" data-proxy-mode="cloudflare" style="display: <?php echo ( 'cloudflare' === $proxy_mode ) ? 'table' : 'none'; ?>;">
-				<tbody>
-					<tr>
-						<td style="width: 20%;">
-							<label for="cloudflare_worker_url">
-								<?php esc_html_e( 'Worker URL', 'all-sources-images' ); ?>
-							</label>
-						</td>
-						<td style="width: 80%;" colspan="2">
-							<input type="url" class="regular-text" name="ASI_plugin_proxy_settings[cloudflare_worker_url]" id="cloudflare_worker_url" value="<?php echo esc_attr( isset( $options['cloudflare_worker_url'] ) ? $options['cloudflare_worker_url'] : '' ); ?>" placeholder="https://example.workers.dev" />
-							<p class="description">
-								<?php esc_html_e( 'Full HTTPS URL of your Cloudflare Worker acting as the API gateway.', 'all-sources-images' ); ?>
-							</p>
-						</td>
-					</tr>
-					<tr>
-						<td style="width: 20%;">
-							<label for="cloudflare_token">
-								<?php esc_html_e( 'Shared Token', 'all-sources-images' ); ?>
-							</label>
-						</td>
-						<td style="width: 80%;" colspan="2">
-							<input type="password" class="regular-text" name="ASI_plugin_proxy_settings[cloudflare_token]" id="cloudflare_token" value="<?php echo esc_attr( isset( $options['cloudflare_token'] ) ? $options['cloudflare_token'] : '' ); ?>" placeholder="********" />
-							<p class="description">
-								<?php esc_html_e( 'Must match the PLUGIN_AUTH_TOKEN configured in the worker. Used to authorize the plugin.', 'all-sources-images' ); ?>
-							</p>
-						</td>
-					</tr>
-				</tbody>
-			</table>
 		</div>
 
 		<?php submit_button(); ?>
@@ -189,24 +154,13 @@ $proxy_mode = in_array( $saved_mode, array( 'legacy', 'cloudflare' ), true ) ? $
 jQuery(document).ready(function($) {
 	// Show/hide proxy settings based on enable checkbox
 	var $container = $('#proxy-settings-container');
-	var $modeSelect = $('#proxy_mode');
-
-	function refreshProxyModeSections() {
-		var mode = $modeSelect.val();
-		$('.asi-proxy-mode-section').hide();
-		$('.asi-proxy-mode-section[data-proxy-mode="' + mode + '"]').fadeIn('fast');
-	}
 
 	$('#enable_proxy').on('change', function() {
 		if ($(this).is(':checked')) {
 			$container.slideDown();
-			refreshProxyModeSections();
 		} else {
 			$container.slideUp();
 		}
 	});
-
-	$modeSelect.on('change', refreshProxyModeSections);
-	refreshProxyModeSections();
 });
 </script>

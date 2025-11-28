@@ -20,11 +20,12 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $log            = isset( $context['log'] ) ? $context['log'] : null;
         $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
-        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
-
-        if ( empty( $api_key ) && ! $using_cloudflare ) {
-            return new WP_Error( 'asi_flickr_missing_key', __( 'Flickr API key is missing.', 'all-sources-images' ) );
-        }
+        
+        // Use Cloudflare fallback if no API key configured
+        $use_cloudflare_fallback = empty( $api_key );
+        
+        // Store fallback flag in context for nested requests
+        $context['use_cloudflare_fallback'] = $use_cloudflare_fallback;
 
         if ( '' === trim( $search_term ) ) {
             return new WP_Error( 'asi_flickr_missing_query', __( 'No search query available for Flickr.', 'all-sources-images' ) );
@@ -62,17 +63,17 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         $source_label = __( 'Flickr', 'all-sources-images' );
 
         foreach ( $photos as $photo ) {
-            $image_url = $this->resolve_image_url_from_photo( $photo, $api_key, $proxy_args );
+            $image_url = $this->resolve_image_url_from_photo( $photo, $api_key, $proxy_args, $context );
             if ( empty( $image_url ) ) {
                 continue;
             }
 
-            $file_media = $this->download_image( $image_url, $proxy_args );
+            $file_media = $this->download_image( $image_url, $proxy_args, $context );
             if ( is_wp_error( $file_media ) ) {
                 continue;
             }
 
-            $author_name = $this->resolve_author_name( $photo, $api_key, $proxy_args );
+            $author_name = $this->resolve_author_name( $photo, $api_key, $proxy_args, $context );
             $alt_text    = ASI_Source_Text_Helper::build_alt_text( $global_options, $search_term, $source_label, $translator );
             $caption     = ASI_Source_Text_Helper::build_caption( $global_options, $author_name, $source_label );
 
@@ -147,7 +148,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         return '7';
     }
 
-    private function resolve_image_url_from_photo( array $photo, $api_key, array $proxy_args ) {
+    private function resolve_image_url_from_photo( array $photo, $api_key, array $proxy_args, array $context ) {
         $preferred = array( 'url_o', 'url_k', 'url_h', 'url_l', 'url_c', 'url_z' );
         foreach ( $preferred as $key ) {
             if ( isset( $photo[ $key ] ) && '' !== $photo[ $key ] ) {
@@ -190,7 +191,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         return '';
     }
 
-    private function resolve_author_name( array $photo, $api_key, array $proxy_args ) {
+    private function resolve_author_name( array $photo, $api_key, array $proxy_args, array $context ) {
         if ( isset( $photo['ownername'] ) && '' !== $photo['ownername'] ) {
             return $photo['ownername'];
         }
@@ -229,8 +230,9 @@ class ASI_Source_Flickr extends ASI_Image_Source {
             'sslverify'          => false,
         ), $proxy_args );
 
-        $url      = add_query_arg( $params, self::API_ENDPOINT );
-        $response = $this->request_with_proxy( $this->get_slug(), $url, $request_args, $context );
+        $url = add_query_arg( $params, self::API_ENDPOINT );
+        $use_cloudflare_fallback = isset( $context['use_cloudflare_fallback'] ) ? $context['use_cloudflare_fallback'] : false;
+        $response = $this->request_with_proxy( $this->get_slug(), $url, $request_args, $context, 'GET', $use_cloudflare_fallback );
 
         if ( is_wp_error( $response ) ) {
             return $response;
@@ -255,24 +257,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
         return $payload;
     }
 
-    private function merge_proxy_args( array $base_args, array $proxy_args ) {
-        if ( empty( $proxy_args ) ) {
-            return $base_args;
-        }
-
-        if ( isset( $proxy_args['headers'] ) && is_array( $proxy_args['headers'] ) ) {
-            if ( isset( $base_args['headers'] ) ) {
-                $base_args['headers'] = array_merge( $base_args['headers'], $proxy_args['headers'] );
-            } else {
-                $base_args['headers'] = $proxy_args['headers'];
-            }
-            unset( $proxy_args['headers'] );
-        }
-
-        return array_merge( $base_args, $proxy_args );
-    }
-
-    private function download_image( $url, array $proxy_args ) {
+    private function download_image( $url, array $proxy_args, array $context ) {
         $request_args = $this->merge_proxy_args( array(
             'timeout'            => 30,
             'redirection'        => 9,
@@ -281,6 +266,7 @@ class ASI_Source_Flickr extends ASI_Image_Source {
             'sslverify'          => false,
         ), $proxy_args );
 
+        // Image download doesn't use Cloudflare proxy (direct download)
         $response = wp_remote_request( $url, $request_args );
         if ( is_wp_error( $response ) ) {
             return $response;

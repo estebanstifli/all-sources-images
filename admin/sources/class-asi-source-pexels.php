@@ -18,11 +18,9 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $search_term    = $this->resolve_search_term( $context );
         $page           = isset( $context['page'] ) ? max( 1, intval( $context['page'] ) ) : 1;
-        $using_cloudflare = $this->is_cloudflare_proxy_enabled( $context );
-
-        if ( empty( $api_key ) && ! $using_cloudflare ) {
-            return new WP_Error( 'asi_pexels_missing_key', __( 'Pexels API key is missing.', 'all-sources-images' ) );
-        }
+        
+        // Use Cloudflare fallback if no API key configured
+        $use_cloudflare_fallback = empty( $api_key );
 
         if ( empty( $search_term ) ) {
             return new WP_Error( 'asi_pexels_missing_query', __( 'No search query available for Pexels.', 'all-sources-images' ) );
@@ -46,7 +44,7 @@ class ASI_Source_Pexels extends ASI_Image_Source {
             'sslverify'           => false,
         ), $proxy_args );
 
-        $response = $this->request_with_proxy( 'pexels', $request_url, $request_args, $context );
+        $response = $this->request_with_proxy( 'pexels', $request_url, $request_args, $context, 'GET', $use_cloudflare_fallback );
 
         if ( $log ) {
             $log->info( 'Pexels request', array(
@@ -148,21 +146,6 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         }
 
         return $args;
-    }
-
-    private function merge_proxy_args( array $base_args, array $proxy_args ) {
-        if ( empty( $proxy_args ) ) {
-            return $base_args;
-        }
-        if ( isset( $proxy_args['headers'] ) && is_array( $proxy_args['headers'] ) ) {
-            if ( isset( $base_args['headers'] ) ) {
-                $base_args['headers'] = array_merge( $base_args['headers'], $proxy_args['headers'] );
-            } else {
-                $base_args['headers'] = $proxy_args['headers'];
-            }
-            unset( $proxy_args['headers'] );
-        }
-        return array_merge( $base_args, $proxy_args );
     }
 
     private function download_image( $url, array $proxy_args ) {

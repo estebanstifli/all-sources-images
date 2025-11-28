@@ -45,21 +45,43 @@ abstract class ASI_Image_Source {
         );
     }
 
-    protected function request_with_proxy( $service, $url, array $request_args, array $context, $method = 'GET' ) {
+    /**
+     * Make HTTP request with proxy support and optional Cloudflare fallback
+     * 
+     * @param string $service Service name (pixabay, pexels, etc.)
+     * @param string $url Target URL
+     * @param array $request_args Request arguments
+     * @param array $context Generation context
+     * @param string $method HTTP method (GET, POST)
+     * @param bool $use_cloudflare_fallback Whether to use Cloudflare Worker (when no API key)
+     */
+    protected function request_with_proxy( $service, $url, array $request_args, array $context, $method = 'GET', $use_cloudflare_fallback = false ) {
         $request_args['method'] = strtoupper( $method );
 
         if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_remote_request' ) ) {
-            return $context['generation']->ASI_remote_request( $service, $url, $request_args );
+            return $context['generation']->ASI_remote_request( $service, $url, $request_args, $use_cloudflare_fallback );
         }
 
+        // Fallback without centralized proxy
         $proxy_args = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();
         return wp_remote_request( $url, array_merge( $request_args, $proxy_args ) );
     }
 
-        protected function is_cloudflare_proxy_enabled( array $context ) {
-            if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_current_proxy_mode' ) ) {
-                return 'cloudflare' === $context['generation']->ASI_current_proxy_mode();
-            }
-            return false;
+    /**
+     * Check if Cloudflare proxy is available for fallback
+     * (deprecated - kept for backward compatibility)
+     */
+    protected function is_cloudflare_proxy_enabled( array $context ) {
+        return false; // No longer used - fallback is automatic per-source
+    }
+    
+    /**
+     * Merge proxy args helper
+     */
+    protected function merge_proxy_args( array $base_args, array $proxy_args ) {
+        if ( empty( $proxy_args ) ) {
+            return $base_args;
         }
+        return array_merge( $base_args, $proxy_args );
+    }
 }

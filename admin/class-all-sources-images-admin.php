@@ -348,11 +348,19 @@ class All_Sources_Images_Admin {
      * @since    6.1.7
      * @return   array    Proxy configuration array
      */
+    
+    // Cloudflare Worker constants (hardcoded for automatic fallback)
+    const ASI_CLOUDFLARE_WORKER_URL = 'https://noisy-heart-6060.estebandezafra.workers.dev';
+    const ASI_CLOUDFLARE_WORKER_TOKEN = 'TTSHFHRwllzM1RDctruMT0daz4sYmTKAj1V3y8VFlL6mVwdt4oYWWolwYrvLz1PS';
+    
+    // Sources that support automatic Cloudflare fallback when no API key is configured
+    const ASI_CLOUDFLARE_FALLBACK_SOURCES = array( 'pixabay', 'pexels', 'unsplash', 'flickr', 'giphy' );
+    
     public function ASI_get_proxy_args() {
         $proxy_options = $this->ASI_get_proxy_settings();
-        $mode = $this->ASI_get_effective_proxy_mode( $proxy_options );
-
-        if ( 'legacy' !== $mode ) {
+        
+        // Only return proxy args if legacy proxy is enabled and configured
+        if ( empty( $proxy_options['enable_proxy'] ) || 'enable' !== $proxy_options['enable_proxy'] ) {
             return array();
         }
 
@@ -381,46 +389,37 @@ class All_Sources_Images_Admin {
         return $cache;
     }
 
-    private function ASI_get_effective_proxy_mode( $options = null ) {
-        if ( null === $options ) {
-            $options = $this->ASI_get_proxy_settings();
-        }
+    /**
+     * Check if a source supports Cloudflare fallback
+     */
+    public function ASI_source_supports_cloudflare_fallback( $service ) {
+        return in_array( $service, self::ASI_CLOUDFLARE_FALLBACK_SOURCES, true );
+    }
 
-        if ( empty( $options['enable_proxy'] ) || 'enable' !== $options['enable_proxy'] ) {
-            return 'disabled';
-        }
-
-        $mode = isset( $options['proxy_mode'] ) ? $options['proxy_mode'] : 'legacy';
-        if ( ! in_array( $mode, array( 'legacy', 'cloudflare' ), true ) ) {
-            $mode = 'legacy';
-        }
-
-        return $mode;
+    /**
+     * Check if legacy proxy is enabled by user
+     */
+    public function ASI_is_legacy_proxy_enabled() {
+        $options = $this->ASI_get_proxy_settings();
+        return ! empty( $options['enable_proxy'] ) && 'enable' === $options['enable_proxy'] && ! empty( $options['proxy_address'] );
     }
 
     public function ASI_current_proxy_mode() {
-        return $this->ASI_get_effective_proxy_mode();
+        // For backward compatibility - now only returns 'legacy' or 'disabled'
+        $options = $this->ASI_get_proxy_settings();
+        if ( ! empty( $options['enable_proxy'] ) && 'enable' === $options['enable_proxy'] ) {
+            return 'legacy';
+        }
+        return 'disabled';
     }
 
-    private function ASI_get_cloudflare_bootstrap( $options = null ) {
-        if ( null === $options ) {
-            $options = $this->ASI_get_proxy_settings();
-        }
-
-        $worker_url = isset( $options['cloudflare_worker_url'] ) ? trim( $options['cloudflare_worker_url'] ) : '';
-        $token      = isset( $options['cloudflare_token'] ) ? trim( $options['cloudflare_token'] ) : '';
-
-        if ( empty( $worker_url ) ) {
-            return new WP_Error( 'asi_proxy_missing_worker', __( 'Cloudflare worker URL is not configured.', 'all-sources-images' ) );
-        }
-
-        if ( empty( $token ) ) {
-            return new WP_Error( 'asi_proxy_missing_token', __( 'Cloudflare worker token is not configured.', 'all-sources-images' ) );
-        }
-
+    /**
+     * Get Cloudflare Worker bootstrap configuration (uses hardcoded constants)
+     */
+    private function ASI_get_cloudflare_bootstrap() {
         return array(
-            'worker_url' => $worker_url,
-            'token'      => $token,
+            'worker_url' => self::ASI_CLOUDFLARE_WORKER_URL,
+            'token'      => self::ASI_CLOUDFLARE_WORKER_TOKEN,
         );
     }
 
@@ -489,11 +488,8 @@ class All_Sources_Images_Admin {
         return $args;
     }
 
-    private function ASI_remote_request_via_cloudflare( $service, $url, array $args, array $options ) {
-        $bootstrap = $this->ASI_get_cloudflare_bootstrap( $options );
-        if ( is_wp_error( $bootstrap ) ) {
-            return $bootstrap;
-        }
+    private function ASI_remote_request_via_cloudflare( $service, $url, array $args ) {
+        $bootstrap = $this->ASI_get_cloudflare_bootstrap();
 
         $worker_url      = untrailingslashit( $bootstrap['worker_url'] );
         $encoded_url_b64 = base64_encode( $url );
@@ -508,33 +504,37 @@ class All_Sources_Images_Admin {
         return wp_remote_request( $final_url, $args );
     }
 
-    public function ASI_remote_request( $service, $url, array $args = array() ) {
+    /**
+     * Main remote request function
+     * 
+     * Logic:
+     * 1. If source supports Cloudflare fallback AND use_cloudflare_fallback is true -> use Cloudflare
+     * 2. If legacy proxy is enabled -> use legacy proxy
+     * 3. Otherwise -> direct request
+     */
+    public function ASI_remote_request( $service, $url, array $args = array(), $use_cloudflare_fallback = false ) {
         $args = $this->ASI_prepare_http_args( $args );
-        $options = $this->ASI_get_proxy_settings();
-        $mode = $this->ASI_get_effective_proxy_mode( $options );
 
-        if ( 'cloudflare' === $mode && ! empty( $service ) ) {
-            $map = $this->ASI_get_cloudflare_service_map();
-            if ( isset( $map[ $service ] ) ) {
-                $response = $this->ASI_remote_request_via_cloudflare( $service, $url, $args, $options );
-                return $response;
-            }
+        // Check if we should use Cloudflare fallback (source has no API key configured)
+        if ( $use_cloudflare_fallback && $this->ASI_source_supports_cloudflare_fallback( $service ) ) {
+            return $this->ASI_remote_request_via_cloudflare( $service, $url, $args );
         }
 
+        // Apply legacy proxy if enabled
         $proxy_args = $this->ASI_get_proxy_args();
         $args = $this->ASI_merge_http_args( $args, $proxy_args );
 
         return wp_remote_request( $url, $args );
     }
 
-    public function ASI_remote_get( $service, $url, array $args = array() ) {
+    public function ASI_remote_get( $service, $url, array $args = array(), $use_cloudflare_fallback = false ) {
         $args['method'] = 'GET';
-        return $this->ASI_remote_request( $service, $url, $args );
+        return $this->ASI_remote_request( $service, $url, $args, $use_cloudflare_fallback );
     }
 
-    public function ASI_remote_post( $service, $url, array $args = array() ) {
+    public function ASI_remote_post( $service, $url, array $args = array(), $use_cloudflare_fallback = false ) {
         $args['method'] = 'POST';
-        return $this->ASI_remote_request( $service, $url, $args );
+        return $this->ASI_remote_request( $service, $url, $args, $use_cloudflare_fallback );
     }
 
     /**

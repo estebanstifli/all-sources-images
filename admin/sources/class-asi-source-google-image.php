@@ -249,23 +249,6 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
         return substr( $body, 0, $limit ) . '...';
     }
 
-    private function merge_proxy_args( array $base_args, array $proxy_args ) {
-        if ( empty( $proxy_args ) ) {
-            return $base_args;
-        }
-
-        if ( isset( $proxy_args['headers'] ) && is_array( $proxy_args['headers'] ) ) {
-            if ( isset( $base_args['headers'] ) ) {
-                $base_args['headers'] = array_merge( $base_args['headers'], $proxy_args['headers'] );
-            } else {
-                $base_args['headers'] = $proxy_args['headers'];
-            }
-            unset( $proxy_args['headers'] );
-        }
-
-        return array_merge( $base_args, $proxy_args );
-    }
-
     private function get_translator_callable( array $context ) {
         if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ASI_translate_text' ) ) {
             return array( $context['generation'], 'ASI_translate_text' );
