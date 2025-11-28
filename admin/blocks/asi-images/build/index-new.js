@@ -18,7 +18,6 @@
         const bankLower = bank.toLowerCase();
         const configs = {
             'pixabay': { apiPath: 'hits', imgKey: 'webformatURL', imgLarge: 'largeImageURL', altKey: 'tags', captionKey: 'user' },
-            'google_scraping': { apiPath: 'results', imgKey: 'url', imgLarge: 'url', altKey: 'alt', captionKey: 'caption' },
             'openverse': { apiPath: 'results', imgKey: 'url', imgLarge: 'url', altKey: 'title', captionKey: 'creator' },
             'cc_search': { apiPath: 'results', imgKey: 'url', imgLarge: 'url', altKey: 'title', captionKey: 'creator' },
             'unsplash': { apiPath: 'results', imgKey: 'urls.small', imgLarge: 'urls.regular', altKey: 'alt_description', captionKey: 'user.name' },

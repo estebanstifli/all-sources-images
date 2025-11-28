@@ -85,6 +85,14 @@ class All_Sources_Images_Admin {
     private $media_picker_hook = '';
 
     /**
+     * Default post ID for media picker.
+     *
+     * @since    6.1.8
+     * @var      int
+     */
+    private $media_picker_default_post_id = 0;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    4.0.0
@@ -426,7 +434,6 @@ class All_Sources_Images_Admin {
             'openverse'      => array( 'key_location' => 'none' ),
             'cc_search'      => array( 'key_location' => 'none' ),
             'youtube'        => array( 'key_location' => 'query',  'key_name' => 'key' ),
-            'google_scraping'=> array( 'key_location' => 'none' ),
             'google_image'   => array( 'key_location' => 'query',  'key_name' => 'key' ),
             'pixabay_video'  => array( 'key_location' => 'query',  'key_name' => 'key' ),
             'dallev1'        => array( 'key_location' => 'header', 'key_name' => 'Authorization' ),
@@ -1093,7 +1100,6 @@ class All_Sources_Images_Admin {
     public function ASI_banks_name_auto() {
         /* Banks for Automatic Bulk */
         $list_api_auto = array(
-            esc_html__( 'Google Image (Scraping)', 'all-sources-images' ) => array('google_scraping', true),
             esc_html__( 'Google Image (API)', 'all-sources-images' )      => array('google_image', true),
             esc_html__( 'DALL·E (v3)', 'all-sources-images' )            => array('dallev1', true),
             esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
@@ -1114,7 +1120,6 @@ class All_Sources_Images_Admin {
 
     public function ASI_banks_name_manual() {
         $list_api_manual = array(
-            esc_html__( 'Google Image (Scraping)', 'all-sources-images' ) => array('google_scraping', true),
             esc_html__( 'Google Image (API)', 'all-sources-images' )      => array('google_image', true),
             esc_html__( 'DALL·E (v3)', 'all-sources-images' )            => array('dallev1', true),
             esc_html__( 'Openverse', 'all-sources-images' )               => array('cc_search', true),
@@ -1217,22 +1222,11 @@ class All_Sources_Images_Admin {
             $ar_bank_auto = array($options_banks['api_chosen']);
         } else {
             // Default banks
-            $ar_bank_auto = array('google_scraping', 'cc_search');
+            $ar_bank_auto = array('openverse', 'cc_search');
         }
         $default_options = array(
             'api_chosen_manual' => array('openverse'),
             'api_chosen_auto'   => $ar_bank_auto,
-            'google_scraping'   => array(
-                'search_country'      => 'en',
-                'img_color'           => '',
-                'rights'              => '',
-                'imgsz'               => '',
-                'format'              => '',
-                'imgtype'             => '',
-                'safe'                => 'medium',
-                'restricted_domains'  => '',
-                'blacklisted_domains' => '',
-            ),
             'googleimage'       => array(
                 'cxid'           => '',
                 'apikey'         => '',
@@ -2856,7 +2850,7 @@ class All_Sources_Images_Admin {
                 $ar_bank_auto = array($options_banks['api_chosen_auto']);
                 $default_bank = reset( $ar_bank_auto[0] );
             } else {
-                $default_bank = 'google_scraping';
+                $default_bank = 'cc_search';
             }
             // Move old values to the new structure
             $optionstomove['image_block'][1] = array(
@@ -2910,7 +2904,7 @@ class All_Sources_Images_Admin {
                 $ar_bank_auto = array($options_banks['api_chosen_auto']);
                 $default_bank = reset( $ar_bank_auto[0] );
             } else {
-                $default_bank = 'google_scraping';
+                $default_bank = 'cc_search';
             }
             // Retrieve current options
             $current_options = get_option( 'ASI_plugin_main_settings', array() );

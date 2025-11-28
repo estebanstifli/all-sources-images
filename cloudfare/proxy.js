@@ -20,7 +20,6 @@ const SERVICE_CONFIGS = {
     openverse:    { key_location: 'none' },
     cc_search:    { key_location: 'none' },
     youtube:      { key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'YOUTUBE_API_KEY' },
-    google_scraping: { key_location: 'none' },
     google_image: { key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'GOOGLE_IMAGE_API_KEY' },
     pixabay_video:{ key_location: 'query',  key_name_in_api: 'key',        env_key_name: 'PIXABAY_API_KEY' },
 

@@ -12,7 +12,6 @@ require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-giphy.php';
 require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-openverse.php';
 require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-unsplash.php';
 require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-google-image.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-google-scraping.php';
 require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-youtube.php';
 require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-dallev1.php';
 require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-stability.php';
@@ -149,10 +148,6 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
 
         if ( class_exists( 'ASI_Source_Google_Image' ) && ! $this->source_manager->has_source( 'google_image' ) ) {
             $this->source_manager->register_source( new ASI_Source_Google_Image() );
-        }
-
-        if ( class_exists( 'ASI_Source_Google_Scraping' ) && ! $this->source_manager->has_source( 'google_scraping' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Google_Scraping() );
         }
 
         if ( class_exists( 'ASI_Source_Youtube' ) && ! $this->source_manager->has_source( 'youtube' ) ) {
@@ -1963,7 +1958,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         );
         
         $url = add_query_arg( $params, $url );
-        $response = $this->ASI_remote_get( 'google_scraping', $url, array(
+        $response = $this->ASI_remote_get( 'google_translate', $url, array(
             'timeout' => 10,
         ) );
         

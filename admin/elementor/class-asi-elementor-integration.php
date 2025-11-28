@@ -113,7 +113,6 @@ class ASI_Elementor_Integration {
             
             // Build available banks list (same as admin class)
             $manual_bank_labels = array(
-                'google_scraping' => __( 'Google Image (Scraping)', 'all-sources-images' ),
                 'google_image'    => __( 'Google Image (API)', 'all-sources-images' ),
                 'dallev1'         => __( 'DALL·E (v3)', 'all-sources-images' ),
                 'cc_search'       => __( 'Openverse', 'all-sources-images' ),
