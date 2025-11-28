@@ -1224,8 +1224,18 @@ class All_Sources_Images_Admin {
             // Default banks
             $ar_bank_auto = array('openverse', 'cc_search');
         }
+        // Default manual banks: stock image sources selected by default (as shown in settings UI)
+        // Order: Pixabay, Flickr, Openverse (cc_search), Unsplash, GIPHY, Pexels
+        // AI sources and YouTube/Google Image excluded by default
         $default_options = array(
-            'api_chosen_manual' => array('openverse'),
+            'api_chosen_manual' => array(
+                'pixabay',
+                'flickr',
+                'cc_search',
+                'unsplash',
+                'giphy',
+                'pexels',
+            ),
             'api_chosen_auto'   => $ar_bank_auto,
             'googleimage'       => array(
                 'cxid'           => '',

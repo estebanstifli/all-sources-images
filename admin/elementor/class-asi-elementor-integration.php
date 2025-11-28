@@ -107,8 +107,18 @@ class ASI_Elementor_Integration {
             );
             
             // Localize with required data
+            // Default manual banks: stock image sources selected by default
+            // Order: Pixabay, Flickr, Openverse (cc_search), Unsplash, GIPHY, Pexels
+            $default_manual_banks = array(
+                'pixabay',
+                'flickr',
+                'cc_search',
+                'unsplash',
+                'giphy',
+                'pexels',
+            );
             $banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), array(
-                'api_chosen_manual' => array( 'pixabay' ),
+                'api_chosen_manual' => $default_manual_banks,
             ) );
             
             // Build available banks list (same as admin class)
@@ -135,7 +145,7 @@ class ASI_Elementor_Integration {
                 'ajax_url'         => admin_url( 'admin-ajax.php' ),
                 'admin_url'        => admin_url(),
                 'nonce'            => wp_create_nonce( 'ASI_gutenberg_block' ),
-                'choosed_banks'    => isset( $banks['api_chosen_manual'] ) ? $banks['api_chosen_manual'] : array( 'pixabay' ),
+                'choosed_banks'    => isset( $banks['api_chosen_manual'] ) ? $banks['api_chosen_manual'] : $default_manual_banks,
                 'available_banks'  => $manual_bank_labels,
                 'licensing_data'   => '1',
                 'path_default_img' => plugin_dir_url( __FILE__ ) . '../blocks/asi-images/img/',
