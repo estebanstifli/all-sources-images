@@ -1213,6 +1213,24 @@
                                     value: settingsPanel.values.alt,
                                     onChange: (value) => handleSettingsValueChange('alt', value)
                                 }),
+                                // Translation indicator for ALT text
+                                asiAjax.translate_alt && asiAjax.translate_alt_lang && asiAjax.translate_alt_lang !== 'en' && wp.element.createElement('p', {
+                                    style: {
+                                        marginTop: '-8px',
+                                        marginBottom: '16px',
+                                        fontSize: '11px',
+                                        color: '#1e88e5',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }
+                                },
+                                    wp.element.createElement('span', {
+                                        className: 'dashicons dashicons-translation',
+                                        style: { fontSize: '12px', width: '12px', height: '12px' }
+                                    }),
+                                    sprintf(__('Will be translated to %s', 'all-sources-images'), asiAjax.translate_alt_lang.toUpperCase())
+                                ),
                                 wp.element.createElement('div', {
                                     className: 'asi-settings-caption-group'
                                 },

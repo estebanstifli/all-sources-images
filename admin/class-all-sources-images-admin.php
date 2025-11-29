@@ -1971,17 +1971,21 @@ class All_Sources_Images_Admin {
         $this->media_picker_default_post_id = $default_post_id;
         $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
         $translation_en_active = ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' );
+        $translate_alt_active = ( ! empty( $block_settings['translate_alt'] ) && $block_settings['translate_alt'] == 'true' );
+        $translate_alt_lang = ( ! empty( $block_settings['translate_alt_lang'] ) ? $block_settings['translate_alt_lang'] : '' );
         wp_localize_script( 'asi-images-script', 'asiAjax', array(
-            'ajax_url'         => admin_url( 'admin-ajax.php' ),
-            'admin_url'        => admin_url(),
-            'nonce'            => wp_create_nonce( 'ASI_gutenberg_block' ),
-            'choosed_banks'    => $banks['api_chosen_manual'],
-            'available_banks'  => $manual_bank_labels,
-            'licensing_data'   => '1', // All features available
-            'path_default_img' => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
-            'ai_sources'       => $this->ASI_ai_source_codes(),
-            'default_post_id'  => $default_post_id,
-            'translation_en'   => $translation_en_active,
+            'ajax_url'           => admin_url( 'admin-ajax.php' ),
+            'admin_url'          => admin_url(),
+            'nonce'              => wp_create_nonce( 'ASI_gutenberg_block' ),
+            'choosed_banks'      => $banks['api_chosen_manual'],
+            'available_banks'    => $manual_bank_labels,
+            'licensing_data'     => '1', // All features available
+            'path_default_img'   => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
+            'ai_sources'         => $this->ASI_ai_source_codes(),
+            'default_post_id'    => $default_post_id,
+            'translation_en'     => $translation_en_active,
+            'translate_alt'      => $translate_alt_active,
+            'translate_alt_lang' => $translate_alt_lang,
         ) );
         // Locate character strings
         wp_set_script_translations( 'asi-images-script', 'all-sources-images', plugin_dir_path( __DIR__ ) . 'languages' );
@@ -2812,6 +2816,26 @@ class All_Sources_Images_Admin {
             'post_status'    => 'inherit',
         );
         $attach_id = wp_insert_attachment( $attachment, $uploaded_file['file'], $post_id );
+        
+        // Translate ALT text if enabled in block settings
+        $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
+        if ( ! empty( $alt ) && ! empty( $block_settings['translate_alt'] ) && $block_settings['translate_alt'] == 'true' ) {
+            $target_lang = ( ! empty( $block_settings['translate_alt_lang'] ) ? $block_settings['translate_alt_lang'] : '' );
+            // Only translate if target language is set and not English (ALT usually comes in English from image banks)
+            if ( ! empty( $target_lang ) && $target_lang !== 'en' ) {
+                $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
+                $translated_alt = $REST_generation->ASI_translate_text( $alt, 'en', $target_lang );
+                if ( $translated_alt !== false && ! empty( $translated_alt ) ) {
+                    ASI_log( array(
+                        'original_alt'   => $alt,
+                        'translated_alt' => $translated_alt,
+                        'target_lang'    => $target_lang,
+                    ), 'GUTENBERG_DOWNLOAD_ALT_TRANSLATED' );
+                    $alt = $translated_alt;
+                }
+            }
+        }
+        
         // Add alt text for image
         update_post_meta( $attach_id, '_wp_attachment_image_alt', $alt );
         // Add caption text for image

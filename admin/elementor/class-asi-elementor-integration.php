@@ -145,18 +145,22 @@ class ASI_Elementor_Integration {
             $admin_class = new All_Sources_Images_Admin( 'all-sources-images', ALL_SOURCES_IMAGES_VERSION );
             $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $admin_class->ASI_default_options_block_settings( TRUE ) );
             $translation_en_active = ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' );
+            $translate_alt_active = ( ! empty( $block_settings['translate_alt'] ) && $block_settings['translate_alt'] == 'true' );
+            $translate_alt_lang = ( ! empty( $block_settings['translate_alt_lang'] ) ? $block_settings['translate_alt_lang'] : '' );
             
             wp_localize_script( 'asi-images-script', 'asiAjax', array(
-                'ajax_url'         => admin_url( 'admin-ajax.php' ),
-                'admin_url'        => admin_url(),
-                'nonce'            => wp_create_nonce( 'ASI_gutenberg_block' ),
-                'choosed_banks'    => isset( $banks['api_chosen_manual'] ) ? $banks['api_chosen_manual'] : $default_manual_banks,
-                'available_banks'  => $manual_bank_labels,
-                'licensing_data'   => '1',
-                'path_default_img' => plugin_dir_url( __FILE__ ) . '../blocks/asi-images/img/',
-                'ai_sources'       => $ai_sources,
-                'default_post_id'  => 0,
-                'translation_en'   => $translation_en_active,
+                'ajax_url'           => admin_url( 'admin-ajax.php' ),
+                'admin_url'          => admin_url(),
+                'nonce'              => wp_create_nonce( 'ASI_gutenberg_block' ),
+                'choosed_banks'      => isset( $banks['api_chosen_manual'] ) ? $banks['api_chosen_manual'] : $default_manual_banks,
+                'available_banks'    => $manual_bank_labels,
+                'licensing_data'     => '1',
+                'path_default_img'   => plugin_dir_url( __FILE__ ) . '../blocks/asi-images/img/',
+                'ai_sources'         => $ai_sources,
+                'default_post_id'    => 0,
+                'translation_en'     => $translation_en_active,
+                'translate_alt'      => $translate_alt_active,
+                'translate_alt_lang' => $translate_alt_lang,
             ) );
         }
         
