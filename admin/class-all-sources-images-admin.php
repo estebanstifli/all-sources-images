@@ -1371,7 +1371,11 @@ class All_Sources_Images_Admin {
      */
     public function ASI_default_options_block_settings( $never_set = FALSE ) {
         $default_options = array(
-            'enable_manual_search' => true,
+            'enable_manual_search'    => true,
+            'translation_EN'          => '',
+            'translate_alt'           => '',
+            'translate_alt_lang'      => '',
+            'google_translate_apikey' => '',
         );
         return $default_options;
     }
@@ -1965,6 +1969,8 @@ class All_Sources_Images_Admin {
         ) );
         $default_post_id = apply_filters( 'asi_media_picker_default_post_id', 0 );
         $this->media_picker_default_post_id = $default_post_id;
+        $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
+        $translation_en_active = ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' );
         wp_localize_script( 'asi-images-script', 'asiAjax', array(
             'ajax_url'         => admin_url( 'admin-ajax.php' ),
             'admin_url'        => admin_url(),
@@ -1975,6 +1981,7 @@ class All_Sources_Images_Admin {
             'path_default_img' => plugins_url( '/blocks/asi-images/img/', __FILE__ ),
             'ai_sources'       => $this->ASI_ai_source_codes(),
             'default_post_id'  => $default_post_id,
+            'translation_en'   => $translation_en_active,
         ) );
         // Locate character strings
         wp_set_script_translations( 'asi-images-script', 'all-sources-images', plugin_dir_path( __DIR__ ) . 'languages' );
@@ -2139,6 +2146,25 @@ class All_Sources_Images_Admin {
         $index = intval( $_GET['index'] );
         $id = intval( $_GET['id'] );
         $page = isset( $_GET['page'] ) ? max( 1, intval( $_GET['page'] ) ) : 1;
+        
+        // Translate search term to English if translation_EN is enabled
+        $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
+        if ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' ) {
+            $wp_lang = get_bloginfo( 'language' );
+            $source_lang = substr( $wp_lang, 0, 2 );
+            if ( $source_lang !== 'en' && ! empty( $search_term ) ) {
+                $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
+                $translated_term = $REST_generation->ASI_translate_text( $search_term, $source_lang, 'en' );
+                if ( $translated_term !== false && ! empty( $translated_term ) ) {
+                    ASI_log( array(
+                        'original_search' => $search_term,
+                        'translated_search' => $translated_term,
+                        'source_lang' => $source_lang,
+                    ), 'GUTENBERG_BLOCK_TRANSLATION' );
+                    $search_term = $translated_term;
+                }
+            }
+        }
         
         ASI_log( array(
             'search_term' => $search_term,

@@ -1035,12 +1035,42 @@
                             style: { marginBottom: '10px' }
                         }),
 
-                        // Search button
-                        wp.element.createElement(Button, {
-                            isPrimary: true,
-                            onClick: searchAllBanks,
-                            disabled: !hasBanks
-                        }, __('Search', 'all-sources-images'))
+                        // Search button and translation indicator
+                        wp.element.createElement('div', {
+                            style: {
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                flexWrap: 'wrap'
+                            }
+                        },
+                            wp.element.createElement(Button, {
+                                isPrimary: true,
+                                onClick: searchAllBanks,
+                                disabled: !hasBanks
+                            }, __('Search', 'all-sources-images')),
+                            
+                            // Translation indicator - show only if translation_en is enabled
+                            asiAjax.translation_en && wp.element.createElement('span', {
+                                style: {
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    fontSize: '12px',
+                                    color: '#1e88e5',
+                                    backgroundColor: '#e3f2fd',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    fontWeight: '500'
+                                }
+                            },
+                                wp.element.createElement('span', {
+                                    className: 'dashicons dashicons-translation',
+                                    style: { fontSize: '14px', width: '14px', height: '14px' }
+                                }),
+                                __('Auto-translate ON', 'all-sources-images')
+                            )
+                        )
                     ),
 
                         showingCachedResults ? wp.element.createElement(Notice, {
