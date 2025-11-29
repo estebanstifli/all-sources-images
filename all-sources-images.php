@@ -192,3 +192,10 @@ function asi_run_plugin() {
 }
 
 asi_run_plugin();
+
+/**
+ * Load New Admin UI
+ * 
+ * @since 6.2.0
+ */
+require_once plugin_dir_path( __FILE__ ) . 'admin/partials/new-ui/new-ui-loader.php';
