@@ -26,9 +26,6 @@ switch ( $active_tab ) {
     case 'postprocessing':
         $title = esc_html__( 'Automatic [Post-Processing]', 'all-sources-images' );
         break;
-    case 'preprocessing':
-        $title = esc_html__( 'Automatic [Pre-Processing]', 'all-sources-images' );
-        break;
     case 'sources':
     default:
         $title = esc_html__( 'Automatic [Sources]', 'all-sources-images' );
@@ -50,9 +47,6 @@ include_once plugin_dir_path( __FILE__ ) . 'header-automatic.php';
             break;
         case 'postprocessing':
             include_once 'tabs/new-automatic-post-processing.php';
-            break;
-        case 'preprocessing':
-            include_once 'tabs/new-automatic-pre-processing.php';
             break;
         case 'sources':
         default:

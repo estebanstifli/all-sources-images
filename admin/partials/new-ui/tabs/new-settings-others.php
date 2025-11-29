@@ -75,6 +75,9 @@ $country_choose = array(
 <form method="post" action="options.php" class="asi-form-section">
     <?php settings_fields( 'ASI-plugin-block-settings' ); ?>
 
+    <h3><?php esc_html_e( 'Translation', 'all-sources-images' ); ?></h3>
+    <p class="description"><?php esc_html_e( 'Configure automatic translation for search keywords and image metadata.', 'all-sources-images' ); ?></p>
+
     <div class="alert alert-custom alert-default" role="alert">
         <div class="alert-icon"><span class="svg-icon svg-icon-primary svg-icon-xl"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -136,9 +139,10 @@ $country_choose = array(
                     <label for="google_translate_apikey"><?php esc_html_e( 'Google Translate API Key', 'all-sources-images' ); ?></label>
                     <span class="description" style="font-weight: normal; font-size: 11px; display: block;"><?php esc_html_e( '(Optional)', 'all-sources-images' ); ?></span>
                 </th>
-                <td>
-                    <input type="text" name="ASI_plugin_block_settings[google_translate_apikey]" id="google_translate_apikey" class="form-control form-control-lg" style="width: 100%; max-width: 400px;" placeholder="<?php esc_attr_e( 'Leave empty to use free translation', 'all-sources-images' ); ?>" value="<?php echo ! empty( $options_block['google_translate_apikey'] ) ? esc_attr( $options_block['google_translate_apikey'] ) : ''; ?>" />
-                    <p class="description">
+                <td id="password-google-translate" class="password">
+                    <input type="password" name="ASI_plugin_block_settings[google_translate_apikey]" id="google_translate_apikey" class="form-control" placeholder="<?php esc_attr_e( 'Leave empty to use free translation', 'all-sources-images' ); ?>" value="<?php echo ! empty( $options_block['google_translate_apikey'] ) ? esc_attr( $options_block['google_translate_apikey'] ) : ''; ?>" />
+                    <i id="togglePassword"></i>
+                    <p class="description" style="clear: both; padding-top: 10px;">
                         <?php esc_html_e( 'Optional: Provide your Google Cloud Translation API key for better quality and reliability. If left empty, the plugin will use the free Google Translate service.', 'all-sources-images' ); ?>
                         <br>
                         <?php esc_html_e( 'Get your API key from:', 'all-sources-images' ); ?> 
@@ -197,5 +201,18 @@ jQuery(document).ready(function($) {
     }
     
     $('#translation_EN, #translate_alt').on('change', toggleGoogleApiRow);
+    
+    // Toggle password visibility for Google Translate API Key
+    var passwordSelector = '#password-google-translate';
+    var password = document.querySelector(passwordSelector + " input");
+    var togglePassword = document.querySelector(passwordSelector + " #togglePassword");
+    
+    if (togglePassword && password) {
+        togglePassword.addEventListener("click", function() {
+            var type = password.getAttribute("type") === "password" ? "text" : "password";
+            password.setAttribute("type", type);
+            this.classList.toggle("close-eye");
+        });
+    }
 });
 </script>
