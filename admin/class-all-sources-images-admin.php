@@ -776,6 +776,7 @@ class All_Sources_Images_Admin {
             'strDalleGenerate'  => esc_html__( 'Dall-e v3 Generation may take 20 to 40 seconds. Please be patient', 'all-sources-images' ),
             'strManualGenerate' => esc_html__( 'Generate Manually', 'all-sources-images' ),
             'strNoRewrite'      => esc_html__( 'Edit your overwrite settings if you want a new image', 'all-sources-images' ),
+            'strConfirmReplace' => esc_html__( 'A featured image already exists. Do you want to replace it with a new one?', 'all-sources-images' ),
             'manual_search'     => $block['enable_manual_search'],
             'dalle'             => $dalle,
             'nonce'             => $post_nounce,

@@ -130,7 +130,56 @@ function displayGenerationButton(gutenbergEditor = true) {
 
                             // Featured image already exist
                             if( data.data && 'already-done' === data.data.status ) {
-                                alert( generationSpecificPostJsVars.postgeneration.strNoRewrite );
+                                if( confirm( generationSpecificPostJsVars.postgeneration.strConfirmReplace ) ) {
+                                    // User wants to replace - make new request with forceRewrite
+                                    jQuery.ajax({
+                                        url : generationSpecificPostJsVars.postgeneration.wp_ajax_url,
+                                        method : 'POST',
+                                        data : {
+                                            action             : 'asi_generate_image',
+                                            ids_mpt_generation : generationSpecificPostJsVars.postgeneration.postID,
+                                            currentPostIndex   : 1,
+                                            count              : 1,
+                                            totalBlocks        : 1,
+                                            imageCounter       : 0,
+                                            blockIndex         : 0,
+                                            buttonAutoGenerate : true,
+                                            forceRewrite       : true,
+                                            nonce              : generationSpecificPostJsVars.postgeneration.nonce
+                                        },
+                                        success: function( replaceData ) {
+                                            if ( replaceData.success && replaceData.data ) {
+                                                var fifuOn              = generationSpecificPostJsVars.postgeneration.fifu_on;
+                                                var classicEditorImage  = jQuery('#postimagediv .inside');
+                                                var fifuPlugin          = jQuery('#fifu_image');
+                                                if( (true == fifuOn) && ( fifuPlugin.length ) ) {
+                                                    jQuery(fifuPlugin).css({'display': 'block', 'background-image': 'url("'+ replaceData.data.img +'")'});
+                                                    jQuery('#fifu_input_url').val(replaceData.data.img);
+                                                } else if( classicEditorImage.length ) {
+                                                    classicEditorImage.html(replaceData.data.postimagediv);
+                                                } else {
+                                                    if (replaceData.data.thumbnail_id) {
+                                                        wp.data.dispatch( 'core/editor' ).editPost({ featured_media: replaceData.data.thumbnail_id });
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        complete: function() {
+                                            jQuery('#post-button-generate .no-generation').show();
+                                            jQuery('#post-button-generate .generation').hide();
+                                            jQuery( '.dalle-wait' ).hide();
+                                            jQuery('.button-hero > .icon-dashboard').removeClass('generate');
+                                            jQuery('#post-button-generate.'+uniqueButtonIdentifier).removeClass('generation-pending');
+                                        }
+                                    });
+                                } else {
+                                    // User cancelled - restore button state
+                                    jQuery('#post-button-generate .no-generation').show();
+                                    jQuery('#post-button-generate .generation').hide();
+                                    jQuery( '.dalle-wait' ).hide();
+                                    jQuery('.button-hero > .icon-dashboard').removeClass('generate');
+                                    jQuery('#post-button-generate.'+uniqueButtonIdentifier).removeClass('generation-pending');
+                                }
                                 return;
                             }
 

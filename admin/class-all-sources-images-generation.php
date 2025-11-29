@@ -214,17 +214,27 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         // Retrieve the current post index and ID from the AJAX request.
         $current_post_index = (int) $_POST['currentPostIndex'];
         $current_post_id = $post_ids_with_keys[$current_post_index];
-        // Load plugin settings for image generation.
-        $main_settings = get_option( 'ASI_plugin_main_settings' );
-        // Check if the 'rewrite featured image' option is enabled.
-        if ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) {
+        // Load plugin settings for image generation (with defaults).
+        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
+        // Check if forceRewrite is set from AJAX request (user confirmed replacement)
+        $force_rewrite = isset( $_POST['forceRewrite'] ) && filter_var( $_POST['forceRewrite'], FILTER_VALIDATE_BOOLEAN );
+        // Check if the 'rewrite featured image' option is enabled or forceRewrite is set.
+        if ( $force_rewrite || ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) ) {
             $rewrite_featured = true;
         } else {
             $rewrite_featured = false;
         }
         $int_blockIndex = 0;
         $counter_blocks = 1;
-        $img_blocks = $main_settings['image_block'];
+        $img_blocks = isset( $main_settings['image_block'] ) && is_array( $main_settings['image_block'] ) ? $main_settings['image_block'] : array(
+            1 => array(
+                'image_location'  => 'featured',
+                'based_on'        => 'title',
+                'translation_EN'  => '',
+                'title_selection' => 'full_title',
+                'selected_image'  => 'first_result',
+            ),
+        );
         $speed = '500';
         // Default speed for image generation.
         $current_image_index = $int_blockIndex;
@@ -246,11 +256,18 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         } elseif ( (!has_post_thumbnail( $current_post_id ) || $rewrite_featured == true || $image_location != 'featured') && $current_post_id != 0 ) {
             // Generate featured image if not present or if rewriting is enabled.
             $image_generation_result = $this->ASI_create_thumb(
-                $current_post_id,
-                '0',
-                '0',
-                '0',
-                $rewrite_featured
+                $current_post_id,       // $id
+                '0',                     // $check_value_enable
+                '0',                     // $check_post_type
+                '0',                     // $check_category
+                $rewrite_featured,       // $rewrite_featured
+                false,                   // $get_only_thumb
+                null,                    // $extracted_search_term
+                null,                    // $api_chosen
+                null,                    // $key_img_block
+                null,                    // $avoid_revision
+                null,                    // $include_datas
+                $button_autogenerate     // $button_autogenerate
             );
 
             if ( is_array( $image_generation_result ) ) {
@@ -347,13 +364,13 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $active_posts_types = $this->ASI_default_posts_types();
         // Avoid generation when click "Add New"
         if ( ($pagenow == 'index.php' || $pagenow == 'post.php') && in_array( get_post_type( $ID ), $active_posts_types['choosed_post_type'] ) ) {
-            $main_settings = get_option( 'ASI_plugin_main_settings' );
+            $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
             if ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) {
                 $rewrite_featured = true;
             } else {
                 $rewrite_featured = false;
             }
-            $img_blocks = $main_settings['image_block'];
+            $img_blocks = isset( $main_settings['image_block'] ) && is_array( $main_settings['image_block'] ) ? $main_settings['image_block'] : $this->ASI_default_options_main_settings( true )['image_block'];
             foreach ( $img_blocks as $key_img_block => $img_block ) {
                 $this->ASI_create_thumb(
                     $ID,
@@ -443,7 +460,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             return false;
         }
         // Settings
-        $main_settings = get_option( 'ASI_plugin_main_settings' );
+        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
         
         // For Gutenberg block (get_only_thumb), we don't need image_block config
         if ( TRUE == $get_only_thumb ) {
@@ -465,6 +482,12 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             $img_block = $main_settings['image_block'][$key_img_block];
             if ( !isset( $img_block ) ) {
                 return false;
+            }
+            
+            // Ensure api_chosen is set from banks settings if not in img_block
+            if ( !isset( $img_block['api_chosen'] ) || empty( $img_block['api_chosen'] ) ) {
+                $banks_settings = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( true ) );
+                $img_block['api_chosen'] = isset( $banks_settings['api_chosen_auto'] ) ? $banks_settings['api_chosen_auto'] : array( 'openverse' );
             }
         }
         
