@@ -127,6 +127,38 @@ $blockIndex = count( $image_blocks ) + 1;
 #image-blocks-container {
     margin-bottom: 20px;
 }
+/* Search Based On conditional fields */
+.based-on-fields {
+    display: none;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.based-on-fields.visible {
+    display: block;
+}
+/* Help text styling */
+.based-on-help-text {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    border-left: 4px solid;
+}
+.based-on-help-text.help-title { background-color: #e8f5e9; border-left-color: #4caf50; }
+.based-on-help-text.help-text_analyser { background-color: #e3f2fd; border-left-color: #2196f3; }
+.based-on-help-text.help-text_analyser_previous_paragraph { background-color: #f3e5f5; border-left-color: #9c27b0; }
+.based-on-help-text.help-text_analyser_next_paragraph { background-color: #fff3e0; border-left-color: #ff9800; }
+.based-on-help-text.help-tags { background-color: #fce4ec; border-left-color: #e91e63; }
+.based-on-help-text.help-categories { background-color: #fff8e1; border-left-color: #ffc107; }
+.based-on-help-text.help-custom_field { background-color: #e0f2f1; border-left-color: #009688; }
+.based-on-help-text.help-custom_request { background-color: #f1f8e9; border-left-color: #8bc34a; }
+.based-on-help-text.help-openai_extractor { background-color: #ede7f6; border-left-color: #673ab7; }
+.based-on-help-text.help-ai_image_prompt { background-color: #e1f5fe; border-left-color: #03a9f4; }
+.based-on-help-text i { margin-right: 8px; }
 </style>
 
 <div class="card mb-5 mb-xl-10">
@@ -239,14 +271,123 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- Search Based On -->
                 <div class="form-row">
                     <label><?php esc_html_e( 'Search Based On', 'all-sources-images' ); ?></label>
-                    <select name="ASI_plugin_main_settings[image_block][0][based_on]" class="form-control based-on-select" style="max-width: 300px;">
+                    <select name="ASI_plugin_main_settings[image_block][0][based_on]" class="form-control based-on-select" style="max-width: 300px;" data-block-index="0">
                         <option value="title"><?php esc_html_e( 'Title', 'all-sources-images' ); ?></option>
                         <option value="text_analyser"><?php esc_html_e( 'Text Analyzer: Full text', 'all-sources-images' ); ?></option>
-                        <option value="tags" <?php echo $disabled; ?>><?php esc_html_e( 'Tags', 'all-sources-images' ); ?></option>
-                        <option value="categories" <?php echo $disabled; ?>><?php esc_html_e( 'Categories', 'all-sources-images' ); ?></option>
-                        <option value="custom_field" <?php echo $disabled; ?>><?php esc_html_e( 'Custom Field', 'all-sources-images' ); ?></option>
-                        <option value="openai_extractor" <?php echo $disabled; ?>><?php esc_html_e( 'OpenAI Keyword Extractor', 'all-sources-images' ); ?></option>
+                        <option value="text_analyser_previous_paragraph"><?php esc_html_e( 'Text Analyzer: Previous paragraph', 'all-sources-images' ); ?></option>
+                        <option value="text_analyser_next_paragraph"><?php esc_html_e( 'Text Analyzer: Next paragraph', 'all-sources-images' ); ?></option>
+                        <option value="tags"><?php esc_html_e( 'Tags', 'all-sources-images' ); ?></option>
+                        <option value="categories"><?php esc_html_e( 'Categories', 'all-sources-images' ); ?></option>
+                        <option value="custom_field"><?php esc_html_e( 'Custom Field', 'all-sources-images' ); ?></option>
+                        <option value="custom_request"><?php esc_html_e( 'Custom Request (Placeholders)', 'all-sources-images' ); ?></option>
+                        <option value="openai_extractor"><?php esc_html_e( 'OpenAI Keyword Extractor', 'all-sources-images' ); ?></option>
+                        <option value="ai_image_prompt"><?php esc_html_e( 'AI Image Prompt (Enhanced)', 'all-sources-images' ); ?></option>
                     </select>
+                    <!-- Help text container -->
+                    <div class="based-on-help-text help-title" data-based-on="title">
+                        <i class="dashicons dashicons-info-outline"></i>
+                        <?php esc_html_e( 'Uses the post title as the search term. This is the simplest and most common option.', 'all-sources-images' ); ?>
+                    </div>
+                </div>
+                
+                <!-- Text Analyzer Language (for text_analyser options) -->
+                <div class="form-row based-on-fields section_text_analyser">
+                    <label><?php esc_html_e( 'Content Language', 'all-sources-images' ); ?></label>
+                    <select name="ASI_plugin_main_settings[image_block][0][text_analyser_lang]" class="form-control" style="max-width: 200px;">
+                        <option value="en"><?php esc_html_e( 'English', 'all-sources-images' ); ?></option>
+                        <option value="es"><?php esc_html_e( 'Spanish', 'all-sources-images' ); ?></option>
+                        <option value="fr"><?php esc_html_e( 'French', 'all-sources-images' ); ?></option>
+                        <option value="de"><?php esc_html_e( 'German', 'all-sources-images' ); ?></option>
+                        <option value="it"><?php esc_html_e( 'Italian', 'all-sources-images' ); ?></option>
+                        <option value="pt"><?php esc_html_e( 'Portuguese', 'all-sources-images' ); ?></option>
+                        <option value="nl"><?php esc_html_e( 'Dutch', 'all-sources-images' ); ?></option>
+                        <option value="ru"><?php esc_html_e( 'Russian', 'all-sources-images' ); ?></option>
+                        <option value="ja"><?php esc_html_e( 'Japanese', 'all-sources-images' ); ?></option>
+                        <option value="zh"><?php esc_html_e( 'Chinese', 'all-sources-images' ); ?></option>
+                        <option value="ar"><?php esc_html_e( 'Arabic', 'all-sources-images' ); ?></option>
+                    </select>
+                </div>
+                
+                <!-- Tags Options -->
+                <div class="form-row based-on-fields section_tags">
+                    <label><?php esc_html_e( 'Tag Selection', 'all-sources-images' ); ?></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="ASI_plugin_main_settings[image_block][0][tags]" value="first_tag" checked> <?php esc_html_e( 'First Tag', 'all-sources-images' ); ?></label>
+                        <label><input type="radio" name="ASI_plugin_main_settings[image_block][0][tags]" value="last_tag"> <?php esc_html_e( 'Last Tag', 'all-sources-images' ); ?></label>
+                        <label><input type="radio" name="ASI_plugin_main_settings[image_block][0][tags]" value="random_tag"> <?php esc_html_e( 'Random Tag', 'all-sources-images' ); ?></label>
+                    </div>
+                </div>
+                
+                <!-- Categories Options -->
+                <div class="form-row based-on-fields section_categories">
+                    <label><?php esc_html_e( 'Category Selection', 'all-sources-images' ); ?></label>
+                    <div class="select-row" style="margin-bottom: 10px;">
+                        <select name="ASI_plugin_main_settings[image_block][0][categories]" class="form-control" style="max-width: 200px;">
+                            <option value="first_category"><?php esc_html_e( 'First Category', 'all-sources-images' ); ?></option>
+                            <option value="last_category"><?php esc_html_e( 'Last Category', 'all-sources-images' ); ?></option>
+                            <option value="random_category"><?php esc_html_e( 'Random Category', 'all-sources-images' ); ?></option>
+                        </select>
+                        <select name="ASI_plugin_main_settings[image_block][0][categories_level]" class="form-control" style="max-width: 200px;">
+                            <option value="child"><?php esc_html_e( 'Child (Most Specific)', 'all-sources-images' ); ?></option>
+                            <option value="parent"><?php esc_html_e( 'Parent', 'all-sources-images' ); ?></option>
+                            <option value="grandparent"><?php esc_html_e( 'Grandparent (Top Level)', 'all-sources-images' ); ?></option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Custom Field Options -->
+                <div class="form-row based-on-fields section_custom_field">
+                    <label><?php esc_html_e( 'Custom Field Name', 'all-sources-images' ); ?></label>
+                    <input type="text" name="ASI_plugin_main_settings[image_block][0][custom_field]" class="form-control" style="max-width: 300px;" placeholder="my_custom_field">
+                    <p class="description"><?php esc_html_e( 'Enter the meta key name of your custom field.', 'all-sources-images' ); ?></p>
+                </div>
+                
+                <!-- Custom Request Options -->
+                <div class="form-row based-on-fields section_custom_request">
+                    <label><?php esc_html_e( 'Custom Search Template', 'all-sources-images' ); ?></label>
+                    <input type="text" name="ASI_plugin_main_settings[image_block][0][custom_request]" class="form-control" style="max-width: 400px;" placeholder="%%Title%% %%Category%%" value="%%Title%% %%Category%%">
+                    <p class="description">
+                        <?php esc_html_e( 'Available placeholders:', 'all-sources-images' ); ?> 
+                        <code>%%Title%%</code>, <code>%%Category%%</code>, <code>%%Tag%%</code>, <code>%%Taxonomy%%</code>
+                    </p>
+                </div>
+                
+                <!-- OpenAI Keyword Extractor Options -->
+                <div class="form-row based-on-fields section_openai_extractor">
+                    <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
+                    <input type="password" name="ASI_plugin_main_settings[image_block][0][openai_extractor_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-...">
+                    <div style="margin-top: 10px;">
+                        <label><?php esc_html_e( 'Number of Keywords', 'all-sources-images' ); ?></label>
+                        <select name="ASI_plugin_main_settings[image_block][0][openai_number_of_keywords]" class="form-control" style="max-width: 100px;">
+                            <option value="1-2">1-2</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- AI Image Prompt Options -->
+                <div class="form-row based-on-fields section_ai_image_prompt">
+                    <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
+                    <input type="password" name="ASI_plugin_main_settings[image_block][0][ai_prompt_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-...">
+                    <div style="margin-top: 10px;">
+                        <label><?php esc_html_e( 'Image Style', 'all-sources-images' ); ?></label>
+                        <select name="ASI_plugin_main_settings[image_block][0][ai_prompt_style]" class="form-control" style="max-width: 200px;">
+                            <option value="photorealistic"><?php esc_html_e( 'Photorealistic', 'all-sources-images' ); ?></option>
+                            <option value="illustration"><?php esc_html_e( 'Illustration', 'all-sources-images' ); ?></option>
+                            <option value="digital_art"><?php esc_html_e( 'Digital Art', 'all-sources-images' ); ?></option>
+                            <option value="3d_render"><?php esc_html_e( '3D Render', 'all-sources-images' ); ?></option>
+                            <option value="oil_painting"><?php esc_html_e( 'Oil Painting', 'all-sources-images' ); ?></option>
+                            <option value="watercolor"><?php esc_html_e( 'Watercolor', 'all-sources-images' ); ?></option>
+                            <option value="sketch"><?php esc_html_e( 'Sketch/Drawing', 'all-sources-images' ); ?></option>
+                            <option value="minimalist"><?php esc_html_e( 'Minimalist', 'all-sources-images' ); ?></option>
+                            <option value="cinematic"><?php esc_html_e( 'Cinematic', 'all-sources-images' ); ?></option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label><?php esc_html_e( 'Custom Instructions (Optional)', 'all-sources-images' ); ?></label>
+                        <input type="text" name="ASI_plugin_main_settings[image_block][0][ai_prompt_custom_instructions]" class="form-control" style="max-width: 400px;" placeholder="<?php esc_attr_e( 'e.g., vibrant colors, no text', 'all-sources-images' ); ?>">
+                    </div>
                 </div>
                 
                 <!-- Title Options (shown when based_on = title) -->
@@ -263,6 +404,19 @@ $blockIndex = count( $image_blocks ) + 1;
                             <input type="number" name="ASI_plugin_main_settings[image_block][0][title_length]" min="1" value="3" class="form-control" style="width: 60px; margin-left: 5px;">
                             <span style="margin-left: 5px;"><?php esc_html_e( 'first words', 'all-sources-images' ); ?></span>
                         </label>
+                    </div>
+                </div>
+                
+                <!-- Translate to English -->
+                <div class="form-row">
+                    <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
+                    <div class="field-content">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="ASI_plugin_main_settings[image_block][0][translation_EN]" value="true">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
+                        </label>
+                        <p class="field-description" style="display: block; margin-top: 8px; clear: both;"><?php esc_html_e( 'The "based on" phrase/keywords will be translated into English. This helps to get better results with most image databases.', 'all-sources-images' ); ?></p>
                     </div>
                 </div>
                 
@@ -391,14 +545,149 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- Search Based On -->
                             <div class="form-row">
                                 <label><?php esc_html_e( 'Search Based On', 'all-sources-images' ); ?></label>
-                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][based_on]" class="form-control based-on-select" style="max-width: 300px;">
+                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][based_on]" class="form-control based-on-select" style="max-width: 300px;" data-block-index="<?php echo $displayIndex; ?>">
                                     <option value="title" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'title' ); ?>><?php esc_html_e( 'Title', 'all-sources-images' ); ?></option>
                                     <option value="text_analyser" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'text_analyser' ); ?>><?php esc_html_e( 'Text Analyzer: Full text', 'all-sources-images' ); ?></option>
-                                    <option value="tags" <?php echo $disabled; ?> <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'tags' ); ?>><?php esc_html_e( 'Tags', 'all-sources-images' ); ?></option>
-                                    <option value="categories" <?php echo $disabled; ?> <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'categories' ); ?>><?php esc_html_e( 'Categories', 'all-sources-images' ); ?></option>
-                                    <option value="custom_field" <?php echo $disabled; ?> <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'custom_field' ); ?>><?php esc_html_e( 'Custom Field', 'all-sources-images' ); ?></option>
-                                    <option value="openai_extractor" <?php echo $disabled; ?> <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'openai_extractor' ); ?>><?php esc_html_e( 'OpenAI Keyword Extractor', 'all-sources-images' ); ?></option>
+                                    <option value="text_analyser_previous_paragraph" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'text_analyser_previous_paragraph' ); ?>><?php esc_html_e( 'Text Analyzer: Previous paragraph', 'all-sources-images' ); ?></option>
+                                    <option value="text_analyser_next_paragraph" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'text_analyser_next_paragraph' ); ?>><?php esc_html_e( 'Text Analyzer: Next paragraph', 'all-sources-images' ); ?></option>
+                                    <option value="tags" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'tags' ); ?>><?php esc_html_e( 'Tags', 'all-sources-images' ); ?></option>
+                                    <option value="categories" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'categories' ); ?>><?php esc_html_e( 'Categories', 'all-sources-images' ); ?></option>
+                                    <option value="custom_field" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'custom_field' ); ?>><?php esc_html_e( 'Custom Field', 'all-sources-images' ); ?></option>
+                                    <option value="custom_request" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'custom_request' ); ?>><?php esc_html_e( 'Custom Request (Placeholders)', 'all-sources-images' ); ?></option>
+                                    <option value="openai_extractor" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'openai_extractor' ); ?>><?php esc_html_e( 'OpenAI Keyword Extractor', 'all-sources-images' ); ?></option>
+                                    <option value="ai_image_prompt" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'ai_image_prompt' ); ?>><?php esc_html_e( 'AI Image Prompt (Enhanced)', 'all-sources-images' ); ?></option>
                                 </select>
+                                <!-- Help text container -->
+                                <?php 
+                                $current_based_on = isset( $block['based_on'] ) ? $block['based_on'] : 'title';
+                                $help_texts = array(
+                                    'title' => __( 'Uses the post title as the search term. This is the simplest and most common option.', 'all-sources-images' ),
+                                    'text_analyser' => __( 'Analyzes the post content to extract the most relevant keywords using ML algorithms.', 'all-sources-images' ),
+                                    'text_analyser_previous_paragraph' => __( 'Analyzes only the paragraph BEFORE the image position for keyword extraction.', 'all-sources-images' ),
+                                    'text_analyser_next_paragraph' => __( 'Analyzes only the paragraph AFTER the image position for keyword extraction.', 'all-sources-images' ),
+                                    'tags' => __( 'Uses post tags as search terms. Choose first, last, or random tag.', 'all-sources-images' ),
+                                    'categories' => __( 'Uses post categories as search terms with hierarchy level selection.', 'all-sources-images' ),
+                                    'custom_field' => __( 'Uses a custom field (post meta) value as the search term.', 'all-sources-images' ),
+                                    'custom_request' => __( 'Build your own search using placeholders: %%Title%%, %%Category%%, %%Tag%%, %%Taxonomy%%.', 'all-sources-images' ),
+                                    'openai_extractor' => __( 'Uses OpenAI GPT to extract relevant keywords from your post title.', 'all-sources-images' ),
+                                    'ai_image_prompt' => __( 'Uses OpenAI to generate optimized prompts for AI image generation (DALL-E, Stable Diffusion, etc.).', 'all-sources-images' ),
+                                );
+                                ?>
+                                <div class="based-on-help-text help-<?php echo esc_attr( $current_based_on ); ?>">
+                                    <i class="dashicons dashicons-info-outline"></i>
+                                    <?php echo esc_html( $help_texts[ $current_based_on ] ); ?>
+                                </div>
+                            </div>
+                            
+                            <?php 
+                            // Determine which sections should be visible
+                            $show_text_analyser = in_array( $current_based_on, array( 'text_analyser', 'text_analyser_previous_paragraph', 'text_analyser_next_paragraph' ) );
+                            $show_tags = ( $current_based_on === 'tags' );
+                            $show_categories = ( $current_based_on === 'categories' );
+                            $show_custom_field = ( $current_based_on === 'custom_field' );
+                            $show_custom_request = ( $current_based_on === 'custom_request' );
+                            $show_openai_extractor = ( $current_based_on === 'openai_extractor' );
+                            $show_ai_image_prompt = ( $current_based_on === 'ai_image_prompt' );
+                            ?>
+                            
+                            <!-- Text Analyzer Language -->
+                            <div class="form-row based-on-fields section_text_analyser <?php echo $show_text_analyser ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'Content Language', 'all-sources-images' ); ?></label>
+                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][text_analyser_lang]" class="form-control" style="max-width: 200px;">
+                                    <?php 
+                                    $langs = array( 'en' => 'English', 'es' => 'Spanish', 'fr' => 'French', 'de' => 'German', 'it' => 'Italian', 'pt' => 'Portuguese', 'nl' => 'Dutch', 'ru' => 'Russian', 'ja' => 'Japanese', 'zh' => 'Chinese', 'ar' => 'Arabic' );
+                                    $current_lang = isset( $block['text_analyser_lang'] ) ? $block['text_analyser_lang'] : 'en';
+                                    foreach ( $langs as $code => $name ) : ?>
+                                        <option value="<?php echo esc_attr( $code ); ?>" <?php selected( $current_lang, $code ); ?>><?php echo esc_html( $name ); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            
+                            <!-- Tags Options -->
+                            <div class="form-row based-on-fields section_tags <?php echo $show_tags ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'Tag Selection', 'all-sources-images' ); ?></label>
+                                <div class="radio-group">
+                                    <?php $current_tags = isset( $block['tags'] ) ? $block['tags'] : 'first_tag'; ?>
+                                    <label><input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="first_tag" <?php checked( $current_tags, 'first_tag' ); ?>> <?php esc_html_e( 'First Tag', 'all-sources-images' ); ?></label>
+                                    <label><input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="last_tag" <?php checked( $current_tags, 'last_tag' ); ?>> <?php esc_html_e( 'Last Tag', 'all-sources-images' ); ?></label>
+                                    <label><input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="random_tag" <?php checked( $current_tags, 'random_tag' ); ?>> <?php esc_html_e( 'Random Tag', 'all-sources-images' ); ?></label>
+                                </div>
+                            </div>
+                            
+                            <!-- Categories Options -->
+                            <div class="form-row based-on-fields section_categories <?php echo $show_categories ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'Category Selection', 'all-sources-images' ); ?></label>
+                                <div class="select-row" style="margin-bottom: 10px;">
+                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][categories]" class="form-control" style="max-width: 200px;">
+                                        <?php $current_cat = isset( $block['categories'] ) ? $block['categories'] : 'first_category'; ?>
+                                        <option value="first_category" <?php selected( $current_cat, 'first_category' ); ?>><?php esc_html_e( 'First Category', 'all-sources-images' ); ?></option>
+                                        <option value="last_category" <?php selected( $current_cat, 'last_category' ); ?>><?php esc_html_e( 'Last Category', 'all-sources-images' ); ?></option>
+                                        <option value="random_category" <?php selected( $current_cat, 'random_category' ); ?>><?php esc_html_e( 'Random Category', 'all-sources-images' ); ?></option>
+                                    </select>
+                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][categories_level]" class="form-control" style="max-width: 200px;">
+                                        <?php $current_level = isset( $block['categories_level'] ) ? $block['categories_level'] : 'child'; ?>
+                                        <option value="child" <?php selected( $current_level, 'child' ); ?>><?php esc_html_e( 'Child (Most Specific)', 'all-sources-images' ); ?></option>
+                                        <option value="parent" <?php selected( $current_level, 'parent' ); ?>><?php esc_html_e( 'Parent', 'all-sources-images' ); ?></option>
+                                        <option value="grandparent" <?php selected( $current_level, 'grandparent' ); ?>><?php esc_html_e( 'Grandparent (Top Level)', 'all-sources-images' ); ?></option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Custom Field Options -->
+                            <div class="form-row based-on-fields section_custom_field <?php echo $show_custom_field ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'Custom Field Name', 'all-sources-images' ); ?></label>
+                                <input type="text" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][custom_field]" class="form-control" style="max-width: 300px;" placeholder="my_custom_field" value="<?php echo esc_attr( isset( $block['custom_field'] ) ? $block['custom_field'] : '' ); ?>">
+                                <p class="description"><?php esc_html_e( 'Enter the meta key name of your custom field.', 'all-sources-images' ); ?></p>
+                            </div>
+                            
+                            <!-- Custom Request Options -->
+                            <div class="form-row based-on-fields section_custom_request <?php echo $show_custom_request ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'Custom Search Template', 'all-sources-images' ); ?></label>
+                                <input type="text" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][custom_request]" class="form-control" style="max-width: 400px;" placeholder="%%Title%% %%Category%%" value="<?php echo esc_attr( isset( $block['custom_request'] ) ? $block['custom_request'] : '%%Title%% %%Category%%' ); ?>">
+                                <p class="description">
+                                    <?php esc_html_e( 'Available placeholders:', 'all-sources-images' ); ?> 
+                                    <code>%%Title%%</code>, <code>%%Category%%</code>, <code>%%Tag%%</code>, <code>%%Taxonomy%%</code>
+                                </p>
+                            </div>
+                            
+                            <!-- OpenAI Keyword Extractor Options -->
+                            <div class="form-row based-on-fields section_openai_extractor <?php echo $show_openai_extractor ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
+                                <input type="password" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][openai_extractor_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-..." value="<?php echo esc_attr( isset( $block['openai_extractor_apikey'] ) ? $block['openai_extractor_apikey'] : '' ); ?>">
+                                <div style="margin-top: 10px;">
+                                    <label><?php esc_html_e( 'Number of Keywords', 'all-sources-images' ); ?></label>
+                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][openai_number_of_keywords]" class="form-control" style="max-width: 100px;">
+                                        <?php $current_num = isset( $block['openai_number_of_keywords'] ) ? $block['openai_number_of_keywords'] : '2'; ?>
+                                        <option value="1-2" <?php selected( $current_num, '1-2' ); ?>>1-2</option>
+                                        <option value="2" <?php selected( $current_num, '2' ); ?>>2</option>
+                                        <option value="3" <?php selected( $current_num, '3' ); ?>>3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Image Prompt Options -->
+                            <div class="form-row based-on-fields section_ai_image_prompt <?php echo $show_ai_image_prompt ? 'visible' : ''; ?>">
+                                <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
+                                <input type="password" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-..." value="<?php echo esc_attr( isset( $block['ai_prompt_apikey'] ) ? $block['ai_prompt_apikey'] : '' ); ?>">
+                                <div style="margin-top: 10px;">
+                                    <label><?php esc_html_e( 'Image Style', 'all-sources-images' ); ?></label>
+                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_style]" class="form-control" style="max-width: 200px;">
+                                        <?php $current_style = isset( $block['ai_prompt_style'] ) ? $block['ai_prompt_style'] : 'photorealistic'; ?>
+                                        <option value="photorealistic" <?php selected( $current_style, 'photorealistic' ); ?>><?php esc_html_e( 'Photorealistic', 'all-sources-images' ); ?></option>
+                                        <option value="illustration" <?php selected( $current_style, 'illustration' ); ?>><?php esc_html_e( 'Illustration', 'all-sources-images' ); ?></option>
+                                        <option value="digital_art" <?php selected( $current_style, 'digital_art' ); ?>><?php esc_html_e( 'Digital Art', 'all-sources-images' ); ?></option>
+                                        <option value="3d_render" <?php selected( $current_style, '3d_render' ); ?>><?php esc_html_e( '3D Render', 'all-sources-images' ); ?></option>
+                                        <option value="oil_painting" <?php selected( $current_style, 'oil_painting' ); ?>><?php esc_html_e( 'Oil Painting', 'all-sources-images' ); ?></option>
+                                        <option value="watercolor" <?php selected( $current_style, 'watercolor' ); ?>><?php esc_html_e( 'Watercolor', 'all-sources-images' ); ?></option>
+                                        <option value="sketch" <?php selected( $current_style, 'sketch' ); ?>><?php esc_html_e( 'Sketch/Drawing', 'all-sources-images' ); ?></option>
+                                        <option value="minimalist" <?php selected( $current_style, 'minimalist' ); ?>><?php esc_html_e( 'Minimalist', 'all-sources-images' ); ?></option>
+                                        <option value="cinematic" <?php selected( $current_style, 'cinematic' ); ?>><?php esc_html_e( 'Cinematic', 'all-sources-images' ); ?></option>
+                                    </select>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label><?php esc_html_e( 'Custom Instructions (Optional)', 'all-sources-images' ); ?></label>
+                                    <input type="text" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_custom_instructions]" class="form-control" style="max-width: 400px;" placeholder="<?php esc_attr_e( 'e.g., vibrant colors, no text', 'all-sources-images' ); ?>" value="<?php echo esc_attr( isset( $block['ai_prompt_custom_instructions'] ) ? $block['ai_prompt_custom_instructions'] : '' ); ?>">
+                                </div>
                             </div>
                             
                             <!-- Title Options -->
@@ -415,6 +704,19 @@ $blockIndex = count( $image_blocks ) + 1;
                                         <input type="number" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_length]" min="1" value="<?php echo isset( $block['title_length'] ) ? esc_attr( $block['title_length'] ) : '3'; ?>" class="form-control" style="width: 60px; margin-left: 5px;">
                                         <span style="margin-left: 5px;"><?php esc_html_e( 'first words', 'all-sources-images' ); ?></span>
                                     </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Translate to English -->
+                            <div class="form-row">
+                                <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
+                                <div class="field-content">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][translation_EN]" value="true" <?php checked( isset( $block['translation_EN'] ) && $block['translation_EN'] == 'true' ); ?>>
+                                        <span class="toggle-slider"></span>
+                                        <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
+                                    </label>
+                                    <p class="field-description" style="display: block; margin-top: 8px; clear: both;"><?php esc_html_e( 'The "based on" phrase/keywords will be translated into English. This helps to get better results with most image databases.', 'all-sources-images' ); ?></p>
                                 </div>
                             </div>
                             
@@ -458,6 +760,20 @@ $blockIndex = count( $image_blocks ) + 1;
     // Initialize block index
     var blockIndex = <?php echo $blockIndex; ?>;
     
+    // Help texts for each based_on option
+    var helpTexts = {
+        'title': '<?php echo esc_js( __( 'Uses the post title as the search term. This is the simplest and most common option.', 'all-sources-images' ) ); ?>',
+        'text_analyser': '<?php echo esc_js( __( 'Analyzes the post content to extract the most relevant keywords using ML algorithms.', 'all-sources-images' ) ); ?>',
+        'text_analyser_previous_paragraph': '<?php echo esc_js( __( 'Analyzes only the paragraph BEFORE the image position for keyword extraction.', 'all-sources-images' ) ); ?>',
+        'text_analyser_next_paragraph': '<?php echo esc_js( __( 'Analyzes only the paragraph AFTER the image position for keyword extraction.', 'all-sources-images' ) ); ?>',
+        'tags': '<?php echo esc_js( __( 'Uses post tags as search terms. Choose first, last, or random tag.', 'all-sources-images' ) ); ?>',
+        'categories': '<?php echo esc_js( __( 'Uses post categories as search terms with hierarchy level selection.', 'all-sources-images' ) ); ?>',
+        'custom_field': '<?php echo esc_js( __( 'Uses a custom field (post meta) value as the search term.', 'all-sources-images' ) ); ?>',
+        'custom_request': '<?php echo esc_js( __( 'Build your own search using placeholders: %%Title%%, %%Category%%, %%Tag%%, %%Taxonomy%%.', 'all-sources-images' ) ); ?>',
+        'openai_extractor': '<?php echo esc_js( __( 'Uses OpenAI GPT to extract relevant keywords from your post title.', 'all-sources-images' ) ); ?>',
+        'ai_image_prompt': '<?php echo esc_js( __( 'Uses OpenAI to generate optimized prompts for AI image generation (DALL-E, Stable Diffusion, etc.).', 'all-sources-images' ) ); ?>'
+    };
+    
     $(document).ready(function() {
         
         // Toggle inline content fields when radio changes
@@ -469,6 +785,48 @@ $blockIndex = count( $image_blocks ) + 1;
                 $inlineFields.addClass('visible');
             } else {
                 $inlineFields.removeClass('visible');
+            }
+        });
+        
+        // Show/hide based_on fields and update help text
+        $(document).on('change', '.based-on-select', function() {
+            var $block = $(this).closest('.image-placement-block');
+            var value = $(this).val();
+            
+            // Hide all based-on fields
+            $block.find('.based-on-fields').removeClass('visible');
+            
+            // Show relevant fields based on selection
+            if (value === 'text_analyser' || value === 'text_analyser_previous_paragraph' || value === 'text_analyser_next_paragraph') {
+                $block.find('.section_text_analyser').addClass('visible');
+            } else if (value === 'tags') {
+                $block.find('.section_tags').addClass('visible');
+            } else if (value === 'categories') {
+                $block.find('.section_categories').addClass('visible');
+            } else if (value === 'custom_field') {
+                $block.find('.section_custom_field').addClass('visible');
+            } else if (value === 'custom_request') {
+                $block.find('.section_custom_request').addClass('visible');
+            } else if (value === 'openai_extractor') {
+                $block.find('.section_openai_extractor').addClass('visible');
+            } else if (value === 'ai_image_prompt') {
+                $block.find('.section_ai_image_prompt').addClass('visible');
+            }
+            
+            // Update help text
+            var $helpText = $block.find('.based-on-help-text');
+            $helpText.removeClass(function(index, className) {
+                return (className.match(/(^|\s)help-\S+/g) || []).join(' ');
+            });
+            $helpText.addClass('help-' + value);
+            $helpText.html('<i class="dashicons dashicons-info-outline"></i> ' + helpTexts[value]);
+            
+            // Also handle title section visibility
+            var $titleSection = $block.find('.section_title');
+            if (value === 'title') {
+                $titleSection.show();
+            } else {
+                $titleSection.hide();
             }
         });
         
@@ -488,6 +846,9 @@ $blockIndex = count( $image_blocks ) + 1;
                 var name = $(this).attr('name');
                 $(this).attr('name', name.replace('[image_block][0]', '[image_block][' + blockIndex + ']'));
             });
+            
+            // Update data-block-index on select
+            $newBlock.find('.based-on-select').attr('data-block-index', blockIndex);
             
             // Show the block
             $newBlock.css('display', 'block');
@@ -513,18 +874,6 @@ $blockIndex = count( $image_blocks ) + 1;
             
             $block.remove();
             renumberBlocks();
-        });
-        
-        // Show/hide title options based on "based_on" selection
-        $(document).on('change', '.based-on-select', function() {
-            var $block = $(this).closest('.image-placement-block');
-            var $titleSection = $block.find('.section_title');
-            
-            if ($(this).val() === 'title') {
-                $titleSection.show();
-            } else {
-                $titleSection.hide();
-            }
         });
         
         // Renumber blocks after deletion

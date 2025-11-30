@@ -569,18 +569,262 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         if ( $executeElseBlock ) {
             if ( TRUE == $get_only_thumb ) {
                 $search = $extracted_search_term;
-            } elseif ( $img_block['based_on'] == 'text_analyser' ) {
-                $content = get_the_content( '', false, $id );
-                $content = str_replace( "&nbsp;", ' ', $content );
-                // Get lang option
-                $selected_lang = $img_block['text_analyser_lang'];
-                $search = $this->get_extracted_term( $content, $selected_lang );
-                $log->info( 'Extracted search term', array(
-                    'post'        => $id,
-                    'search term' => $search,
-                ) );
             } else {
-                $search = get_post_field( 'post_title', $id, 'raw' );
+                // Handle all based_on options
+                $based_on = isset( $img_block['based_on'] ) ? $img_block['based_on'] : 'title';
+                
+                switch ( $based_on ) {
+                    case 'text_analyser':
+                    case 'text_analyser_previous_paragraph':
+                    case 'text_analyser_next_paragraph':
+                        $content = get_the_content( '', false, $id );
+                        $content = str_replace( "&nbsp;", ' ', $content );
+                        
+                        // For paragraph-specific analysis, extract relevant paragraph
+                        if ( $based_on === 'text_analyser_previous_paragraph' || $based_on === 'text_analyser_next_paragraph' ) {
+                            $paragraphs = preg_split( '/\n\s*\n/', strip_tags( $content ) );
+                            $paragraphs = array_filter( array_map( 'trim', $paragraphs ) );
+                            $paragraphs = array_values( $paragraphs );
+                            
+                            // Get image position from settings (default to first paragraph)
+                            $image_position = isset( $img_block['image_location'] ) ? $img_block['image_location'] : 'featured';
+                            $para_index = 0;
+                            
+                            if ( preg_match( '/after_paragraph_(\d+)/', $image_position, $matches ) ) {
+                                $para_index = intval( $matches[1] );
+                            }
+                            
+                            if ( $based_on === 'text_analyser_previous_paragraph' ) {
+                                $content = isset( $paragraphs[ $para_index - 1 ] ) ? $paragraphs[ $para_index - 1 ] : ( isset( $paragraphs[0] ) ? $paragraphs[0] : '' );
+                            } else {
+                                $content = isset( $paragraphs[ $para_index ] ) ? $paragraphs[ $para_index ] : ( isset( $paragraphs[0] ) ? $paragraphs[0] : '' );
+                            }
+                        }
+                        
+                        $selected_lang = isset( $img_block['text_analyser_lang'] ) ? $img_block['text_analyser_lang'] : 'en';
+                        $search = $this->get_extracted_term( $content, $selected_lang );
+                        $log->info( 'Extracted search term from text analysis', array(
+                            'post'        => $id,
+                            'based_on'    => $based_on,
+                            'search term' => $search,
+                        ) );
+                        break;
+                        
+                    case 'tags':
+                        $tags = wp_get_post_tags( $id );
+                        if ( ! empty( $tags ) ) {
+                            $tags_option = isset( $img_block['tags'] ) ? $img_block['tags'] : 'first_tag';
+                            
+                            switch ( $tags_option ) {
+                                case 'last_tag':
+                                    $tag = end( $tags );
+                                    break;
+                                case 'random_tag':
+                                    $tag = $tags[ array_rand( $tags ) ];
+                                    break;
+                                case 'first_tag':
+                                default:
+                                    $tag = reset( $tags );
+                                    break;
+                            }
+                            
+                            $search = $tag->name;
+                            $log->info( 'Search term from tag', array(
+                                'post'        => $id,
+                                'tag_option'  => $tags_option,
+                                'search term' => $search,
+                            ) );
+                        } else {
+                            // Fallback to title if no tags
+                            $search = get_post_field( 'post_title', $id, 'raw' );
+                            $log->info( 'No tags found, using title as fallback', array( 'post' => $id ) );
+                        }
+                        break;
+                        
+                    case 'categories':
+                        $categories = get_the_category( $id );
+                        if ( ! empty( $categories ) ) {
+                            $cat_option = isset( $img_block['categories'] ) ? $img_block['categories'] : 'first_category';
+                            $cat_level = isset( $img_block['categories_level'] ) ? $img_block['categories_level'] : 'child';
+                            
+                            // Select category based on option
+                            switch ( $cat_option ) {
+                                case 'last_category':
+                                    $category = end( $categories );
+                                    break;
+                                case 'random_category':
+                                    $category = $categories[ array_rand( $categories ) ];
+                                    break;
+                                case 'first_category':
+                                default:
+                                    $category = reset( $categories );
+                                    break;
+                            }
+                            
+                            // Adjust for hierarchy level
+                            if ( $cat_level === 'parent' && $category->parent > 0 ) {
+                                $parent = get_category( $category->parent );
+                                if ( $parent && ! is_wp_error( $parent ) ) {
+                                    $category = $parent;
+                                }
+                            } elseif ( $cat_level === 'grandparent' ) {
+                                $ancestors = get_ancestors( $category->term_id, 'category' );
+                                if ( ! empty( $ancestors ) ) {
+                                    $top_ancestor = end( $ancestors );
+                                    $grandparent = get_category( $top_ancestor );
+                                    if ( $grandparent && ! is_wp_error( $grandparent ) ) {
+                                        $category = $grandparent;
+                                    }
+                                }
+                            }
+                            
+                            $search = $category->name;
+                            $log->info( 'Search term from category', array(
+                                'post'         => $id,
+                                'cat_option'   => $cat_option,
+                                'cat_level'    => $cat_level,
+                                'search term'  => $search,
+                            ) );
+                        } else {
+                            // Fallback to title if no categories
+                            $search = get_post_field( 'post_title', $id, 'raw' );
+                            $log->info( 'No categories found, using title as fallback', array( 'post' => $id ) );
+                        }
+                        break;
+                        
+                    case 'custom_field':
+                        $field_name = isset( $img_block['custom_field'] ) ? $img_block['custom_field'] : '';
+                        if ( ! empty( $field_name ) ) {
+                            $field_value = get_post_meta( $id, $field_name, true );
+                            if ( ! empty( $field_value ) ) {
+                                $search = $field_value;
+                                $log->info( 'Search term from custom field', array(
+                                    'post'        => $id,
+                                    'field_name'  => $field_name,
+                                    'search term' => $search,
+                                ) );
+                            } else {
+                                // Fallback to title
+                                $search = get_post_field( 'post_title', $id, 'raw' );
+                                $log->info( 'Custom field empty, using title as fallback', array( 'post' => $id, 'field' => $field_name ) );
+                            }
+                        } else {
+                            $search = get_post_field( 'post_title', $id, 'raw' );
+                            $log->info( 'Custom field name not specified, using title', array( 'post' => $id ) );
+                        }
+                        break;
+                        
+                    case 'custom_request':
+                        $template = isset( $img_block['custom_request'] ) ? $img_block['custom_request'] : '%%Title%%';
+                        $search = $template;
+                        
+                        // Replace %%Title%%
+                        $post_title = get_post_field( 'post_title', $id, 'raw' );
+                        $search = str_replace( '%%Title%%', $post_title, $search );
+                        
+                        // Replace %%Category%%
+                        $post_categories = get_the_category( $id );
+                        $category_name = ! empty( $post_categories ) ? $post_categories[0]->name : '';
+                        $search = str_replace( '%%Category%%', $category_name, $search );
+                        
+                        // Replace %%Tag%%
+                        $post_tags = wp_get_post_tags( $id );
+                        $tag_name = ! empty( $post_tags ) ? $post_tags[0]->name : '';
+                        $search = str_replace( '%%Tag%%', $tag_name, $search );
+                        
+                        // Replace %%Taxonomy%% (custom taxonomies)
+                        $taxonomies = get_object_taxonomies( get_post_type( $id ), 'names' );
+                        $taxonomy_terms = array();
+                        foreach ( $taxonomies as $taxonomy ) {
+                            if ( $taxonomy !== 'category' && $taxonomy !== 'post_tag' ) {
+                                $terms = wp_get_post_terms( $id, $taxonomy );
+                                if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                                    $taxonomy_terms[] = $terms[0]->name;
+                                }
+                            }
+                        }
+                        $taxonomy_value = ! empty( $taxonomy_terms ) ? implode( ' ', $taxonomy_terms ) : '';
+                        $search = str_replace( '%%Taxonomy%%', $taxonomy_value, $search );
+                        
+                        // Clean up multiple spaces
+                        $search = preg_replace( '/\s+/', ' ', trim( $search ) );
+                        
+                        $log->info( 'Search term from custom request template', array(
+                            'post'        => $id,
+                            'template'    => $template,
+                            'search term' => $search,
+                        ) );
+                        break;
+                        
+                    case 'openai_extractor':
+                        $api_key = isset( $img_block['openai_extractor_apikey'] ) ? $img_block['openai_extractor_apikey'] : '';
+                        $num_keywords = isset( $img_block['openai_number_of_keywords'] ) ? $img_block['openai_number_of_keywords'] : '2';
+                        
+                        if ( ! empty( $api_key ) ) {
+                            $post_title = get_post_field( 'post_title', $id, 'raw' );
+                            $post_content = get_the_content( '', false, $id );
+                            $post_content = wp_strip_all_tags( $post_content );
+                            $post_content = substr( $post_content, 0, 1000 ); // Limit content length
+                            
+                            $extracted = $this->ASI_openai_extract_keywords( $api_key, $post_title, $post_content, $num_keywords );
+                            
+                            if ( $extracted ) {
+                                $search = $extracted;
+                                $log->info( 'Search term from OpenAI keyword extraction', array(
+                                    'post'        => $id,
+                                    'search term' => $search,
+                                ) );
+                            } else {
+                                // Fallback to title
+                                $search = $post_title;
+                                $log->info( 'OpenAI extraction failed, using title as fallback', array( 'post' => $id ) );
+                            }
+                        } else {
+                            $search = get_post_field( 'post_title', $id, 'raw' );
+                            $log->info( 'OpenAI API key not provided, using title', array( 'post' => $id ) );
+                        }
+                        break;
+                        
+                    case 'ai_image_prompt':
+                        $api_key = isset( $img_block['ai_prompt_apikey'] ) ? $img_block['ai_prompt_apikey'] : '';
+                        $style = isset( $img_block['ai_prompt_style'] ) ? $img_block['ai_prompt_style'] : 'photorealistic';
+                        $custom_instructions = isset( $img_block['ai_prompt_custom_instructions'] ) ? $img_block['ai_prompt_custom_instructions'] : '';
+                        
+                        if ( ! empty( $api_key ) ) {
+                            $post_title = get_post_field( 'post_title', $id, 'raw' );
+                            $post_content = get_the_content( '', false, $id );
+                            $post_content = wp_strip_all_tags( $post_content );
+                            $post_content = substr( $post_content, 0, 1500 ); // Limit content length
+                            
+                            $generated_prompt = $this->ASI_openai_generate_image_prompt( $api_key, $post_title, $post_content, $style, $custom_instructions );
+                            
+                            if ( $generated_prompt ) {
+                                $search = $generated_prompt;
+                                $log->info( 'AI-generated image prompt', array(
+                                    'post'        => $id,
+                                    'style'       => $style,
+                                    'search term' => $search,
+                                ) );
+                            } else {
+                                // Fallback to title
+                                $search = $post_title;
+                                $log->info( 'AI prompt generation failed, using title as fallback', array( 'post' => $id ) );
+                            }
+                        } else {
+                            $search = get_post_field( 'post_title', $id, 'raw' );
+                            $log->info( 'AI prompt API key not provided, using title', array( 'post' => $id ) );
+                        }
+                        break;
+                        
+                    case 'title':
+                    default:
+                        $search = get_post_field( 'post_title', $id, 'raw' );
+                        $log->info( 'Using post title as search term', array(
+                            'post'        => $id,
+                            'search term' => $search,
+                        ) );
+                        break;
+                }
             }
         }
         if ( isset( $img_block['title_selection'] ) && $img_block['title_selection'] == 'cut_title' && isset( $img_block['title_length'] ) ) {
@@ -2002,6 +2246,201 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'to'   => $translated,
             ) );
             return $translated;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Extract keywords using OpenAI GPT
+     * 
+     * @since 6.2.0
+     * @param string $api_key OpenAI API key
+     * @param string $title Post title
+     * @param string $content Post content (optional)
+     * @param string $num_keywords Number of keywords to extract ('1-2', '2', '3')
+     * @return string|false Extracted keywords or false on failure
+     */
+    public function ASI_openai_extract_keywords( $api_key, $title, $content = '', $num_keywords = '2' ) {
+        $log = $this->ASI_monolog_call();
+        
+        if ( empty( $api_key ) ) {
+            return false;
+        }
+        
+        // Determine keyword count
+        $keyword_count = 2;
+        if ( $num_keywords === '1-2' ) {
+            $keyword_count = '1 or 2';
+        } elseif ( $num_keywords === '3' ) {
+            $keyword_count = 3;
+        }
+        
+        $prompt = "Extract the {$keyword_count} most relevant keywords for image search from the following content. Return ONLY the keywords separated by spaces, nothing else. The keywords should be suitable for searching stock photos or generating AI images.\n\nTitle: {$title}";
+        
+        if ( ! empty( $content ) ) {
+            $prompt .= "\n\nContent excerpt: {$content}";
+        }
+        
+        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => json_encode( array(
+                'model'       => 'gpt-3.5-turbo',
+                'messages'    => array(
+                    array(
+                        'role'    => 'system',
+                        'content' => 'You are a keyword extraction assistant. Extract concise, relevant keywords for image search. Return only the keywords, nothing else.',
+                    ),
+                    array(
+                        'role'    => 'user',
+                        'content' => $prompt,
+                    ),
+                ),
+                'max_tokens'  => 50,
+                'temperature' => 0.3,
+            ) ),
+        ) );
+        
+        if ( is_wp_error( $response ) ) {
+            $log->error( 'OpenAI keyword extraction error', array(
+                'error' => $response->get_error_message(),
+            ) );
+            return false;
+        }
+        
+        $body = wp_remote_retrieve_body( $response );
+        $result = json_decode( $body, true );
+        
+        if ( isset( $result['choices'][0]['message']['content'] ) ) {
+            $keywords = trim( $result['choices'][0]['message']['content'] );
+            // Clean up any punctuation or formatting
+            $keywords = preg_replace( '/[,;:\-\n]/', ' ', $keywords );
+            $keywords = preg_replace( '/\s+/', ' ', $keywords );
+            
+            $log->info( 'OpenAI keywords extracted', array(
+                'title'    => $title,
+                'keywords' => $keywords,
+            ) );
+            
+            return $keywords;
+        }
+        
+        if ( isset( $result['error'] ) ) {
+            $log->error( 'OpenAI API error', array(
+                'error' => $result['error']['message'],
+            ) );
+        }
+        
+        return false;
+    }
+
+    /**
+     * Generate optimized image prompt using OpenAI GPT
+     * 
+     * @since 6.2.0
+     * @param string $api_key OpenAI API key
+     * @param string $title Post title
+     * @param string $content Post content (optional)
+     * @param string $style Image style (photorealistic, illustration, etc.)
+     * @param string $custom_instructions Additional user instructions
+     * @return string|false Generated prompt or false on failure
+     */
+    public function ASI_openai_generate_image_prompt( $api_key, $title, $content = '', $style = 'photorealistic', $custom_instructions = '' ) {
+        $log = $this->ASI_monolog_call();
+        
+        if ( empty( $api_key ) ) {
+            return false;
+        }
+        
+        // Style descriptions
+        $style_descriptions = array(
+            'photorealistic' => 'a highly realistic photograph',
+            'illustration'   => 'a detailed illustration',
+            'digital_art'    => 'digital art style',
+            '3d_render'      => 'a 3D rendered image',
+            'oil_painting'   => 'an oil painting style',
+            'watercolor'     => 'a watercolor painting',
+            'sketch'         => 'a pencil sketch or drawing',
+            'minimalist'     => 'a minimalist design',
+            'vintage'        => 'a vintage or retro style',
+            'comic'          => 'a comic or cartoon style',
+            'anime'          => 'anime or manga art style',
+            'cinematic'      => 'a cinematic movie-like shot',
+            'custom'         => 'a professional image',
+        );
+        
+        $style_desc = isset( $style_descriptions[ $style ] ) ? $style_descriptions[ $style ] : $style_descriptions['photorealistic'];
+        
+        $system_prompt = "You are an expert at creating image generation prompts for AI tools like DALL-E, Stable Diffusion, and Midjourney. Create detailed, visually descriptive prompts that will generate beautiful, relevant images.";
+        
+        $user_prompt = "Create an optimized image generation prompt for the following blog post. The image should be {$style_desc}.\n\n";
+        $user_prompt .= "Title: {$title}\n";
+        
+        if ( ! empty( $content ) ) {
+            $user_prompt .= "Content summary: {$content}\n";
+        }
+        
+        if ( ! empty( $custom_instructions ) ) {
+            $user_prompt .= "Additional requirements: {$custom_instructions}\n";
+        }
+        
+        $user_prompt .= "\nReturn ONLY the image prompt, no explanations. The prompt should be detailed but under 200 characters for best results.";
+        
+        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => json_encode( array(
+                'model'       => 'gpt-3.5-turbo',
+                'messages'    => array(
+                    array(
+                        'role'    => 'system',
+                        'content' => $system_prompt,
+                    ),
+                    array(
+                        'role'    => 'user',
+                        'content' => $user_prompt,
+                    ),
+                ),
+                'max_tokens'  => 150,
+                'temperature' => 0.7,
+            ) ),
+        ) );
+        
+        if ( is_wp_error( $response ) ) {
+            $log->error( 'OpenAI image prompt generation error', array(
+                'error' => $response->get_error_message(),
+            ) );
+            return false;
+        }
+        
+        $body = wp_remote_retrieve_body( $response );
+        $result = json_decode( $body, true );
+        
+        if ( isset( $result['choices'][0]['message']['content'] ) ) {
+            $prompt = trim( $result['choices'][0]['message']['content'] );
+            // Remove quotes if present
+            $prompt = trim( $prompt, '"\'');
+            
+            $log->info( 'AI image prompt generated', array(
+                'title'  => $title,
+                'style'  => $style,
+                'prompt' => $prompt,
+            ) );
+            
+            return $prompt;
+        }
+        
+        if ( isset( $result['error'] ) ) {
+            $log->error( 'OpenAI API error', array(
+                'error' => $result['error']['message'],
+            ) );
         }
         
         return false;
