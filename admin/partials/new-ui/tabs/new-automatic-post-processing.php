@@ -44,7 +44,10 @@ if( !isset( $options['translate_alt_lang'] ) ) {
         </div>
     </div>
 
-    <table class="form-table">
+    <form method="post" action="options.php" id="post-processing-form">
+        <?php settings_fields( 'ASI-plugin-main-settings' ); ?>
+        
+        <table class="form-table">
         <!-- Image Naming Convention -->
         <tr valign="top" class="selected_image">
             <th scope="row">
@@ -219,6 +222,11 @@ if( !isset( $options['translate_alt_lang'] ) ) {
             </td>
         </tr>
     </table>
+    
+    <div class="d-flex justify-content-end mt-6">
+        <?php submit_button( __( 'Save Changes', 'all-sources-images' ), 'btn btn-primary', 'submit', false ); ?>
+    </div>
+    </form>
 </div>
 
 <script type="text/javascript">

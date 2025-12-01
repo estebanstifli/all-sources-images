@@ -120,12 +120,22 @@ class All_Sources_Images {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-all-sources-images-generation.php';
 
 		/**
+		 * Plugin Integrations (WP All Import, WPeMatico, FeedWordPress, etc.)
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-asi-plugin-integrations.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-all-sources-images-public.php';
 
 		$this->loader = new All_Sources_Images_Loader();
+		
+		/**
+		 * Initialize Plugin Integrations
+		 */
+		ASI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
 
 	}
 

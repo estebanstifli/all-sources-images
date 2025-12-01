@@ -111,6 +111,9 @@ class All_Sources_Images_Admin {
         // Register cron hook for automated image generation
         add_action( 'ASI_cron_image_generation', array(&$this, 'ASI_execute_cron_generation') );
         
+        // Register hook for scheduled image generation (used by plugin integrations)
+        add_action( 'ASI_generate_scheduled_image', array(&$this, 'ASI_generate_scheduled_image') );
+        
         // Testing APIs function with Ajax call
         add_action( 'wp_ajax_test_apis', array(&$this, 'ASI_test_apis') );
         add_action( 'wp_ajax_nopriv_test_apis', array(&$this, 'ASI_test_apis') );
@@ -159,6 +162,47 @@ class All_Sources_Images_Admin {
         //$automatic_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
         // Add a callback function to the save_post action to handle image generation
         add_action( 'save_post', function ( $post_id ) {
+            // Skip if this is an autosave
+            if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+                return;
+            }
+            
+            // Skip if this is a revision
+            if ( wp_is_post_revision( $post_id ) ) {
+                return;
+            }
+            
+            // Skip if triggered by WP All Import (uses global flag set by integrations class)
+            if ( defined( 'ASI_WPAI_IMPORTING' ) && ASI_WPAI_IMPORTING ) {
+                return;
+            }
+            
+            // Skip if triggered by WPeMatico 
+            // Check our flag set by integration class (via wpematico_pre_insert_post filter)
+            if ( defined( 'ASI_WPEMATICO_IMPORTING' ) && ASI_WPEMATICO_IMPORTING ) {
+                return;
+            }
+            // Check if WPeMatico campaign_fetch class is active (it's instantiated during feed processing)
+            if ( class_exists( 'wpematico_campaign_fetch' ) ) {
+                return;
+            }
+            // Check if we're in a WPeMatico cron/ajax context
+            if ( defined( 'WPEMATICO_VERSION' ) && ( doing_action( 'wpematico_cron' ) || did_action( 'wpematico_init_fetching' ) || did_action( 'Wpematico_init_fetching' ) ) ) {
+                return;
+            }
+            
+            // Skip if triggered by FeedWordPress  
+            if ( class_exists( 'FeedWordPress' ) && doing_action( 'syndicated_item' ) ) {
+                return;
+            }
+            
+            // Check if we already scheduled generation for this post (prevents duplicates)
+            $transient_key = 'asi_scheduled_' . $post_id;
+            if ( get_transient( $transient_key ) ) {
+                return;
+            }
+            set_transient( $transient_key, true, 120 );
+            
             // Schedule a single event with a delay to avoid conflicts
             wp_schedule_single_event( 
                 time() + 5,
@@ -170,35 +214,101 @@ class All_Sources_Images_Admin {
     }
 
     /**
-     * Generate an image for a specified block when called by the scheduled event
+     * Generate images for all blocks when called by the scheduled event
+     * Uses post meta flags per image block to prevent duplicates
      *
      * @since    6.0.0
      * @access   public
      */
     public function ASI_generate_scheduled_image( $post_id ) {
-        $automatic_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
+        $log = $this->ASI_monolog_call();
+        $log->info( '=== SCHEDULED GENERATION START for post ID: ' . $post_id . ' ===' );
+        
         // Retrieve main settings from the plugin options
         $main_settings = get_option( 'ASI_plugin_main_settings' );
-        $img_blocks = $main_settings['image_block'];
-        // Iterate through each image block to schedule image generation
-        foreach ( $img_blocks as $key_img_block => $img_block ) {
-            $log = $this->ASI_monolog_call();
-            $log->info( 'Generating scheduled image for post ID: ' . $post_id . ', block: ' . $key_img_block );
-            // Generate the image for the specific block
-            $automatic_generation->ASI_create_thumb(
-                $post_id,
-                0,
-                1,
-                1,
-                0,
-                false,
-                null,
-                null,
-                $key_img_block,
-                true
-            );
-            $log->info( 'Scheduled image generation completed for block: ' . $key_img_block );
+        $img_blocks = isset( $main_settings['image_block'] ) ? $main_settings['image_block'] : array();
+        
+        if ( empty( $img_blocks ) ) {
+            $log->info( 'No image blocks configured, exiting' );
+            return;
         }
+        
+        // Check rewrite_featured setting
+        $rewrite_featured = isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] === 'true';
+        $log->info( 'Rewrite featured setting: ' . ( $rewrite_featured ? 'enabled' : 'disabled' ) );
+        
+        $automatic_generation = new All_Sources_Images_Generation($this->plugin_name, $this->version);
+        
+        // Iterate through each image block
+        foreach ( $img_blocks as $key_img_block => $img_block ) {
+            $meta_key = '_asi_block_' . $key_img_block . '_status';
+            $current_status = get_post_meta( $post_id, $meta_key, true );
+            
+            $log->info( 'Block ' . $key_img_block . ' status: ' . ( $current_status ?: 'empty' ) );
+            
+            // Skip if already completed or in progress
+            if ( $current_status === 'completed' ) {
+                $log->info( 'Block ' . $key_img_block . ' already completed, skipping' );
+                continue;
+            }
+            
+            if ( $current_status === 'processing' ) {
+                // Check if processing started more than 2 minutes ago (stuck process)
+                $started_at = get_post_meta( $post_id, '_asi_block_' . $key_img_block . '_started', true );
+                if ( $started_at && ( time() - intval( $started_at ) ) < 120 ) {
+                    $log->info( 'Block ' . $key_img_block . ' is being processed by another instance, skipping' );
+                    continue;
+                }
+                $log->info( 'Block ' . $key_img_block . ' was stuck, retrying' );
+            }
+            
+            // Mark as processing with timestamp
+            update_post_meta( $post_id, $meta_key, 'processing' );
+            update_post_meta( $post_id, '_asi_block_' . $key_img_block . '_started', time() );
+            
+            $log->info( 'Starting generation for block ' . $key_img_block );
+            
+            try {
+                // Generate the image for this specific block
+                $automatic_generation->ASI_create_thumb(
+                    $post_id,
+                    0,                      // $check_value_enable
+                    1,                      // $check_post_type
+                    1,                      // $check_category
+                    $rewrite_featured,      // $rewrite_featured - pass the setting!
+                    false,
+                    null,
+                    null,
+                    $key_img_block,
+                    true
+                );
+                
+                // Mark as completed
+                update_post_meta( $post_id, $meta_key, 'completed' );
+                delete_post_meta( $post_id, '_asi_block_' . $key_img_block . '_started' );
+                $log->info( 'Block ' . $key_img_block . ' completed successfully' );
+                
+            } catch ( Exception $e ) {
+                // Mark as failed so it can be retried
+                update_post_meta( $post_id, $meta_key, 'failed' );
+                $log->error( 'Block ' . $key_img_block . ' failed: ' . $e->getMessage() );
+            }
+        }
+        
+        $log->info( '=== SCHEDULED GENERATION END for post ID: ' . $post_id . ' ===' );
+    }
+
+    /**
+     * Clear ASI block status meta for a post (useful for re-generation)
+     *
+     * @param int $post_id The post ID.
+     */
+    public function clear_block_status( $post_id ) {
+        global $wpdb;
+        $wpdb->query( $wpdb->prepare(
+            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE '_asi_block_%'",
+            $post_id
+        ) );
     }
 
     /**

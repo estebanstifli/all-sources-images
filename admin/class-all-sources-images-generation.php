@@ -1325,12 +1325,22 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $position = '1',
         $image_size = 'large'
     ) {
+        // If content is plain text without HTML tags, apply wpautop first
+        // This handles cases like WP All Import where content comes as plain text
+        if ( ! preg_match('/<[^>]+>/', $content) || ( $tag == 'p' && stripos($content, '<p') === false ) ) {
+            $content = wpautop( $content );
+        }
+        
         // Check if the Classic Editor is being used
         $classic_editor = $this->ASI_is_using_classic_editor();
         $match = false;
+        $loop_count = 0;
+        $max_loops = 2; // Prevent infinite loops
+        
         // Variable to track if the image was inserted successfully
         // Loop until the image insertion is successful
-        while ( !$match ) {
+        while ( !$match && $loop_count < $max_loops ) {
+            $loop_count++;
             // Prepare the HTML block for the image depending on the editor type
             if ( $classic_editor ) {
                 $match = true;
@@ -1379,11 +1389,15 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 // Re-indexing of table keys if necessary
                 $parts = array_values( $filtered_array );
                 // Restart the loop if can not find paragraphs
-                if ( 'p' == $tag && count( $parts ) < 2 ) {
+                if ( 'p' == $tag && count( $parts ) < 2 && $loop_count == 1 ) {
                     //Apply wpautop() for next loop
                     $content = wpautop( $content );
                     $match = false;
                     continue;
+                } elseif ( 'p' == $tag && count( $parts ) < 2 ) {
+                    // If still no paragraphs after wpautop, insert at beginning of content
+                    $new_content = $image_block . $content;
+                    return $new_content;
                 }
             } else {
                 // Patterns for Gutenberg Editor, ensuring separate blocks

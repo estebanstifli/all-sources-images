@@ -8,10 +8,32 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Get current settings
-$options_main = get_option( 'ASI_plugin_main_settings' );
-$options_main = wp_parse_args( $options_main, $this->ASI_default_options_main_settings() );
-$image_blocks = isset( $options_main['image_block'] ) ? $options_main['image_block'] : array();
+// Get current settings - use raw option first to see what's actually stored
+$raw_options = get_option( 'ASI_plugin_main_settings' );
+$options_main = wp_parse_args( $raw_options, $this->ASI_default_options_main_settings() );
+
+// Get image_blocks from the RAW options first (what's actually in DB)
+// If empty or not set, fall back to defaults
+if ( isset( $raw_options['image_block'] ) && is_array( $raw_options['image_block'] ) && !empty( $raw_options['image_block'] ) ) {
+    $raw_image_blocks = $raw_options['image_block'];
+} else {
+    $raw_image_blocks = isset( $options_main['image_block'] ) ? $options_main['image_block'] : array();
+}
+
+// Re-index image_blocks to use consecutive indices starting from 1
+// This fixes issues where blocks had non-consecutive indices (e.g., 2, 5, 7)
+$image_blocks = array();
+$new_index = 1;
+foreach ( $raw_image_blocks as $block ) {
+    if ( is_array( $block ) ) {
+        $image_blocks[ $new_index ] = $block;
+        $new_index++;
+    }
+}
+
+// Debug: uncomment to see what's stored
+// error_log( 'ASI Image Blocks Raw: ' . print_r( $raw_image_blocks, true ) );
+// error_log( 'ASI Image Blocks Re-indexed: ' . print_r( $image_blocks, true ) );
 
 // Get available image sizes
 $image_sizes = get_intermediate_image_sizes();
@@ -29,7 +51,7 @@ if ( function_exists( 'asi_freemius' ) && !asi_freemius()->is_premium() ) {
     $checkbox_disabled = 'checkbox-disabled';
 }
 
-// Calculate next block index
+// Calculate next block index - after the last re-indexed block
 $blockIndex = count( $image_blocks ) + 1;
 ?>
 
@@ -170,11 +192,9 @@ $blockIndex = count( $image_blocks ) + 1;
     <div class="card-body border-top p-9">
         <p class="text-muted mb-6"><?php esc_html_e( 'Configure where and how images are placed in your posts. You can add multiple image locations.', 'all-sources-images' ); ?></p>
         
-        <form method="post" action="options.php" id="image-placement-form">
-            <?php settings_fields( 'ASI_plugin_main_settings_group' ); ?>
-            
-            <!-- Hidden Template Block (index 0) for cloning -->
-            <div class="image-placement-block template-block image-block-0" data-block-index="0" style="display: none;">
+        <!-- Hidden Template Block - OUTSIDE the form to prevent submission -->
+        <div id="template-container" style="display: none;">
+            <div class="image-placement-block template-block" data-block-index="0">
                 <div class="block-header">
                     <h4><?php esc_html_e( 'Image Location', 'all-sources-images' ); ?> #<span class="block-number">0</span></h4>
                     <button type="button" class="btn-delete-block"><?php esc_html_e( '[-] Delete', 'all-sources-images' ); ?></button>
@@ -185,11 +205,11 @@ $blockIndex = count( $image_blocks ) + 1;
                     <label><?php esc_html_e( 'Image Location Type', 'all-sources-images' ); ?></label>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="ASI_plugin_main_settings[image_block][0][image_location]" value="featured" checked>
+                            <input type="radio" data-name-template="ASI_plugin_main_settings[image_block][__INDEX__][image_location]" value="featured" checked>
                             <?php esc_html_e( 'Featured Image', 'all-sources-images' ); ?>
                         </label>
                         <label>
-                            <input type="radio" name="ASI_plugin_main_settings[image_block][0][image_location]" value="custom">
+                            <input type="radio" data-name-template="ASI_plugin_main_settings[image_block][__INDEX__][image_location]" value="custom">
                             <?php esc_html_e( 'Inline Content', 'all-sources-images' ); ?>
                         </label>
                     </div>
@@ -435,7 +455,11 @@ $blockIndex = count( $image_blocks ) + 1;
                     </div>
                 </div>
             </div>
-            <!-- End Hidden Template Block -->
+        </div>
+        <!-- End Template Container -->
+        
+        <form method="post" action="options.php" id="image-placement-form">
+            <?php settings_fields( 'ASI-plugin-main-settings' ); ?>
             
             <!-- Container for saved and new blocks -->
             <div id="image-blocks-container">
@@ -832,19 +856,27 @@ $blockIndex = count( $image_blocks ) + 1;
         
         // Add new block
         $('#add-image-block').on('click', function() {
-            var $template = $('.image-placement-block.template-block').first();
+            var $template = $('#template-container .image-placement-block.template-block').first();
             var $newBlock = $template.clone();
             
             // Update block index
-            $newBlock.removeClass('template-block image-block-0');
+            $newBlock.removeClass('template-block');
             $newBlock.addClass('image-block-' + blockIndex);
             $newBlock.attr('data-block-index', blockIndex);
             $newBlock.find('.block-number').text(blockIndex);
             
-            // Update all input names
+            // Update all input names - replace [0] with new index
             $newBlock.find('[name*="[image_block][0]"]').each(function() {
                 var name = $(this).attr('name');
                 $(this).attr('name', name.replace('[image_block][0]', '[image_block][' + blockIndex + ']'));
+            });
+            
+            // Handle data-name-template attributes (convert to name with proper index)
+            $newBlock.find('[data-name-template]').each(function() {
+                var nameTemplate = $(this).attr('data-name-template');
+                var newName = nameTemplate.replace('__INDEX__', blockIndex);
+                $(this).attr('name', newName);
+                $(this).removeAttr('data-name-template');
             });
             
             // Update data-block-index on select
@@ -853,7 +885,7 @@ $blockIndex = count( $image_blocks ) + 1;
             // Show the block
             $newBlock.css('display', 'block');
             
-            // Append to container
+            // Append to container (inside the form)
             $('#image-blocks-container').append($newBlock);
             
             // Increment block index for next addition
@@ -876,14 +908,44 @@ $blockIndex = count( $image_blocks ) + 1;
             renumberBlocks();
         });
         
-        // Renumber blocks after deletion
+        // Renumber blocks after deletion - updates BOTH display AND input names
         function renumberBlocks() {
-            var displayNum = 1;
+            var newIndex = 1;
             $('#image-blocks-container .image-placement-block:not(.template-block)').each(function() {
-                $(this).find('.block-number').text(displayNum);
-                displayNum++;
+                var $block = $(this);
+                var oldIndex = $block.attr('data-block-index');
+                
+                // Update display number
+                $block.find('.block-number').text(newIndex);
+                
+                // Update data-block-index attribute
+                $block.attr('data-block-index', newIndex);
+                $block.removeClass('image-block-' + oldIndex).addClass('image-block-' + newIndex);
+                
+                // Update ALL input/select names in this block to use the new index
+                $block.find('input, select, textarea').each(function() {
+                    var name = $(this).attr('name');
+                    if (name && name.indexOf('[image_block]') !== -1) {
+                        // Replace [image_block][ANY_NUMBER] with [image_block][newIndex]
+                        var newName = name.replace(/\[image_block\]\[\d+\]/, '[image_block][' + newIndex + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
+                
+                // Update data-block-index on select
+                $block.find('.based-on-select').attr('data-block-index', newIndex);
+                
+                newIndex++;
             });
+            
+            // Update blockIndex for next new block
+            blockIndex = newIndex;
         }
+        
+        // Also renumber on form submit to ensure consistent indices
+        $('#image-placement-form').on('submit', function() {
+            renumberBlocks();
+        });
         
     });
     
