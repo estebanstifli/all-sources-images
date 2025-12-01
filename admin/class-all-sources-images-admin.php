@@ -123,7 +123,12 @@ class All_Sources_Images_Admin {
         // Scripts for Block & Translations
         add_action( 'init', array(&$this, 'ASI_register_mpt_block') );
         add_action( 'enqueue_block_editor_assets', array(&$this, 'ASI_enqueue_style_block') );
-        add_action( 'admin_menu', array( $this, 'ASI_register_media_picker_page' ) );
+        // Register media picker page only once (avoid duplicates from multiple class instances)
+        static $media_picker_registered = false;
+        if ( ! $media_picker_registered ) {
+            add_action( 'admin_menu', array( $this, 'ASI_register_media_picker_page' ) );
+            $media_picker_registered = true;
+        }
         add_action( 'admin_enqueue_scripts', array( $this, 'ASI_enqueue_media_picker_assets' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'ASI_enqueue_media_modal_assets' ) );
         add_action( 'enqueue_block_editor_assets', array( $this, 'ASI_enqueue_media_modal_assets' ) );
