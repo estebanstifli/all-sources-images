@@ -34,6 +34,9 @@ class All_Sources_Images_Activator {
 		// This prevents "You do not have sufficient permissions" error on first activation
 		self::add_capabilities();
 		
+		// Create bulk generation database tables
+		self::create_bulk_generation_tables();
+		
 		if ( ! get_option( 'ASI_plugin_activation_date' ) ) {
 			$result = update_option( 'ASI_plugin_activation_date', time() );
 			ASI_log( 'Activation date set: ' . ( $result ? 'SUCCESS' : 'FAILED' ), 'ACTIVATOR' );
@@ -42,6 +45,25 @@ class All_Sources_Images_Activator {
 		}
 		
 		ASI_log( 'Activator::activate() completed', 'ACTIVATOR' );
+	}
+
+	/**
+	 * Create bulk generation database tables
+	 *
+	 * @since    6.1.7
+	 */
+	private static function create_bulk_generation_tables() {
+		ASI_log( 'Creating bulk generation database tables', 'ACTIVATOR' );
+		
+		// Load the DB class
+		$db_class_path = plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-db.php';
+		if ( file_exists( $db_class_path ) ) {
+			require_once $db_class_path;
+			ASI_Bulk_Generation_DB::create_tables();
+			ASI_log( 'Bulk generation tables created successfully', 'ACTIVATOR' );
+		} else {
+			ASI_log( 'Bulk generation DB class not found: ' . $db_class_path, 'ACTIVATOR' );
+		}
 	}
 
 	/**

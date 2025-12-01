@@ -132,6 +132,44 @@ function asi_enqueue_new_ui_assets( $hook ) {
         true
     );
     
+    // Bootstrap Icons CSS
+    wp_enqueue_style(
+        'bootstrap-icons',
+        'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css',
+        array(),
+        '1.11.1'
+    );
+    
+    // Bulk Generation JS (only on bulk generation page)
+    if ( $hook === 'all-sources-images_page_asi-new-bulk-generation' ) {
+        // Bootstrap 5 JS for tabs/accordions
+        wp_enqueue_script(
+            'bootstrap5',
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
+            array('jquery'),
+            '5.3.2',
+            true
+        );
+        
+        wp_enqueue_script(
+            'asi-bulk-generation',
+            $plugin_url . 'js/bulk-generation.js',
+            array('jquery', 'bootstrap5'),
+            $version,
+            true
+        );
+        wp_localize_script( 'asi-bulk-generation', 'asiBulkAjax', array(
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+            'nonce'    => wp_create_nonce( 'asi_bulk_nonce' ),
+            'edit_url' => admin_url( 'post.php' ),
+            'i18n'     => array(
+                'no_selection'   => esc_html__( 'Please select content to generate images for.', 'magic-post-thumbnail' ),
+                'confirm_delete' => esc_html__( 'Are you sure you want to delete this job?', 'magic-post-thumbnail' ),
+                'loading'        => esc_html__( 'Loading...', 'magic-post-thumbnail' ),
+            ),
+        ) );
+    }
+    
     // Custom styles for new UI pages (loaded last to override)
     wp_enqueue_style(
         'asi-new-ui-styles',

@@ -120,6 +120,21 @@ class All_Sources_Images {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-all-sources-images-generation.php';
 
 		/**
+		 * Bulk Generation Database Class
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-db.php';
+
+		/**
+		 * Bulk Generation AJAX Handlers
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-ajax.php';
+
+		/**
+		 * Bulk Generation Cron Processor
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-cron.php';
+
+		/**
 		 * Plugin Integrations (WP All Import, WPeMatico, FeedWordPress, etc.)
 		 * DISABLED: Plugin compatibility features have been removed from the UI.
 		 * The file is kept for backward compatibility but not loaded by default.

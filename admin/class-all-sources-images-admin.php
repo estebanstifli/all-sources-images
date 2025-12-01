@@ -719,10 +719,7 @@ class All_Sources_Images_Admin {
             $this->version,
             false
         );
-        // Bulk generation scripts (new page)
-        if ( $hook == 'all-sources-images_page_asi-new-bulk-generation' ) {
-            wp_enqueue_script( 'images-generation', plugins_url( 'js/generation.js', __FILE__ ), array('jquery', 'jquery-ui') );
-        }
+        // Old bulk generation scripts removed - now using bulk-generation.js via new-ui-assets.php
         // Source/Settings scripts (new page)
         if ( $hook == 'toplevel_page_asi-new-settings' ) {
             wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui') );
