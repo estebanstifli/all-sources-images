@@ -52,11 +52,6 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'sou
 											</a>
 										</li>
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'plugins' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=asi-new-automatic&tab=plugins' ) ); ?>">
-												<?php esc_html_e( 'Plugins', 'all-sources-images' ); ?>
-											</a>
-										</li>
-										<li class="nav-item">
 											<a class="nav-link <?php echo $active_tab === 'placement' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=asi-new-automatic&tab=placement' ) ); ?>">
 												<?php esc_html_e( 'Image Placement', 'all-sources-images' ); ?>
 											</a>

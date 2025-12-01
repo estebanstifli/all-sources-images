@@ -121,8 +121,10 @@ class All_Sources_Images {
 
 		/**
 		 * Plugin Integrations (WP All Import, WPeMatico, FeedWordPress, etc.)
+		 * DISABLED: Plugin compatibility features have been removed from the UI.
+		 * The file is kept for backward compatibility but not loaded by default.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-asi-plugin-integrations.php';
+		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-asi-plugin-integrations.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -134,8 +136,9 @@ class All_Sources_Images {
 		
 		/**
 		 * Initialize Plugin Integrations
+		 * DISABLED: Plugin compatibility features have been removed from the UI.
 		 */
-		ASI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
+		// ASI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
 
 	}
 

@@ -17,9 +17,6 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'sou
 
 // Set title based on active tab
 switch ( $active_tab ) {
-    case 'plugins':
-        $title = esc_html__( 'Automatic [Plugins]', 'all-sources-images' );
-        break;
     case 'placement':
         $title = esc_html__( 'Automatic [Image Placement]', 'all-sources-images' );
         break;
@@ -39,9 +36,6 @@ include_once plugin_dir_path( __FILE__ ) . 'header-automatic.php';
 <div class="card-body">
     <?php
     switch ( $active_tab ) {
-        case 'plugins':
-            include_once 'tabs/new-automatic-plugins.php';
-            break;
         case 'placement':
             include_once 'tabs/new-automatic-image-placement.php';
             break;
