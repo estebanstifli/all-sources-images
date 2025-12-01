@@ -1314,7 +1314,7 @@ class All_Sources_Images_Admin {
                 1 => array(
                     'image_location'  => 'featured',
                     'based_on'        => 'title',
-                    'translation_EN'  => '',
+                    'translation_EN'  => 'true',
                     'title_selection' => 'full_title',
                     'selected_image'  => 'first_result',
                 ),
@@ -1491,7 +1491,7 @@ class All_Sources_Images_Admin {
     public function ASI_default_options_block_settings( $never_set = FALSE ) {
         $default_options = array(
             'enable_manual_search'    => true,
-            'translation_EN'          => '',
+            'translation_EN'          => 'true',
             'translate_alt'           => '',
             'translate_alt_lang'      => '',
             'google_translate_apikey' => '',

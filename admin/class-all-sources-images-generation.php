@@ -230,7 +230,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             1 => array(
                 'image_location'  => 'featured',
                 'based_on'        => 'title',
-                'translation_EN'  => '',
+                'translation_EN'  => 'true',
                 'title_selection' => 'full_title',
                 'selected_image'  => 'first_result',
             ),
