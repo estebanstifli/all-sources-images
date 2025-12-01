@@ -602,7 +602,8 @@ class All_Sources_Images_Admin {
         $bootstrap = $this->ASI_get_cloudflare_bootstrap();
 
         $worker_url      = untrailingslashit( $bootstrap['worker_url'] );
-        $encoded_url_b64 = base64_encode( $url );
+        // Use URL-safe base64 encoding: replace + with -, / with _, remove =
+        $encoded_url_b64 = rtrim( strtr( base64_encode( $url ), '+/', '-_' ), '=' );
         $final_url       = add_query_arg( array(
             'servicio' => $service,
             'token'    => $bootstrap['token'],
@@ -611,7 +612,27 @@ class All_Sources_Images_Admin {
 
         unset( $args['proxy'] );
 
-        return wp_remote_request( $final_url, $args );
+        // Debug logging for Cloudflare proxy requests
+        error_log( '[ASI Cloudflare Proxy] Service: ' . $service );
+        error_log( '[ASI Cloudflare Proxy] Original URL: ' . $url );
+        error_log( '[ASI Cloudflare Proxy] Base64 encoded (URL-safe): ' . $encoded_url_b64 );
+        error_log( '[ASI Cloudflare Proxy] Final URL length: ' . strlen( $final_url ) );
+
+        $response = wp_remote_request( $final_url, $args );
+        
+        // Log response details
+        if ( is_wp_error( $response ) ) {
+            error_log( '[ASI Cloudflare Proxy] WP_Error: ' . $response->get_error_message() );
+        } else {
+            $status = wp_remote_retrieve_response_code( $response );
+            $body   = wp_remote_retrieve_body( $response );
+            error_log( '[ASI Cloudflare Proxy] Response status: ' . $status );
+            if ( $status !== 200 ) {
+                error_log( '[ASI Cloudflare Proxy] Response body: ' . substr( $body, 0, 500 ) );
+            }
+        }
+
+        return $response;
     }
 
     /**

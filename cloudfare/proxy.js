@@ -65,12 +65,32 @@ export default {
         const destinationUrlBase64 = url.searchParams.get('url_b64');
         if (destinationUrlBase64 && destinationUrlBase64 !== 'null' && destinationUrlBase64 !== 'undefined') {
             try {
-                const normalizedB64 = destinationUrlBase64.replace(/ /g, '+');
+                // Decode URL-safe base64: replace - with +, _ with /, add padding
+                let normalizedB64 = destinationUrlBase64.replace(/-/g, '+').replace(/_/g, '/');
+                // Add padding if needed
+                const pad = normalizedB64.length % 4;
+                if (pad) {
+                    normalizedB64 += '='.repeat(4 - pad);
+                }
                 destinationUrl = atob(normalizedB64);
             } catch (error) {
                 // fall back to plain URL if provided
                 if (!destinationUrl) {
-                    return new Response('URL base64 decode failed.', { status: 400 });
+                    return new Response(JSON.stringify({
+                        error: 'URL base64 decode failed',
+                        details: {
+                            service: rawService,
+                            url_b64_length: destinationUrlBase64 ? destinationUrlBase64.length : 0,
+                            url_b64_preview: destinationUrlBase64 ? destinationUrlBase64.substring(0, 100) : null,
+                            error_message: error.message
+                        }
+                    }), { 
+                        status: 400,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    });
                 }
             }
         }
