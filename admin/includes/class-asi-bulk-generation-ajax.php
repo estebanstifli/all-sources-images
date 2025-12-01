@@ -23,6 +23,7 @@ class ASI_Bulk_Generation_Ajax {
         
         // Job management
         add_action( 'wp_ajax_asi_bulk_create_job', array( $this, 'create_job' ) );
+        add_action( 'wp_ajax_asi_bulk_create_job_from_ids', array( $this, 'create_job_from_ids' ) );
         add_action( 'wp_ajax_asi_bulk_get_jobs', array( $this, 'get_jobs' ) );
         add_action( 'wp_ajax_asi_bulk_get_job_details', array( $this, 'get_job_details' ) );
         add_action( 'wp_ajax_asi_bulk_start_job', array( $this, 'start_job' ) );
@@ -231,6 +232,85 @@ class ASI_Bulk_Generation_Ajax {
         wp_send_json_success( array(
             'message' => sprintf( __( 'Job created with %d posts', 'magic-post-thumbnail' ), $added ),
             'job_id'  => $job_id,
+        ) );
+    }
+
+    /**
+     * Create a job directly from post IDs (used by bulk action from posts list)
+     */
+    public function create_job_from_ids() {
+        $this->verify_request();
+
+        $post_ids_raw = sanitize_text_field( $_POST['post_ids'] ?? '' );
+        
+        if ( empty( $post_ids_raw ) ) {
+            wp_send_json_error( array( 'message' => __( 'No posts provided', 'magic-post-thumbnail' ) ) );
+        }
+
+        // Parse IDs
+        $post_ids = array_filter( array_map( 'absint', explode( ',', $post_ids_raw ) ) );
+        
+        if ( empty( $post_ids ) ) {
+            wp_send_json_error( array( 'message' => __( 'No valid posts provided', 'magic-post-thumbnail' ) ) );
+        }
+
+        // Get images per post from settings
+        $options = get_option( 'ASI_plugin_main_settings', array() );
+        $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
+        $images_per_post = max( 1, count( $image_blocks ) );
+
+        // Generate job name
+        $job_name = sprintf( 
+            __( 'Quick Job - %d posts (%s)', 'magic-post-thumbnail' ), 
+            count( $post_ids ),
+            current_time( 'Y-m-d H:i' ) 
+        );
+
+        // Determine post types from the IDs
+        $post_types_selected = array();
+        foreach ( $post_ids as $post_id ) {
+            $post_type = get_post_type( $post_id );
+            if ( $post_type && ! in_array( $post_type, $post_types_selected ) ) {
+                $post_types_selected[] = $post_type;
+            }
+        }
+
+        // Create job
+        $job_id = ASI_Bulk_Generation_DB::create_job( array(
+            'job_name'        => $job_name,
+            'job_status'      => 'pending',
+            'total_posts'     => count( $post_ids ),
+            'images_per_post' => $images_per_post,
+            'selection_mode'  => 'direct_ids',
+            'post_types'      => $post_types_selected,
+            'settings'        => array(
+                'source' => 'bulk_action',
+                'original_ids' => $post_ids,
+            ),
+        ) );
+
+        if ( ! $job_id ) {
+            wp_send_json_error( array( 'message' => __( 'Failed to create job', 'magic-post-thumbnail' ) ) );
+        }
+
+        // Add posts to job
+        $added = ASI_Bulk_Generation_DB::add_posts_to_job( $job_id, $post_ids );
+
+        // Update total with actual added count
+        ASI_Bulk_Generation_DB::update_job( $job_id, array( 'total_posts' => $added ) );
+
+        // Start job immediately
+        ASI_Bulk_Generation_DB::update_job_status( $job_id, 'processing' );
+        
+        // Schedule cron event
+        if ( ! wp_next_scheduled( 'asi_bulk_process_job', array( $job_id ) ) ) {
+            wp_schedule_single_event( time(), 'asi_bulk_process_job', array( $job_id ) );
+        }
+
+        wp_send_json_success( array(
+            'message' => sprintf( __( 'Job created and started with %d posts', 'magic-post-thumbnail' ), $added ),
+            'job_id'  => $job_id,
+            'total_posts' => $added,
         ) );
     }
 

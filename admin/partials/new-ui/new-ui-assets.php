@@ -166,6 +166,10 @@ function asi_enqueue_new_ui_assets( $hook ) {
                 'no_selection'   => esc_html__( 'Please select content to generate images for.', 'magic-post-thumbnail' ),
                 'confirm_delete' => esc_html__( 'Are you sure you want to delete this job?', 'magic-post-thumbnail' ),
                 'loading'        => esc_html__( 'Loading...', 'magic-post-thumbnail' ),
+                'creating_job'   => esc_html__( 'Creating job...', 'magic-post-thumbnail' ),
+                'please_wait'    => esc_html__( 'Please wait while we set up your image generation job.', 'magic-post-thumbnail' ),
+                'error'          => esc_html__( 'Error', 'magic-post-thumbnail' ),
+                'network_error'  => esc_html__( 'Network error', 'magic-post-thumbnail' ),
             ),
         ) );
     }

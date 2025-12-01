@@ -1599,7 +1599,7 @@ class All_Sources_Images_Admin {
     public function ASI_bulk_action_handler( $redirect_to, $action_name, $post_ids ) {
         if ( 'bulk_regenerate_thumbnails' === $action_name ) {
             $ids = implode( ',', array_map( 'intval', $post_ids ) );
-            wp_redirect( 'admin.php?page=asi-new-bulk-generation&ids_mpt_generation=' . $ids, '301' );
+            wp_redirect( 'admin.php?page=asi-new-bulk-generation&auto_generate_ids=' . $ids, '301' );
             exit;
         }
         return $redirect_to;
@@ -1615,7 +1615,7 @@ class All_Sources_Images_Admin {
 	        <script type="text/javascript">
 	                jQuery(document).ready(function($){
 						$('select[name^="action"] option:last-child').before('<option value="bulk_regenerate_thumbnails"><?php 
-        echo esc_html__( 'Generate Images (MPT)', 'all-sources-images' );
+        echo esc_html__( 'Generate Images (ASI)', 'all-sources-images' );
         ?></option>');
 	                });
 	        </script>

@@ -765,8 +765,110 @@ jQuery(document).ready(function($) {
     }
 
     // =====================
+    // Auto-generate from URL (bulk action from posts list)
+    // =====================
+    function checkAutoGenerate() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoIds = urlParams.get('auto_generate_ids');
+        
+        if (!autoIds) return;
+        
+        // Show loading overlay
+        const $overlay = $(`
+            <div id="asi-auto-generate-overlay" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255,255,255,0.95);
+                z-index: 99999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            ">
+                <div style="text-align: center;">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4>${asiBulkAjax.i18n.creating_job || 'Creating job...'}</h4>
+                    <p class="text-muted">${asiBulkAjax.i18n.please_wait || 'Please wait while we set up your image generation job.'}</p>
+                </div>
+            </div>
+        `);
+        $('body').append($overlay);
+        
+        // Create job via AJAX
+        $.ajax({
+            url: asiBulkAjax.ajax_url,
+            method: 'POST',
+            data: {
+                action: 'asi_bulk_create_job_from_ids',
+                nonce: asiBulkAjax.nonce,
+                post_ids: autoIds
+            }
+        })
+        .done(function(res) {
+            if (res && res.success) {
+                // Remove URL parameter to prevent re-triggering
+                const newUrl = window.location.pathname + '?page=asi-new-bulk-generation';
+                window.history.replaceState({}, document.title, newUrl);
+                
+                // Switch to jobs tab
+                const jobsTabEl = document.querySelector('#jobs-list-tab');
+                if (jobsTabEl && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                    const tabInstance = bootstrap.Tab.getOrCreateInstance(jobsTabEl);
+                    tabInstance.show();
+                } else {
+                    $('#jobs-list-tab').trigger('click');
+                }
+                
+                // Load jobs and show details
+                loadJobs();
+                
+                if (res.data.job_id) {
+                    currentJobId = res.data.job_id;
+                    setTimeout(function() {
+                        viewJobDetails(res.data.job_id);
+                    }, 500);
+                }
+                
+                // Remove overlay
+                $overlay.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            } else {
+                $overlay.find('h4').text(asiBulkAjax.i18n.error || 'Error');
+                $overlay.find('p').text(res.data.message || 'Failed to create job');
+                $overlay.find('.spinner-border').hide();
+                
+                setTimeout(function() {
+                    $overlay.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            }
+        })
+        .fail(function() {
+            $overlay.find('h4').text(asiBulkAjax.i18n.error || 'Error');
+            $overlay.find('p').text(asiBulkAjax.i18n.network_error || 'Network error');
+            $overlay.find('.spinner-border').hide();
+            
+            setTimeout(function() {
+                $overlay.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }, 3000);
+        });
+    }
+
+    // =====================
     // Initialize
     // =====================
+    // Check for auto-generate from URL
+    checkAutoGenerate();
+    
     // Load jobs on page load if on jobs tab
     if ($('#jobs-list').hasClass('active')) {
         loadJobs();
