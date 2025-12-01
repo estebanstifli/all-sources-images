@@ -51,31 +51,31 @@ function asi_get_new_ui_admin() {
  * This should be called from the admin class or after admin_menu hook
  */
 function asi_register_new_ui_menus() {
-    // New Settings submenu
+    // Settings submenu (first item, replaces Dashboard)
     add_submenu_page(
-        'all-sources-images-admin-display',
-        __( 'New Settings', 'all-sources-images' ),
-        __( '→ New Settings', 'all-sources-images' ),
+        'asi-new-settings',
+        __( 'Settings', 'all-sources-images' ),
+        __( 'Settings', 'all-sources-images' ),
         'asi_manage',
         'asi-new-settings',
         'asi_render_new_settings_page'
     );
     
-    // New Automatic submenu
+    // Automatic submenu
     add_submenu_page(
-        'all-sources-images-admin-display',
-        __( 'New Automatic', 'all-sources-images' ),
-        __( '→ New Automatic', 'all-sources-images' ),
+        'asi-new-settings',
+        __( 'Automatic', 'all-sources-images' ),
+        __( 'Automatic', 'all-sources-images' ),
         'asi_manage',
         'asi-new-automatic',
         'asi_render_new_automatic_page'
     );
     
-    // New Bulk Generation submenu
+    // Bulk Generation submenu
     add_submenu_page(
-        'all-sources-images-admin-display',
-        __( 'New Bulk Generation', 'all-sources-images' ),
-        __( '→ New Bulk Generation', 'all-sources-images' ),
+        'asi-new-settings',
+        __( 'Bulk Generation', 'all-sources-images' ),
+        __( 'Bulk Generation', 'all-sources-images' ),
         'asi_manage',
         'asi-new-bulk-generation',
         'asi_render_new_bulk_generation_page'
@@ -183,11 +183,5 @@ function asi_render_error_page() {
     <?php
 }
 
-// Auto-register if this file is included
-if ( did_action( 'admin_menu' ) ) {
-    // If admin_menu already fired, register immediately
-    asi_register_new_ui_menus();
-} else {
-    // Otherwise hook it
-    add_action( 'admin_menu', 'asi_register_new_ui_menus', 100 );
-}
+// Note: Menus are registered via ASI_main_settings() which calls asi_register_new_ui_menus()
+// Do NOT call asi_register_new_ui_menus() here as this file may be loaded before admin_menu hook

@@ -172,7 +172,6 @@ class All_Sources_Images {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
     	$this->loader->add_action( 'admin_menu', $plugin_admin, 'ASI_main_settings' );
-		$this->loader->add_filter( 'submenu_file', $plugin_admin, 'ASI_submenu_class' );
 
     	$this->loader->add_action( 'init', $plugin_admin, 'ASI_main_actions' );
 

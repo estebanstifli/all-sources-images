@@ -735,37 +735,68 @@ jQuery(document).ready(function() {
     });
 
 
-    /* Eye to show/hide API key */
-    function hideAPIKey(passwordSelector) {
+    /* Eye to show/hide API key - use event delegation for dynamically loaded content */
+    jQuery(document).on('click', '#togglePassword', function() {
+        var passwordInput = jQuery(this).siblings('input').first();
+        if (passwordInput.length === 0) {
+            passwordInput = jQuery(this).closest('.password').find('input');
+        }
+        if (passwordInput.length) {
+            var type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+            passwordInput.attr('type', type);
+            jQuery(this).toggleClass('close-eye');
+        }
+    });
 
+    // Also support legacy initialization for static elements
+    function hideAPIKey(passwordSelector) {
       const togglePassword  = document.querySelector(passwordSelector+" #togglePassword");
       const password        = document.querySelector(passwordSelector+" input");
 
-      if(togglePassword) {
+      if(togglePassword && !togglePassword.dataset.initialized) {
+        togglePassword.dataset.initialized = 'true';
         togglePassword.addEventListener("click", function () {
-
             // toggle the type attribute
             const type = password.getAttribute("type") === "password" ? "text" : "password";
             password.setAttribute("type", type);
-
             // toggle the icon
             this.classList.toggle("close-eye");
         });
       }
     }
 
+    // Initialize all password toggles
+    var passwordSelectors = [
+        "#password-unsplash",
+        "#password-googleAPI", 
+        "#password-pixabay",
+        "#password-dalle",
+        "#password-stability",
+        "#password-replicate",
+        "#password-youtube",
+        "#password-pexels",
+        "#password-openai",
+        "#password-giphy",
+        "#password-flickr",
+        "#password-gemini",
+        "#password-workers",
+        "#password-envato",
+        "#password-cc_search",
+        "#password-google-translate"
+    ];
     
-    hideAPIKey("#password-unsplash");
-    hideAPIKey("#password-googleAPI");
-    hideAPIKey("#password-pixabay");
-    hideAPIKey("#password-dalle");
-    hideAPIKey("#password-stability");
-    hideAPIKey("#password-replicate");
-    hideAPIKey("#password-youtube");
-    hideAPIKey("#password-pexels");
-    hideAPIKey("#password-openai");
-    hideAPIKey("#password-giphy");
-    hideAPIKey("#password-flickr");
+    passwordSelectors.forEach(function(selector) {
+        hideAPIKey(selector);
+    });
+
+    // Re-initialize after tabs are shown (for jQuery UI tabs)
+    jQuery(document).on('tabsactivate', '#tabs', function(event, ui) {
+        setTimeout(function() {
+            passwordSelectors.forEach(function(selector) {
+                hideAPIKey(selector);
+            });
+        }, 100);
+    });
 
 
 

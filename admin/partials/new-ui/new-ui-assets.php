@@ -20,6 +20,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 function asi_enqueue_new_ui_assets( $hook ) {
     // Only load on our new pages
     $new_ui_pages = array(
+        'toplevel_page_asi-new-settings',
         'all-sources-images_page_asi-new-settings',
         'all-sources-images_page_asi-new-automatic',
         'all-sources-images_page_asi-new-bulk-generation',

@@ -672,53 +672,17 @@ class All_Sources_Images_Admin {
                 'all'
             );
         }
-        // MPT Admin Dashboard
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' || $hook == 'admin_page_all-sources-images-admin-display-pricing' ) {
+        // ASI Admin Pages (new UI)
+        $asi_pages = array(
+            'toplevel_page_asi-new-settings',
+            'all-sources-images_page_asi-new-automatic',
+            'all-sources-images_page_asi-new-bulk-generation',
+            'admin_page_all-sources-images-admin-display-pricing'
+        );
+        if ( in_array( $hook, $asi_pages ) ) {
             wp_enqueue_style(
                 $this->plugin_name,
                 plugin_dir_url( __FILE__ ) . 'css/all-sources-images-admin.css',
-                array(),
-                $this->version,
-                'all'
-            );
-            wp_enqueue_style(
-                'plugins-bundle',
-                plugin_dir_url( __FILE__ ) . 'css/plugins.bundle.css',
-                array(),
-                $this->version,
-                'all'
-            );
-            wp_enqueue_style(
-                'style.bundle',
-                plugin_dir_url( __FILE__ ) . 'css/style.bundle.css',
-                array(),
-                $this->version,
-                'all'
-            );
-            wp_enqueue_style(
-                'theme-base-light',
-                plugin_dir_url( __FILE__ ) . 'css/themes/layout/header/base/light.css',
-                array(),
-                $this->version,
-                'all'
-            );
-            wp_enqueue_style(
-                'theme-menu-light',
-                plugin_dir_url( __FILE__ ) . 'css/themes/layout/header/menu/light.css',
-                array(),
-                $this->version,
-                'all'
-            );
-            wp_enqueue_style(
-                'theme-brand-dark',
-                plugin_dir_url( __FILE__ ) . 'css/themes/layout/brand/dark.css',
-                array(),
-                $this->version,
-                'all'
-            );
-            wp_enqueue_style(
-                'theme-aside-dark',
-                plugin_dir_url( __FILE__ ) . 'css/themes/layout/aside/dark.css',
                 array(),
                 $this->version,
                 'all'
@@ -738,28 +702,15 @@ class All_Sources_Images_Admin {
         $block = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
         $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
         $options_auto = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' ) {
-            wp_enqueue_script(
-                'prismjs-bundle',
-                plugin_dir_url( __FILE__ ) . 'js/prismjs.bundle.js',
-                array('jquery'),
-                $this->version,
-                true
-            );
-            wp_enqueue_script(
-                'scripts-bundle',
-                plugin_dir_url( __FILE__ ) . 'js/scripts.bundle.js',
-                array('jquery'),
-                $this->version,
-                true
-            );
-            wp_enqueue_script(
-                'common-mpt',
-                plugin_dir_url( __FILE__ ) . 'js/common.js',
-                array('jquery'),
-                $this->version,
-                true
-            );
+        // Scripts for new UI pages
+        $asi_new_pages = array(
+            'toplevel_page_asi-new-settings',
+            'all-sources-images_page_asi-new-automatic',
+            'all-sources-images_page_asi-new-bulk-generation'
+        );
+        if ( in_array( $hook, $asi_new_pages ) ) {
+            wp_enqueue_script( 'jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.js', __FILE__ ) );
+            wp_enqueue_style( 'style-jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.css', __FILE__ ) );
         }
         wp_enqueue_script(
             'mpt-rating',
@@ -768,16 +719,12 @@ class All_Sources_Images_Admin {
             $this->version,
             false
         );
-        // Bulk generation
-        $module = ( isset( $_GET['module'] ) ? sanitize_text_field( $_GET['module'] ) : '' );
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && ('bulk-generation' == $module || 'source' == $module || 'automatic' == $module || 'interval' == $module || 'block' == $module) ) {
-            wp_enqueue_script( 'jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.js', __FILE__ ) );
-            wp_enqueue_style( 'style-jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.css', __FILE__ ) );
+        // Bulk generation scripts (new page)
+        if ( $hook == 'all-sources-images_page_asi-new-bulk-generation' ) {
+            wp_enqueue_script( 'images-generation', plugins_url( 'js/generation.js', __FILE__ ), array('jquery', 'jquery-ui') );
         }
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && 'bulk-generation' == $module ) {
-            wp_enqueue_script( 'images-generation', plugins_url( 'js/generation.js', __FILE__ ), array('jquery-ui') );
-        }
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && 'source' == $module ) {
+        // Source/Settings scripts (new page)
+        if ( $hook == 'toplevel_page_asi-new-settings' ) {
             wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui') );
             wp_localize_script( 'source', 'apisTestingAjax', array(
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
@@ -853,7 +800,7 @@ class All_Sources_Images_Admin {
             );
         }
         //Include Main dashboard Js
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' || ($pagenow == 'index.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') && in_array( get_post_type( get_the_ID() ), $post_types_default['choosed_post_type'] ) ) {
+        if ( in_array( $hook, $asi_new_pages ) || ($pagenow == 'index.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') && in_array( get_post_type( get_the_ID() ), $post_types_default['choosed_post_type'] ) ) {
             wp_enqueue_script(
                 $this->plugin_name,
                 plugin_dir_url( __FILE__ ) . 'js/magic-post-thumbnail-admin.js',
@@ -864,7 +811,7 @@ class All_Sources_Images_Admin {
                 )
             );
         }
-        if ( $hook == 'toplevel_page_all-sources-images-admin-display' && 'automatic' == $module ) {
+        if ( $hook == 'all-sources-images_page_asi-new-automatic' ) {
             $image_blocks = ( isset( $options_auto['image_block'] ) ? $options_auto['image_block'] : array() );
             // Calculating the current block index based on existing blocks
             $blockIndex = count( $image_blocks ) + 1;
@@ -959,41 +906,25 @@ class All_Sources_Images_Admin {
      * Show main menu item
      *
      * @since    4.0.0
+     * @since    6.2.0 Simplified to only use new UI pages
      */
     public function ASI_main_settings() {
+        // Main menu - redirects to Settings page
         add_menu_page(
             __( 'All Sources Images Options', 'all-sources-images' ),
             'All Sources Images',
             'asi_manage',
-            'all-sources-images-admin-display',
-            array(&$this, 'ASI_options'),
+            'asi-new-settings',
+            'asi_render_new_settings_page',
             'dashicons-images-alt2',
             81
         );
-        add_submenu_page(
-            'all-sources-images-admin-display',
-            __( 'Dashboard', 'all-sources-images' ),
-            __( 'Dashboard', 'all-sources-images' ),
-            'asi_manage',
-            'all-sources-images-admin-display',
-            array(&$this, 'ASI_options')
-        );
-        add_submenu_page(
-            'all-sources-images-admin-display',
-            __( 'Source', 'all-sources-images' ),
-            __( 'Source', 'all-sources-images' ),
-            'asi_manage',
-            'all-sources-images-admin-display&module=source',
-            array(&$this, 'ASI_options')
-        );
-        add_submenu_page(
-            'all-sources-images-admin-display',
-            __( 'Automatic Settings', 'all-sources-images' ),
-            __( 'Settings', 'all-sources-images' ),
-            'asi_manage',
-            'all-sources-images-admin-display&module=automatic',
-            array(&$this, 'ASI_options')
-        );
+        
+        // Include new UI menus (Settings, Automatic, Bulk Generation)
+        include_once plugin_dir_path( __FILE__ ) . 'partials/new-ui/new-ui-menus.php';
+        asi_set_new_ui_admin( $this );
+        asi_register_new_ui_menus();
+        
         /* Bulk Generation link for posts & custom post type */
         $post_type_availables = get_option( 'ASI_plugin_posts_settings' );
         if ( isset( $post_type_availables['choosed_post_type'] ) ) {
@@ -1054,30 +985,6 @@ class All_Sources_Images_Admin {
                 2
             );
         }
-    }
-
-    /**
-     * Add class "current" for chosen submenu 
-     *
-     * @since    6.0.0
-     */
-    public function ASI_submenu_class( $submenu_file ) {
-        if ( isset( $_GET['page'] ) && $_GET['page'] === 'all-sources-images-admin-display' ) {
-            if ( isset( $_GET['module'] ) ) {
-                switch ( $_GET['module'] ) {
-                    case 'dashboard':
-                        $submenu_file = 'all-sources-images-admin-display';
-                        break;
-                    case 'source':
-                        $submenu_file = 'all-sources-images-admin-display&module=source';
-                        break;
-                    case 'automatic':
-                        $submenu_file = 'all-sources-images-admin-display&module=automatic';
-                        break;
-                }
-            }
-        }
-        return $submenu_file;
     }
 
     /**
@@ -1144,60 +1051,6 @@ class All_Sources_Images_Admin {
             }
         }
         return $caps;
-    }
-
-    /**
-     * Main settings page
-     *
-     * @since    4.0.0
-     */
-    public function ASI_options() {
-        if ( !current_user_can( 'asi_manage' ) ) {
-            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-sources-images' ) );
-        }
-        do_action( 'ASI_before_options_panel' );
-        require_once dirname( __FILE__ ) . '/partials/all-sources-images-admin-display.php';
-    }
-
-    /**
-     * Display submenus
-     *
-     * @since    4.0.0
-     */
-    public function ASI_submenu( $title = 'Submenu', $slug = 'dashboard', $icon = 'default.png' ) {
-        $url = explode( '?', esc_url_raw( add_query_arg( array() ) ) );
-        $no_query_args = $url[0];
-        $current_url = remove_query_arg( 'ids_mpt_generation', add_query_arg( 'module', $slug, $this->ASI_current_url() ) );
-        if ( isset( $_GET['module'] ) ) {
-            $current_module = sanitize_text_field( $_GET['module'] );
-        } else {
-            // Default Tab
-            $current_module = 'dashboard';
-        }
-        $item_class = 'menu-item menu-item-submenu ';
-        if ( $current_module == $slug ) {
-            $item_class .= 'menu-item-open menu-item-here ';
-        }
-        // Exception with upgrade page
-        if ( 'upgrade' == $slug ) {
-            $current_url = get_admin_url() . 'admin.php?page=all-sources-images-admin-display-pricing';
-        }
-        ?>
-		<li class="<?php 
-        echo $item_class;
-        ?>" data-menu-toggle="hover">
-		    <a href="<?php 
-        echo $current_url;
-        ?>" class="menu-link">
-		        <img src="<?php 
-        echo plugin_dir_url( __FILE__ ) . '/img/' . $icon;
-        ?>" class="icon-dashboard" width="24px" height="24px" />
-		        <span class="menu-text"><?php 
-        echo $title;
-        ?></span>
-		    </a>
-		</li>
-	<?php 
     }
 
     /**
@@ -1735,7 +1588,7 @@ class All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ASI_add_bulk_action_category( $actions, $tag ) {
-        $actions['atp'] = '<a href="admin.php?page=all-sources-images-admin-display&module=bulk-generation&cats=' . $tag->term_id . '" class="aria-button-if-js">' . esc_html__( 'Generate featured images', 'all-sources-images' ) . '</a>';
+        $actions['atp'] = '<a href="admin.php?page=asi-new-bulk-generation&cats=' . $tag->term_id . '" class="aria-button-if-js">' . esc_html__( 'Generate featured images', 'all-sources-images' ) . '</a>';
         return $actions;
     }
 
@@ -1747,7 +1600,7 @@ class All_Sources_Images_Admin {
     public function ASI_bulk_action_handler( $redirect_to, $action_name, $post_ids ) {
         if ( 'bulk_regenerate_thumbnails' === $action_name ) {
             $ids = implode( ',', array_map( 'intval', $post_ids ) );
-            wp_redirect( 'admin.php?page=all-sources-images-admin-display&module=bulk-generation&ids_mpt_generation=' . $ids, '301' );
+            wp_redirect( 'admin.php?page=asi-new-bulk-generation&ids_mpt_generation=' . $ids, '301' );
             exit;
         }
         return $redirect_to;
@@ -3051,7 +2904,7 @@ class All_Sources_Images_Admin {
      * @since    2.0.5
      */
     public function ASI_add_link_parameters( $links ) {
-        $settings_link = '<a href="admin.php?page=all-sources-images-admin-display">' . esc_html__( 'Settings', 'all-sources-images' ) . '</a>';
+        $settings_link = '<a href="admin.php?page=asi-new-settings">' . esc_html__( 'Settings', 'all-sources-images' ) . '</a>';
         array_push( $links, $settings_link );
         return $links;
     }
