@@ -41,39 +41,8 @@ The plugin allows you to configure some settings for your automatic images : **I
 <li>Image generated randomized</li>
 </ul>
 
-= Extended Features =
-
-<ul>
-
-<li>Customisable <strong>Crons</strong></li>
-<li>Set different image locations for each post generation.</li>
-<li>Images from Youtube, <strong>Stable Diffusion</strong>, <strong>Replicate (42 models)</strong>, Unsplash or Pexels</li>
-<li>More images with the Gutenberg Block</li>
-<li>Image search based on Tags, Categories, Text Analyser per paragraph Custom Fields, Custom Request and <strong>OpenAI Keyword Extractor</strong></li>
-<li>Image Modifications: Flip horizontally and/or Crop Image by 10%</li>
-<li><strong>Compatibility</strong> with REST requests, WPeMatico, FeedWordPress, WP All Import, Featured Image from URL, CMB2, ACF and metabox.io</li>
-<li>Restricted domains</li>
-<li>Setup a proxy</li>
-<li><strong>24h Support</strong></li>
-</ul>
 
 
-**<a target="_blank" href="https://www.youtube.com/watch?v=crI3V-Kkb8k">Youtube Tutorial</a>**
-
-== Translations ==
-* French
-* Spanish
-
-== Screenshots ==
-1. All Sources Images : Bulk Generation
-2. All Sources Images : Gutenberg Block
-3. All Sources Images : Settings
-4. All Sources Images : Post-Processing Settings
-5. All Sources Images : Generate images for post types
-6. All Sources Images : Image Banks
-7. All Sources Images : Generate featured images for taxonomies
-8. All Sources Images : Generate featured images for each post individually
-9. All Sources Images : Crons
 
 == Support ==
 Custom development based on original All Sources Images plugin.
