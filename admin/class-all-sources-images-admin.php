@@ -995,7 +995,9 @@ class All_Sources_Images_Admin {
         }
         //register_setting('ASI-plugin-posts-settings', 'ASI_plugin_posts_settings');
         register_setting( 'ASI-plugin-block-settings', 'ASI_plugin_block_settings' );
-        register_setting( 'ASI-plugin-main-settings', 'ASI_plugin_main_settings' );
+        register_setting( 'ASI-plugin-main-settings', 'ASI_plugin_main_settings', array(
+            'sanitize_callback' => array($this, 'ASI_sanitize_main_settings'),
+        ) );
         register_setting( 'ASI-plugin-banks-settings', 'ASI_plugin_banks_settings', array(
             'sanitize_callback' => array($this, 'ASI_sanitize_banks_settings'),
         ) );
@@ -3004,6 +3006,111 @@ class All_Sources_Images_Admin {
             update_option( 'ASI_plugin_main_settings', $current_options );
         } else {
         }
+    }
+
+    /**
+     * Sanitize main settings - Merge with existing values to preserve settings from other tabs
+     *
+     * When saving from Image Placement tab, we don't want to lose Post-Processing settings and vice versa.
+     * This callback merges the new values with existing ones based on the _saving_tab field.
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array              Merged settings
+     */
+    public function ASI_sanitize_main_settings( $input ) {
+        // Get existing settings
+        $existing = get_option( 'ASI_plugin_main_settings', array() );
+        
+        // If input is empty or not an array, return existing
+        if ( empty( $input ) || ! is_array( $input ) ) {
+            return $existing;
+        }
+        
+        // Fields that belong to Post-Processing tab
+        $post_processing_fields = array(
+            'image_filename',
+            'rewrite_featured',
+            'image_reuse',
+            'image_flip',
+            'image_crop',
+            'enable_alt',
+            'alt_from',
+            'translate_alt',
+            'translate_alt_lang',
+            'enable_caption',
+            'caption_from',
+        );
+        
+        // Fields that belong to Image Placement tab
+        $image_placement_fields = array(
+            'image_block',
+            'image_custom_post_type',
+        );
+        
+        // Check for explicit tab indicator (added as hidden field in forms)
+        $saving_tab = isset( $input['_saving_tab'] ) ? $input['_saving_tab'] : null;
+        
+        // Remove the _saving_tab field as it's not a real setting
+        unset( $input['_saving_tab'] );
+        
+        // Merge strategy based on which tab is being saved
+        if ( $saving_tab === 'post_processing' ) {
+            // Saving Post-Processing: preserve ALL Image Placement fields from existing
+            foreach ( $image_placement_fields as $field ) {
+                if ( isset( $existing[ $field ] ) ) {
+                    $input[ $field ] = $existing[ $field ];
+                }
+            }
+        } elseif ( $saving_tab === 'image_placement' ) {
+            // Saving Image Placement: preserve ALL Post-Processing fields from existing
+            foreach ( $post_processing_fields as $field ) {
+                if ( isset( $existing[ $field ] ) ) {
+                    $input[ $field ] = $existing[ $field ];
+                }
+            }
+        } else {
+            // Fallback: try to detect which tab based on fields present (for legacy/other forms)
+            $saving_post_processing = false;
+            $saving_image_placement = false;
+            
+            foreach ( $post_processing_fields as $field ) {
+                if ( isset( $input[ $field ] ) ) {
+                    $saving_post_processing = true;
+                    break;
+                }
+            }
+            
+            foreach ( $image_placement_fields as $field ) {
+                if ( isset( $input[ $field ] ) ) {
+                    $saving_image_placement = true;
+                    break;
+                }
+            }
+            
+            if ( $saving_post_processing && ! $saving_image_placement ) {
+                foreach ( $image_placement_fields as $field ) {
+                    if ( isset( $existing[ $field ] ) && ! isset( $input[ $field ] ) ) {
+                        $input[ $field ] = $existing[ $field ];
+                    }
+                }
+            } elseif ( $saving_image_placement && ! $saving_post_processing ) {
+                foreach ( $post_processing_fields as $field ) {
+                    if ( isset( $existing[ $field ] ) && ! isset( $input[ $field ] ) ) {
+                        $input[ $field ] = $existing[ $field ];
+                    }
+                }
+            }
+        }
+        
+        // Also preserve any other fields that might exist but weren't in the form
+        foreach ( $existing as $key => $value ) {
+            if ( ! isset( $input[ $key ] ) ) {
+                $input[ $key ] = $value;
+            }
+        }
+        
+        return $input;
     }
 
     /**

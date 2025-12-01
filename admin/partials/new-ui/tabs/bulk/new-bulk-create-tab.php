@@ -38,48 +38,17 @@ if ( $has_woocommerce ) {
 <!-- TAB: Create New Job -->
 <div class="tab-pane fade show active" id="create-job" role="tabpanel" aria-labelledby="create-job-tab">
     
-    <!-- Job Settings Card -->
-    <div class="card card100 shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title mb-3">
-                <i class="bi bi-gear me-2 text-secondary"></i><?php esc_html_e( 'Job Settings', 'magic-post-thumbnail' ); ?>
-            </h5>
-
-            <div class="row g-3">
-                <!-- Job Name -->
-                <div class="col-12 col-lg-6">
-                    <label for="asi-job-name" class="form-label fw-semibold">
-                        <i class="bi bi-tag me-1"></i><?php esc_html_e( 'Job Name', 'magic-post-thumbnail' ); ?>
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-pencil-square"></i></span>
-                        <input type="text" id="asi-job-name" name="job_name" class="form-control" placeholder="<?php esc_attr_e( 'Enter job name (optional)', 'magic-post-thumbnail' ); ?>">
-                    </div>
-                    <div class="form-text"><?php esc_html_e( 'If left empty, a default name will be assigned.', 'magic-post-thumbnail' ); ?></div>
-                </div>
-
-                <!-- Images per Post -->
-                <div class="col-12 col-lg-6">
-                    <label for="asi-images-per-post" class="form-label fw-semibold">
-                        <i class="bi bi-image me-1"></i><?php esc_html_e( 'Images per Post', 'magic-post-thumbnail' ); ?>
-                    </label>
-                    <select id="asi-images-per-post" name="images_per_post" class="form-select">
-                        <?php
-                        $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
-                        $block_count = count( $image_blocks );
-                        for ( $i = 1; $i <= max( 1, $block_count ); $i++ ) {
-                            echo '<option value="' . $i . '">' . $i . '</option>';
-                        }
-                        ?>
-                    </select>
-                    <div class="form-text"><?php esc_html_e( 'Based on your configured image blocks in Automatic settings.', 'magic-post-thumbnail' ); ?></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php
+    // Get image blocks count for hidden field
+    $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
+    $block_count = max( 1, count( $image_blocks ) );
+    ?>
 
     <!-- Select Sources Card -->
     <div class="card card100 shadow-sm mb-4">
+        <!-- Hidden fields for job creation -->
+        <input type="hidden" id="asi-job-name" name="job_name" value="">
+        <input type="hidden" id="asi-images-per-post" name="images_per_post" value="<?php echo esc_attr( $block_count ); ?>">
         <div class="card-body">
             <h5 class="card-title mb-3">
                 <i class="bi bi-check2-square me-2 text-secondary"></i><?php esc_html_e( 'Select Content', 'magic-post-thumbnail' ); ?>

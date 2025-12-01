@@ -448,7 +448,7 @@ jQuery(document).ready(function($) {
                             <i class="bi bi-play-fill"></i>
                         </button>
                     ` : ''}
-                    ${['pending', 'paused', 'completed', 'failed'].includes(job.job_status) ? `
+                    ${['pending', 'processing', 'paused', 'completed', 'failed'].includes(job.job_status) ? `
                         <button class="btn btn-sm btn-outline-danger asi-delete-job" data-job-id="${job.id}" title="Delete">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -589,6 +589,30 @@ jQuery(document).ready(function($) {
         } else {
             let html = '';
             posts.posts.forEach(function(post) {
+                // Build images HTML (supports multiple images)
+                let imagesHtml = '-';
+                if (post.image_urls && post.image_urls.length > 0) {
+                    imagesHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
+                    post.image_urls.forEach(function(url, index) {
+                        imagesHtml += '<img src="' + url + '" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" title="Image ' + (index + 1) + '">';
+                    });
+                    imagesHtml += '</div>';
+                } else if (post.thumbnail_url) {
+                    // Fallback to single thumbnail
+                    imagesHtml = '<img src="' + post.thumbnail_url + '" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">';
+                } else if (post.featured_image_id) {
+                    imagesHtml = '<i class="bi bi-check-circle text-success" title="Image ID: ' + post.featured_image_id + '"></i>';
+                }
+                
+                // Build status HTML with retry info
+                let statusHtml = `<span class="status-badge ${post.status}">${post.status}</span>`;
+                if (post.retry_count && post.retry_count > 0) {
+                    statusHtml += `<br><small class="text-muted">Retry ${post.retry_count}/3</small>`;
+                }
+                if (post.error_message && post.status === 'failed') {
+                    statusHtml += `<br><small class="text-danger" title="${escapeHtml(post.error_message)}">⚠ Error</small>`;
+                }
+                
                 html += `<tr>
                     <td>
                         <a href="${asiBulkAjax.edit_url}?post=${post.post_id}&action=edit" target="_blank">
@@ -596,8 +620,8 @@ jQuery(document).ready(function($) {
                         </a>
                     </td>
                     <td>${post.post_type}</td>
-                    <td><span class="status-badge ${post.status}">${post.status}</span></td>
-                    <td>${post.featured_image_id ? `<i class="bi bi-check-circle text-success"></i>` : '-'}</td>
+                    <td>${statusHtml}</td>
+                    <td>${imagesHtml}</td>
                     <td>${post.image_source || '-'}</td>
                 </tr>`;
             });

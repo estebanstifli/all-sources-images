@@ -112,7 +112,7 @@ if ( ! function_exists( 'add_filter' ) ) {
                             <th><?php esc_html_e( 'Post', 'magic-post-thumbnail' ); ?></th>
                             <th><?php esc_html_e( 'Type', 'magic-post-thumbnail' ); ?></th>
                             <th><?php esc_html_e( 'Status', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Image', 'magic-post-thumbnail' ); ?></th>
+                            <th><?php esc_html_e( 'Images', 'magic-post-thumbnail' ); ?></th>
                             <th><?php esc_html_e( 'Source', 'magic-post-thumbnail' ); ?></th>
                         </tr>
                     </thead>

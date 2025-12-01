@@ -271,6 +271,45 @@ class ASI_Bulk_Generation_Ajax {
 
         $stats = ASI_Bulk_Generation_DB::get_job_stats( $job_id );
         $posts = ASI_Bulk_Generation_DB::get_job_posts( $job_id, array( 'page' => $posts_page ) );
+        
+        // Add thumbnail URLs to posts (all images generated for this post)
+        if ( ! empty( $posts['posts'] ) ) {
+            foreach ( $posts['posts'] as &$post ) {
+                $post->image_urls = array();
+                $post->thumbnail_url = ''; // Keep for backward compatibility
+                
+                // Get featured image if exists
+                if ( has_post_thumbnail( $post->post_id ) ) {
+                    $thumb_id = get_post_thumbnail_id( $post->post_id );
+                    $thumb = wp_get_attachment_image_src( $thumb_id, 'thumbnail' );
+                    if ( $thumb ) {
+                        $post->thumbnail_url = $thumb[0];
+                        $post->image_urls[] = $thumb[0];
+                        if ( empty( $post->featured_image_id ) ) {
+                            $post->featured_image_id = $thumb_id;
+                        }
+                    }
+                }
+                
+                // Get images attached to this post (uploaded during bulk generation)
+                $attached_images = get_posts( array(
+                    'post_type'      => 'attachment',
+                    'post_mime_type' => 'image',
+                    'post_parent'    => $post->post_id,
+                    'posts_per_page' => 10,
+                    'orderby'        => 'date',
+                    'order'          => 'DESC',
+                    'exclude'        => has_post_thumbnail( $post->post_id ) ? array( get_post_thumbnail_id( $post->post_id ) ) : array(),
+                ) );
+                
+                foreach ( $attached_images as $image ) {
+                    $thumb = wp_get_attachment_image_src( $image->ID, 'thumbnail' );
+                    if ( $thumb && ! in_array( $thumb[0], $post->image_urls, true ) ) {
+                        $post->image_urls[] = $thumb[0];
+                    }
+                }
+            }
+        }
 
         wp_send_json_success( array(
             'job'   => $job,
@@ -342,8 +381,9 @@ class ASI_Bulk_Generation_Ajax {
             wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'magic-post-thumbnail' ) ) );
         }
 
-        // Clear scheduled cron
+        // Clear all scheduled cron events for this job
         wp_clear_scheduled_hook( 'asi_bulk_process_job', array( $job_id ) );
+        wp_clear_scheduled_hook( 'asi_bulk_process_batch', array( $job_id ) );
 
         $deleted = ASI_Bulk_Generation_DB::delete_job( $job_id );
 

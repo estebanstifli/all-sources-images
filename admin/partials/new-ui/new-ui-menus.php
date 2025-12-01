@@ -61,11 +61,11 @@ function asi_register_new_ui_menus() {
         'asi_render_new_settings_page'
     );
     
-    // Automatic submenu
+    // Bulk Settings submenu (formerly Automatic)
     add_submenu_page(
         'asi-new-settings',
-        __( 'Automatic', 'all-sources-images' ),
-        __( 'Automatic', 'all-sources-images' ),
+        __( 'Bulk Settings', 'all-sources-images' ),
+        __( 'Bulk Settings', 'all-sources-images' ),
         'asi_manage',
         'asi-new-automatic',
         'asi_render_new_automatic_page'

@@ -5,8 +5,8 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit();
 }
 
-// Determine active tab for styling
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'sources';
+// Determine active tab for styling - Default is now 'placement' since Sources tab is removed
+$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'placement';
 ?>
 <div class="wrap main-mpt">
 	<!--begin::Main-->
@@ -47,19 +47,14 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'sou
 									<!-- Tabs BEFORE the card -->
 									<ul class="nav nav-tabs nav-tabs-line nav-tabs-line-2x nav-tabs-primary" role="tablist" style="margin-bottom: 0; border-bottom: none;">
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'sources' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=asi-new-automatic&tab=sources' ) ); ?>">
-												<?php esc_html_e( 'Sources', 'all-sources-images' ); ?>
-											</a>
-										</li>
-										<li class="nav-item">
 											<a class="nav-link <?php echo $active_tab === 'placement' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=asi-new-automatic&tab=placement' ) ); ?>">
 												<?php esc_html_e( 'Image Placement', 'all-sources-images' ); ?>
 											</a>
 										</li>
 										<li class="nav-item">
-													<a class="nav-link <?php echo $active_tab === 'postprocessing' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=asi-new-automatic&tab=postprocessing' ) ); ?>">
-														<?php esc_html_e( 'Post-Processing', 'all-sources-images' ); ?>
-													</a>
-												</li>
-											</ul>									<!--begin::Card-->
+											<a class="nav-link <?php echo $active_tab === 'postprocessing' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=asi-new-automatic&tab=postprocessing' ) ); ?>">
+												<?php esc_html_e( 'Post-Processing', 'all-sources-images' ); ?>
+											</a>
+										</li>
+									</ul>									<!--begin::Card-->
 									<div class="card card-custom" style="border-top-left-radius: 0;">

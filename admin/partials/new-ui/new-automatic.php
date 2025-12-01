@@ -12,20 +12,17 @@ if ( ! function_exists( 'add_filter' ) ) {
     exit;
 }
 
-// Determine active tab
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'sources';
+// Determine active tab - Default is now 'placement' since Sources tab is removed
+$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'placement';
 
 // Set title based on active tab
 switch ( $active_tab ) {
-    case 'placement':
-        $title = esc_html__( 'Automatic [Image Placement]', 'all-sources-images' );
-        break;
     case 'postprocessing':
-        $title = esc_html__( 'Automatic [Post-Processing]', 'all-sources-images' );
+        $title = esc_html__( 'Bulk Settings [Post-Processing]', 'all-sources-images' );
         break;
-    case 'sources':
+    case 'placement':
     default:
-        $title = esc_html__( 'Automatic [Sources]', 'all-sources-images' );
+        $title = esc_html__( 'Bulk Settings [Image Placement]', 'all-sources-images' );
         break;
 }
 
@@ -36,15 +33,12 @@ include_once plugin_dir_path( __FILE__ ) . 'header-automatic.php';
 <div class="card-body">
     <?php
     switch ( $active_tab ) {
-        case 'placement':
-            include_once 'tabs/new-automatic-image-placement.php';
-            break;
         case 'postprocessing':
             include_once 'tabs/new-automatic-post-processing.php';
             break;
-        case 'sources':
+        case 'placement':
         default:
-            include_once 'tabs/new-automatic-sources.php';
+            include_once 'tabs/new-automatic-image-placement.php';
             break;
     }
     ?>

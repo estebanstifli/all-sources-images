@@ -46,6 +46,7 @@ if( !isset( $options['translate_alt_lang'] ) ) {
 
     <form method="post" action="options.php" id="post-processing-form">
         <?php settings_fields( 'ASI-plugin-main-settings' ); ?>
+        <input type="hidden" name="ASI_plugin_main_settings[_saving_tab]" value="post_processing">
         
         <table class="form-table">
         <!-- Image Naming Convention -->

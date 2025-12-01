@@ -432,7 +432,7 @@ $blockIndex = count( $image_blocks ) + 1;
                     <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
                     <div class="field-content">
                         <label class="toggle-switch">
-                            <input type="checkbox" name="ASI_plugin_main_settings[image_block][0][translation_EN]" value="true">
+                            <input type="checkbox" name="ASI_plugin_main_settings[image_block][0][translation_EN]" value="true" checked>
                             <span class="toggle-slider"></span>
                             <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
                         </label>
@@ -460,6 +460,7 @@ $blockIndex = count( $image_blocks ) + 1;
         
         <form method="post" action="options.php" id="image-placement-form">
             <?php settings_fields( 'ASI-plugin-main-settings' ); ?>
+            <input type="hidden" name="ASI_plugin_main_settings[_saving_tab]" value="image_placement">
             
             <!-- Container for saved and new blocks -->
             <div id="image-blocks-container">

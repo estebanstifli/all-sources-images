@@ -19,7 +19,7 @@ class ASI_Bulk_Generation_DB {
      *
      * @var string
      */
-    private static $db_version = '1.0.0';
+    private static $db_version = '1.1.0';
 
     /**
      * Table name for jobs (parent)
@@ -85,6 +85,7 @@ class ASI_Bulk_Generation_DB {
             post_type VARCHAR(50) NOT NULL,
             post_title VARCHAR(255) NOT NULL,
             status ENUM('pending', 'processing', 'completed', 'failed', 'skipped') DEFAULT 'pending',
+            retry_count TINYINT(3) UNSIGNED DEFAULT 0,
             featured_image_id BIGINT(20) UNSIGNED DEFAULT NULL,
             featured_image_status ENUM('pending', 'completed', 'failed', 'skipped') DEFAULT 'pending',
             additional_images TEXT,
@@ -104,7 +105,31 @@ class ASI_Bulk_Generation_DB {
         dbDelta( $sql_jobs );
         dbDelta( $sql_posts );
 
+        // Add retry_count column if it doesn't exist (for upgrades from 1.0.0)
+        self::maybe_add_retry_column();
+
         update_option( 'asi_bulk_db_version', self::$db_version );
+    }
+
+    /**
+     * Add retry_count column if upgrading from older version
+     */
+    private static function maybe_add_retry_column() {
+        global $wpdb;
+        
+        self::init();
+        
+        // Check if column exists
+        $column_exists = $wpdb->get_results( $wpdb->prepare(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = 'retry_count'",
+            DB_NAME,
+            self::$table_posts
+        ) );
+        
+        if ( empty( $column_exists ) ) {
+            $wpdb->query( "ALTER TABLE " . self::$table_posts . " ADD COLUMN retry_count TINYINT(3) UNSIGNED DEFAULT 0 AFTER status" );
+        }
     }
 
     /**
