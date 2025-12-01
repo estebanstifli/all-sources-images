@@ -128,6 +128,9 @@ class All_Sources_Images_Admin {
         add_action( 'admin_enqueue_scripts', array( $this, 'ASI_enqueue_media_modal_assets' ) );
         add_action( 'enqueue_block_editor_assets', array( $this, 'ASI_enqueue_media_modal_assets' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'ASI_enqueue_front_media_modal_assets' ) );
+        // Gutenberg Block : Translate search term (called once before searching multiple banks)
+        add_action( 'wp_ajax_asi_translate_search', array(&$this, 'ASI_translate_search_ajax') );
+        add_action( 'wp_ajax_nopriv_asi_translate_search', array(&$this, 'ASI_translate_search_ajax') );
         // Gutenberg Block : Searching images with APIs
         add_action( 'wp_ajax_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
         add_action( 'wp_ajax_nopriv_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
@@ -612,27 +615,7 @@ class All_Sources_Images_Admin {
 
         unset( $args['proxy'] );
 
-        // Debug logging for Cloudflare proxy requests
-        error_log( '[ASI Cloudflare Proxy] Service: ' . $service );
-        error_log( '[ASI Cloudflare Proxy] Original URL: ' . $url );
-        error_log( '[ASI Cloudflare Proxy] Base64 encoded (URL-safe): ' . $encoded_url_b64 );
-        error_log( '[ASI Cloudflare Proxy] Final URL length: ' . strlen( $final_url ) );
-
-        $response = wp_remote_request( $final_url, $args );
-        
-        // Log response details
-        if ( is_wp_error( $response ) ) {
-            error_log( '[ASI Cloudflare Proxy] WP_Error: ' . $response->get_error_message() );
-        } else {
-            $status = wp_remote_retrieve_response_code( $response );
-            $body   = wp_remote_retrieve_body( $response );
-            error_log( '[ASI Cloudflare Proxy] Response status: ' . $status );
-            if ( $status !== 200 ) {
-                error_log( '[ASI Cloudflare Proxy] Response body: ' . substr( $body, 0, 500 ) );
-            }
-        }
-
-        return $response;
+        return wp_remote_request( $final_url, $args );
     }
 
     /**
@@ -2282,21 +2265,26 @@ class All_Sources_Images_Admin {
         $id = intval( $_GET['id'] );
         $page = isset( $_GET['page'] ) ? max( 1, intval( $_GET['page'] ) ) : 1;
         
-        // Translate search term to English if translation_EN is enabled
-        $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
-        if ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' ) {
-            $wp_lang = get_bloginfo( 'language' );
-            $source_lang = substr( $wp_lang, 0, 2 );
-            if ( $source_lang !== 'en' && ! empty( $search_term ) ) {
-                $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
-                $translated_term = $REST_generation->ASI_translate_text( $search_term, $source_lang, 'en' );
-                if ( $translated_term !== false && ! empty( $translated_term ) ) {
-                    ASI_log( array(
-                        'original_search' => $search_term,
-                        'translated_search' => $translated_term,
-                        'source_lang' => $source_lang,
-                    ), 'GUTENBERG_BLOCK_TRANSLATION' );
-                    $search_term = $translated_term;
+        // Skip translation if already translated by frontend (skip_translation=1)
+        $skip_translation = isset( $_GET['skip_translation'] ) && $_GET['skip_translation'] == '1';
+        
+        // Translate search term to English if translation_EN is enabled AND not already translated
+        if ( ! $skip_translation ) {
+            $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
+            if ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' ) {
+                $wp_lang = get_bloginfo( 'language' );
+                $source_lang = substr( $wp_lang, 0, 2 );
+                if ( $source_lang !== 'en' && ! empty( $search_term ) ) {
+                    $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
+                    $translated_term = $REST_generation->ASI_translate_text( $search_term, $source_lang, 'en' );
+                    if ( $translated_term !== false && ! empty( $translated_term ) ) {
+                        ASI_log( array(
+                            'original_search' => $search_term,
+                            'translated_search' => $translated_term,
+                            'source_lang' => $source_lang,
+                        ), 'GUTENBERG_BLOCK_TRANSLATION' );
+                        $search_term = $translated_term;
+                    }
                 }
             }
         }
@@ -2763,6 +2751,54 @@ class All_Sources_Images_Admin {
             ASI_log( 'Search successful, returning ' . count($normalized_images) . ' normalized images', 'GUTENBERG_BLOCK_SUCCESS' );
             wp_send_json_success( $response_data );
         }
+    }
+
+    /**
+     * Translate search term AJAX endpoint
+     * Called once by frontend before searching multiple image banks
+     *
+     * @since    6.2.0
+     */
+    public function ASI_translate_search_ajax() {
+        check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
+        
+        if ( ! isset( $_GET['search'] ) ) {
+            wp_send_json_error( 'Missing search parameter' );
+            return;
+        }
+        
+        $search_term = sanitize_text_field( $_GET['search'] );
+        $original_term = $search_term;
+        $was_translated = false;
+        
+        // Check if translation is enabled
+        $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
+        
+        if ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' ) {
+            $wp_lang = get_bloginfo( 'language' );
+            $source_lang = substr( $wp_lang, 0, 2 );
+            
+            if ( $source_lang !== 'en' && ! empty( $search_term ) ) {
+                $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
+                $translated_term = $REST_generation->ASI_translate_text( $search_term, $source_lang, 'en' );
+                
+                if ( $translated_term !== false && ! empty( $translated_term ) ) {
+                    ASI_log( array(
+                        'original_search' => $search_term,
+                        'translated_search' => $translated_term,
+                        'source_lang' => $source_lang,
+                    ), 'TRANSLATE_SEARCH_AJAX' );
+                    $search_term = $translated_term;
+                    $was_translated = true;
+                }
+            }
+        }
+        
+        wp_send_json_success( array(
+            'original' => $original_term,
+            'translated' => $search_term,
+            'was_translated' => $was_translated,
+        ) );
     }
 
     /**

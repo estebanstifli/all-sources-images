@@ -210,6 +210,38 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
         },
 
         /**
+         * Translate search term via AJAX (called once before searching)
+         */
+        translateSearch: function(searchTerm, callback) {
+            // Check if translation is enabled
+            if (typeof asiAjax === 'undefined' || !asiAjax.translation_en) {
+                // Translation disabled, return original term
+                callback(searchTerm, false);
+                return;
+            }
+
+            $.ajax({
+                url: asiAjax.ajax_url,
+                type: 'GET',
+                data: {
+                    action: 'asi_translate_search',
+                    nonce: asiAjax.nonce,
+                    search: searchTerm
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        callback(response.data.translated, response.data.was_translated);
+                    } else {
+                        callback(searchTerm, false);
+                    }
+                },
+                error: function() {
+                    callback(searchTerm, false);
+                }
+            });
+        },
+
+        /**
          * Perform search via AJAX
          */
         performSearch: function($modal, searchTerm, bank, postId, page) {
@@ -231,34 +263,43 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             $modal.find('.asi-results-container').html('<div class="asi-loading">Loading images...</div>');
             $modal.find('.asi-pagination').hide();
 
-            // AJAX call to existing endpoint
-            $.ajax({
-                url: asiAjax.ajax_url,
-                type: 'GET',
-                data: {
-                    action: 'asi_block_searching_images',
-                    nonce: asiAjax.nonce,
-                    search: searchTerm,
-                    bank: bank,
-                    id: postId,
-                    index: 0,
-                    page: page
-                },
-                success: function(response) {
-                    if (response.success && response.data) {
-                        self.renderResults($modal, response.data, bank, searchTerm, postId);
-                    } else {
+            // Translate once, then search
+            self.translateSearch(searchTerm, function(translatedTerm, wasTranslated) {
+                // Update search input if translated
+                if (wasTranslated && translatedTerm !== searchTerm) {
+                    $modal.find('.asi-search-input').val(translatedTerm);
+                }
+
+                // AJAX call to search endpoint with skip_translation flag
+                $.ajax({
+                    url: asiAjax.ajax_url,
+                    type: 'GET',
+                    data: {
+                        action: 'asi_block_searching_images',
+                        nonce: asiAjax.nonce,
+                        search: translatedTerm,
+                        bank: bank,
+                        id: postId,
+                        index: 0,
+                        page: page,
+                        skip_translation: wasTranslated ? '1' : '0'
+                    },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            self.renderResults($modal, response.data, bank, translatedTerm, postId);
+                        } else {
+                            $modal.find('.asi-results-container').html(
+                                '<div class="asi-no-results">No images found. Try a different search term.</div>'
+                            );
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('ASI Search Error:', error);
                         $modal.find('.asi-results-container').html(
-                            '<div class="asi-no-results">No images found. Try a different search term.</div>'
+                            '<div class="asi-no-results">Error loading images. Please try again.</div>'
                         );
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('ASI Search Error:', error);
-                    $modal.find('.asi-results-container').html(
-                        '<div class="asi-no-results">Error loading images. Please try again.</div>'
-                    );
-                }
+                });
             });
         },
 

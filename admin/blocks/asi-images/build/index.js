@@ -436,8 +436,35 @@
                 });
             }
 
+            // Translate search term once via AJAX
+            async function translateSearchTerm(term) {
+                // Check if translation is enabled
+                if (typeof asiAjax === 'undefined' || !asiAjax.translation_en) {
+                    return { translated: term, wasTranslated: false };
+                }
+
+                try {
+                    const params = new URLSearchParams({
+                        action: 'asi_translate_search',
+                        nonce: asiAjax.nonce,
+                        search: term
+                    });
+                    const response = await fetch(`${asiAjax.ajax_url}?${params.toString()}`);
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        return {
+                            translated: data.data.translated,
+                            wasTranslated: data.data.was_translated
+                        };
+                    }
+                } catch (error) {
+                    console.warn('ASI: Translation failed, using original term', error);
+                }
+                return { translated: term, wasTranslated: false };
+            }
+
             // Search all configured banks
-            function searchAllBanks() {
+            async function searchAllBanks() {
                 const postId = resolvePostId();
                 const banks = activeBanks;
                 const entries = Object.entries(banks);
@@ -449,13 +476,24 @@
 
                 setHasRenderedCachedResults(false);
 
+                // Translate once before searching all banks
+                const { translated, wasTranslated } = await translateSearchTerm(searchTerm);
+                
+                // Update search input if translated
+                if (wasTranslated && translated !== searchTerm) {
+                    setSearchTerm(translated);
+                }
+
                 entries.forEach(([key, bankName], index) => {
-                    searchSingleBank(bankName, index, postId);
+                    searchSingleBank(bankName, index, postId, 1, false, translated, wasTranslated);
                 });
             }
 
             // Search a single bank
-            function searchSingleBank(bankName, index, postId, page = 1, append = false) {
+            function searchSingleBank(bankName, index, postId, page = 1, append = false, translatedTerm = null, skipTranslation = false) {
+                // Use translated term if provided, otherwise use current searchTerm
+                const termToSearch = translatedTerm || searchTerm;
+                
                 // Normalize bank name
                 let bankParam = bankName.toLowerCase();
                 if (bankParam === 'openverse') bankParam = 'cc_search';
@@ -493,11 +531,12 @@
 
                 const params = new URLSearchParams({
                     action: 'asi_block_searching_images',
-                    search: searchTerm,
+                    search: termToSearch,
                     bank: bankParam,
                     index: index,
                     id: postId,
-                    nonce: asiAjax.nonce
+                    nonce: asiAjax.nonce,
+                    skip_translation: skipTranslation ? '1' : '0'
                 });
                 if (supportsPagination) {
                     params.append('page', page);
@@ -592,8 +631,10 @@
                 }
                 const postId = resolvePostId();
                 const nextPage = (entry.page || 1) + 1;
-                searchSingleBank(bankName, index, postId, nextPage, true);
-            }, [resultsSearch, bankSupportsPagination, resolvePostId]);
+                // On pagination, the searchTerm is already translated (if it was)
+                // so we skip translation on backend
+                searchSingleBank(bankName, index, postId, nextPage, true, searchTerm, true);
+            }, [resultsSearch, bankSupportsPagination, resolvePostId, searchTerm]);
 
             useEffect(() => {
                 if (sentinelObserverRef.current) {

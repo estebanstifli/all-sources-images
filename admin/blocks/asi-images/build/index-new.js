@@ -51,18 +51,48 @@
             const [resultsSearch, setResultsSearch] = useState({});
             const [isSearching, setIsSearching] = useState({});
 
+            // Translate search term once via AJAX
+            async function translateSearchTerm(term) {
+                if (typeof asiAjax === 'undefined' || !asiAjax.translation_en) {
+                    return { translated: term, wasTranslated: false };
+                }
+                try {
+                    const params = new URLSearchParams({
+                        action: 'asi_translate_search',
+                        nonce: asiAjax.nonce,
+                        search: term
+                    });
+                    const response = await fetch(`${asiAjax.ajax_url}?${params.toString()}`);
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        return { translated: data.data.translated, wasTranslated: data.data.was_translated };
+                    }
+                } catch (error) {
+                    console.warn('ASI: Translation failed', error);
+                }
+                return { translated: term, wasTranslated: false };
+            }
+
             // Search all configured banks
-            function searchAllBanks() {
+            async function searchAllBanks() {
                 const postId = wp.data.select('core/editor').getCurrentPostId();
                 const banks = asiAjax.choosed_banks || {};
 
+                // Translate once before searching all banks
+                const { translated, wasTranslated } = await translateSearchTerm(searchTerm);
+                if (wasTranslated && translated !== searchTerm) {
+                    setSearchTerm(translated);
+                }
+
                 Object.entries(banks).forEach(([key, bankName], index) => {
-                    searchSingleBank(bankName, index, postId);
+                    searchSingleBank(bankName, index, postId, translated, wasTranslated);
                 });
             }
 
             // Search a single bank
-            function searchSingleBank(bankName, index, postId) {
+            function searchSingleBank(bankName, index, postId, translatedTerm = null, skipTranslation = false) {
+                const termToSearch = translatedTerm || searchTerm;
+                
                 // Normalize bank name
                 let bankParam = bankName.toLowerCase();
                 if (bankParam === 'openverse') bankParam = 'cc_search';
@@ -71,11 +101,12 @@
 
                 const params = new URLSearchParams({
                     action: 'asi_block_searching_images',
-                    search: searchTerm,
+                    search: termToSearch,
                     bank: bankParam,
                     index: index,
                     id: postId,
-                    nonce: asiAjax.nonce
+                    nonce: asiAjax.nonce,
+                    skip_translation: skipTranslation ? '1' : '0'
                 });
 
                 fetch(`${asiAjax.ajax_url}?${params.toString()}`)
