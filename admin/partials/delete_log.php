@@ -6,10 +6,11 @@ if ( ! function_exists( 'add_filter' ) ) {
 }
 
 // Verify nonce
-if( ! empty( $_GET['action'] ) && ( 'deletelog' == $_GET['action'] ) ) {
-    if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( wp_unslash( $_REQUEST['_wpnonce'] ), 'delete_log' ) ) {
+$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+if ( 'deletelog' === $action ) {
+    $nonce = isset( $_REQUEST['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '';
+    if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'delete_log' ) ) {
         return false;
-    } else {
     }
 } else {
     return false;

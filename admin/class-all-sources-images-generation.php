@@ -182,14 +182,16 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         error_log('[All Sources Images] [AJAX CALL] Started - POST data: ' . print_r($_POST, true));
         
         // Check if button "Generate Automatically" is clicked
-        $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? boolval( $_POST['buttonAutoGenerate'] ) : false );
+        $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? filter_var( wp_unslash( $_POST['buttonAutoGenerate'] ), FILTER_VALIDATE_BOOLEAN ) : false );
         
         // Convert the JSON-encoded post IDs into an array and sanitize them.
-        $post_ids = array_map( 'absint', json_decode( $_POST['ids_mpt_generation'] ) );
+        $ids_json = isset( $_POST['ids_mpt_generation'] ) ? wp_unslash( $_POST['ids_mpt_generation'] ) : '[]';
+        $post_ids = array_map( 'absint', json_decode( $ids_json ) );
         
         // DEBUG: Log security check values
         $can_manage = current_user_can( 'asi_manage' );  // Fixed: lowercase asi_manage
-        $nonce_valid = wp_verify_nonce( $_POST['nonce'], 'ajax_nonce_All_Sources_Images' );
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+        $nonce_valid = wp_verify_nonce( $nonce, 'ajax_nonce_All_Sources_Images' );
         error_log('[All Sources Images] [AJAX CALL] Security - can_manage: ' . ($can_manage ? 'YES' : 'NO') . ', nonce_valid: ' . ($nonce_valid ? 'YES' : 'NO'));
         
         // Security checks: Verify user capability and nonce for security.
@@ -212,12 +214,12 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             $post_ids_with_keys[$key + 1] = $val;
         }
         // Retrieve the current post index and ID from the AJAX request.
-        $current_post_index = (int) $_POST['currentPostIndex'];
+        $current_post_index = isset( $_POST['currentPostIndex'] ) ? absint( $_POST['currentPostIndex'] ) : 0;
         $current_post_id = $post_ids_with_keys[$current_post_index];
         // Load plugin settings for image generation (with defaults).
         $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
         // Check if forceRewrite is set from AJAX request (user confirmed replacement)
-        $force_rewrite = isset( $_POST['forceRewrite'] ) && filter_var( $_POST['forceRewrite'], FILTER_VALIDATE_BOOLEAN );
+        $force_rewrite = isset( $_POST['forceRewrite'] ) && filter_var( wp_unslash( $_POST['forceRewrite'] ), FILTER_VALIDATE_BOOLEAN );
         // Check if the 'rewrite featured image' option is enabled or forceRewrite is set.
         if ( $force_rewrite || ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) ) {
             $rewrite_featured = true;

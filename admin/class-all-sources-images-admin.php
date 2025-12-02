@@ -746,7 +746,7 @@ class All_Sources_Images_Admin {
         );
         if ( !empty( $_POST['all-sources-images'] ) || !empty( $_REQUEST['ids_mpt_generation'] ) || !empty( $_REQUEST['cats'] ) ) {
             if ( !empty( $_REQUEST['cats'] ) ) {
-                $taxo_term = get_term( $_REQUEST['cats'] );
+                $taxo_term = get_term( absint( $_REQUEST['cats'] ) );
                 if ( empty( $taxo_term ) ) {
                     return false;
                 }
@@ -1033,7 +1033,8 @@ class All_Sources_Images_Admin {
         // Check if the capability being checked is 'manage_options'
         if ( $cap === 'manage_options' ) {
             // Check if the form is submitting a specific option related to your plugin
-            if ( isset( $_POST['option_page'] ) && in_array( $_POST['option_page'], array(
+            $option_page = isset( $_POST['option_page'] ) ? sanitize_text_field( wp_unslash( $_POST['option_page'] ) ) : '';
+            if ( $option_page && in_array( $option_page, array(
                 'ASI-plugin-proxy-settings',
                 'ASI-plugin-main-settings',
                 'ASI-plugin-block-settings',
@@ -2117,14 +2118,14 @@ class All_Sources_Images_Admin {
             return;
         }
         
-        $search_term = sanitize_text_field( $_GET['search'] );
-        $bank = sanitize_text_field( strtolower( $_GET['bank'] ) );
-        $index = intval( $_GET['index'] );
-        $id = intval( $_GET['id'] );
-        $page = isset( $_GET['page'] ) ? max( 1, intval( $_GET['page'] ) ) : 1;
+        $search_term = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+        $bank = sanitize_text_field( strtolower( wp_unslash( $_GET['bank'] ) ) );
+        $index = isset( $_GET['index'] ) ? absint( $_GET['index'] ) : 0;
+        $id = absint( $_GET['id'] );
+        $page = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
         
         // Skip translation if already translated by frontend (skip_translation=1)
-        $skip_translation = isset( $_GET['skip_translation'] ) && $_GET['skip_translation'] == '1';
+        $skip_translation = isset( $_GET['skip_translation'] ) && absint( $_GET['skip_translation'] ) === 1;
         
         // Translate search term to English if translation_EN is enabled AND not already translated
         if ( ! $skip_translation ) {
