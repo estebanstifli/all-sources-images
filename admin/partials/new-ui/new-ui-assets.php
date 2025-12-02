@@ -133,6 +133,41 @@ function asi_enqueue_new_ui_assets( $hook ) {
         true
     );
     
+    // New UI Scripts (handles all inline script functionality)
+    wp_enqueue_script(
+        'asi-new-ui',
+        $plugin_url . 'js/asi-new-ui.js',
+        array('jquery'),
+        $version,
+        true
+    );
+    
+    // Localize script data for Image Placement page
+    if ( $hook === 'all-sources-images_page_asi-new-automatic' ) {
+        // Get current block index from settings
+        $options = get_option( 'ASI_plugin_main_settings', array() );
+        $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
+        $block_index = empty( $image_blocks ) ? 1 : max( array_keys( $image_blocks ) ) + 1;
+        
+        wp_localize_script( 'asi-new-ui', 'asiNewUI', array(
+            'imagePlacement' => array(
+                'blockIndex' => $block_index,
+                'helpTexts'  => array(
+                    'title'                           => esc_html__( 'Uses the post title as the search term. This is the simplest and most common option.', 'all-sources-images' ),
+                    'text_analyser'                   => esc_html__( 'Analyzes the post content to extract the most relevant keywords using ML algorithms.', 'all-sources-images' ),
+                    'text_analyser_previous_paragraph'=> esc_html__( 'Analyzes only the paragraph BEFORE the image position for keyword extraction.', 'all-sources-images' ),
+                    'text_analyser_next_paragraph'    => esc_html__( 'Analyzes only the paragraph AFTER the image position for keyword extraction.', 'all-sources-images' ),
+                    'tags'                            => esc_html__( 'Uses post tags as search terms. Choose first, last, or random tag.', 'all-sources-images' ),
+                    'categories'                      => esc_html__( 'Uses post categories as search terms with hierarchy level selection.', 'all-sources-images' ),
+                    'custom_field'                    => esc_html__( 'Uses a custom field (post meta) value as the search term.', 'all-sources-images' ),
+                    'custom_request'                  => esc_html__( 'Build your own search using placeholders: %%Title%%, %%Category%%, %%Tag%%, %%Taxonomy%%.', 'all-sources-images' ),
+                    'openai_extractor'                => esc_html__( 'Uses OpenAI GPT to extract relevant keywords from your post title.', 'all-sources-images' ),
+                    'ai_image_prompt'                 => esc_html__( 'Uses OpenAI to generate optimized prompts for AI image generation (DALL-E, Stable Diffusion, etc.).', 'all-sources-images' ),
+                ),
+            ),
+        ) );
+    }
+    
     // Bootstrap Icons CSS (local)
     wp_enqueue_style(
         'bootstrap-icons',

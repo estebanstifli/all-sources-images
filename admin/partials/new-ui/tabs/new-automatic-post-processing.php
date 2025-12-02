@@ -229,25 +229,3 @@ if( !isset( $options['translate_alt_lang'] ) ) {
     </div>
     </form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    // Toggle ALT options
-    $('#enable_alt').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('.show_alt').show();
-        } else {
-            $('.show_alt').hide();
-        }
-    });
-
-    // Toggle Caption options
-    $('#enable_caption').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('.show_caption').show();
-        } else {
-            $('.show_caption').hide();
-        }
-    });
-});
-</script>

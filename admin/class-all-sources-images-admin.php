@@ -1611,15 +1611,16 @@ class All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ASI_add_bulk_actions( $actions ) {
-        ?>
-	        <script type="text/javascript">
-	                jQuery(document).ready(function($){
-						$('select[name^="action"] option:last-child').before('<option value="bulk_regenerate_thumbnails"><?php 
-        echo esc_html__( 'Generate Images (ASI)', 'all-sources-images' );
-        ?></option>');
-	                });
-	        </script>
-	        <?php 
+        // Get translated text for the bulk action option
+        $option_text = esc_html__( 'Generate Images (ASI)', 'all-sources-images' );
+        
+        // Add inline script to jQuery (which is always loaded in admin)
+        $inline_script = "jQuery(document).ready(function($){" .
+            "\$('select[name^=\"action\"] option:last-child').before('<option value=\"bulk_regenerate_thumbnails\">" . esc_js( $option_text ) . "</option>');" .
+        "});";
+        
+        wp_add_inline_script( 'jquery', $inline_script );
+        
         return $actions;
     }
 

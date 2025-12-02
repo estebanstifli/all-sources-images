@@ -186,33 +186,3 @@ $country_choose = array(
 
     <?php submit_button( __( 'Save Log Settings', 'all-sources-images' ), 'primary' ); ?>
 </form>
-
-<script>
-jQuery(document).ready(function($) {
-    function toggleGoogleApiRow() {
-        var translationEN = $('#translation_EN').is(':checked');
-        var translateAlt = $('#translate_alt').is(':checked');
-        
-        if (translationEN || translateAlt) {
-            $('.asi-google-api-row').slideDown();
-        } else {
-            $('.asi-google-api-row').slideUp();
-        }
-    }
-    
-    $('#translation_EN, #translate_alt').on('change', toggleGoogleApiRow);
-    
-    // Toggle password visibility for Google Translate API Key
-    var passwordSelector = '#password-google-translate';
-    var password = document.querySelector(passwordSelector + " input");
-    var togglePassword = document.querySelector(passwordSelector + " #togglePassword");
-    
-    if (togglePassword && password) {
-        togglePassword.addEventListener("click", function() {
-            var type = password.getAttribute("type") === "password" ? "text" : "password";
-            password.setAttribute("type", type);
-            this.classList.toggle("close-eye");
-        });
-    }
-});
-</script>

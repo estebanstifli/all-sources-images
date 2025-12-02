@@ -129,15 +129,3 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
 
     <?php submit_button(); ?>
 </form>
-
-<script>
-jQuery(document).ready(function($) {
-    $('#enable_proxy').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('#asi-proxy-settings').slideDown();
-        } else {
-            $('#asi-proxy-settings').slideUp();
-        }
-    });
-});
-</script>
