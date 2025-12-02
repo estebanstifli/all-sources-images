@@ -184,7 +184,7 @@ if( !isset( $options['translate_alt_lang'] ) ) {
 
                     foreach( $country_choose as $name_country => $code_country ) {
                         $choose = ( $alt_lang == $code_country) ? 'selected="selected"': '';
-                        echo '<option '. $choose .' value="'. $code_country .'">'. $name_country .'</option>';
+                        echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_country ) . '">' . esc_html( $name_country ) . '</option>';
                     }
                     ?>
                 </select>

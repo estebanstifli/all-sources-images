@@ -178,9 +178,6 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ASI_ajax_call() {
-        // DEBUG: Log entry point
-        error_log('[All Sources Images] [AJAX CALL] Started - POST data: ' . print_r($_POST, true));
-        
         // Check if button "Generate Automatically" is clicked
         $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? filter_var( wp_unslash( $_POST['buttonAutoGenerate'] ), FILTER_VALIDATE_BOOLEAN ) : false );
         
@@ -188,20 +185,17 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $ids_json = isset( $_POST['ids_mpt_generation'] ) ? wp_unslash( $_POST['ids_mpt_generation'] ) : '[]';
         $post_ids = array_map( 'absint', json_decode( $ids_json ) );
         
-        // DEBUG: Log security check values
+        // Security check values
         $can_manage = current_user_can( 'asi_manage' );  // Fixed: lowercase asi_manage
         $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
         $nonce_valid = wp_verify_nonce( $nonce, 'ajax_nonce_All_Sources_Images' );
-        error_log('[All Sources Images] [AJAX CALL] Security - can_manage: ' . ($can_manage ? 'YES' : 'NO') . ', nonce_valid: ' . ($nonce_valid ? 'YES' : 'NO'));
         
         // Security checks: Verify user capability and nonce for security.
         if ( !$can_manage || false === $nonce_valid ) {
-            error_log('[All Sources Images] [AJAX CALL] FAILED - Security check failed');
             wp_send_json_error();
             // Send an error response if checks fail.
         }
         
-        error_log('[All Sources Images] [AJAX CALL] Passed security checks');
         // Validate the presence of post IDs.
         if ( !isset( $_POST['ids_mpt_generation'] ) ) {
             return false;

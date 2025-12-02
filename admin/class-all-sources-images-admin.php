@@ -2113,7 +2113,6 @@ class All_Sources_Images_Admin {
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
         
         if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
-            error_log('[All Sources Images] Missing required parameters');
             wp_send_json_error( 'Missing required parameters' );
             return;
         }

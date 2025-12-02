@@ -27,7 +27,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'pla
 								<!--begin::Page Heading-->
 								<div class="d-flex align-items-baseline flex-wrap mr-5">
 									<!--begin::Page Title-->
-									<h5 class="text-dark font-weight-bold my-1 mr-5">All Sources Images : <?php echo $title; ?></h5>
+									<h5 class="text-dark font-weight-bold my-1 mr-5">All Sources Images : <?php echo esc_html( $title ); ?></h5>
 									<!--end::Page Title-->
 								</div>
 								<!--end::Page Heading-->

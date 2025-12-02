@@ -142,7 +142,7 @@ foreach ( $list_api_manual as $api => $api_code ) {
     if ( false === $api_code[1] ) {
         continue;
     }
-    echo '<li><a href="#tab-' . $a . '">' . esc_html( $api ) . '</a></li>';
+    echo '<li><a href="#tab-' . esc_attr( $a ) . '">' . esc_html( $api ) . '</a></li>';
     $a++;
 }
 ?>
@@ -153,7 +153,7 @@ foreach ( $list_api_manual as $api => $api_code ) {
     if ( false === $api_code[1] ) {
         continue;
     }
-    echo '<table id="tab-' . $a . '" class="form-table" >';
+    echo '<table id="tab-' . esc_attr( $a ) . '" class="form-table" >';
     echo '<tbody>';
     include_once plugin_dir_path( __FILE__ ) . '../../tabs/banks/' . $api_code[0] . '.php';
     echo '</tbody>';
