@@ -13,7 +13,6 @@ admin/partials/monolog/logs/*.log
 *.sublime-workspace
 
 # Composer
-vendor/
 composer.lock
 
 # Node modules (if any)

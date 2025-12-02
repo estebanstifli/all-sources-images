@@ -31,6 +31,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
     }
     
     $plugin_url = plugin_dir_url( __FILE__ ) . '../../';
+    $plugin_root_url = plugin_dir_url( __FILE__ ) . '../../../';
     $version = defined( 'ALL_SOURCES_IMAGES_VERSION' ) ? ALL_SOURCES_IMAGES_VERSION : '1.0.0';
     
     // === CSS - Same as original admin pages ===
@@ -132,23 +133,31 @@ function asi_enqueue_new_ui_assets( $hook ) {
         true
     );
     
-    // Bootstrap Icons CSS
+    // Bootstrap Icons CSS (local)
     wp_enqueue_style(
         'bootstrap-icons',
-        'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css',
+        $plugin_root_url . 'vendor/bootstrap-icons/font/bootstrap-icons.css',
         array(),
-        '1.11.1'
+        '1.11.3'
     );
     
     // Bulk Generation JS (only on bulk generation page)
     if ( $hook === 'all-sources-images_page_asi-new-bulk-generation' ) {
-        // Bootstrap 5 JS for tabs/accordions
+        // Bootstrap 5 JS for tabs/accordions (local)
         wp_enqueue_script(
             'bootstrap5',
-            'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
+            $plugin_root_url . 'vendor/bootstrap/js/bootstrap.bundle.min.js',
             array('jquery'),
-            '5.3.2',
+            '5.3.3',
             true
+        );
+        
+        // Bootstrap 5 CSS (local)
+        wp_enqueue_style(
+            'bootstrap5-css',
+            $plugin_root_url . 'vendor/bootstrap/css/bootstrap.min.css',
+            array(),
+            '5.3.3'
         );
         
         wp_enqueue_script(
