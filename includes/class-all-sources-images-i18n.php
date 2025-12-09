@@ -26,16 +26,14 @@ class All_Sources_Images_i18n {
 	/**
 	 * Load the plugin text domain for translation.
 	 *
+	 * Since WordPress 4.6, translations are automatically loaded from WordPress.org
+	 * for plugins hosted there. This function is kept for backwards compatibility.
+	 *
 	 * @since    4.0.0
+	 * @deprecated Since WordPress 4.6
 	 */
 	public function load_plugin_textdomain() {
-
-		load_plugin_textdomain(
-			'all-sources-images',
-			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
-		);
-
+		// No longer needed - WordPress automatically loads translations for plugins hosted on WordPress.org.
 	}
 
 

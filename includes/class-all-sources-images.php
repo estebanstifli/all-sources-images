@@ -73,7 +73,6 @@ class All_Sources_Images {
 		$this->plugin_name = 'all-sources-images';
 
 		$this->load_dependencies();
-		$this->set_locale();
 		$this->define_admin_hooks();
 		//$this->define_public_hooks();
 
@@ -154,23 +153,6 @@ class All_Sources_Images {
 		 * DISABLED: Plugin compatibility features have been removed from the UI.
 		 */
 		// ASI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
-
-	}
-
-	/**
-	 * Define the locale for this plugin for internationalization.
-	 *
-	 * Uses the All_Sources_Images_i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    4.0.0
-	 * @access   private
-	 */
-	private function set_locale() {
-
-		$plugin_i18n = new All_Sources_Images_i18n();
-
-		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
 
 	}
 

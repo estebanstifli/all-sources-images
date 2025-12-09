@@ -78,7 +78,7 @@ class KeywordExtractor
         $content = preg_replace('/<!--.*?-->/s', '', $content);
         
         // Remove all HTML tags
-        $content = strip_tags($content);
+        $content = wp_strip_all_tags($content);
         
         // Remove multiple spaces and unnecessary newlines
         $content = preg_replace('/\s+/', ' ', $content);

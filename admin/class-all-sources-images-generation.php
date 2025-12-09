@@ -182,7 +182,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? filter_var( wp_unslash( $_POST['buttonAutoGenerate'] ), FILTER_VALIDATE_BOOLEAN ) : false );
         
         // Convert the JSON-encoded post IDs into an array and sanitize them.
-        $ids_json = isset( $_POST['ids_mpt_generation'] ) ? wp_unslash( $_POST['ids_mpt_generation'] ) : '[]';
+        $ids_json = isset( $_POST['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_POST['ids_mpt_generation'] ) ) : '[]';
         $post_ids = array_map( 'absint', json_decode( $ids_json ) );
         
         // Security check values
@@ -578,7 +578,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                         
                         // For paragraph-specific analysis, extract relevant paragraph
                         if ( $based_on === 'text_analyser_previous_paragraph' || $based_on === 'text_analyser_next_paragraph' ) {
-                            $paragraphs = preg_split( '/\n\s*\n/', strip_tags( $content ) );
+                            $paragraphs = preg_split( '/\n\s*\n/', wp_strip_all_tags( $content ) );
                             $paragraphs = array_filter( array_map( 'trim', $paragraphs ) );
                             $paragraphs = array_values( $paragraphs );
                             
@@ -1091,7 +1091,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             if ( true == $png_jpg && 'dallev1' == $img_block['api_chosen'] ) {
                 $image = imagecreatefrompng( $folder );
                 // Remove old png file
-                unlink( $folder );
+                wp_delete_file( $folder );
                 $folder = str_replace( ".png", ".jpg", $folder );
                 $filename = str_replace( ".png", ".jpg", $filename );
                 imagejpeg( $image, $folder, 90 );
@@ -1509,7 +1509,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 // Return the last paragraph found before the target element
                 if ( !empty( $paragraph_matches[0] ) ) {
                     // Return only the last paragraph, cleaned of HTML tags
-                    return ( is_string( $paragraph_matches[0][count( $paragraph_matches[0] ) - 1] ) ? trim( strip_tags( $paragraph_matches[0][count( $paragraph_matches[0] ) - 1] ) ) : '' );
+                    return ( is_string( $paragraph_matches[0][count( $paragraph_matches[0] ) - 1] ) ? trim( wp_strip_all_tags( $paragraph_matches[0][count( $paragraph_matches[0] ) - 1] ) ) : '' );
                 }
             } elseif ( $direction === 'text_analyser_next_paragraph' ) {
                 // Get the position of the target element in the content
@@ -1528,7 +1528,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 }
                 // Return the first paragraph found after the target element
                 if ( !empty( $paragraph_matches[0] ) ) {
-                    return ( is_string( $paragraph_matches[0][0] ) ? trim( strip_tags( $paragraph_matches[0][0] ) ) : '' );
+                    return ( is_string( $paragraph_matches[0][0] ) ? trim( wp_strip_all_tags( $paragraph_matches[0][0] ) ) : '' );
                 }
             }
         }
@@ -1876,7 +1876,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                             $file_media['body'] = $file_content;
                             $file_media['headers']['content-type'] = 'image/' . $options_banks['stability']['output_format'];
                             // Remove temporary file
-                            unlink( $file_path );
+                            wp_delete_file( $file_path );
                         }
                     } else {
                         $proxy_args = $this->ASI_get_proxy_args();

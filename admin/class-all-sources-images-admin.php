@@ -313,9 +313,11 @@ class All_Sources_Images_Admin {
      */
     public function clear_block_status( $post_id ) {
         global $wpdb;
+        $like_pattern = $wpdb->esc_like( '_asi_block_' ) . '%';
         $wpdb->query( $wpdb->prepare(
-            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE '_asi_block_%'",
-            $post_id
+            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE %s",
+            $post_id,
+            $like_pattern
         ) );
     }
 
@@ -748,8 +750,11 @@ class All_Sources_Images_Admin {
                 'img_bank'         => esc_html__( 'Image Bank', 'all-sources-images' ),
             ),
         );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification not required here, data is only used to prepare JS variables for AJAX which has its own nonce verification
         if ( !empty( $_POST['all-sources-images'] ) || !empty( $_REQUEST['ids_mpt_generation'] ) || !empty( $_REQUEST['cats'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing
             if ( !empty( $_REQUEST['cats'] ) ) {
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $taxo_term = get_term( absint( $_REQUEST['cats'] ) );
                 if ( empty( $taxo_term ) ) {
                     return false;
@@ -1979,8 +1984,7 @@ class All_Sources_Images_Admin {
                 );
             }
         } );
-        /* Translations for Gutenberg block */
-        load_plugin_textdomain( 'all-sources-images', false, plugin_dir_path( __DIR__ ) . 'languages' );
+        // Note: Translations are loaded automatically by WordPress.org for plugins hosted there.
     }
 
     /**
@@ -2819,7 +2823,7 @@ class All_Sources_Images_Admin {
         // Check to ensure the image is valid
         $check = wp_check_filetype_and_ext( $file_array['tmp_name'], $file_array['name'] );
         if ( $check["ext"] == "" ) {
-            @unlink( $file_array['tmp_name'] );
+            wp_delete_file( $file_array['tmp_name'] );
             ASI_log( array(
                 'reason' => 'Invalid image after download',
                 'mime'   => $mime_type,
@@ -2835,7 +2839,7 @@ class All_Sources_Images_Admin {
             'test_form' => false,
         ) );
         if ( isset( $uploaded_file['error'] ) ) {
-            @unlink( $file_array['tmp_name'] );
+            wp_delete_file( $file_array['tmp_name'] );
             ASI_log( array(
                 'reason' => $uploaded_file['error'],
                 'file'   => $file_array['name'],

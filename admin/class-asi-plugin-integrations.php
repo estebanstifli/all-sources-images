@@ -113,6 +113,7 @@ class ASI_Plugin_Integrations {
     private function init_hooks() {
         // Log which integrations are enabled for debugging
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging only when WP_DEBUG is true.
             error_log( '[ASI Plugin Integration] Settings loaded: ' . wp_json_encode( $this->compatibility_settings ) );
         }
         
@@ -588,6 +589,7 @@ class ASI_Plugin_Integrations {
         
         // Fallback to error_log in debug mode
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging only when WP_DEBUG is true.
             error_log( '[ASI Plugin Integration] ' . $message . ' ' . wp_json_encode( $context ) );
         }
     }
@@ -629,9 +631,11 @@ class ASI_Plugin_Integrations {
      */
     private function clear_block_status_meta( $post_id ) {
         global $wpdb;
+        $like_pattern = $wpdb->esc_like( '_asi_block_' ) . '%';
         $deleted = $wpdb->query( $wpdb->prepare(
-            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE '_asi_block_%'",
-            $post_id
+            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE %s",
+            $post_id,
+            $like_pattern
         ) );
         $this->log( "Cleared block status meta for post {$post_id}", array( 'deleted_rows' => $deleted ) );
     }
