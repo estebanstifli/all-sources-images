@@ -16,7 +16,8 @@ if ( 'deletelog' === $action ) {
     return false;
 }
 
-// Disable max execution time
+// Disable max execution time (required for large file operations)
+// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 set_time_limit(0);
 
 // Start the session
@@ -61,17 +62,18 @@ $size = filesize($filename);
 
 // No GZip compression
 if (ini_get("zlib.output_compression")) {
+    // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
     ini_set("zlib.output_compression", "Off");
 }
 
 // Close the session
 session_write_close();
 
-// Disable cache
-unlink( $filename );
+// Delete log file
+wp_delete_file( $filename );
 
 // Redirect without delete arguments
-wp_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
+wp_safe_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
 exit;
 
 ?>

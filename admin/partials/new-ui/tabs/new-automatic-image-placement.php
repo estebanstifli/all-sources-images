@@ -269,7 +269,7 @@ $blockIndex = count( $image_blocks ) + 1;
                     <select name="ASI_plugin_main_settings[image_block][0][api_chosen]" class="form-control" style="max-width: 300px;">
                         <?php foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) : ?>
                             <?php if ( true === $api_auto_id[1] ) : ?>
-                                <option value="<?php echo esc_attr( $api_auto_id[0] ); ?>"><?php echo esc_html( $api_auto_name ); ?></option>
+                                <option value="<?php echo esc_attr( $api_auto_id[0] ); ?>" <?php selected( 'pixabay', $api_auto_id[0] ); ?>><?php echo esc_html( $api_auto_name ); ?></option>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </select>

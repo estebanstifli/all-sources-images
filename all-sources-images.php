@@ -2,24 +2,24 @@
 
 /**
  *
- * @link              https://github.com/yourusername/all-sources-images
+ * @link              https://github.com/estebanstifli/all-sources-images
  * @since             1.0.0
  * @package           All_Sources_Images
  *
  * @wordpress-plugin
  * Plugin Name:       All Sources Images
- * Plugin URI:        https://github.com/yourusername/all-sources-images
- * Description:       Add stunning images to your posts effortlessly, as featured images or within content. All Sources Images retrieves them automatically from multiple image banks and AI services.
+ * Plugin URI:        https://github.com/estebanstifli/all-sources-images
+ * Description:       Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or image banks (Pexels, Unsplash, etc)
  * Version:           1.0.0
- * Author:            Your Name
- * Author URI:        https://yourwebsite.com
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Author:            estebandezafra
+ * Author URI:        https://github.com/estebanstifli
+ * License:           GPLv2 or later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       all-sources-images
  * Domain Path:       /languages
- *
- *
- *
+ * Requires at least: 5.8
+ * Tested up to:      6.9
+ * Requires PHP:      7.4
  *
  */
 // If this file is called directly, abort.
@@ -34,7 +34,7 @@ if ( !defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 if ( ! defined( 'ASI_DEBUG' ) ) {
-    define( 'ASI_DEBUG', true );
+    define( 'ASI_DEBUG', false );
 }
 
 if ( ! defined( 'ASI_DIAGNOSTIC_TOKEN' ) ) {

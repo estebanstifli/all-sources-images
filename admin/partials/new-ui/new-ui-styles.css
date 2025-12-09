@@ -450,6 +450,41 @@
 .mb-20 { margin-bottom: 20px; }
 
 /* ==========================================================================
+   jQuery UI Tabs Base Styles (Required for functionality)
+   ========================================================================== */
+.ui-tabs {
+    position: relative;
+    padding: 0;
+}
+.ui-tabs .ui-tabs-nav {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+.ui-tabs .ui-tabs-nav li {
+    list-style: none;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+.ui-tabs .ui-tabs-nav li a {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+}
+.ui-tabs .ui-tabs-panel {
+    display: block;
+    padding: 1em;
+}
+.ui-tabs .ui-tabs-hide,
+.ui-tabs-panel[aria-hidden="true"] {
+    display: none !important;
+}
+
+/* ==========================================================================
    jQuery UI Tabs Override - Source Settings
    ========================================================================== */
 .new-settings-source-tab #tabs,

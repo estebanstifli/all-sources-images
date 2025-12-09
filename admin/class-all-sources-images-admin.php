@@ -709,8 +709,12 @@ class All_Sources_Images_Admin {
             'all-sources-images_page_asi-new-bulk-generation'
         );
         if ( in_array( $hook, $asi_new_pages ) ) {
-            wp_enqueue_script( 'jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.js', __FILE__ ) );
-            wp_enqueue_style( 'style-jquery-ui', plugins_url( 'js/jquery-ui/jquery-ui.css', __FILE__ ) );
+            // Use WordPress Core jQuery UI
+            wp_enqueue_script( 'jquery-ui-core' );
+            wp_enqueue_script( 'jquery-ui-tabs' );
+            wp_enqueue_script( 'jquery-ui-sortable' );
+            wp_enqueue_script( 'jquery-ui-draggable' );
+            wp_enqueue_script( 'jquery-ui-droppable' );
         }
         wp_enqueue_script(
             'mpt-rating',
@@ -722,7 +726,7 @@ class All_Sources_Images_Admin {
         // Old bulk generation scripts removed - now using bulk-generation.js via new-ui-assets.php
         // Source/Settings scripts (new page)
         if ( $hook == 'toplevel_page_asi-new-settings' ) {
-            wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui') );
+            wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui-core') );
             wp_localize_script( 'source', 'apisTestingAjax', array(
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
                 'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
@@ -1601,7 +1605,7 @@ class All_Sources_Images_Admin {
     public function ASI_bulk_action_handler( $redirect_to, $action_name, $post_ids ) {
         if ( 'bulk_regenerate_thumbnails' === $action_name ) {
             $ids = implode( ',', array_map( 'intval', $post_ids ) );
-            wp_redirect( 'admin.php?page=asi-new-bulk-generation&auto_generate_ids=' . $ids, '301' );
+            wp_safe_redirect( admin_url( 'admin.php?page=asi-new-bulk-generation&auto_generate_ids=' . $ids ) );
             exit;
         }
         return $redirect_to;

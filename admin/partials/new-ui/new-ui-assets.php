@@ -85,9 +85,6 @@ function asi_enqueue_new_ui_assets( $hook ) {
         'all'
     );
     
-    // jQuery UI CSS
-    wp_enqueue_style( 'style-jquery-ui', $plugin_url . 'js/jquery-ui/jquery-ui.css', array(), $version );
-    
     // === JavaScript - Same as original admin pages ===
     wp_enqueue_script(
         'prismjs-bundle',
@@ -106,16 +103,20 @@ function asi_enqueue_new_ui_assets( $hook ) {
     wp_enqueue_script(
         'common-mpt',
         $plugin_url . 'js/common.js',
-        array('jquery'),
+        array('jquery', 'jquery-ui-tabs'),
         $version,
         true
     );
     
-    // jQuery UI
-    wp_enqueue_script( 'jquery-ui', $plugin_url . 'js/jquery-ui/jquery-ui.js', array('jquery'), $version, true );
+    // jQuery UI from WordPress Core
+    wp_enqueue_script( 'jquery-ui-core' );
+    wp_enqueue_script( 'jquery-ui-tabs' );
+    wp_enqueue_script( 'jquery-ui-sortable' );
+    wp_enqueue_script( 'jquery-ui-draggable' );
+    wp_enqueue_script( 'jquery-ui-droppable' );
     
     // Source page JS (for API testing)
-    wp_enqueue_script( 'source', $plugin_url . 'js/source.js', array('jquery', 'jquery-ui'), $version, true );
+    wp_enqueue_script( 'source', $plugin_url . 'js/source.js', array('jquery', 'jquery-ui-core'), $version, true );
     wp_localize_script( 'source', 'apisTestingAjax', array(
         'ajaxurl'            => admin_url( 'admin-ajax.php' ),
         'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
@@ -128,7 +129,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
     wp_enqueue_script(
         'mpt-admin',
         $plugin_url . 'js/all-sources-images-admin.js',
-        array('jquery', 'jquery-ui'),
+        array('jquery'),
         $version,
         true
     );

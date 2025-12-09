@@ -16,7 +16,8 @@ if ( 'downloadlog' === $action ) {
     return false;
 }
 
-// Disable max execution time
+// Disable max execution time (required for large file operations)
+// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 set_time_limit(0);
  
 // Start the session
@@ -61,6 +62,7 @@ $size = filesize($filename);
  
 // No GZip compression
 if (ini_get("zlib.output_compression")) {
+    // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
     ini_set("zlib.output_compression", "Off");
 }
  
@@ -81,7 +83,13 @@ header('Content-Disposition: attachment; filename="'.$result.'"');
 // File size
 header("Content-Length: ".$size);
  
-// Send the file
-readfile($filename);
+// Send the file using WP_Filesystem
+global $wp_filesystem;
+if ( empty( $wp_filesystem ) ) {
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    WP_Filesystem();
+}
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo $wp_filesystem->get_contents( $filename );
 
 ?>
