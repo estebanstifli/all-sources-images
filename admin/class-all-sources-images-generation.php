@@ -830,8 +830,14 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         
         // Translate search keywords to English if enabled
         if ( isset( $img_block['translation_EN'] ) && $img_block['translation_EN'] == 'true' ) {
-            $wp_lang = get_bloginfo('language');
-            $source_lang = substr( $wp_lang, 0, 2 );
+            // Use configured source language or auto-detect from WordPress
+            $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), array( 'source_lang' => '' ) );
+            if ( ! empty( $block_settings['source_lang'] ) ) {
+                $source_lang = $block_settings['source_lang'];
+            } else {
+                $wp_lang = get_bloginfo('language');
+                $source_lang = substr( $wp_lang, 0, 2 );
+            }
             if ( $source_lang !== 'en' ) {
                 $translated_search = $this->ASI_translate_text( $search, $source_lang, 'en' );
                 if ( $translated_search !== false ) {

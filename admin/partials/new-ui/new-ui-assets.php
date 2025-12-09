@@ -127,7 +127,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
     // Main admin JS (contains password toggle)
     wp_enqueue_script(
         'mpt-admin',
-        $plugin_url . 'js/magic-post-thumbnail-admin.js',
+        $plugin_url . 'js/all-sources-images-admin.js',
         array('jquery', 'jquery-ui'),
         $version,
         true
@@ -207,13 +207,13 @@ function asi_enqueue_new_ui_assets( $hook ) {
             'nonce'    => wp_create_nonce( 'asi_bulk_nonce' ),
             'edit_url' => admin_url( 'post.php' ),
             'i18n'     => array(
-                'no_selection'   => esc_html__( 'Please select content to generate images for.', 'magic-post-thumbnail' ),
-                'confirm_delete' => esc_html__( 'Are you sure you want to delete this job?', 'magic-post-thumbnail' ),
-                'loading'        => esc_html__( 'Loading...', 'magic-post-thumbnail' ),
-                'creating_job'   => esc_html__( 'Creating job...', 'magic-post-thumbnail' ),
-                'please_wait'    => esc_html__( 'Please wait while we set up your image generation job.', 'magic-post-thumbnail' ),
-                'error'          => esc_html__( 'Error', 'magic-post-thumbnail' ),
-                'network_error'  => esc_html__( 'Network error', 'magic-post-thumbnail' ),
+                'no_selection'   => esc_html__( 'Please select content to generate images for.', 'all-sources-images' ),
+                'confirm_delete' => esc_html__( 'Are you sure you want to delete this job?', 'all-sources-images' ),
+                'loading'        => esc_html__( 'Loading...', 'all-sources-images' ),
+                'creating_job'   => esc_html__( 'Creating job...', 'all-sources-images' ),
+                'please_wait'    => esc_html__( 'Please wait while we set up your image generation job.', 'all-sources-images' ),
+                'error'          => esc_html__( 'Error', 'all-sources-images' ),
+                'network_error'  => esc_html__( 'Network error', 'all-sources-images' ),
             ),
         ) );
     }

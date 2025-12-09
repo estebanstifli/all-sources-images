@@ -18,14 +18,6 @@ $options_block = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this
 $options_logs = wp_parse_args( get_option( 'ASI_plugin_logs_settings' ), $this->ASI_default_options_logs_settings( TRUE ) );
 $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
 
-// Alt tag language
-if ( ! isset( $options_block['translate_alt_lang'] ) ) {
-    $wp_lang  = get_bloginfo( 'language' );
-    $alt_lang = substr( $wp_lang, 0, 2 );
-} else {
-    $alt_lang = $options_block['translate_alt_lang'];
-}
-
 // Language options for translation
 $country_choose = array(
     __( 'Afrikaans', 'all-sources-images' )             => 'af',
@@ -39,6 +31,7 @@ $country_choose = array(
     __( 'Czech', 'all-sources-images' )                 => 'cs',
     __( 'Danish', 'all-sources-images' )                => 'da',
     __( 'Dutch', 'all-sources-images' )                 => 'nl',
+    __( 'English', 'all-sources-images' )               => 'en',
     __( 'Estonian', 'all-sources-images' )              => 'et',
     __( 'Finnish', 'all-sources-images' )               => 'fi',
     __( 'French', 'all-sources-images' )                => 'fr',
@@ -69,6 +62,31 @@ $country_choose = array(
     __( 'Ukrainian', 'all-sources-images' )             => 'uk',
     __( 'Vietnamese', 'all-sources-images' )            => 'vi',
 );
+
+// Get WordPress language and find matching code in country_choose
+$wp_lang = get_bloginfo( 'language' );
+$wp_lang_code = substr( $wp_lang, 0, 2 );
+
+// Find the best matching language code from the list
+$wp_lang_matched = $wp_lang_code; // Default to 2-letter code
+foreach ( $country_choose as $name => $code ) {
+    // First try exact match with full locale (e.g., pt-BR)
+    if ( str_replace( '-', '-', $wp_lang ) === $code ) {
+        $wp_lang_matched = $code;
+        break;
+    }
+    // Then try 2-letter code match
+    if ( substr( $code, 0, 2 ) === $wp_lang_code && strlen( $code ) === 2 ) {
+        $wp_lang_matched = $code;
+    }
+}
+
+// Alt tag language - use saved value or default to WordPress language
+if ( ! empty( $options_block['translate_alt_lang'] ) ) {
+    $alt_lang = $options_block['translate_alt_lang'];
+} else {
+    $alt_lang = $wp_lang_matched;
+}
 ?>
 
 <!-- Translation Settings Form -->
@@ -110,6 +128,43 @@ $country_choose = array(
                         <?php esc_html_e( 'Translate search keywords to English', 'all-sources-images' ); ?>
                     </label>
                     <p class="description"><?php esc_html_e( 'Translates your search keywords to English before searching. Helps get more results from international APIs.', 'all-sources-images' ); ?></p>
+                </td>
+            </tr>
+
+            <!-- Source Language for Translation -->
+            <?php
+            // Determine current source language setting
+            $current_source_lang = ! empty( $options_block['source_lang'] ) ? $options_block['source_lang'] : '';
+            
+            // Find the display name for WordPress language
+            $wp_lang_name = '';
+            foreach ( $country_choose as $name => $code ) {
+                if ( $code === $wp_lang_matched ) {
+                    $wp_lang_name = $name;
+                    break;
+                }
+            }
+            if ( empty( $wp_lang_name ) ) {
+                $wp_lang_name = $wp_lang;
+            }
+            ?>
+            <tr class="asi-source-lang-row" <?php echo ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) ? 'style="display:none;"' : ''; ?>>
+                <th scope="row">
+                    <label for="source_lang"><?php esc_html_e( 'Source Language', 'all-sources-images' ); ?></label>
+                </th>
+                <td>
+                    <select name="ASI_plugin_block_settings[source_lang]" id="source_lang" class="form-control" style="width: auto;">
+                        <option value="" <?php selected( $current_source_lang, '' ); ?>>
+                            <?php 
+                            /* translators: %s: WordPress language name */
+                            printf( esc_html__( 'Auto (WordPress: %s)', 'all-sources-images' ), esc_html( $wp_lang_name ) ); 
+                            ?>
+                        </option>
+                        <?php foreach ( $country_choose as $country => $value ) : ?>
+                            <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current_source_lang, $value ); ?>><?php echo esc_html( $country ); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="description"><?php esc_html_e( 'Select the language of your content. This is the language that will be translated to English for searching. By default, it uses your WordPress site language.', 'all-sources-images' ); ?></p>
                 </td>
             </tr>
 

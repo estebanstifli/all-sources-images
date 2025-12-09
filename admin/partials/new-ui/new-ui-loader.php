@@ -6,7 +6,7 @@
  * Include this file from the main plugin or functions.php to activate the new UI.
  * 
  * Usage:
- *   include_once WP_PLUGIN_DIR . '/magic-post-thumbnail/admin/partials/new-ui/new-ui-loader.php';
+ *   include_once WP_PLUGIN_DIR . '/all-sources-images/admin/partials/new-ui/new-ui-loader.php';
  *
  * @package All_Sources_Images
  * @since 6.2.0

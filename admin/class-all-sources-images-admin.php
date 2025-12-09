@@ -666,7 +666,7 @@ class All_Sources_Images_Admin {
         if ( $hook == 'post.php' || $hook == 'post-new.php' ) {
             wp_enqueue_style(
                 'mpt-post',
-                plugin_dir_url( __FILE__ ) . 'css/magic-post-thumbnail-post.css',
+                plugin_dir_url( __FILE__ ) . 'css/all-sources-images-post.css',
                 array(),
                 $this->version,
                 'all'
@@ -800,7 +800,7 @@ class All_Sources_Images_Admin {
         if ( in_array( $hook, $asi_new_pages ) || ($pagenow == 'index.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') && in_array( get_post_type( get_the_ID() ), $post_types_default['choosed_post_type'] ) ) {
             wp_enqueue_script(
                 $this->plugin_name,
-                plugin_dir_url( __FILE__ ) . 'js/magic-post-thumbnail-admin.js',
+                plugin_dir_url( __FILE__ ) . 'js/all-sources-images-admin.js',
                 array('jquery'),
                 $this->version,
                 array(
@@ -1345,6 +1345,7 @@ class All_Sources_Images_Admin {
         $default_options = array(
             'enable_manual_search'    => true,
             'translation_EN'          => 'true',
+            'source_lang'             => '', // Empty = auto-detect from WordPress language
             'translate_alt'           => '',
             'translate_alt_lang'      => '',
             'google_translate_apikey' => '',
@@ -2130,8 +2131,13 @@ class All_Sources_Images_Admin {
         if ( ! $skip_translation ) {
             $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
             if ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' ) {
-                $wp_lang = get_bloginfo( 'language' );
-                $source_lang = substr( $wp_lang, 0, 2 );
+                // Use configured source language or auto-detect from WordPress
+                if ( ! empty( $block_settings['source_lang'] ) ) {
+                    $source_lang = $block_settings['source_lang'];
+                } else {
+                    $wp_lang = get_bloginfo( 'language' );
+                    $source_lang = substr( $wp_lang, 0, 2 );
+                }
                 if ( $source_lang !== 'en' && ! empty( $search_term ) ) {
                     $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );
                     $translated_term = $REST_generation->ASI_translate_text( $search_term, $source_lang, 'en' );
@@ -2633,8 +2639,13 @@ class All_Sources_Images_Admin {
         $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), $this->ASI_default_options_block_settings( TRUE ) );
         
         if ( ! empty( $block_settings['translation_EN'] ) && $block_settings['translation_EN'] == 'true' ) {
-            $wp_lang = get_bloginfo( 'language' );
-            $source_lang = substr( $wp_lang, 0, 2 );
+            // Use configured source language or auto-detect from WordPress
+            if ( ! empty( $block_settings['source_lang'] ) ) {
+                $source_lang = $block_settings['source_lang'];
+            } else {
+                $wp_lang = get_bloginfo( 'language' );
+                $source_lang = substr( $wp_lang, 0, 2 );
+            }
             
             if ( $source_lang !== 'en' && ! empty( $search_term ) ) {
                 $REST_generation = new All_Sources_Images_Generation( $this->plugin_name, $this->version );

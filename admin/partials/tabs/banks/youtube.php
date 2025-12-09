@@ -27,10 +27,10 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('API Key Required', 'magic-post-thumbnail'); ?>:</strong> 
-            <?php _e('Create a project in', 'magic-post-thumbnail'); ?> 
+            <strong><?php _e('API Key Required', 'all-sources-images'); ?>:</strong> 
+            <?php _e('Create a project in', 'all-sources-images'); ?> 
             <a href="https://console.developers.google.com/" target="_blank">Google Cloud Console</a>, 
-            <?php _e('enable YouTube Data API v3, and create an API key under Credentials.', 'magic-post-thumbnail'); ?>
+            <?php _e('enable YouTube Data API v3, and create an API key under Credentials.', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
@@ -38,8 +38,8 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('Quota Limits', 'magic-post-thumbnail'); ?>:</strong> 
-            <?php _e('Default: 10,000 units/day. Each video search costs 100 units (100 searches/day max). Thumbnails retrieved from search results do not consume additional quota.', 'magic-post-thumbnail'); ?>
+            <strong><?php _e('Quota Limits', 'all-sources-images'); ?>:</strong> 
+            <?php _e('Default: 10,000 units/day. Each video search costs 100 units (100 searches/day max). Thumbnails retrieved from search results do not consume additional quota.', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
@@ -47,14 +47,14 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('Thumbnail Quality', 'magic-post-thumbnail'); ?>:</strong> 
-            <?php _e('YouTube provides thumbnails at different resolutions: default (120x90), medium (320x180), high (480x360), standard (640x480), maxresdefault (1280x720 - not always available).', 'magic-post-thumbnail'); ?>
+            <strong><?php _e('Thumbnail Quality', 'all-sources-images'); ?>:</strong> 
+            <?php _e('YouTube provides thumbnails at different resolutions: default (120x90), medium (320x180), high (480x360), standard (640x480), maxresdefault (1280x720 - not always available).', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('API Key', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('API Key', 'all-sources-images'); ?></td>
     <td id="password-youtube" class="password">
         <input type="password" class="form-control" name="ASI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr($apikey); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
@@ -65,7 +65,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td></td>
     <td>
         <button class="btn btn-primary" id="btnYouTube" onclick="return false;">
-            <?php _e('Test YouTube Connection', 'magic-post-thumbnail'); ?>
+            <?php _e('Test YouTube Connection', 'all-sources-images'); ?>
         </button>
         <span id="resultYoutube">
             <img src="<?php echo plugin_dir_url(__FILE__); ?>../../../img/loader-mpt.gif" width="32" class="hidden" />
@@ -74,16 +74,16 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 </tr>
 
 <tr>
-    <td><?php _e('Thumbnail Quality', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('Thumbnail Quality', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[youtube][thumbnail_quality]">
             <?php
             $qualities = array(
-                'default' => __('Default (120x90px)', 'magic-post-thumbnail'),
-                'medium' => __('Medium (320x180px)', 'magic-post-thumbnail'),
-                'high' => __('High (480x360px - Recommended)', 'magic-post-thumbnail'),
-                'standard' => __('Standard (640x480px)', 'magic-post-thumbnail'),
-                'maxresdefault' => __('Max Resolution (1280x720px - may not exist)', 'magic-post-thumbnail')
+                'default' => __('Default (120x90px)', 'all-sources-images'),
+                'medium' => __('Medium (320x180px)', 'all-sources-images'),
+                'high' => __('High (480x360px - Recommended)', 'all-sources-images'),
+                'standard' => __('Standard (640x480px)', 'all-sources-images'),
+                'maxresdefault' => __('Max Resolution (1280x720px - may not exist)', 'all-sources-images')
             );
             foreach ($qualities as $value => $label) {
                 $selected = ($thumbnail_quality == $value) ? 'selected="selected"' : '';
@@ -91,21 +91,21 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             }
             ?>
         </select>
-        <p class="description"><?php _e('YouTube thumbnail resolution to download. maxresdefault may not be available for all videos (fallback to lower quality).', 'magic-post-thumbnail'); ?></p>
+        <p class="description"><?php _e('YouTube thumbnail resolution to download. maxresdefault may not be available for all videos (fallback to lower quality).', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Search Order', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('Search Order', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[youtube][search_order]">
             <?php
             $orders = array(
-                'relevance' => __('Relevance (Default)', 'magic-post-thumbnail'),
-                'date' => __('Upload Date (Newest first)', 'magic-post-thumbnail'),
-                'rating' => __('Rating (Highest first)', 'magic-post-thumbnail'),
-                'viewCount' => __('View Count (Most viewed)', 'magic-post-thumbnail'),
-                'title' => __('Title (Alphabetical)', 'magic-post-thumbnail')
+                'relevance' => __('Relevance (Default)', 'all-sources-images'),
+                'date' => __('Upload Date (Newest first)', 'all-sources-images'),
+                'rating' => __('Rating (Highest first)', 'all-sources-images'),
+                'viewCount' => __('View Count (Most viewed)', 'all-sources-images'),
+                'title' => __('Title (Alphabetical)', 'all-sources-images')
             );
             foreach ($orders as $value => $label) {
                 $selected = ($search_order == $value) ? 'selected="selected"' : '';
@@ -113,20 +113,20 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             }
             ?>
         </select>
-        <p class="description"><?php _e('How to sort YouTube search results.', 'magic-post-thumbnail'); ?></p>
+        <p class="description"><?php _e('How to sort YouTube search results.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Video Duration Filter', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('Video Duration Filter', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[youtube][video_duration]">
             <?php
             $durations = array(
-                'any' => __('Any Duration', 'magic-post-thumbnail'),
-                'short' => __('Short (< 4 minutes)', 'magic-post-thumbnail'),
-                'medium' => __('Medium (4-20 minutes)', 'magic-post-thumbnail'),
-                'long' => __('Long (> 20 minutes)', 'magic-post-thumbnail')
+                'any' => __('Any Duration', 'all-sources-images'),
+                'short' => __('Short (< 4 minutes)', 'all-sources-images'),
+                'medium' => __('Medium (4-20 minutes)', 'all-sources-images'),
+                'long' => __('Long (> 20 minutes)', 'all-sources-images')
             );
             foreach ($durations as $value => $label) {
                 $selected = ($video_duration == $value) ? 'selected="selected"' : '';
@@ -134,19 +134,19 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             }
             ?>
         </select>
-        <p class="description"><?php _e('Filter videos by length.', 'magic-post-thumbnail'); ?></p>
+        <p class="description"><?php _e('Filter videos by length.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Safe Search', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('Safe Search', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[youtube][safe_search]">
             <?php
             $safe_search_options = array(
-                'none' => __('None (No filtering)', 'magic-post-thumbnail'),
-                'moderate' => __('Moderate (Filter restricted content - Default)', 'magic-post-thumbnail'),
-                'strict' => __('Strict (Filter all sensitive content)', 'magic-post-thumbnail')
+                'none' => __('None (No filtering)', 'all-sources-images'),
+                'moderate' => __('Moderate (Filter restricted content - Default)', 'all-sources-images'),
+                'strict' => __('Strict (Filter all sensitive content)', 'all-sources-images')
             );
             foreach ($safe_search_options as $value => $label) {
                 $selected = ($safe_search == $value) ? 'selected="selected"' : '';
@@ -154,12 +154,12 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             }
             ?>
         </select>
-        <p class="description"><?php _e('YouTube Safe Search filter level.', 'magic-post-thumbnail'); ?></p>
+        <p class="description"><?php _e('YouTube Safe Search filter level.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Max Results', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('Max Results', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[youtube][max_results]">
             <?php
@@ -177,14 +177,14 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             }
             ?>
         </select>
-        <p class="description"><?php _e('Number of video results to retrieve. Higher values consume more quota (each search = 100 units regardless of results).', 'magic-post-thumbnail'); ?></p>
+        <p class="description"><?php _e('Number of video results to retrieve. Higher values consume more quota (each search = 100 units regardless of results).', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Region Code', 'magic-post-thumbnail'); ?></td>
+    <td><?php _e('Region Code', 'all-sources-images'); ?></td>
     <td>
         <input type="text" class="regular-text" name="ASI_plugin_banks_settings[youtube][region_code]" value="<?php echo esc_attr($region_code); ?>" maxlength="2" placeholder="US" />
-        <p class="description"><?php _e('Optional 2-letter ISO 3166-1 country code (e.g., US, GB, ES, FR, DE). Filters videos viewable in specified region.', 'magic-post-thumbnail'); ?></p>
+        <p class="description"><?php _e('Optional 2-letter ISO 3166-1 country code (e.g., US, GB, ES, FR, DE). Filters videos viewable in specified region.', 'all-sources-images'); ?></p>
     </td>
 </tr>

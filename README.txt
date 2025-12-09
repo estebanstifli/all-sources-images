@@ -1,261 +1,202 @@
 === All Sources Images ===
-Plugin Name:       All Sources Images
-Version:           1.0.0
-Tags:              generate, image, dalle, stable diffusion, replicate, pexels, unsplash, pixabay
-Contributors:      Custom Development
-Author URI:        https://github.com/yourusername/
-Author:            Your Name
+Contributors:      developer starter
+Donate link:       https://developer-starter.es/
+Tags:              ai images, featured image, automatic thumbnail, dall-e, stable diffusion, pexels, unsplash, pixabay
 Requires at least: 6.0
-Tested up to:      6.8.3
+Tested up to:      6.7
 Stable tag:        1.0.0
 Requires PHP:      7.3
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License:           GPLv2 or later
+License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 
-Get images for your posts from multiple sources (AI + Image Banks). Generate as featured images or in your content with Gutenberg Block and in bulk
+Automatically generate stunning images for your posts using AI (DALL·E, Stable Diffusion, Gemini) or image banks (Pexels, Unsplash, Pixabay). Set as featured image or insert directly into content.
 
 == Description ==
 
-**Easily create eye-catching images for your posts automatically with All Sources Images!**
+**Stop wasting hours searching for the perfect images!** All Sources Images automatically generates and retrieves high-quality images for your WordPress posts from multiple AI services and image banks.
 
-Retrieve images from Google Images, DALL·E, Stable Diffusion, Replicate, Pexels, Unsplash or Pixabay thanks to API, **based on your post title**, text analysis and much more. The plugin add picture as your **featured thumbnail** or **inside the post** when you publish the post.
+= 🎨 Why All Sources Images? =
 
-The plugin allows you to configure some settings for your automatic images : **Image bank**, language search, selected post types, image type, free-to-use or not, image size and much more.
+* **Save Time** - Automatically fetch images based on your post title, tags, or content analysis
+* **Multiple Sources** - Connect to 10+ image providers with a single plugin
+* **AI-Powered** - Generate unique images with DALL·E, Stable Diffusion, Gemini, and more
+* **Flexible Placement** - Set as featured image or insert anywhere in your content
+* **Bulk Processing** - Generate images for hundreds of posts at once
 
+= 🚀 Key Features =
 
-**Tired of spending hours searching for the perfect images for your posts?** All Sources Images does the hard work for you!
+**Image Sources Available:**
 
-== What is included ? ==
+* 🤖 **AI Generation:** DALL·E (OpenAI), Stable Diffusion, Gemini, Replicate, Cloudflare Workers AI
+* 📷 **Stock Photos:** Pexels, Unsplash, Pixabay, Flickr, Openverse
+* 🎬 **Video Thumbnails:** YouTube
+* 🎭 **Animated:** GIPHY
 
-= All Sources Images Features =
+**Generation Options:**
 
-<ul>
-<li>Generate Thumbnail for one post</li>
-<li><strong>Generate Thumbnails</strong> for Posts, Pages & Custom Post Types</li>
-<li><strong>new: Insert Image anywhere in your post content!</strong></li>
-<li><strong>new: Choose image position up to the 10th occurrence (First to Tenth, plus Last) when inserting images in your post content!</strong></li>
-<li>Image <strong>based on Titles</strong> or Text Analysis</li>
-<li><strong>New</strong>: Gutenberg Block for searching and adding images to your posts</li>
-<li>Images from Google Image, Google API, Pixabay, Openverse, DALL·E or Flickr</li>
-<li><strong>Mass Image Generation</strong> for chosen posts or chosen taxonomies</li>
-<li>Image generated randomized</li>
-</ul>
+* ✅ Generate featured thumbnails for Posts, Pages & Custom Post Types
+* ✅ Insert images anywhere in your post content (choose position: first, second, third... up to 10th paragraph)
+* ✅ **Gutenberg Block** for manual image search and insertion
+* ✅ **Elementor Widget** - Full integration with Elementor page builder
+* ✅ Bulk generation for multiple posts at once
+* ✅ Automatic generation on post publish (optional)
+* ✅ Smart keyword extraction from title, content, tags, or categories
+* ✅ Randomized image selection for variety
+* ✅ Custom ALT text and captions with attribution
 
+**Advanced Features:**
 
+* 🔄 Scheduled generation with WP-Cron
+* 🔗 REST API support for headless WordPress
+* 🔌 Compatible with WPeMatico, FeedWordPress, WP All Import
+* 🌍 Multi-language search support
+* 🖼️ Image post-processing (resize, crop)
+* 📊 Detailed logging for troubleshooting
 
+= 🎯 Perfect For =
 
-== Support ==
-Custom development based on original All Sources Images plugin.
+* **Bloggers** - Automatically illustrate your articles
+* **News Sites** - Keep up with high-volume content
+* **E-commerce** - Generate product imagery
+* **Content Aggregators** - Auto-add images to imported content
+* **Agencies** - Streamline client site management
+* **Elementor Users** - Native widget for seamless page building
 
+= 📖 How It Works =
+
+1. **Configure** - Add your API keys for your preferred image sources
+2. **Select** - Choose which post types should get automatic images
+3. **Publish** - Images are automatically fetched and attached to your posts
+
+That's it! The plugin handles keyword extraction, API calls, image downloading, and media library management automatically.
 
 == Installation ==
-1. Activate the plugin
-2. Go to the "All Sources Images" menu tab
-3. Configure your settings, which post type you want to enable it and the image bank.
-4. Go into a post, and choose "Click to generate" on the sidebar.
-5. You can also **mass generate thumbnails** for posts. Go into the list of your posts, choose posts or taxonomy you want to get thumbnails, and into "Bulk Actions" choose "Generate featured images"
 
-Configure your API keys for each image bank you want to use.
+= Automatic Installation =
 
+1. Go to **Plugins > Add New** in your WordPress admin
+2. Search for "All Sources Images"
+3. Click **Install Now** and then **Activate**
+
+= Manual Installation =
+
+1. Download the plugin ZIP file
+2. Go to **Plugins > Add New > Upload Plugin**
+3. Upload the ZIP file and click **Install Now**
+4. Activate the plugin
+
+= Configuration =
+
+1. Navigate to **All Sources Images** in your admin menu
+2. Go to the **Image Banks** tab
+3. Add API keys for your preferred image sources:
+   * [Get Pexels API Key](https://www.pexels.com/api/)
+   * [Get Unsplash API Key](https://unsplash.com/developers)
+   * [Get Pixabay API Key](https://pixabay.com/api/docs/)
+   * [Get OpenAI API Key](https://platform.openai.com/api-keys) (for DALL·E)
+4. Configure your generation preferences in the **Settings** tab
+5. Start generating images!
 
 == Frequently Asked Questions ==
 
-= How to generate images ? =
+= How do I generate images for my posts? =
 
-There are several ways :
-<ul>
-<li>You can generate an image with the button "Click to generate" on a post (works on Gutemberg & Classic Editor).</li>
-<li>You can mass generate thumbnails for posts. Go into the list of your posts, choose posts or taxonomy you want to get thumbnails, and into “Bulk Actions” choose “Generate featured images”</li>
-<li>You can also automatically schedule generation with crons, or by enabling compatibility with REST Requests, WPeMatico, FeedWordPress & WP Automatic Plugin.</li>
-</ul>
+There are multiple ways:
 
-= Is it unlimited ? =
+1. **Manual:** Click the "Generate Image" button in the post editor sidebar
+2. **Automatic:** Enable auto-generation on post publish in settings
+3. **Bulk:** Select multiple posts in the Posts list, choose "Generate featured images" from Bulk Actions
+4. **Gutenberg Block:** Use the ASI Images block to search and insert images directly
+5. **Elementor Widget:** Drag and drop the ASI Images widget in Elementor editor
 
-Yes you can generate image as much as you want.
+= Which image sources are free to use? =
 
-= Why images aren't generated anymore ? =
+* **Pexels, Unsplash, Pixabay, Openverse** - Free with API key (generous limits)
+* **Flickr** - Free with API key
+* **GIPHY** - Free with API key
+* **AI Services (DALL·E, Stable Diffusion, etc.)** - Paid per generation
 
-If you use Google Image too much for generation in a short time, your server may be temporarily banned. In this case, you should enable Interval for the generation.
+= Can I use this with custom post types? =
 
-= I have other pre-sale questions, can you help? =
+Yes! Go to Settings and select which post types should have automatic image generation enabled. Works with any registered custom post type.
 
-Contact the plugin administrator for support.
+= What happens if an image source fails? =
 
+The plugin automatically tries the next configured source in your priority list. You can configure multiple fallback sources.
 
-== Upgrade Notice ==
+= Is there a limit on how many images I can generate? =
 
-This is a custom development version based on All Sources Images 6.1.6.
+The plugin itself has no limits. However, each image source has its own API rate limits:
 
+* Pexels: 200 requests/hour (free)
+* Unsplash: 50 requests/hour (free)
+* Pixabay: 5000 requests/hour (free)
+* AI services: Based on your subscription
+
+= Does it work with the Classic Editor? =
+
+Yes! The plugin works with both Gutenberg (Block Editor) and the Classic Editor.
+
+= Does it work with Elementor? =
+
+Absolutely! We provide a native Elementor widget that integrates seamlessly with the Elementor page builder. Simply drag and drop the "ASI Images" widget into your page and search for images from any configured source.
+
+= Can I customize the search keywords? =
+
+Absolutely! You can configure the plugin to extract keywords from:
+
+* Post title
+* Post content (text analysis)
+* Categories
+* Tags
+* Custom fields
+
+== Screenshots ==
+
+1. Main settings dashboard with source configuration
+2. Image bank API configuration
+3. Gutenberg block for manual image search
+4. Elementor widget integration
+5. Bulk generation interface
+6. Post editor with generation button
 
 == Changelog ==
 
 = 1.0.0 - December 2025 =
-* Custom development fork based on All Sources Images 6.1.6
-* Complete rebrand to "All Sources Images"
-* Renamed all functions, classes, and options from MPT/mpt to ASI/asi
-* Maintained all core functionality from original plugin
-* Updated text domain to 'all-sources-images'
-* Removed commercial links and promotional content
+* 🎉 Initial release
+* ✨ Support for 10+ image sources (AI + Stock Photos)
+* ✨ Gutenberg block for image search
+* ✨ Elementor widget for page builder integration
+* ✨ Bulk generation system with database-backed job queue
+* ✨ Automatic generation on post publish
+* ✨ REST API support
+* ✨ WPeMatico, FeedWordPress, WP All Import compatibility
+* ✨ Multi-language keyword search
+* ✨ Comprehensive logging system
 
-Previous changelog history from All Sources Images 6.1.6:
+== Upgrade Notice ==
 
-= 6.1.6 - November 13, 2025 =
-* PRO: Improve compatibility with "Featured Image from URL" (FIFU) plugin - supports both free and premium versions
-* PRO: Disable Envato Elements integration (API no longer working)
-* Remove Envato Elements from available image banks in settings
-* Update Freemius 2.13.0
+= 1.0.0 =
+Initial release. Welcome to All Sources Images!
 
-= 6.1.5 - November 11, 2025 = 
-* Add Black Friday discount
+== Additional Info ==
 
-= 6.1.4 - October 16, 2025 =
-* PRO: Add support for ByteDance Seedream-4 model (Replicate)
-* PRO: Add support for Google Imagen models (Replicate) (imagen-4, imagen-4-fast, imagen-4-ultra, nano-banana)
-* PRO: Improve dimension calculation for different aspect ratios (16:9, 4:3, 1:1, 3:2, 9:16) with imagen & seedream
+= Requirements =
 
-= 6.1.3 - August 07 2025 =
-* Allow image positioning up to the 10th occurrence (First to Tenth, plus Last) for inline content placement.
-* Update Freemius 2.12.1
+* WordPress 6.0 or higher
+* PHP 7.3 or higher
+* At least one API key from supported image sources
 
-= 6.1.2 - June 24, 2025 =
-* Fix bug with plugin Kadence Blocks
-* Update Freemius 2.12.0
+= Support =
 
-= 6.1.1 - May 07, 2025 =
-* Add discount code for may
-* PRO: Add cron interval to every 3 minute
+For support, feature requests, or bug reports, please visit our [GitHub repository](https://github.com/developer-starter/all-sources-images) or contact us through WordPress.org support forums.
 
-= 6.1.0 - April 22, 2025 =
-* Improve images of Dalle generation
-* PRO: Add Replicate Api models with 42 images models.
-* PRO: Add "Stable Image Ultra" as model for better quality
+= Privacy =
 
-= 6.0.8 - April 16, 2025 =
-* PRO: Fix "custom field" option
-* PRO: Add post status choice for crons
+This plugin connects to third-party APIs to fetch images. Your post titles/keywords are sent to these services to search for relevant images. Please review each service's privacy policy:
 
-= 6.0.7 - April 08, 2025 =
-* Update compatibility with theme "cocoon" (japanese made theme)
+* [Pexels Privacy Policy](https://www.pexels.com/privacy-policy/)
+* [Unsplash Privacy Policy](https://unsplash.com/privacy)
+* [Pixabay Privacy Policy](https://pixabay.com/service/privacy/)
+* [OpenAI Privacy Policy](https://openai.com/privacy/)
 
-= 6.0.6 - January 27, 2025 =
-* Update freemius 2.11
-
-= 6.0.5 - January 17, 2025 =
-* Update scroll during generation
-* Limit manual_search.js only to edit pages
-* Add "Image reuse" option: Check for existing images media before downloading
-* PRO: Fix WP All Import for all "Search Based on" options. Generated post-import
-
-= 6.0.4 - December 17, 2024 =
-* Update freemius 2.10.1
-* PRO: Better compatibility with image galleries for "Meta Box" (metabox.io)
-
-= 6.0.3 - November 27, 2024 =
-* Add second image source for "image location" blocks
-
-= 6.0.2 - November 18, 2024 =
-* Add Black Friday discount
-* PRO: Fix problems with REST Requests
-
-= 6.0.1 - November 11, 2024 =
-* Update CSS for delete button block
-* Update Youtube Tutorial video link
-* Fix migration problem with 6.0.0: could not generate image when plugin updated
-
-= 6.0.0 - November 7, 2024 =
-* PRO: Change automatic settings: Ability to add multiple images during generation
-* PRO: Add Compatibility with CMB2, ACF & Meta Box (metabox.io)
-* PRO: Add Image bank "Stable Diffusion"
-* PRO: Strict Search Mode: include quotes inside the search term
-* PRO: Add text analyzer per paragraph
-* Add images inside content: Previously in paid version, now free.
-* Add "random" image selection: Previously in paid version, now free.
-* Add caption on images to mention author
-* Improve "Custom Request" ("based on" option) by including taxonomies
-* Improve text analyzer included with the plugin ("based on" option)
-* "Inside content" option : add "div" and "a" as possible tags
-* Add submenus into the sidebar
-* Other minor code improvements
-* Update Freemius version
-
-= 5.2.11 - October 03, 2024 =
-* Update Freemius version
-* PRO: Add "Category Level" option for "Based on Custom Request"
-* Add "Rights" tab options to allow roles to access the plugin dashboard
-
-= 5.2.10 - August 12, 2024 =
-* Fix security problem (level of privilege required)
-* Update Freemius version
-
-= 5.2.9 - July 22, 2024 =
-* Update with WordPress 6.6 : Fix buttons for generating with Gutemberg editor
-
-= 5.2.8 - July 13, 2024 =
-* PRO: Fix Obsolete "Optional parameter" error
-* Fix security problem (level of privilege required)
-
-= 5.2.7 - June 04, 2024 =
-* Fix bugs with Hook "Save Post" & "WP Insert Post"
-
-= 5.2.6 - June 03, 2024 =
-* Change display options with "enable alt"
-* Add rating plugin notice
-
-= 5.2.5 - May 22, 2024 =
-* PRO: gpt-4o as model for "OpenAI Keyword Extractor". Cheaper/better quality.
-
-= 5.2.4 - May 20, 2024 =
-* Update for discount
-* Update Freemius version
-
-= 5.2.3 - April 17, 2024 =
-* PRO: Fix problem with WP All import Compatibility
-* PRO: Improve "Inside Content" when "Classic" block is inside Gutenberg
-
-= 5.2.2 - April 09, 2024 =
-* Fix bug with no result when post is not saved
-* Update Freemius version
-
-= 5.2.1 - April 04, 2024 =
-* Changed Gutemberg detection method due to WP 6.5
-* Remove warnings with option "enable alt"
-
-= 5.2.0 - March 18, 2024 =
-* Update Bulk page if no generation
-* PRO: Manage image position anywhere in content
-
-= 5.1.1 - January 15, 2024 =
-* Update Freemius version
-* Add post type selection for Hooks
-* Fix CSS admin dashboard on small desktop resolutions
-
-= 5.1 - December 20, 2023 =
-* PRO: Add alt on images with translation possibility
-* PRO: Add "Pro Account" link
-
-= 5.0.4 - December 18, 2023 =
-* Add CSS links underline for source settings
-* Update jQuery UI version for better compatibility
-* Update freemius version
-
-= 5.0.3 - November 25, 2023 =
-* Improve click area on button for manual generation
-* PRO: Add "WP Insert Post" Hook. Also works with XML RPC requests
-
-= 5.0.2 - November 17, 2023 =
-* Update for Black Friday
-
-= 5.0.1 - November 15, 2023 =
-* Fix problem with automatic generation failing
-* Remove the Gutenberg Block description in the settings. Wasn't the correct description
-* Fix Dall-e sentence CSS problem
-
-= 5.0.0 - November 14, 2023 =
-* Change some Settings Pages
-* Warning errors removed by removing useless include_once for free version
-* Add multiple sources for automatic generation: select multiple Banks and set priorities
-* New Gutenberg block to manually add images from multiple Image Banks
-* Button for featured Image to select manually images from multiple Image Banks
-* Remove Image Banks "Shutterstock" & "Getty Images", not very usefull
-* Add API tester for settings to check API key validity
-* Change Dall-e v2 to Dall-e v3

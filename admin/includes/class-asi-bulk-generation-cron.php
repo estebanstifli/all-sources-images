@@ -83,7 +83,7 @@ class ASI_Bulk_Generation_Cron {
                             'status'        => 'failed',
                             'retry_count'   => $retry_count,
                             'error_message' => sprintf( 
-                                __( 'Fatal error after %d attempts: %s', 'magic-post-thumbnail' ),
+                                __( 'Fatal error after %d attempts: %s', 'all-sources-images' ),
                                 $retry_count,
                                 $error['message']
                             ),
@@ -98,7 +98,7 @@ class ASI_Bulk_Generation_Cron {
                             'status'        => 'pending',
                             'retry_count'   => $retry_count,
                             'error_message' => sprintf(
-                                __( 'Retry %d/%d after error: %s', 'magic-post-thumbnail' ),
+                                __( 'Retry %d/%d after error: %s', 'all-sources-images' ),
                                 $retry_count,
                                 self::MAX_RETRIES,
                                 $error['message']
@@ -145,7 +145,7 @@ class ASI_Bulk_Generation_Cron {
                 ASI_Bulk_Generation_DB::update_job_post( $post->id, array(
                     'status'        => 'failed',
                     'retry_count'   => $retry_count,
-                    'error_message' => __( 'Timed out after maximum retries', 'magic-post-thumbnail' ),
+                    'error_message' => __( 'Timed out after maximum retries', 'all-sources-images' ),
                     'processed_at'  => current_time( 'mysql' ),
                 ) );
                 ASI_Bulk_Generation_DB::increment_job_counter( $job_id, 'processed_posts', 1 );
@@ -157,7 +157,7 @@ class ASI_Bulk_Generation_Cron {
                     'status'      => 'pending',
                     'retry_count' => $retry_count,
                     'error_message' => sprintf(
-                        __( 'Retry %d/%d after timeout', 'magic-post-thumbnail' ),
+                        __( 'Retry %d/%d after timeout', 'all-sources-images' ),
                         $retry_count,
                         self::MAX_RETRIES
                     ),
@@ -257,9 +257,9 @@ class ASI_Bulk_Generation_Cron {
                     ASI_Bulk_Generation_DB::mark_post_processed( $job_post->id, 'failed', array(
                         'featured_image_status' => 'failed',
                         'error_message'         => sprintf(
-                            __( 'Failed after %d attempts: %s', 'magic-post-thumbnail' ),
+                            __( 'Failed after %d attempts: %s', 'all-sources-images' ),
                             $retry_count,
-                            $result['error'] ?? __( 'Unknown error', 'magic-post-thumbnail' )
+                            $result['error'] ?? __( 'Unknown error', 'all-sources-images' )
                         ),
                         'retry_count'           => $retry_count,
                     ) );
@@ -271,10 +271,10 @@ class ASI_Bulk_Generation_Cron {
                         'status'        => 'pending',
                         'retry_count'   => $retry_count,
                         'error_message' => sprintf(
-                            __( 'Retry %d/%d: %s', 'magic-post-thumbnail' ),
+                            __( 'Retry %d/%d: %s', 'all-sources-images' ),
                             $retry_count,
                             self::MAX_RETRIES,
-                            $result['error'] ?? __( 'Unknown error', 'magic-post-thumbnail' )
+                            $result['error'] ?? __( 'Unknown error', 'all-sources-images' )
                         ),
                     ) );
                     ASI_log( 'Post ' . $job_post->post_id . ' queued for retry (' . $retry_count . '/' . self::MAX_RETRIES . '): ' . ( $result['error'] ?? 'Unknown error' ), 'CRON_RETRY' );
@@ -322,7 +322,7 @@ class ASI_Bulk_Generation_Cron {
         if ( ! $post ) {
             return array(
                 'success' => false,
-                'error'   => __( 'Post not found', 'magic-post-thumbnail' ),
+                'error'   => __( 'Post not found', 'all-sources-images' ),
             );
         }
 
@@ -333,7 +333,7 @@ class ASI_Bulk_Generation_Cron {
         if ( has_post_thumbnail( $post_id ) && $options['rewrite_featured'] !== 'true' ) {
             return array(
                 'success' => false,
-                'error'   => __( 'Post already has featured image', 'magic-post-thumbnail' ),
+                'error'   => __( 'Post already has featured image', 'all-sources-images' ),
             );
         }
 
@@ -353,7 +353,7 @@ class ASI_Bulk_Generation_Cron {
             
             return array(
                 'success' => false,
-                'error'   => __( 'Image generation class not available', 'magic-post-thumbnail' ),
+                'error'   => __( 'Image generation class not available', 'all-sources-images' ),
             );
         }
 
@@ -488,7 +488,7 @@ class ASI_Bulk_Generation_Cron {
 
         return array(
             'success' => false,
-            'error'   => __( 'Could not generate any images', 'magic-post-thumbnail' ),
+            'error'   => __( 'Could not generate any images', 'all-sources-images' ),
         );
     }
 }

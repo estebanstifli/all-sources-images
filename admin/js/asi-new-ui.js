@@ -28,7 +28,7 @@
         // Others Settings (new-settings-others.php)
         // =============================================
         
-        // Toggle Google API row based on translation settings
+        // Toggle Google API row and Source Language row based on translation settings
         function toggleGoogleApiRow() {
             var translationEN = $('#translation_EN').is(':checked');
             var translateAlt = $('#translate_alt').is(':checked');
@@ -37,6 +37,13 @@
                 $('.asi-google-api-row').slideDown();
             } else {
                 $('.asi-google-api-row').slideUp();
+            }
+            
+            // Show/hide source language row based on translation_EN only
+            if (translationEN) {
+                $('.asi-source-lang-row').slideDown();
+            } else {
+                $('.asi-source-lang-row').slideUp();
             }
         }
         

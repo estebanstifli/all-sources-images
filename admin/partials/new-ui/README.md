@@ -36,7 +36,7 @@ admin/partials/new-ui/
 
 ### Option 1: Include in plugin main file
 
-Add this line in `magic-post-thumbnail.php` after plugin initialization:
+Add this line in `all-sources-images.php` after plugin initialization:
 
 ```php
 // Load new admin UI
@@ -58,7 +58,7 @@ asi_init_new_ui( $this );
 ```php
 add_action( 'plugins_loaded', function() {
     if ( defined( 'ALL_SOURCES_IMAGES_VERSION' ) ) {
-        require_once WP_PLUGIN_DIR . '/magic-post-thumbnail/admin/partials/new-ui/new-ui-loader.php';
+        require_once WP_PLUGIN_DIR . '/all-sources-images/admin/partials/new-ui/new-ui-loader.php';
     }
 });
 ```

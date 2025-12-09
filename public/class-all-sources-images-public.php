@@ -70,7 +70,7 @@ class All_Sources_Images_Public {
 		 * class.
 		 */
 
-		//wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/magic-post-thumbnail-public.css', array(), $this->version, 'all' );
+		//wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/all-sources-images-public.css', array(), $this->version, 'all' );
 
 	}
 
@@ -93,7 +93,7 @@ class All_Sources_Images_Public {
 		 * class.
 		 */
 
-		//wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/magic-post-thumbnail-public.js', array( 'jquery' ), $this->version, false );
+		//wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/all-sources-images-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 

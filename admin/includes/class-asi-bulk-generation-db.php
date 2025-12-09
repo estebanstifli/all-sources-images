@@ -173,7 +173,7 @@ class ASI_Bulk_Generation_DB {
         self::init();
 
         $defaults = array(
-            'job_name'        => sprintf( __( 'Bulk Job %s', 'magic-post-thumbnail' ), current_time( 'Y-m-d H:i' ) ),
+            'job_name'        => sprintf( __( 'Bulk Job %s', 'all-sources-images' ), current_time( 'Y-m-d H:i' ) ),
             'job_status'      => 'pending',
             'total_posts'     => 0,
             'processed_posts' => 0,

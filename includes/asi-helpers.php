@@ -100,7 +100,7 @@ if ( ! function_exists( 'ASI_get_logs_dir' ) ) {
 		$base_dir   = isset( $upload_dir['basedir'] ) && ! empty( $upload_dir['basedir'] )
 			? $upload_dir['basedir']
 			: WP_CONTENT_DIR . '/uploads';
-		return trailingslashit( wp_normalize_path( $base_dir ) ) . 'magic-post-thumbnail/logs/';
+		return trailingslashit( wp_normalize_path( $base_dir ) ) . 'all-sources-images/logs/';
 	}
 }
 

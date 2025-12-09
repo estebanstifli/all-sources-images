@@ -21,10 +21,10 @@ if ( ! function_exists( 'add_filter' ) ) {
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="card-title m-0">
-                    <i class="bi bi-list-task me-2 text-secondary"></i><?php esc_html_e( 'Generation Jobs', 'magic-post-thumbnail' ); ?>
+                    <i class="bi bi-list-task me-2 text-secondary"></i><?php esc_html_e( 'Generation Jobs', 'all-sources-images' ); ?>
                 </h5>
                 <button type="button" id="asi-refresh-jobs" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-clockwise me-1"></i><?php esc_html_e( 'Refresh', 'magic-post-thumbnail' ); ?>
+                    <i class="bi bi-arrow-clockwise me-1"></i><?php esc_html_e( 'Refresh', 'all-sources-images' ); ?>
                 </button>
             </div>
 
@@ -32,17 +32,17 @@ if ( ! function_exists( 'add_filter' ) ) {
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th><?php esc_html_e( 'ID', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Job Name', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Status', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Progress', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Created', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Actions', 'magic-post-thumbnail' ); ?></th>
+                            <th><?php esc_html_e( 'ID', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Job Name', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Status', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Progress', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Created', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Actions', 'all-sources-images' ); ?></th>
                         </tr>
                     </thead>
                     <tbody id="asi-jobs-tbody">
                         <tr>
-                            <td colspan="6" class="text-center text-muted"><?php esc_html_e( 'No jobs found.', 'magic-post-thumbnail' ); ?></td>
+                            <td colspan="6" class="text-center text-muted"><?php esc_html_e( 'No jobs found.', 'all-sources-images' ); ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -57,17 +57,17 @@ if ( ! function_exists( 'add_filter' ) ) {
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="card-title m-0">
-                    <i class="bi bi-info-circle me-2 text-secondary"></i><span id="asi-job-details-title"><?php esc_html_e( 'Job Details', 'magic-post-thumbnail' ); ?></span>
+                    <i class="bi bi-info-circle me-2 text-secondary"></i><span id="asi-job-details-title"><?php esc_html_e( 'Job Details', 'all-sources-images' ); ?></span>
                 </h5>
                 <button type="button" id="asi-close-job-details" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-x me-1"></i><?php esc_html_e( 'Close', 'magic-post-thumbnail' ); ?>
+                    <i class="bi bi-x me-1"></i><?php esc_html_e( 'Close', 'all-sources-images' ); ?>
                 </button>
             </div>
 
             <!-- Progress -->
             <div class="mb-4">
                 <div class="d-flex justify-content-between mb-1">
-                    <span><?php esc_html_e( 'Progress', 'magic-post-thumbnail' ); ?></span>
+                    <span><?php esc_html_e( 'Progress', 'all-sources-images' ); ?></span>
                     <span id="asi-job-progress-text">0%</span>
                 </div>
                 <div class="progress" style="height: 20px;">
@@ -80,40 +80,40 @@ if ( ! function_exists( 'add_filter' ) ) {
                 <div class="col-md-3">
                     <div class="text-center p-3 bg-light rounded">
                         <div class="fs-4 fw-bold text-primary" id="asi-job-stat-total">0</div>
-                        <small class="text-muted"><?php esc_html_e( 'Total', 'magic-post-thumbnail' ); ?></small>
+                        <small class="text-muted"><?php esc_html_e( 'Total', 'all-sources-images' ); ?></small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="text-center p-3 bg-light rounded">
                         <div class="fs-4 fw-bold text-warning" id="asi-job-stat-pending">0</div>
-                        <small class="text-muted"><?php esc_html_e( 'Pending', 'magic-post-thumbnail' ); ?></small>
+                        <small class="text-muted"><?php esc_html_e( 'Pending', 'all-sources-images' ); ?></small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="text-center p-3 bg-light rounded">
                         <div class="fs-4 fw-bold text-success" id="asi-job-stat-completed">0</div>
-                        <small class="text-muted"><?php esc_html_e( 'Completed', 'magic-post-thumbnail' ); ?></small>
+                        <small class="text-muted"><?php esc_html_e( 'Completed', 'all-sources-images' ); ?></small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="text-center p-3 bg-light rounded">
                         <div class="fs-4 fw-bold text-danger" id="asi-job-stat-failed">0</div>
-                        <small class="text-muted"><?php esc_html_e( 'Failed', 'magic-post-thumbnail' ); ?></small>
+                        <small class="text-muted"><?php esc_html_e( 'Failed', 'all-sources-images' ); ?></small>
                     </div>
                 </div>
             </div>
 
             <!-- Posts Table -->
-            <h6><?php esc_html_e( 'Posts in this job', 'magic-post-thumbnail' ); ?></h6>
+            <h6><?php esc_html_e( 'Posts in this job', 'all-sources-images' ); ?></h6>
             <div class="table-responsive">
                 <table class="table table-sm table-striped">
                     <thead>
                         <tr>
-                            <th><?php esc_html_e( 'Post', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Type', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Status', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Images', 'magic-post-thumbnail' ); ?></th>
-                            <th><?php esc_html_e( 'Source', 'magic-post-thumbnail' ); ?></th>
+                            <th><?php esc_html_e( 'Post', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Type', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Status', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Images', 'all-sources-images' ); ?></th>
+                            <th><?php esc_html_e( 'Source', 'all-sources-images' ); ?></th>
                         </tr>
                     </thead>
                     <tbody id="asi-job-posts-tbody">

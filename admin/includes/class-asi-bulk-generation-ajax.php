@@ -36,11 +36,11 @@ class ASI_Bulk_Generation_Ajax {
      */
     private function verify_request() {
         if ( ! check_ajax_referer( 'asi_bulk_nonce', 'nonce', false ) ) {
-            wp_send_json_error( array( 'message' => __( 'Security check failed', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Security check failed', 'all-sources-images' ) ) );
         }
 
         if ( ! current_user_can( 'edit_posts' ) ) {
-            wp_send_json_error( array( 'message' => __( 'Permission denied', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Permission denied', 'all-sources-images' ) ) );
         }
     }
 
@@ -106,13 +106,13 @@ class ASI_Bulk_Generation_Ajax {
         // Build HTML
         $html = '';
         if ( empty( $posts ) ) {
-            $html = '<p class="text-muted p-2">' . __( 'No items found.', 'magic-post-thumbnail' ) . '</p>';
+            $html = '<p class="text-muted p-2">' . __( 'No items found.', 'all-sources-images' ) . '</p>';
         } else {
             foreach ( $posts as $post ) {
                 $has_featured = has_post_thumbnail( $post->ID );
                 $class = $has_featured ? 'has-featured' : 'no-featured';
                 $badge_class = $has_featured ? 'has' : 'no';
-                $badge_text = $has_featured ? __( 'Has image', 'magic-post-thumbnail' ) : __( 'No image', 'magic-post-thumbnail' );
+                $badge_text = $has_featured ? __( 'Has image', 'all-sources-images' ) : __( 'No image', 'all-sources-images' );
                 
                 $html .= sprintf(
                     '<label class="%s"><input type="checkbox" value="%d"> %s <span class="featured-badge %s">%s</span></label>',
@@ -145,7 +145,7 @@ class ASI_Bulk_Generation_Ajax {
         $start_immediately = absint( $_POST['start_immediately'] ?? 0 );
 
         if ( empty( $job_name ) ) {
-            $job_name = sprintf( __( 'Bulk Job %s', 'magic-post-thumbnail' ), current_time( 'Y-m-d H:i' ) );
+            $job_name = sprintf( __( 'Bulk Job %s', 'all-sources-images' ), current_time( 'Y-m-d H:i' ) );
         }
 
         // Collect all post IDs based on selection
@@ -194,7 +194,7 @@ class ASI_Bulk_Generation_Ajax {
         $post_ids = array_unique( $post_ids );
 
         if ( empty( $post_ids ) ) {
-            wp_send_json_error( array( 'message' => __( 'No posts selected', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'No posts selected', 'all-sources-images' ) ) );
         }
 
         // Create job
@@ -211,7 +211,7 @@ class ASI_Bulk_Generation_Ajax {
         ) );
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Failed to create job', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Failed to create job', 'all-sources-images' ) ) );
         }
 
         // Add posts to job
@@ -230,7 +230,7 @@ class ASI_Bulk_Generation_Ajax {
         }
 
         wp_send_json_success( array(
-            'message' => sprintf( __( 'Job created with %d posts', 'magic-post-thumbnail' ), $added ),
+            'message' => sprintf( __( 'Job created with %d posts', 'all-sources-images' ), $added ),
             'job_id'  => $job_id,
         ) );
     }
@@ -244,14 +244,14 @@ class ASI_Bulk_Generation_Ajax {
         $post_ids_raw = sanitize_text_field( $_POST['post_ids'] ?? '' );
         
         if ( empty( $post_ids_raw ) ) {
-            wp_send_json_error( array( 'message' => __( 'No posts provided', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'No posts provided', 'all-sources-images' ) ) );
         }
 
         // Parse IDs
         $post_ids = array_filter( array_map( 'absint', explode( ',', $post_ids_raw ) ) );
         
         if ( empty( $post_ids ) ) {
-            wp_send_json_error( array( 'message' => __( 'No valid posts provided', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'No valid posts provided', 'all-sources-images' ) ) );
         }
 
         // Get images per post from settings
@@ -261,7 +261,7 @@ class ASI_Bulk_Generation_Ajax {
 
         // Generate job name
         $job_name = sprintf( 
-            __( 'Quick Job - %d posts (%s)', 'magic-post-thumbnail' ), 
+            __( 'Quick Job - %d posts (%s)', 'all-sources-images' ), 
             count( $post_ids ),
             current_time( 'Y-m-d H:i' ) 
         );
@@ -290,7 +290,7 @@ class ASI_Bulk_Generation_Ajax {
         ) );
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Failed to create job', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Failed to create job', 'all-sources-images' ) ) );
         }
 
         // Add posts to job
@@ -308,7 +308,7 @@ class ASI_Bulk_Generation_Ajax {
         }
 
         wp_send_json_success( array(
-            'message' => sprintf( __( 'Job created and started with %d posts', 'magic-post-thumbnail' ), $added ),
+            'message' => sprintf( __( 'Job created and started with %d posts', 'all-sources-images' ), $added ),
             'job_id'  => $job_id,
             'total_posts' => $added,
         ) );
@@ -341,12 +341,12 @@ class ASI_Bulk_Generation_Ajax {
         $posts_page = absint( $_POST['posts_page'] ?? 1 );
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
         }
 
         $job = ASI_Bulk_Generation_DB::get_job( $job_id );
         if ( ! $job ) {
-            wp_send_json_error( array( 'message' => __( 'Job not found', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Job not found', 'all-sources-images' ) ) );
         }
 
         $stats = ASI_Bulk_Generation_DB::get_job_stats( $job_id );
@@ -407,16 +407,16 @@ class ASI_Bulk_Generation_Ajax {
         $job_id = absint( $_POST['job_id'] ?? 0 );
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
         }
 
         $job = ASI_Bulk_Generation_DB::get_job( $job_id );
         if ( ! $job ) {
-            wp_send_json_error( array( 'message' => __( 'Job not found', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Job not found', 'all-sources-images' ) ) );
         }
 
         if ( ! in_array( $job->job_status, array( 'pending', 'paused' ) ) ) {
-            wp_send_json_error( array( 'message' => __( 'Job cannot be started', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Job cannot be started', 'all-sources-images' ) ) );
         }
 
         ASI_Bulk_Generation_DB::update_job_status( $job_id, 'processing' );
@@ -426,7 +426,7 @@ class ASI_Bulk_Generation_Ajax {
             wp_schedule_single_event( time(), 'asi_bulk_process_job', array( $job_id ) );
         }
 
-        wp_send_json_success( array( 'message' => __( 'Job started', 'magic-post-thumbnail' ) ) );
+        wp_send_json_success( array( 'message' => __( 'Job started', 'all-sources-images' ) ) );
     }
 
     /**
@@ -438,7 +438,7 @@ class ASI_Bulk_Generation_Ajax {
         $job_id = absint( $_POST['job_id'] ?? 0 );
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
         }
 
         ASI_Bulk_Generation_DB::update_job_status( $job_id, 'paused' );
@@ -446,7 +446,7 @@ class ASI_Bulk_Generation_Ajax {
         // Clear scheduled cron
         wp_clear_scheduled_hook( 'asi_bulk_process_job', array( $job_id ) );
 
-        wp_send_json_success( array( 'message' => __( 'Job paused', 'magic-post-thumbnail' ) ) );
+        wp_send_json_success( array( 'message' => __( 'Job paused', 'all-sources-images' ) ) );
     }
 
     /**
@@ -458,7 +458,7 @@ class ASI_Bulk_Generation_Ajax {
         $job_id = absint( $_POST['job_id'] ?? 0 );
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
         }
 
         // Clear all scheduled cron events for this job
@@ -468,9 +468,9 @@ class ASI_Bulk_Generation_Ajax {
         $deleted = ASI_Bulk_Generation_DB::delete_job( $job_id );
 
         if ( $deleted ) {
-            wp_send_json_success( array( 'message' => __( 'Job deleted', 'magic-post-thumbnail' ) ) );
+            wp_send_json_success( array( 'message' => __( 'Job deleted', 'all-sources-images' ) ) );
         } else {
-            wp_send_json_error( array( 'message' => __( 'Failed to delete job', 'magic-post-thumbnail' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Failed to delete job', 'all-sources-images' ) ) );
         }
     }
 }
