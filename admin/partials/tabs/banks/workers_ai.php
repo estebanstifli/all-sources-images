@@ -1,8 +1,6 @@
 <?php
-if ( ! function_exists( 'add_filter' ) ) {
-    header( 'Status: 403 Forbidden' );
-    header( 'HTTP/1.1 403 Forbidden' );
-    exit();
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
 }
 
 $workers_options = isset( $options['workers_ai'] ) ? $options['workers_ai'] : array();

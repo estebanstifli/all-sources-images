@@ -1,6 +1,6 @@
 <?php
-if (!function_exists('add_filter')) {
-    exit();
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
 }
 
 $options = wp_parse_args(

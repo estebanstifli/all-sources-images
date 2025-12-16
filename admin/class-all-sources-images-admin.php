@@ -1182,6 +1182,7 @@ class All_Sources_Images_Admin {
             'image_block'              => array(
                 1 => array(
                     'image_location'  => 'featured',
+                    'api_chosen'      => 'pixabay',
                     'based_on'        => 'title',
                     'translation_EN'  => 'true',
                     'title_selection' => 'full_title',
@@ -1210,8 +1211,8 @@ class All_Sources_Images_Admin {
             // Already chosen bank as selected
             $ar_bank_auto = array($options_banks['api_chosen']);
         } else {
-            // Default banks
-            $ar_bank_auto = array('openverse', 'cc_search');
+            // Default banks - Pixabay as primary
+            $ar_bank_auto = array('pixabay', 'openverse');
         }
         // Default manual banks: stock image sources selected by default (as shown in settings UI)
         // Order: Pixabay, Flickr, Openverse (cc_search), Unsplash, GIPHY, Pexels
@@ -2982,7 +2983,7 @@ class All_Sources_Images_Admin {
                 $ar_bank_auto = array($options_banks['api_chosen_auto']);
                 $default_bank = reset( $ar_bank_auto[0] );
             } else {
-                $default_bank = 'cc_search';
+                $default_bank = 'pixabay';
             }
             // Move old values to the new structure
             $optionstomove['image_block'][1] = array(
@@ -3036,7 +3037,7 @@ class All_Sources_Images_Admin {
                 $ar_bank_auto = array($options_banks['api_chosen_auto']);
                 $default_bank = reset( $ar_bank_auto[0] );
             } else {
-                $default_bank = 'cc_search';
+                $default_bank = 'pixabay';
             }
             // Retrieve current options
             $current_options = get_option( 'ASI_plugin_main_settings', array() );
