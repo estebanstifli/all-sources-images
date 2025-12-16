@@ -1,0 +1,133 @@
+/**
+ * Image Placement Styles
+ * 
+ * Styles for image placement configuration UI
+ *
+ * @package All_Sources_Images
+ */
+
+/* Image Placement specific styles */
+.image-placement-block {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.image-placement-block.template-block {
+    display: none;
+}
+.block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.block-header h4 {
+    margin: 0;
+    color: #333;
+}
+.form-row {
+    margin-bottom: 15px;
+}
+.form-row label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+.form-row .description {
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.inline-content-fields {
+    display: none;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.inline-content-fields.visible {
+    display: block;
+}
+.radio-group label {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    cursor: pointer;
+}
+.radio-group label input[type="radio"] {
+    margin-right: 5px;
+}
+.select-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.select-row select {
+    min-width: 120px;
+}
+.btn-add-block {
+    background: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-add-block:hover {
+    background: #218838;
+}
+.btn-delete-block {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.btn-delete-block:hover {
+    background: #c82333;
+}
+#image-blocks-container {
+    margin-bottom: 20px;
+}
+/* Search Based On conditional fields */
+.based-on-fields {
+    display: none;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.based-on-fields.visible {
+    display: block;
+}
+/* Help text styling */
+.based-on-help-text {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    border-left: 4px solid;
+}
+.based-on-help-text.help-title { background-color: #e8f5e9; border-left-color: #4caf50; }
+.based-on-help-text.help-text_analyser { background-color: #e3f2fd; border-left-color: #2196f3; }
+.based-on-help-text.help-text_analyser_previous_paragraph { background-color: #f3e5f5; border-left-color: #9c27b0; }
+.based-on-help-text.help-text_analyser_next_paragraph { background-color: #fff3e0; border-left-color: #ff9800; }
+.based-on-help-text.help-tags { background-color: #fce4ec; border-left-color: #e91e63; }
+.based-on-help-text.help-categories { background-color: #fff8e1; border-left-color: #ffc107; }
+.based-on-help-text.help-custom_field { background-color: #e0f2f1; border-left-color: #009688; }
+.based-on-help-text.help-custom_request { background-color: #f1f8e9; border-left-color: #8bc34a; }
+.based-on-help-text.help-openai_extractor { background-color: #ede7f6; border-left-color: #673ab7; }
+.based-on-help-text.help-ai_image_prompt { background-color: #e1f5fe; border-left-color: #03a9f4; }
+.based-on-help-text i { margin-right: 8px; }

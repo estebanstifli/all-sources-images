@@ -227,5 +227,27 @@ function asi_enqueue_new_ui_assets( $hook ) {
         $version,
         'all'
     );
+    
+    // Image Placement styles (only on automatic page)
+    if ( $hook === 'all-sources-images_page_asi-new-automatic' ) {
+        wp_enqueue_style(
+            'asi-image-placement',
+            $plugin_url . 'css/asi-image-placement.css',
+            array( 'asi-new-ui-styles' ),
+            $version,
+            'all'
+        );
+    }
+    
+    // Bulk Generation styles (only on bulk generation page)
+    if ( $hook === 'all-sources-images_page_asi-new-bulk-generation' ) {
+        wp_enqueue_style(
+            'asi-bulk-generation',
+            $plugin_url . 'css/asi-bulk-generation.css',
+            array( 'asi-new-ui-styles' ),
+            $version,
+            'all'
+        );
+    }
 }
 add_action( 'admin_enqueue_scripts', 'asi_enqueue_new_ui_assets' );

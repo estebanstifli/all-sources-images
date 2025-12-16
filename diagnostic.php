@@ -414,9 +414,20 @@ function asi_diag_render_and_exit( array $summary, $format, $status_code = 200 )
     exit;
 }
 
+/**
+ * Render diagnostic results as HTML.
+ *
+ * Note: Inline styles are used intentionally here because this function generates
+ * a standalone HTML document (for email reports and CLI output) outside the WordPress
+ * admin context where wp_add_inline_style() would be available.
+ *
+ * @param array $summary Diagnostic summary data.
+ * @return string HTML document.
+ */
 function asi_diag_render_html( array $summary ) {
     $results = $summary['results'] ?? array();
     ob_start();
+    // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Standalone HTML document for email/CLI output.
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -435,6 +446,7 @@ function asi_diag_render_html( array $summary ) {
             .status-skipped { color:#687078; }
             small { color:#555; }
         </style>
+        <?php // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>
     </head>
     <body>
         <h1>All Sources Images · Diagnostics</h1>
