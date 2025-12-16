@@ -4,7 +4,6 @@ thumbs.db
 
 # Logs
 *.log
-admin/partials/monolog/logs/*.log
 
 # IDE
 .idea/

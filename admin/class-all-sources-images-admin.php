@@ -1475,22 +1475,22 @@ class All_Sources_Images_Admin {
      */
     public function ASI_monolog_call() {
         $main_settings = get_option( 'ASI_plugin_logs_settings' );
+        
+        // Ensure the logger class is loaded
+        if ( ! class_exists( 'ASI_Logger' ) ) {
+            require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-asi-logger.php';
+        }
+        
         // Check if logs enabled
-        if ( !empty( $main_settings['logs'] ) && true == $main_settings['logs'] ) {
+        if ( ! empty( $main_settings['logs'] ) && true == $main_settings['logs'] ) {
             $logs_dir = ASI_ensure_logs_dir();
             if ( false === $logs_dir ) {
-                require_once dirname( __FILE__ ) . '/partials/monolog/nologs.php';
-                return new Nolog();
+                return new ASI_Nolog();
             }
-            require_once dirname( __FILE__ ) . '/partials/monolog/vendor/autoload.php';
-            $log = new Monolog\Logger('ASI_logger');
             $logfile = $this->ASI_log_file();
-            // Now add some handlers
-            $log->pushHandler( new Monolog\Handler\StreamHandler($logs_dir . $logfile, Monolog\Logger::DEBUG) );
-            $log->pushHandler( new Monolog\Handler\FirePHPHandler() );
+            $log = new ASI_Logger( 'ASI_logger', $logs_dir . $logfile, true );
         } else {
-            require_once dirname( __FILE__ ) . '/partials/monolog/nologs.php';
-            $log = new Nolog();
+            $log = new ASI_Nolog();
         }
         return $log;
     }

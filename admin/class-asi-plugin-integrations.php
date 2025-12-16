@@ -569,13 +569,13 @@ class ASI_Plugin_Integrations {
     }
 
     /**
-     * Log a message using Monolog if available.
+     * Log a message using ASI Logger if available.
      *
      * @param string $message The message to log.
      * @param array  $context Additional context data.
      */
     private function log( $message, $context = array() ) {
-        // Try to use ASI's Monolog logger
+        // Try to use ASI's logger
         if ( class_exists( 'All_Sources_Images_Admin' ) ) {
             $admin = new All_Sources_Images_Admin( $this->plugin_name, $this->version );
             if ( method_exists( $admin, 'ASI_monolog_call' ) ) {
