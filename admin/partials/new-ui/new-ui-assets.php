@@ -184,7 +184,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
             'bootstrap5',
             $plugin_root_url . 'vendor/bootstrap/js/bootstrap.bundle.min.js',
             array('jquery'),
-            '5.3.3',
+            '5.3.8',
             true
         );
         
@@ -193,7 +193,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
             'bootstrap5-css',
             $plugin_root_url . 'vendor/bootstrap/css/bootstrap.min.css',
             array(),
-            '5.3.3'
+            '5.3.8'
         );
         
         wp_enqueue_script(
