@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * YouTube Data API v3 Configuration
  */

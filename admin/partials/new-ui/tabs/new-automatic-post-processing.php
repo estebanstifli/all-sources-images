@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * New Automatic - Post-Processing Tab
  * 

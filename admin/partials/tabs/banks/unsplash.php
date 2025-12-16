@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Unsplash API Configuration
  */
