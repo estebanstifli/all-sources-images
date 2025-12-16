@@ -1,0 +1,14 @@
+{
+    "name": "all-sources-images/php-ml-wrapper",
+    "description": "PHP-ML library wrapper for All Sources Images plugin text analysis",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=7.3",
+        "php-ai/php-ml": "^0.10.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
