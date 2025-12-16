@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -18,13 +18,13 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 <tr valign="top">
 	<td colspan="2">
 		<div class="update-nag">
-			<?php _e('<b>It\'s required</b> to provide your own <b>api key</b>. You can register in OpenAI API website <a target="_blank" href="https://openai.com/">here</a> and get api key.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( '<b>It\'s required</b> to provide your own <b>api key</b>. You can register in OpenAI API website <a target="_blank" href="https://openai.com/">here</a> and get api key.', 'all-sources-images' ) ); ?>
 		</div>
 		<div class="update-nag red-part">
-			<?php _e('<b>Caution: DALL-E API can take a long time</b> to generate. About 20 seconds to get a 1024x1024 image.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( '<b>Caution: DALL-E API can take a long time</b> to generate. About 20 seconds to get a 1024x1024 image.', 'all-sources-images' ) ); ?>
 		</div>
 		<div class="update-nag">
-			<?php _e('DALL-E API has some <b>restricted words</b> that will not generate any images. Please refer to the <a href="https://labs.openai.com/policies/content-policy">content policy</a> if you want more details.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( 'DALL-E API has some <b>restricted words</b> that will not generate any images. Please refer to the <a href="https://labs.openai.com/policies/content-policy">content policy</a> if you want more details.', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>

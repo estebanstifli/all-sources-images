@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -25,12 +25,12 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 <tr valign="top">
 	<th scope="row">
-		<label for="hseparator"><?php _e( 'Rights', 'all-sources-images' ); ?></label>
+		<label for="hseparator"><?php esc_html_e( 'Rights', 'all-sources-images' ); ?></label>
 	</th>
 	<td class="checkbox-list">
 		<p class="description">
-			<?php _e( 'Choose which licence works for pictures. Licences chosen are cumulative.', 'all-sources-images' ); ?><br/>
-			<?php _e( 'If none of these options are chosen, every licences will be used.', 'all-sources-images' ); ?>
+			<?php esc_html_e( 'Choose which licence works for pictures. Licences chosen are cumulative.', 'all-sources-images' ); ?><br/>
+			<?php esc_html_e( 'If none of these options are chosen, every licences will be used.', 'all-sources-images' ); ?>
 		</p>
 		<?php 
 			$rights_array = array(
@@ -62,7 +62,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 <tr valign="top">
 	<th scope="row">
-		<label for="hseparator"><?php _e( 'Image Type', 'all-sources-images' ); ?></label>
+		<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
 		<select name="ASI_plugin_banks_settings[flickr][imgtype]" class="form-control" >

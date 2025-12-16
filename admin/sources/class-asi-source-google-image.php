@@ -165,7 +165,7 @@ class ASI_Source_Google_Image extends ASI_Image_Source {
             'num'        => 10,
             'hl'         => $country,
             'safe'       => $safe,
-            'userIp'     => isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( $_SERVER['SERVER_ADDR'] ) : '0.0.0.0',
+            'userIp'     => isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) : '0.0.0.0',
             'start'      => 1,
         );
 

@@ -67,10 +67,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         // Ajax calls
-        // AJAX endpoints for image generation (with and without ASI prefix for compatibility)
-        add_action( 'wp_ajax_nopriv_generate_image', array(&$this, 'ASI_ajax_call') );
-        add_action( 'wp_ajax_generate_image', array(&$this, 'ASI_ajax_call') );
-        add_action( 'wp_ajax_nopriv_asi_generate_image', array(&$this, 'ASI_ajax_call') );
+        // AJAX endpoints for image generation (authenticated users only)
         add_action( 'wp_ajax_asi_generate_image', array(&$this, 'ASI_ajax_call') );
         $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( FALSE ) );
         // Enable save_post hook

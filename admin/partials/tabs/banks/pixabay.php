@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -13,7 +13,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 <tr valign="top">
 	<td colspan="2">
 		<div class="update-nag">
-			<?php _e('From now on, <b>it\'s required</b> to provide your own <b>username</b> and <b>api key</b>. You can register in Pixabay website <a target="_blank" href="https://pixabay.com/en/accounts/register/">here</a> and get api username/key <a target="_blank" href="https://pixabay.com/api/docs/">here</a>', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( 'From now on, <b>it\'s required</b> to provide your own <b>username</b> and <b>api key</b>. You can register in Pixabay website <a target="_blank" href="https://pixabay.com/en/accounts/register/">here</a> and get api username/key <a target="_blank" href="https://pixabay.com/api/docs/">here</a>', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>

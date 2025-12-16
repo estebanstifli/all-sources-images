@@ -37,12 +37,14 @@ function ASI_log( $message, $context = '' ) {
 	
 	// Format message
 	if ( is_array( $message ) || is_object( $message ) ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Debug logging function, only runs when ASI_DEBUG is true.
 		$formatted_message = $prefix . ' ' . print_r( $message, true );
 	} else {
 		$formatted_message = $prefix . ' ' . $message;
 	}
 	
 	// Log to WordPress debug.log
+	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging function, only runs when ASI_DEBUG is true.
 	error_log( $formatted_message );
 }
 
@@ -60,6 +62,7 @@ function ASI_log_entry( $function_name, $args = array() ) {
 	
 	$message = "→ Entering: {$function_name}";
 	if ( ! empty( $args ) ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Debug logging function, only runs when ASI_DEBUG is true.
 		$message .= ' | Args: ' . print_r( $args, true );
 	}
 	

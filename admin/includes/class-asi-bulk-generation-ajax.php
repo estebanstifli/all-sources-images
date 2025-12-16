@@ -45,16 +45,56 @@ class ASI_Bulk_Generation_Ajax {
     }
 
     /**
+     * Recursively sanitize the selection array from JSON input
+     *
+     * @param mixed $data The data to sanitize (array or scalar).
+     * @return mixed Sanitized data.
+     */
+    private function sanitize_selection_array( $data ) {
+        if ( ! is_array( $data ) ) {
+            if ( is_string( $data ) ) {
+                return sanitize_text_field( $data );
+            }
+            if ( is_int( $data ) ) {
+                return intval( $data );
+            }
+            if ( is_bool( $data ) ) {
+                return (bool) $data;
+            }
+            return $data;
+        }
+
+        $sanitized = array();
+        foreach ( $data as $key => $value ) {
+            $clean_key = sanitize_key( $key );
+            if ( is_array( $value ) ) {
+                $sanitized[ $clean_key ] = $this->sanitize_selection_array( $value );
+            } elseif ( $clean_key === 'ids' && is_array( $value ) ) {
+                // IDs should be integers
+                $sanitized[ $clean_key ] = array_map( 'absint', $value );
+            } else {
+                $sanitized[ $clean_key ] = $this->sanitize_selection_array( $value );
+            }
+        }
+        return $sanitized;
+    }
+
+    /**
      * Load items for selection tabs
      */
     public function load_items() {
         $this->verify_request();
 
-        $post_type = sanitize_text_field( $_POST['post_type'] ?? 'post' );
-        $tab       = sanitize_text_field( $_POST['tab'] ?? 'recent' );
-        $search    = sanitize_text_field( $_POST['search'] ?? '' );
-        $paged     = absint( $_POST['paged'] ?? 1 );
-        $category  = absint( $_POST['category'] ?? 0 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : 'post';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $tab       = isset( $_POST['tab'] ) ? sanitize_text_field( wp_unslash( $_POST['tab'] ) ) : 'recent';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $search    = isset( $_POST['search'] ) ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $paged     = isset( $_POST['paged'] ) ? absint( $_POST['paged'] ) : 1;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $category  = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
         
         $per_page = 20;
 
@@ -139,10 +179,16 @@ class ASI_Bulk_Generation_Ajax {
     public function create_job() {
         $this->verify_request();
 
-        $job_name        = sanitize_text_field( $_POST['job_name'] ?? '' );
-        $images_per_post = absint( $_POST['images_per_post'] ?? 1 );
-        $selection       = json_decode( stripslashes( $_POST['selection'] ?? '{}' ), true );
-        $start_immediately = absint( $_POST['start_immediately'] ?? 0 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $job_name        = isset( $_POST['job_name'] ) ? sanitize_text_field( wp_unslash( $_POST['job_name'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $images_per_post = isset( $_POST['images_per_post'] ) ? absint( $_POST['images_per_post'] ) : 1;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $selection_raw   = isset( $_POST['selection'] ) ? wp_unslash( $_POST['selection'] ) : '{}';
+        $selection       = json_decode( $selection_raw, true );
+        $selection       = $this->sanitize_selection_array( $selection );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $start_immediately = isset( $_POST['start_immediately'] ) ? absint( $_POST['start_immediately'] ) : 0;
 
         if ( empty( $job_name ) ) {
             $job_name = sprintf( __( 'Bulk Job %s', 'all-sources-images' ), current_time( 'Y-m-d H:i' ) );

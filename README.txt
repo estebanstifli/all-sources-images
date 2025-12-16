@@ -3,8 +3,8 @@ Contributors: estebandezafra
 Donate link: https://github.com/estebanstifli/all-sources-images
 Tags: image, pixabay, openverse, ai, auto
 Requires at least: 5.8
-Tested up to: 6.8
-Stable tag: 1.0.3
+Tested up to: 6.9
+Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -191,12 +191,24 @@ Initial release. Welcome to All Sources Images!
 
 For support, feature requests, or bug reports, please visit our [GitHub repository](https://github.com/developer-starter/all-sources-images) or contact us through WordPress.org support forums.
 
-= Privacy =
+
+
+= External Services =
 
 This plugin connects to third-party APIs to fetch images. Your post titles/keywords are sent to these services to search for relevant images. Please review each service's privacy policy:
 
-* [Pexels Privacy Policy](https://www.pexels.com/privacy-policy/)
-* [Unsplash Privacy Policy](https://unsplash.com/privacy)
-* [Pixabay Privacy Policy](https://pixabay.com/service/privacy/)
-* [OpenAI Privacy Policy](https://openai.com/privacy/)
+
+* **Pexels API** - https://www.pexels.com/api/
+* **Unsplash API** - https://unsplash.com/developers
+* **Pixabay API** - https://pixabay.com/api/docs/
+* **OpenAI API** (DALL·E) - https://platform.openai.com/
+* **Stability AI API** - https://stability.ai/
+* **Google Gemini API** - https://ai.google.dev/
+* **Cloudflare Workers AI** - https://developers.cloudflare.com/workers-ai/
+* **Replicate API** - https://replicate.com/
+* **Flickr API** - https://www.flickr.com/services/api/
+* **GIPHY API** - https://developers.giphy.com/
+* **Openverse API** - https://api.openverse.org/
+* **YouTube Data API** - https://developers.google.com/youtube/v3
+* **Google Custom Search API** - https://developers.google.com/custom-search/
 

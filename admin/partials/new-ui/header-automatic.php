@@ -6,7 +6,8 @@ if ( ! function_exists( 'add_filter' ) ) {
 }
 
 // Determine active tab for styling - Default is now 'placement' since Sources tab is removed
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'placement';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Tab parameter used only for display styling, no data modification.
+$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
 ?>
 <div class="wrap main-mpt">
 	<!--begin::Main-->

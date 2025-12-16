@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -13,13 +13,13 @@ if ( ! function_exists( 'add_filter' ) ) {
 <tr valign="top">
 	<td colspan="2">
 		<div class="update-nag">
-			<?php _e('<b>It\'s required</b> to provide your own <b>API key</b>. You can register for free at <a target="_blank" href="https://www.pexels.com/api/">Pexels API</a> and get instant access to your API key.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( '<b>It\'s required</b> to provide your own <b>API key</b>. You can register for free at <a target="_blank" href="https://www.pexels.com/api/">Pexels API</a> and get instant access to your API key.', 'all-sources-images' ) ); ?>
 		</div>
 		<div class="update-nag">
-			<?php _e('Pexels is free to use with <b>attribution required</b>. Free tier: 200 requests/hour, 20,000 requests/month. Contact Pexels for higher limits at no cost if you provide proper attribution.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( 'Pexels is free to use with <b>attribution required</b>. Free tier: 200 requests/hour, 20,000 requests/month. Contact Pexels for higher limits at no cost if you provide proper attribution.', 'all-sources-images' ) ); ?>
 		</div>
 		<div class="update-nag">
-			<?php _e('<b>Attribution:</b> Photos will automatically include photographer credit. You must display "Photo by [Name] on Pexels" or similar attribution according to <a target="_blank" href="https://www.pexels.com/license/">Pexels License</a>.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( '<b>Attribution:</b> Photos will automatically include photographer credit. You must display "Photo by [Name] on Pexels" or similar attribution according to <a target="_blank" href="https://www.pexels.com/license/">Pexels License</a>.', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>

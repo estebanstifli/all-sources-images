@@ -278,6 +278,6 @@ class ASI_Source_Openverse extends ASI_Image_Source {
         }
         $message .= ' body=' . $body;
 
-        error_log( $message );
+        ASI_log( $message, 'Openverse' );
     }
 }

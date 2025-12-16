@@ -62,7 +62,7 @@ class ASI_Source_Pexels extends ASI_Image_Source {
         $status_code = wp_remote_retrieve_response_code( $response );
 
         if ( ! empty( $body_raw ) ) {
-            error_log( '[All Sources Images][Pexels RAW] ' . mb_substr( $body_raw, 0, 4000 ) );
+            ASI_log( mb_substr( $body_raw, 0, 4000 ), 'Pexels RAW' );
         }
 
         if ( 200 !== intval( $status_code ) ) {

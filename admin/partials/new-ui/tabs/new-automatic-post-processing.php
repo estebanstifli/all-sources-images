@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * New Automatic - Post-Processing Tab
  * 
@@ -218,7 +218,7 @@ if( !isset( $options['translate_alt_lang'] ) ) {
                 </label>
                 <label class="radio">
                     <input value="author_bank" name="ASI_plugin_main_settings[caption_from]" type="radio" <?php echo( !empty( $options['caption_from']) && $options['caption_from'] == 'author_bank' )? 'checked': ''; ?>> <span></span>
-                    <?php _e( 'Image Author + Name of Image Bank (Example: <em>Author Name from Pixabay</em>)', 'all-sources-images' ); ?>
+                    <?php echo wp_kses_post( __( 'Image Author + Name of Image Bank (Example: <em>Author Name from Pixabay</em>)', 'all-sources-images' ) ); ?>
                 </label>
             </td>
         </tr>

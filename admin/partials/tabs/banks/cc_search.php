@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -13,7 +13,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 <tr valign="top">
 	<td colspan="2">
 		<div class="update-nag">
-			<?php _e('<a target="_blank" href="https://oldsearch.creativecommons.org/">CC Search</a> provides Creative Commons images. You can search these images manually from <a target="_blank" href="https://wordpress.org/openverse/">Openverse (WordPress)</a>.', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( '<a target="_blank" href="https://oldsearch.creativecommons.org/">CC Search</a> provides Creative Commons images. You can search these images manually from <a target="_blank" href="https://wordpress.org/openverse/">Openverse (WordPress)</a>.', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>
@@ -53,7 +53,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 		</p>
 		<?php
 			$rights_array = array(
-        		esc_html__( 'Zéro' )                                            => 'CC0',
+        		esc_html__( 'Zéro', 'all-sources-images' )                                            => 'CC0',
 				esc_html__( 'Attribution-NoDerivs', 'all-sources-images' )                     => 'BY-ND',
 				esc_html__( 'Attribution-NonCommercial', 'all-sources-images' )                => 'BY-NC',
 				esc_html__( 'Attribution-NonCommercial-ShareAlike', 'all-sources-images' )     => 'BY-NC-SA',

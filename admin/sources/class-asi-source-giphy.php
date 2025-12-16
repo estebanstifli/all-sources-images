@@ -57,7 +57,7 @@ class ASI_Source_Giphy extends ASI_Image_Source {
 
         if ( ! empty( $body_raw ) ) {
             $preview = function_exists( 'mb_substr' ) ? mb_substr( $body_raw, 0, 4000 ) : substr( $body_raw, 0, 4000 );
-            error_log( '[All Sources Images][Giphy RAW] ' . $preview );
+            ASI_log( $preview, 'Giphy RAW' );
         }
 
         $payload = json_decode( $body_raw, true );

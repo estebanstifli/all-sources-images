@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Unsplash API Configuration
  */
@@ -28,10 +28,10 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('API Access Key Required', 'all-sources-images'); ?>:</strong> 
-            <?php _e('Register your application at', 'all-sources-images'); ?> 
+            <strong><?php esc_html_e('API Access Key Required', 'all-sources-images'); ?>:</strong> 
+            <?php esc_html_e('Register your application at', 'all-sources-images'); ?> 
             <a href="https://unsplash.com/oauth/applications" target="_blank">unsplash.com/oauth/applications</a> 
-            <?php _e('to get your Access Key (instant approval).', 'all-sources-images'); ?>
+            <?php esc_html_e('to get your Access Key (instant approval).', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
@@ -39,8 +39,8 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('Rate Limits', 'all-sources-images'); ?>:</strong> 
-            <?php _e('Demo mode: 50 requests/hour. Production mode (after approval): 5,000 requests/hour. Image requests do not count against rate limits.', 'all-sources-images'); ?>
+            <strong><?php esc_html_e('Rate Limits', 'all-sources-images'); ?>:</strong> 
+            <?php esc_html_e('Demo mode: 50 requests/hour. Production mode (after approval): 5,000 requests/hour. Image requests do not count against rate limits.', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
@@ -48,8 +48,8 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('Attribution Required', 'all-sources-images'); ?>:</strong> 
-            <?php _e('Unsplash license requires crediting photographers. Use format: "Photo by [Photographer Name] on Unsplash" with links to photographer profile and Unsplash.', 'all-sources-images'); ?>
+            <strong><?php esc_html_e('Attribution Required', 'all-sources-images'); ?>:</strong> 
+            <?php esc_html_e('Unsplash license requires crediting photographers. Use format: "Photo by [Photographer Name] on Unsplash" with links to photographer profile and Unsplash.', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
@@ -57,14 +57,14 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td colspan="2">
         <div class="update-nag">
-            <strong><?php _e('Download Tracking', 'all-sources-images'); ?>:</strong> 
-            <?php _e('Per Unsplash API Guidelines, you MUST trigger the download endpoint when using an image. This helps track photo usage and compensate photographers.', 'all-sources-images'); ?>
+            <strong><?php esc_html_e('Download Tracking', 'all-sources-images'); ?>:</strong> 
+            <?php esc_html_e('Per Unsplash API Guidelines, you MUST trigger the download endpoint when using an image. This helps track photo usage and compensate photographers.', 'all-sources-images'); ?>
         </div>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Access Key', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Access Key', 'all-sources-images'); ?></td>
     <td id="password-unsplash" class="password">
         <input type="password" class="form-control" name="ASI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr($apikey); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
@@ -75,7 +75,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td></td>
     <td>
         <button class="btn btn-primary" id="btnUnsplash" onclick="return false;">
-            <?php _e('Test Unsplash Connection', 'all-sources-images'); ?>
+            <?php esc_html_e('Test Unsplash Connection', 'all-sources-images'); ?>
         </button>
         <span id="resultUnsplash">
             <img src="<?php echo plugin_dir_url(__FILE__); ?>../../../img/loader-mpt.gif" width="32" class="hidden" />
@@ -84,7 +84,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 </tr>
 
 <tr>
-    <td><?php _e('Orientation Filter', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Orientation Filter', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[unsplash][orientation]">
             <?php
@@ -100,12 +100,12 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             }
             ?>
         </select>
-        <p class="description"><?php _e('Filter search results by photo orientation.', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('Filter search results by photo orientation.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Content Safety Filter', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Content Safety Filter', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[unsplash][content_filter]">
             <?php
@@ -119,12 +119,12 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             }
             ?>
         </select>
-        <p class="description"><?php _e('Removes content violating submission guidelines. High setting further filters potentially unsuitable content.', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('Removes content violating submission guidelines. High setting further filters potentially unsuitable content.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Color Filter', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Color Filter', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[unsplash][color]">
             <?php
@@ -148,12 +148,12 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             }
             ?>
         </select>
-        <p class="description"><?php _e('Filter results by dominant color in the photo.', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('Filter results by dominant color in the photo.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Results Per Search', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Results Per Search', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[unsplash][per_page]">
             <?php
@@ -169,12 +169,12 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             }
             ?>
         </select>
-        <p class="description"><?php _e('Number of results to retrieve per search query (max 30 per Unsplash API).', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('Number of results to retrieve per search query (max 30 per Unsplash API).', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Preferred Image Size', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Preferred Image Size', 'all-sources-images'); ?></td>
     <td>
         <select name="ASI_plugin_banks_settings[unsplash][preferred_size]">
             <?php
@@ -191,30 +191,30 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             }
             ?>
         </select>
-        <p class="description"><?php _e('Which image size variant to download from Unsplash. All URLs support dynamic resizing.', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('Which image size variant to download from Unsplash. All URLs support dynamic resizing.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Auto-add Attribution', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Auto-add Attribution', 'all-sources-images'); ?></td>
     <td>
         <label class="checkbox">
             <input type="checkbox" name="ASI_plugin_banks_settings[unsplash][add_attribution]" value="yes" <?php checked($add_attribution, 'yes'); ?> />
             <span></span>
-            <?php _e('Automatically add photographer credit to image caption', 'all-sources-images'); ?>
+            <?php esc_html_e('Automatically add photographer credit to image caption', 'all-sources-images'); ?>
         </label>
-        <p class="description"><?php _e('Format: "Photo by [Photographer Name] on Unsplash" - Required by Unsplash License.', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('Format: "Photo by [Photographer Name] on Unsplash" - Required by Unsplash License.', 'all-sources-images'); ?></p>
     </td>
 </tr>
 
 <tr>
-    <td><?php _e('Track Downloads', 'all-sources-images'); ?></td>
+    <td><?php esc_html_e('Track Downloads', 'all-sources-images'); ?></td>
     <td>
         <label class="checkbox">
             <input type="checkbox" name="ASI_plugin_banks_settings[unsplash][track_downloads]" value="yes" <?php checked($track_downloads, 'yes'); ?> />
             <span></span>
-            <?php _e('Trigger download tracking endpoint (REQUIRED by Unsplash TOS)', 'all-sources-images'); ?>
+            <?php esc_html_e('Trigger download tracking endpoint (REQUIRED by Unsplash TOS)', 'all-sources-images'); ?>
         </label>
-        <p class="description"><?php _e('When enabled, calls the download endpoint to increment photographer stats. Required per API guidelines.', 'all-sources-images'); ?></p>
+        <p class="description"><?php esc_html_e('When enabled, calls the download endpoint to increment photographer stats. Required per API guidelines.', 'all-sources-images'); ?></p>
     </td>
 </tr>

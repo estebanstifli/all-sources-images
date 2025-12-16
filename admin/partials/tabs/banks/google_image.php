@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if ( ! function_exists( 'add_filter' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
@@ -13,7 +13,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 <tr valign="top">
 	<td colspan="2">
 		<div class="update-nag">
-			<?php _e('From now on, <b>it\'s required</b> to provide your own Google <i>Search engine ID</i> and <b>API Key</b>. You must follow the process <a target="_blank" href="https://developers.google.com/custom-search/json-api/v1/overview#prerequisites">here</a>. You must get both valid <strong>Search engine ID</strong> and <strong>API Key</strong>', 'all-sources-images' ); ?>
+			<?php echo wp_kses_post( __( 'From now on, <b>it\'s required</b> to provide your own Google <i>Search engine ID</i> and <b>API Key</b>. You must follow the process <a target="_blank" href="https://developers.google.com/custom-search/json-api/v1/overview#prerequisites">here</a>. You must get both valid <strong>Search engine ID</strong> and <strong>API Key</strong>', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>

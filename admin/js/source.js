@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=test_apis&apibank=pixabay&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=asi_test_apis&apibank=pixabay&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=test_apis&apibank=dalle&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInputDalle.value
+            body: "action=asi_test_apis&apibank=dalle&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInputDalle.value
         })
         .then(response => response.json())
         .then(data => {
@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=test_apis&apibank=youtube&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=asi_test_apis&apibank=youtube&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=test_apis&apibank=unsplash&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=asi_test_apis&apibank=unsplash&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=test_apis&apibank=pexels&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=asi_test_apis&apibank=pexels&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -478,7 +478,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=test_apis&apibank=envato&nonce=" + apisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
+            body: "action=asi_test_apis&apibank=envato&nonce=" + apisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
         })
         .then(response => response.json())
         .then(data => {

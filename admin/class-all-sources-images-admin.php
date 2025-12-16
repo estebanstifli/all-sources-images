@@ -115,10 +115,7 @@ class All_Sources_Images_Admin {
         add_action( 'ASI_generate_scheduled_image', array(&$this, 'ASI_generate_scheduled_image') );
         
         // Testing APIs function with Ajax call
-        add_action( 'wp_ajax_test_apis', array(&$this, 'ASI_test_apis') );
-        add_action( 'wp_ajax_nopriv_test_apis', array(&$this, 'ASI_test_apis') );
         add_action( 'wp_ajax_asi_test_apis', array(&$this, 'ASI_test_apis') );
-        add_action( 'wp_ajax_nopriv_asi_test_apis', array(&$this, 'ASI_test_apis') );
         /* Gutenberg Block */
         // Scripts for Block & Translations
         add_action( 'init', array(&$this, 'ASI_register_mpt_block') );
@@ -135,13 +132,10 @@ class All_Sources_Images_Admin {
         add_action( 'wp_enqueue_scripts', array( $this, 'ASI_enqueue_front_media_modal_assets' ) );
         // Gutenberg Block : Translate search term (called once before searching multiple banks)
         add_action( 'wp_ajax_asi_translate_search', array(&$this, 'ASI_translate_search_ajax') );
-        add_action( 'wp_ajax_nopriv_asi_translate_search', array(&$this, 'ASI_translate_search_ajax') );
         // Gutenberg Block : Searching images with APIs
         add_action( 'wp_ajax_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
-        add_action( 'wp_ajax_nopriv_asi_block_searching_images', array(&$this, 'ASI_block_searching_images') );
         // Gutenberg Block : Download images from APIs
         add_action( 'wp_ajax_asi_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
-        add_action( 'wp_ajax_nopriv_asi_block_downloading_image', array(&$this, 'ASI_block_downloading_image') );
         // Extend timeout request for wp_remote_request() with dalle
         $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
         if ( isset( $options_banks['api_chosen_auto'] ) && true === in_array( 'dallev1', $options_banks['api_chosen_auto'] ) ) {
@@ -786,7 +780,8 @@ class All_Sources_Images_Admin {
                 $_GET['ids'] = substr_replace( $ids, '', -1 );
                 $_GET['ids_mpt_generation'] = $_GET['ids'];
             }
-            $ids = esc_attr( $_GET['ids_mpt_generation'] );
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified earlier in the function.
+            $ids = isset( $_GET['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_GET['ids_mpt_generation'] ) ) : '';
             $ids = array_map( 'intval', explode( ',', trim( $ids, ',' ) ) );
             $count = count( $ids );
             $ids = json_encode( $ids );
@@ -1003,21 +998,33 @@ class All_Sources_Images_Admin {
             wp_die( esc_html__( 'You do not have sufficient permissions.', 'all-sources-images' ) );
         }
         //register_setting('ASI-plugin-posts-settings', 'ASI_plugin_posts_settings');
-        register_setting( 'ASI-plugin-block-settings', 'ASI_plugin_block_settings' );
+        register_setting( 'ASI-plugin-block-settings', 'ASI_plugin_block_settings', array(
+            'sanitize_callback' => array( $this, 'ASI_sanitize_block_settings' ),
+        ) );
         register_setting( 'ASI-plugin-main-settings', 'ASI_plugin_main_settings', array(
             'sanitize_callback' => array($this, 'ASI_sanitize_main_settings'),
         ) );
         register_setting( 'ASI-plugin-banks-settings', 'ASI_plugin_banks_settings', array(
             'sanitize_callback' => array($this, 'ASI_sanitize_banks_settings'),
         ) );
-        register_setting( 'ASI-plugin-interval-settings', 'ASI_plugin_interval_settings' );
+        register_setting( 'ASI-plugin-interval-settings', 'ASI_plugin_interval_settings', array(
+            'sanitize_callback' => array( $this, 'ASI_sanitize_interval_settings' ),
+        ) );
         register_setting( 'ASI-plugin-cron-settings', 'ASI_plugin_cron_settings', array(
             'sanitize_callback' => array($this, 'ASI_sanitize_cron_settings'),
         ) );
-        register_setting( 'ASI-plugin-rights-settings', 'ASI_plugin_rights_settings' );
-        register_setting( 'ASI-plugin-proxy-settings', 'ASI_plugin_proxy_settings' );
-        register_setting( 'ASI-plugin-compatibility-settings', 'ASI_plugin_compatibility_settings' );
-        register_setting( 'ASI-plugin-logs-settings', 'ASI_plugin_logs_settings' );
+        register_setting( 'ASI-plugin-rights-settings', 'ASI_plugin_rights_settings', array(
+            'sanitize_callback' => array( $this, 'ASI_sanitize_rights_settings' ),
+        ) );
+        register_setting( 'ASI-plugin-proxy-settings', 'ASI_plugin_proxy_settings', array(
+            'sanitize_callback' => array( $this, 'ASI_sanitize_proxy_settings' ),
+        ) );
+        register_setting( 'ASI-plugin-compatibility-settings', 'ASI_plugin_compatibility_settings', array(
+            'sanitize_callback' => array( $this, 'ASI_sanitize_compatibility_settings' ),
+        ) );
+        register_setting( 'ASI-plugin-logs-settings', 'ASI_plugin_logs_settings', array(
+            'sanitize_callback' => array( $this, 'ASI_sanitize_logs_settings' ),
+        ) );
         require_once dirname( __FILE__ ) . '/partials/download_log.php';
         require_once dirname( __FILE__ ) . '/partials/delete_log.php';
         add_filter(
@@ -1069,8 +1076,8 @@ class All_Sources_Images_Admin {
      */
     public function ASI_current_url() {
         $requested_url = ( is_ssl() ? 'https://' : 'http://' );
-        $requested_url .= $_SERVER['HTTP_HOST'];
-        $requested_url .= $_SERVER['REQUEST_URI'];
+        $requested_url .= isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+        $requested_url .= isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
         return $requested_url;
     }
 
@@ -1642,6 +1649,11 @@ class All_Sources_Images_Admin {
      */
     public function ASI_test_apis() {
         check_ajax_referer( 'api_testing_nonce', 'nonce' );
+        
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
+        }
+        
         $apiKey = sanitize_text_field( $_POST['apikey'] );
         $cxId = isset( $_POST['cxid'] ) ? sanitize_text_field( $_POST['cxid'] ) : '';
         $apiBank = sanitize_text_field( $_POST['apibank'] );
@@ -2115,11 +2127,17 @@ class All_Sources_Images_Admin {
      */
     public function ASI_block_searching_images() {
         if ( defined( 'ASI_DEBUG' ) && ASI_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging only when ASI_DEBUG is true.
             error_log( '[All Sources Images] ASI_block_searching_images CALLED' );
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Debug logging only when ASI_DEBUG is true.
             error_log( '[All Sources Images] GET params: ' . print_r( wp_unslash( $_GET ), true ) );
         }
 
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
+        
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
+        }
         
         if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
             wp_send_json_error( 'Missing required parameters' );
@@ -2634,6 +2652,10 @@ class All_Sources_Images_Admin {
     public function ASI_translate_search_ajax() {
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
         
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
+        }
+        
         if ( ! isset( $_GET['search'] ) ) {
             wp_send_json_error( 'Missing search parameter' );
             return;
@@ -2686,6 +2708,11 @@ class All_Sources_Images_Admin {
     public function ASI_block_downloading_image() {
         // Check the nonce
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
+        
+        if ( ! current_user_can( 'upload_files' ) ) {
+            wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
+        }
+        
         $raw_url_image = isset( $_POST['url_image'] ) ? wp_unslash( $_POST['url_image'] ) : '';
         if ( 0 === strpos( $raw_url_image, 'data:image' ) ) {
             $url_image = $raw_url_image;
@@ -3194,7 +3221,8 @@ class All_Sources_Images_Admin {
             add_filter( 'cron_schedules', function( $schedules ) use ( $recurrence_key, $seconds, $interval_value, $interval_unit ) {
                 $schedules[$recurrence_key] = array(
                     'interval' => $seconds,
-                    'display'  => sprintf( __( 'Every %d %s', 'all-sources-images' ), $interval_value, $interval_unit ),
+                    /* translators: 1: interval number, 2: interval unit (minutes, hours, days) */
+                    'display'  => sprintf( __( 'Every %1$d %2$s', 'all-sources-images' ), $interval_value, $interval_unit ),
                 );
                 return $schedules;
             } );
@@ -3206,6 +3234,157 @@ class All_Sources_Images_Admin {
         }
         
         return $input;
+    }
+
+    /**
+     * Sanitize block settings
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_block_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            if ( is_array( $value ) ) {
+                $sanitized[ sanitize_key( $key ) ] = array_map( 'sanitize_text_field', $value );
+            } else {
+                $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
+            }
+        }
+        
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize interval settings
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_interval_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            $sanitized[ sanitize_key( $key ) ] = is_numeric( $value ) ? absint( $value ) : sanitize_text_field( $value );
+        }
+        
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize rights/permissions settings
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_rights_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            if ( is_array( $value ) ) {
+                // For role arrays, sanitize each role name
+                $sanitized[ sanitize_key( $key ) ] = array_map( 'sanitize_key', $value );
+            } else {
+                $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
+            }
+        }
+        
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize proxy settings
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_proxy_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            switch ( $key ) {
+                case 'proxy_url':
+                    $sanitized[ $key ] = esc_url_raw( $value );
+                    break;
+                case 'proxy_port':
+                    $sanitized[ $key ] = absint( $value );
+                    break;
+                default:
+                    $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
+                    break;
+            }
+        }
+        
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize compatibility settings
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_compatibility_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            // Most compatibility settings are enable/disable checkboxes
+            $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
+        }
+        
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize logs settings
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input from settings form
+     * @return   array             Sanitized settings
+     */
+    public function ASI_sanitize_logs_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            switch ( $key ) {
+                case 'log_level':
+                    $allowed_levels = array( 'debug', 'info', 'warning', 'error', 'none' );
+                    $sanitized[ $key ] = in_array( $value, $allowed_levels, true ) ? $value : 'info';
+                    break;
+                case 'log_retention_days':
+                    $sanitized[ $key ] = absint( $value );
+                    break;
+                default:
+                    $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
+                    break;
+            }
+        }
+        
+        return $sanitized;
     }
 
 }
