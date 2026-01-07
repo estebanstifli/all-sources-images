@@ -100,9 +100,7 @@ if ( ! function_exists( 'ASI_get_logs_dir' ) ) {
 	 */
 	function ASI_get_logs_dir() {
 		$upload_dir = wp_upload_dir();
-		$base_dir   = isset( $upload_dir['basedir'] ) && ! empty( $upload_dir['basedir'] )
-			? $upload_dir['basedir']
-			: WP_CONTENT_DIR . '/uploads';
+		$base_dir   = $upload_dir['basedir'];
 		return trailingslashit( wp_normalize_path( $base_dir ) ) . 'all-sources-images/logs/';
 	}
 }
