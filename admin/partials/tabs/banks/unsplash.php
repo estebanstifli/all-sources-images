@@ -21,7 +21,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 
 <tr>
     <td colspan="2" class="source-logo">
-        <img src="<?php echo plugin_dir_url(__FILE__) . 'img/unsplash.png'; ?>" alt="Unsplash" />
+        <img src="<?php echo esc_url( plugin_dir_url(__FILE__) . 'img/unsplash.png' ); ?>" alt="Unsplash" />
     </td>
 </tr>
 
@@ -78,7 +78,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             <?php esc_html_e('Test Unsplash Connection', 'all-sources-images'); ?>
         </button>
         <span id="resultUnsplash">
-            <img src="<?php echo plugin_dir_url(__FILE__); ?>../../../img/loader-mpt.gif" width="32" class="hidden" />
+            <img src="<?php echo esc_url( plugin_dir_url(__FILE__) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden" />
         </span>
     </td>
 </tr>

@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <tr valign="top">
-	<td colspan="2" class="source-logo"><img alt="Flickr Logo" src="<?php echo plugin_dir_url( __FILE__ ); ?>/img/flickr.png"></td>
+	<td colspan="2" class="source-logo"><img alt="Flickr Logo" src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . 'img/flickr.png' ); ?>"></td>
 </tr>
 
 <tr valign="top">

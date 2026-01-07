@@ -54,7 +54,7 @@ $negative_prompt = isset( $workers_options['negative_prompt'] ) ? $workers_optio
         <button class="btn btn-primary" id="btnWorkersAI" onclick="return false;">
             <?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
         </button>
-        <span id="resultWorkersAI"><img src="<?php echo plugin_dir_url( __FILE__ ); ?>../../../img/loader-mpt.gif" width="32" class="hidden"/></span>
+        <span id="resultWorkersAI"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>
     </td>
 </tr>
 

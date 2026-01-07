@@ -10,7 +10,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 ?>
 
 <tr valign="top">
-	<td colspan="2" class="source-logo"><img alt="Dall-e Logo" src="<?php echo plugin_dir_url( __FILE__ ); ?>/img/dalle.png"></td>
+	<td colspan="2" class="source-logo"><img alt="Dall-e Logo" src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . 'img/dalle.png' ); ?>"></td>
 </tr>
 
 <tr valign="top">
@@ -41,7 +41,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 		<button class="btn btn-primary" id="btnDalle" onclick="return false;">
 			<?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
 		</button>
-		<span id="resultDalle"><img src="<?php echo plugin_dir_url( __FILE__ ); ?>../../../img/loader-mpt.gif" width="32" class="hidden"/></span>
+		<span id="resultDalle"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>
 	</td>
 </tr>
 

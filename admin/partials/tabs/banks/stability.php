@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <tr valign="top">
-	<td colspan="2" class="source-logo"><img alt="Stable Diffusion Logo" src="<?php echo plugin_dir_url( __FILE__ ); ?>/img/stability.png"></td>
+	<td colspan="2" class="source-logo"><img alt="Stable Diffusion Logo" src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . 'img/stability.png' ); ?>"></td>
 </tr>
 
 <tr valign="top">
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<button class="btn btn-primary" id="btnStability" onclick="return false;">
 			<?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
 		</button>
-		<span id="resultStability"><img src="<?php echo plugin_dir_url( __FILE__ ); ?>../../../img/loader-mpt.gif" width="32" class="hidden"/></span>
+		<span id="resultStability"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>
 	</td>
 </tr>
 

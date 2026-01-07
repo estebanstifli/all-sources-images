@@ -20,7 +20,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 
 <tr>
     <td colspan="2" class="source-logo">
-        <img src="<?php echo plugin_dir_url(__FILE__) . 'img/youtube.png'; ?>" alt="YouTube" />
+        <img src="<?php echo esc_url( plugin_dir_url(__FILE__) . 'img/youtube.png' ); ?>" alt="YouTube" />
     </td>
 </tr>
 
@@ -68,7 +68,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             <?php esc_html_e('Test YouTube Connection', 'all-sources-images'); ?>
         </button>
         <span id="resultYoutube">
-            <img src="<?php echo plugin_dir_url(__FILE__); ?>../../../img/loader-mpt.gif" width="32" class="hidden" />
+            <img src="<?php echo esc_url( plugin_dir_url(__FILE__) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden" />
         </span>
     </td>
 </tr>

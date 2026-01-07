@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <tr valign="top">
-	<td colspan="2" class="source-logo"><img alt="Google Images Logo" src="<?php echo plugin_dir_url( __FILE__ ); ?>/img/google_images.png"></td>
+	<td colspan="2" class="source-logo"><img alt="Google Images Logo" src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . 'img/google_images.png' ); ?>"></td>
 </tr>
 
 <tr valign="top">
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Custom Search Engine ID', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="text" name="ASI_plugin_banks_settings[googleimage][cxid]" class="form-control" value="<?php echo( isset( $options['googleimage']['cxid'] ) && !empty( $options['googleimage']['cxid'] ) )? trim( $options['googleimage']['cxid'] ): ''; ?>" >
+		<input type="text" name="ASI_plugin_banks_settings[googleimage][cxid]" class="form-control" value="<?php echo( isset( $options['googleimage']['cxid'] ) && !empty( $options['googleimage']['cxid'] ) )? esc_attr( trim( $options['googleimage']['cxid'] ) ): ''; ?>" >
 	</td>
 </tr>
 <tr valign="top">
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Google API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-googleAPI" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[googleimage][apikey]" class="form-control" value="<?php echo( isset( $options['googleimage']['apikey'] ) && !empty( $options['googleimage']['apikey']) )? trim( $options['googleimage']['apikey'] ): ''; ?>" >
+		<input type="password" name="ASI_plugin_banks_settings[googleimage][apikey]" class="form-control" value="<?php echo( isset( $options['googleimage']['apikey'] ) && !empty( $options['googleimage']['apikey']) )? esc_attr( trim( $options['googleimage']['apikey'] ) ): ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<button class="btn btn-primary" id="btnGoogleImage" onclick="return false;">
 			<?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
 		</button>
-		<span id="resultGoogleImage"><img src="<?php echo plugin_dir_url( __FILE__ ); ?>../../../img/loader-mpt.gif" width="32" class="hidden"/></span>
+		<span id="resultGoogleImage"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>
 	</td>
 </tr>
 
