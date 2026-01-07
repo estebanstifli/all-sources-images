@@ -175,6 +175,17 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ASI_ajax_call() {
+        // Security check: Verify nonce first before processing any input
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'ajax_nonce_All_Sources_Images' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Security check failed.', 'all-sources-images' ) ) );
+        }
+        
+        // Security check: Verify user capability
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'all-sources-images' ) ) );
+        }
+        
         // Check if button "Generate Automatically" is clicked
         $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? filter_var( wp_unslash( $_POST['buttonAutoGenerate'] ), FILTER_VALIDATE_BOOLEAN ) : false );
         
@@ -182,20 +193,9 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $ids_json = isset( $_POST['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_POST['ids_mpt_generation'] ) ) : '[]';
         $post_ids = array_map( 'absint', json_decode( $ids_json ) );
         
-        // Security check values
-        $can_manage = current_user_can( 'asi_manage' );  // Fixed: lowercase asi_manage
-        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-        $nonce_valid = wp_verify_nonce( $nonce, 'ajax_nonce_All_Sources_Images' );
-        
-        // Security checks: Verify user capability and nonce for security.
-        if ( !$can_manage || false === $nonce_valid ) {
-            wp_send_json_error();
-            // Send an error response if checks fail.
-        }
-        
         // Validate the presence of post IDs.
-        if ( !isset( $_POST['ids_mpt_generation'] ) ) {
-            return false;
+        if ( ! isset( $_POST['ids_mpt_generation'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'No posts selected.', 'all-sources-images' ) ) );
         }
         // Exit if no post IDs are provided.
         // Count the number of posts for bulk processing.

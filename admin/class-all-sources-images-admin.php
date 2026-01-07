@@ -2127,17 +2127,16 @@ class All_Sources_Images_Admin {
      * @since    5.0.0
      */
     public function ASI_block_searching_images() {
-        if ( defined( 'ASI_DEBUG' ) && ASI_DEBUG ) {
-            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging only when ASI_DEBUG is true.
-            error_log( '[All Sources Images] ASI_block_searching_images CALLED' );
-            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Debug logging only when ASI_DEBUG is true.
-            error_log( '[All Sources Images] GET params: ' . print_r( wp_unslash( $_GET ), true ) );
-        }
-
+        // Security check first
         check_ajax_referer( 'ASI_gutenberg_block', 'nonce' );
         
         if ( ! current_user_can( 'edit_posts' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
+        }
+        
+        if ( defined( 'ASI_DEBUG' ) && ASI_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging only when ASI_DEBUG is true.
+            error_log( '[All Sources Images] ASI_block_searching_images CALLED' );
         }
         
         if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
