@@ -14,15 +14,6 @@ if ( 'deletelog' === $action ) {
     return false;
 }
 
-// Disable max execution time (required for large file operations)
-// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
-set_time_limit(0);
-
-// Start the session
-session_start();
-
-
-
 // Check the file
 $dir    = ASI_ensure_logs_dir();
 if ( false === $dir ) {
@@ -55,17 +46,6 @@ if ( !is_file($filename) || !is_readable( $filename ) ) {
     exit;
 }
 $size = filesize($filename);
-
-
-
-// No GZip compression
-if (ini_get("zlib.output_compression")) {
-    // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
-    ini_set("zlib.output_compression", "Off");
-}
-
-// Close the session
-session_write_close();
 
 // Delete log file
 wp_delete_file( $filename );
