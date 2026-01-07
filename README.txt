@@ -193,22 +193,139 @@ For support, feature requests, or bug reports, please visit our [GitHub reposito
 
 
 
+= Third Party Libraries =
+
+This plugin includes the following third-party JavaScript libraries:
+
+**MiniMasonry.js**
+A lightweight dependency-free masonry layout library used for the image grid display in the Gutenberg block.
+* Source code: https://github.com/Spope/MiniMasonry.js
+* NPM package: https://www.npmjs.com/package/minimasonry
+* License: MIT
+* Version: 1.3.2
+
+**PHP-ML**
+A machine learning library for PHP used for keyword extraction from post content.
+* Source code: https://github.com/php-ai/php-ml
+* License: MIT
+* Version: 0.10.0
+
 = External Services =
 
-This plugin connects to third-party APIs to fetch images. Your post titles/keywords are sent to these services to search for relevant images. Please review each service's privacy policy:
+This plugin connects to external third-party APIs to fetch and generate images. When you use any of these services, your post titles, keywords, or prompts are sent to these services to search for or generate relevant images.
 
+**Only the services you configure with API keys will be used. No data is sent to services you haven't enabled.**
 
-* **Pexels API** - https://www.pexels.com/api/
-* **Unsplash API** - https://unsplash.com/developers
-* **Pixabay API** - https://pixabay.com/api/docs/
-* **OpenAI API** (DALL·E) - https://platform.openai.com/
-* **Stability AI API** - https://stability.ai/
-* **Google Gemini API** - https://ai.google.dev/
-* **Cloudflare Workers AI** - https://developers.cloudflare.com/workers-ai/
-* **Replicate API** - https://replicate.com/
-* **Flickr API** - https://www.flickr.com/services/api/
-* **GIPHY API** - https://developers.giphy.com/
-* **Openverse API** - https://api.openverse.org/
-* **YouTube Data API** - https://developers.google.com/youtube/v3
-* **Google Custom Search API** - https://developers.google.com/custom-search/
+== Plugin Developer Services ==
+
+**All Sources Images Proxy (Optional)**
+This plugin offers an optional proxy service hosted on Cloudflare Workers, provided by the plugin developer. This proxy allows users to access some image bank APIs without needing to obtain their own API keys.
+
+When using the proxy option:
+* Your search keywords are sent through our Cloudflare Worker proxy to the image bank APIs
+* The proxy uses shared API keys to make requests on your behalf
+* No personal data is stored by the proxy; it only forwards requests and returns results
+* You can choose to use your own API keys instead for direct connections
+
+This is an optional convenience feature. Users who prefer direct connections can configure their own API keys in the plugin settings.
+* Service Provider: Plugin Developer (estebandezafra)
+* Hosted on: Cloudflare Workers
+* Cloudflare Terms of Service: https://www.cloudflare.com/terms/
+* Cloudflare Privacy Policy: https://www.cloudflare.com/privacypolicy/
+
+== Stock Photo Services ==
+
+**Pexels API**
+Free stock photo service. Sends search keywords to retrieve images.
+* Service: https://www.pexels.com/
+* Terms of Service: https://www.pexels.com/terms-of-service/
+* Privacy Policy: https://www.pexels.com/privacy-policy/
+
+**Unsplash API**
+Free high-resolution photos. Sends search keywords to retrieve images.
+* Service: https://unsplash.com/
+* Terms of Service: https://unsplash.com/terms
+* Privacy Policy: https://unsplash.com/privacy
+
+**Pixabay API**
+Free images and royalty-free stock. Sends search keywords to retrieve images.
+* Service: https://pixabay.com/
+* Terms of Service: https://pixabay.com/service/terms/
+* Privacy Policy: https://pixabay.com/service/privacy/
+
+**Flickr API**
+Photo sharing platform. Sends search keywords to retrieve Creative Commons images.
+* Service: https://www.flickr.com/
+* Terms of Service: https://www.flickr.com/help/terms
+* Privacy Policy: https://www.flickr.com/help/privacy
+
+**Openverse API**
+Open-licensed media search engine by WordPress. Sends search keywords to retrieve images.
+* Service: https://openverse.org/
+* Terms of Service: https://docs.openverse.org/terms_of_service.html
+* Privacy Policy: https://automattic.com/privacy/
+
+**GIPHY API**
+Animated GIF search engine. Sends search keywords to retrieve GIFs.
+* Service: https://giphy.com/
+* Terms of Service: https://support.giphy.com/hc/en-us/articles/360020027752-GIPHY-Terms-of-Service
+* Privacy Policy: https://support.giphy.com/hc/en-us/articles/360032872931-GIPHY-Privacy-Policy
+
+== AI Image Generation Services ==
+
+**OpenAI API (DALL·E)**
+AI image generation service. Sends text prompts to generate unique images.
+* Service: https://openai.com/
+* Terms of Use: https://openai.com/policies/terms-of-use
+* Privacy Policy: https://openai.com/policies/privacy-policy
+
+**Stability AI API (Stable Diffusion)**
+AI image generation service. Sends text prompts to generate images.
+* Service: https://stability.ai/
+* Terms of Service: https://stability.ai/terms-of-service
+* Privacy Policy: https://stability.ai/privacy-policy
+
+**Google Gemini API**
+Google's multimodal AI for image generation. Sends text prompts to generate images.
+* Service: https://ai.google.dev/
+* Terms of Service: https://ai.google.dev/gemini-api/terms
+* Privacy Policy: https://policies.google.com/privacy
+
+**Cloudflare Workers AI**
+Cloudflare's AI inference platform. Sends text prompts to generate images.
+* Service: https://developers.cloudflare.com/workers-ai/
+* Terms of Service: https://www.cloudflare.com/terms/
+* Privacy Policy: https://www.cloudflare.com/privacypolicy/
+
+**Replicate API**
+Platform for running machine learning models. Sends text prompts to generate images.
+* Service: https://replicate.com/
+* Terms of Service: https://replicate.com/terms
+* Privacy Policy: https://replicate.com/privacy
+
+== Other Services ==
+
+**YouTube Data API**
+Retrieves video thumbnails from YouTube. Sends video URLs or search terms.
+* Service: https://www.youtube.com/
+* Terms of Service: https://www.youtube.com/t/terms
+* Privacy Policy: https://policies.google.com/privacy
+
+**Google Custom Search API**
+Web image search via Google. Sends search keywords to retrieve images.
+* Service: https://programmablesearchengine.google.com/
+* Terms of Service: https://developers.google.com/custom-search/terms
+* Privacy Policy: https://policies.google.com/privacy
+
+**Google Cloud Translation API**
+Optional translation service for search keywords. Sends text to translate.
+* Service: https://cloud.google.com/translate
+* Terms of Service: https://cloud.google.com/terms
+* Privacy Policy: https://policies.google.com/privacy
+
+**Envato Elements API**
+Premium stock assets (requires Envato Elements subscription). Sends search keywords.
+* Service: https://elements.envato.com/
+* Terms of Service: https://elements.envato.com/user-terms
+* Privacy Policy: https://www.envato.com/privacy/
 
