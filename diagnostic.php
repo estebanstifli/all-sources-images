@@ -13,10 +13,10 @@
  *  - email           : Comma/semicolon separated recipient list (fallback: admin_email).
  *  - notify          : always | errors | never (default: errors -> notify only on failures).
  *  - format          : html | text | json (default html for web, text for CLI).
- *  - token           : Optional shared secret. If ASI_DIAGNOSTIC_TOKEN constant or asi_diagnostic_token option is set, requests must provide it.
+ *  - token           : Optional shared secret. If ALLSI_DIAGNOSTIC_TOKEN constant or ALLSI_diagnostic_token option is set, requests must provide it.
  */
 
-define( 'ASI_DIAGNOSTIC_START', microtime( true ) );
+define( 'ALLSI_DIAGNOSTIC_START', microtime( true ) );
 
 // Bootstrap WordPress when the script is executed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,18 +45,18 @@ if ( ! class_exists( 'All_Sources_Images_Generation' ) ) {
 $plugin_name    = 'all-sources-images';
 $plugin_version = defined( 'ALL_SOURCES_IMAGES_VERSION' ) ? ALL_SOURCES_IMAGES_VERSION : '1.0.0';
 $generation     = new All_Sources_Images_Generation( $plugin_name, $plugin_version );
-$params         = asi_diag_collect_params();
+$params         = ALLSI_diag_collect_params();
 
-asi_diag_guard_token( $params );
+ALLSI_diag_guard_token( $params );
 
 $search_term = sanitize_text_field( $params['busqueda'] );
 if ( '' === $search_term ) {
     $search_term = 'nature landscape';
 }
 
-$notify_mode = asi_diag_resolve_notify_mode( $params['notify'] );
-$format      = asi_diag_resolve_format( $params['format'] );
-$recipients  = asi_diag_resolve_recipients( $params['email'] );
+$notify_mode = ALLSI_diag_resolve_notify_mode( $params['notify'] );
+$format      = ALLSI_diag_resolve_format( $params['format'] );
+$recipients  = ALLSI_diag_resolve_recipients( $params['email'] );
 if ( empty( $recipients ) ) {
     $admin_email = get_option( 'admin_email' );
     if ( $admin_email && is_email( $admin_email ) ) {
@@ -64,41 +64,41 @@ if ( empty( $recipients ) ) {
     }
 }
 
-$options_main  = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $generation->ASI_default_options_main_settings( true ) );
-$options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $generation->ASI_default_options_banks_settings( true ) );
-$options_cron  = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ), $generation->ASI_default_options_cron_settings( true ) );
+$options_main  = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $generation->ALLSI_default_options_main_settings( true ) );
+$options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $generation->ALLSI_default_options_banks_settings( true ) );
+$options_cron  = wp_parse_args( get_option( 'ALLSI_plugin_cron_settings' ), $generation->ALLSI_default_options_cron_settings( true ) );
 $merged_options = array_merge( $options_main, $options_banks, $options_cron );
-$proxy_args      = $generation->ASI_get_proxy_args();
+$proxy_args      = $generation->ALLSI_get_proxy_args();
 
-$available_codes = asi_diag_extract_codes( $generation->ASI_banks_name_auto() );
-$ai_codes        = array_values( array_unique( array_map( 'sanitize_key', $generation->ASI_ai_source_codes() ) ) );
+$available_codes = ALLSI_diag_extract_codes( $generation->ALLSI_banks_name_auto() );
+$ai_codes        = array_values( array_unique( array_map( 'sanitize_key', $generation->ALLSI_ai_source_codes() ) ) );
 $non_ai_codes    = array_values( array_diff( $available_codes, $ai_codes ) );
 
-$selected_non_ai = asi_diag_resolve_sources( $params['sources_no_ia'], 'non_ai', $options_banks, $non_ai_codes, $ai_codes );
-$selected_ai     = asi_diag_resolve_sources( $params['sources_ia'], 'ai', $options_banks, $non_ai_codes, $ai_codes );
+$selected_non_ai = ALLSI_diag_resolve_sources( $params['sources_no_ia'], 'non_ai', $options_banks, $non_ai_codes, $ai_codes );
+$selected_ai     = ALLSI_diag_resolve_sources( $params['sources_ia'], 'ai', $options_banks, $non_ai_codes, $ai_codes );
 $targets         = array_values( array_unique( array_merge( $selected_non_ai, $selected_ai ) ) );
 
 if ( empty( $targets ) ) {
-    asi_diag_render_and_exit( array(
+    ALLSI_diag_render_and_exit( array(
         'generated_at' => current_time( 'mysql' ),
         'search_term'  => $search_term,
         'results'      => array(),
         'error_count'  => 0,
         'warning_count'=> 0,
-        'duration_ms'  => asi_diag_duration_ms(),
+        'duration_ms'  => ALLSI_diag_duration_ms(),
         'message'      => 'No sources selected. Provide sources_no_ia or sources_ia parameters.',
     ), $format );
 }
 
-$source_manager = asi_diag_get_source_manager( $generation );
+$source_manager = ALLSI_diag_get_source_manager( $generation );
 if ( ! $source_manager ) {
-    asi_diag_render_and_exit( array(
+    ALLSI_diag_render_and_exit( array(
         'generated_at' => current_time( 'mysql' ),
         'search_term'  => $search_term,
         'results'      => array(),
         'error_count'  => 1,
         'warning_count'=> 0,
-        'duration_ms'  => asi_diag_duration_ms(),
+        'duration_ms'  => ALLSI_diag_duration_ms(),
         'message'      => 'Unable to initialize source manager.',
     ), $format, 500 );
 }
@@ -106,7 +106,7 @@ if ( ! $source_manager ) {
 $results = array();
 foreach ( $targets as $bank ) {
     $category      = in_array( $bank, $ai_codes, true ) ? 'ai' : 'non_ai';
-    $results[]     = asi_diag_run_check( $generation, $source_manager, $bank, $search_term, $category, $merged_options, $proxy_args );
+    $results[]     = ALLSI_diag_run_check( $generation, $source_manager, $bank, $search_term, $category, $merged_options, $proxy_args );
 }
 
 $error_count   = count( array_filter( $results, function( $item ) {
@@ -125,7 +125,7 @@ $summary = array(
     'error_count'   => $error_count,
     'warning_count' => $warning_count,
     'ok_count'      => count( $results ) - $error_count - $warning_count,
-    'duration_ms'   => asi_diag_duration_ms(),
+    'duration_ms'   => ALLSI_diag_duration_ms(),
     'status_label'  => $status_label,
     'notify_mode'   => $notify_mode,
 );
@@ -138,16 +138,16 @@ if ( 'always' === $notify_mode ) {
 }
 
 if ( $should_email && ! empty( $recipients ) ) {
-    asi_diag_send_email( $recipients, $summary );
+    ALLSI_diag_send_email( $recipients, $summary );
 }
 
-asi_diag_render_and_exit( $summary, $format );
+ALLSI_diag_render_and_exit( $summary, $format );
 
 // -----------------------------------------------------------------------------
 // Helper functions
 // -----------------------------------------------------------------------------
 
-function asi_diag_collect_params() {
+function ALLSI_diag_collect_params() {
     $defaults = array(
         'busqueda'      => '',
         'sources_no_ia' => 'auto',
@@ -179,12 +179,12 @@ function asi_diag_collect_params() {
     return $params;
 }
 
-function asi_diag_guard_token( array $params ) {
+function ALLSI_diag_guard_token( array $params ) {
     $expected = '';
-    if ( defined( 'ASI_DIAGNOSTIC_TOKEN' ) && ASI_DIAGNOSTIC_TOKEN ) {
-        $expected = ASI_DIAGNOSTIC_TOKEN;
+    if ( defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) && ALLSI_DIAGNOSTIC_TOKEN ) {
+        $expected = ALLSI_DIAGNOSTIC_TOKEN;
     } else {
-        $stored = get_option( 'asi_diagnostic_token' );
+        $stored = get_option( 'ALLSI_diagnostic_token' );
         if ( is_string( $stored ) ) {
             $expected = $stored;
         }
@@ -199,7 +199,7 @@ function asi_diag_guard_token( array $params ) {
     }
 }
 
-function asi_diag_resolve_notify_mode( $value ) {
+function ALLSI_diag_resolve_notify_mode( $value ) {
     $value = strtolower( trim( (string) $value ) );
     if ( in_array( $value, array( 'always', 'siempre', 'all', '1', 'true' ), true ) ) {
         return 'always';
@@ -213,7 +213,7 @@ function asi_diag_resolve_notify_mode( $value ) {
     return 'errors';
 }
 
-function asi_diag_resolve_format( $value ) {
+function ALLSI_diag_resolve_format( $value ) {
     $value = strtolower( trim( (string) $value ) );
     if ( in_array( $value, array( 'json', 'text', 'html' ), true ) ) {
         return $value;
@@ -221,7 +221,7 @@ function asi_diag_resolve_format( $value ) {
     return PHP_SAPI === 'cli' ? 'text' : 'html';
 }
 
-function asi_diag_resolve_recipients( $value ) {
+function ALLSI_diag_resolve_recipients( $value ) {
     if ( empty( $value ) ) {
         return array();
     }
@@ -236,7 +236,7 @@ function asi_diag_resolve_recipients( $value ) {
     return array_values( array_unique( $valid ) );
 }
 
-function asi_diag_extract_codes( array $banks_map ) {
+function ALLSI_diag_extract_codes( array $banks_map ) {
     $codes = array();
     foreach ( $banks_map as $data ) {
         if ( is_array( $data ) && ! empty( $data[0] ) ) {
@@ -246,7 +246,7 @@ function asi_diag_extract_codes( array $banks_map ) {
     return array_values( array_unique( $codes ) );
 }
 
-function asi_diag_resolve_sources( $raw, $category, $bank_options, $non_ai_codes, $ai_codes ) {
+function ALLSI_diag_resolve_sources( $raw, $category, $bank_options, $non_ai_codes, $ai_codes ) {
     $allowed = ( 'ai' === $category ) ? $ai_codes : $non_ai_codes;
     if ( empty( $allowed ) ) {
         return array();
@@ -271,10 +271,10 @@ function asi_diag_resolve_sources( $raw, $category, $bank_options, $non_ai_codes
     return $selected;
 }
 
-function asi_diag_get_source_manager( $generation ) {
+function ALLSI_diag_get_source_manager( $generation ) {
     try {
         $reflection = new ReflectionClass( $generation );
-        $method     = $reflection->getMethod( 'ASI_get_source_manager_instance' );
+        $method     = $reflection->getMethod( 'ALLSI_get_source_manager_instance' );
         $method->setAccessible( true );
         return $method->invoke( $generation );
     } catch ( Exception $e ) {
@@ -283,7 +283,7 @@ function asi_diag_get_source_manager( $generation ) {
     }
 }
 
-function asi_diag_run_check( $generation, $source_manager, $bank, $search_term, $category, $options, $proxy_args ) {
+function ALLSI_diag_run_check( $generation, $source_manager, $bank, $search_term, $category, $options, $proxy_args ) {
     $result = array(
         'bank'        => $bank,
         'category'    => $category,
@@ -342,7 +342,7 @@ function asi_diag_run_check( $generation, $source_manager, $bank, $search_term, 
         return $result;
     }
 
-    $items = asi_diag_estimate_items( $response );
+    $items = ALLSI_diag_estimate_items( $response );
     if ( null === $items ) {
         $result['status']  = 'ok';
         $result['message'] = 'Response received.';
@@ -356,11 +356,11 @@ function asi_diag_run_check( $generation, $source_manager, $bank, $search_term, 
         $result['items']   = 0;
     }
 
-    $result['preview'] = asi_diag_preview_payload( $response );
+    $result['preview'] = ALLSI_diag_preview_payload( $response );
     return $result;
 }
 
-function asi_diag_estimate_items( $payload ) {
+function ALLSI_diag_estimate_items( $payload ) {
     if ( ! is_array( $payload ) ) {
         return null;
     }
@@ -372,32 +372,32 @@ function asi_diag_estimate_items( $payload ) {
     return null;
 }
 
-function asi_diag_preview_payload( $payload ) {
+function ALLSI_diag_preview_payload( $payload ) {
     if ( is_array( $payload ) ) {
         $encoded = wp_json_encode( $payload );
         if ( is_string( $encoded ) ) {
-            return asi_diag_truncate( $encoded, 600 );
+            return ALLSI_diag_truncate( $encoded, 600 );
         }
     }
     if ( is_string( $payload ) ) {
-        return asi_diag_truncate( $payload, 300 );
+        return ALLSI_diag_truncate( $payload, 300 );
     }
     return '';
 }
 
-function asi_diag_send_email( array $recipients, array $summary ) {
+function ALLSI_diag_send_email( array $recipients, array $summary ) {
     $subject = sprintf(
         '[All Sources Images] %s (%s errors, %s warnings)',
         $summary['status_label'],
         $summary['error_count'],
         $summary['warning_count']
     );
-    $body    = asi_diag_render_html( $summary );
+    $body    = ALLSI_diag_render_html( $summary );
     $headers = array( 'Content-Type: text/html; charset=UTF-8' );
     wp_mail( $recipients, $subject, $body, $headers );
 }
 
-function asi_diag_render_and_exit( array $summary, $format, $status_code = 200 ) {
+function ALLSI_diag_render_and_exit( array $summary, $format, $status_code = 200 ) {
     if ( ! headers_sent() ) {
         http_response_code( $status_code );
     }
@@ -406,10 +406,10 @@ function asi_diag_render_and_exit( array $summary, $format, $status_code = 200 )
         echo wp_json_encode( $summary, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
     } elseif ( 'text' === $format ) {
         header( 'Content-Type: text/plain; charset=utf-8' );
-        echo asi_diag_render_text( $summary );
+        echo ALLSI_diag_render_text( $summary );
     } else {
         header( 'Content-Type: text/html; charset=utf-8' );
-        echo asi_diag_render_html( $summary );
+        echo ALLSI_diag_render_html( $summary );
     }
     exit;
 }
@@ -424,7 +424,7 @@ function asi_diag_render_and_exit( array $summary, $format, $status_code = 200 )
  * @param array $summary Diagnostic summary data.
  * @return string HTML document.
  */
-function asi_diag_render_html( array $summary ) {
+function ALLSI_diag_render_html( array $summary ) {
     $results = $summary['results'] ?? array();
     ob_start();
     // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Standalone HTML document for email/CLI output.
@@ -495,7 +495,7 @@ function asi_diag_render_html( array $summary ) {
     return trim( ob_get_clean() );
 }
 
-function asi_diag_render_text( array $summary ) {
+function ALLSI_diag_render_text( array $summary ) {
     $lines   = array();
     $lines[] = 'All Sources Images :: Diagnostics';
     $lines[] = 'Site: ' . ( $summary['site'] ?? get_home_url() );
@@ -510,11 +510,11 @@ function asi_diag_render_text( array $summary ) {
     return implode( PHP_EOL, $lines ) . PHP_EOL;
 }
 
-function asi_diag_duration_ms() {
-    return round( ( microtime( true ) - ASI_DIAGNOSTIC_START ) * 1000, 2 );
+function ALLSI_diag_duration_ms() {
+    return round( ( microtime( true ) - ALLSI_DIAGNOSTIC_START ) * 1000, 2 );
 }
 
-function asi_diag_truncate( $text, $length ) {
+function ALLSI_diag_truncate( $text, $length ) {
     if ( ! is_string( $text ) ) {
         return '';
     }

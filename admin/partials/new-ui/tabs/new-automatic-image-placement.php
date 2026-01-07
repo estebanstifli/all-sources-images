@@ -9,8 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Get current settings - use raw option first to see what's actually stored
-$raw_options = get_option( 'ASI_plugin_main_settings' );
-$options_main = wp_parse_args( $raw_options, $this->ASI_default_options_main_settings() );
+$raw_options = get_option( 'ALLSI_plugin_main_settings' );
+$options_main = wp_parse_args( $raw_options, $this->ALLSI_default_options_main_settings() );
 
 // Get image_blocks from the RAW options first (what's actually in DB)
 // If empty or not set, fall back to defaults
@@ -39,13 +39,13 @@ foreach ( $raw_image_blocks as $block ) {
 $image_sizes = get_intermediate_image_sizes();
 
 // Get available image sources
-$list_api_auto = $this->ASI_banks_name_auto();
+$list_api_auto = $this->ALLSI_banks_name_auto();
 
 // Pro feature check
 $disabled = '';
 $class_disabled = '';
 $checkbox_disabled = '';
-if ( function_exists( 'asi_freemius' ) && !asi_freemius()->is_premium() ) {
+if ( function_exists( 'ALLSI_freemius' ) && !ALLSI_freemius()->is_premium() ) {
     $disabled = 'disabled';
     $class_disabled = 'disabled-option';
     $checkbox_disabled = 'checkbox-disabled';
@@ -54,8 +54,8 @@ if ( function_exists( 'asi_freemius' ) && !asi_freemius()->is_premium() ) {
 // Calculate next block index - after the last re-indexed block
 $blockIndex = count( $image_blocks ) + 1;
 
-// Note: Styles are now enqueued via wp_enqueue_style( 'asi-image-placement' ) in new-ui-assets.php
-// See: admin/css/asi-image-placement.css
+// Note: Styles are now enqueued via wp_enqueue_style( 'allsi-image-placement' ) in new-ui-assets.php
+// See: admin/css/allsi-image-placement.css
 ?>
 
 <div class="card mb-5 mb-xl-10">
@@ -80,11 +80,11 @@ $blockIndex = count( $image_blocks ) + 1;
                     <label><?php esc_html_e( 'Image Location Type', 'all-sources-images' ); ?></label>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" data-name-template="ASI_plugin_main_settings[image_block][__INDEX__][image_location]" value="featured" checked>
+                            <input type="radio" data-name-template="ALLSI_plugin_main_settings[image_block][__INDEX__][image_location]" value="featured" checked>
                             <?php esc_html_e( 'Featured Image', 'all-sources-images' ); ?>
                         </label>
                         <label>
-                            <input type="radio" data-name-template="ASI_plugin_main_settings[image_block][__INDEX__][image_location]" value="custom">
+                            <input type="radio" data-name-template="ALLSI_plugin_main_settings[image_block][__INDEX__][image_location]" value="custom">
                             <?php esc_html_e( 'Inline Content', 'all-sources-images' ); ?>
                         </label>
                     </div>
@@ -97,12 +97,12 @@ $blockIndex = count( $image_blocks ) + 1;
                         <label><?php esc_html_e( 'Image Position', 'all-sources-images' ); ?></label>
                         <div class="select-row">
                             <span><?php esc_html_e( 'Insert', 'all-sources-images' ); ?></span>
-                            <select name="ASI_plugin_main_settings[image_block][0][image_custom_location_placement]" class="form-control">
+                            <select name="ALLSI_plugin_main_settings[image_block][0][image_custom_location_placement]" class="form-control">
                                 <option value="before"><?php esc_html_e( 'Before', 'all-sources-images' ); ?></option>
                                 <option value="after"><?php esc_html_e( 'After', 'all-sources-images' ); ?></option>
                             </select>
                             <span><?php esc_html_e( 'the', 'all-sources-images' ); ?></span>
-                            <select name="ASI_plugin_main_settings[image_block][0][image_custom_location_position]" class="form-control">
+                            <select name="ALLSI_plugin_main_settings[image_block][0][image_custom_location_position]" class="form-control">
                                 <option value="1"><?php esc_html_e( 'First', 'all-sources-images' ); ?></option>
                                 <option value="2"><?php esc_html_e( 'Second', 'all-sources-images' ); ?></option>
                                 <option value="3"><?php esc_html_e( 'Third', 'all-sources-images' ); ?></option>
@@ -115,7 +115,7 @@ $blockIndex = count( $image_blocks ) + 1;
                                 <option value="10"><?php esc_html_e( 'Tenth', 'all-sources-images' ); ?></option>
                                 <option value="last"><?php esc_html_e( 'Last', 'all-sources-images' ); ?></option>
                             </select>
-                            <select name="ASI_plugin_main_settings[image_block][0][image_custom_location_tag]" class="form-control">
+                            <select name="ALLSI_plugin_main_settings[image_block][0][image_custom_location_tag]" class="form-control">
                                 <option value="p"><?php esc_html_e( 'paragraph (p)', 'all-sources-images' ); ?></option>
                                 <option value="h2">h2</option>
                                 <option value="h3">h3</option>
@@ -130,7 +130,7 @@ $blockIndex = count( $image_blocks ) + 1;
                     
                     <div class="form-row">
                         <label><?php esc_html_e( 'Image Size', 'all-sources-images' ); ?></label>
-                        <select name="ASI_plugin_main_settings[image_block][0][image_custom_image_size]" class="form-control" style="max-width: 200px;">
+                        <select name="ALLSI_plugin_main_settings[image_block][0][image_custom_image_size]" class="form-control" style="max-width: 200px;">
                             <?php foreach ( $image_sizes as $image_size ) : ?>
                                 <option value="<?php echo esc_attr( $image_size ); ?>"><?php echo esc_html( $image_size ); ?></option>
                             <?php endforeach; ?>
@@ -141,7 +141,7 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- Image Source -->
                 <div class="form-row">
                     <label><?php esc_html_e( 'Image Source', 'all-sources-images' ); ?></label>
-                    <select name="ASI_plugin_main_settings[image_block][0][api_chosen]" class="form-control" style="max-width: 300px;">
+                    <select name="ALLSI_plugin_main_settings[image_block][0][api_chosen]" class="form-control" style="max-width: 300px;">
                         <?php foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) : ?>
                             <?php if ( true === $api_auto_id[1] ) : ?>
                                 <option value="<?php echo esc_attr( $api_auto_id[0] ); ?>" <?php selected( 'pixabay', $api_auto_id[0] ); ?>><?php echo esc_html( $api_auto_name ); ?></option>
@@ -153,7 +153,7 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- Second Image Source -->
                 <div class="form-row">
                     <label><?php esc_html_e( 'Second Image Source (Fallback)', 'all-sources-images' ); ?></label>
-                    <select name="ASI_plugin_main_settings[image_block][0][api_chosen_2]" class="form-control" style="max-width: 300px;">
+                    <select name="ALLSI_plugin_main_settings[image_block][0][api_chosen_2]" class="form-control" style="max-width: 300px;">
                         <option value="none"><?php esc_html_e( 'None', 'all-sources-images' ); ?></option>
                         <?php foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) : ?>
                             <?php if ( true === $api_auto_id[1] ) : ?>
@@ -166,7 +166,7 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- Search Based On -->
                 <div class="form-row">
                     <label><?php esc_html_e( 'Search Based On', 'all-sources-images' ); ?></label>
-                    <select name="ASI_plugin_main_settings[image_block][0][based_on]" class="form-control based-on-select" style="max-width: 300px;" data-block-index="0">
+                    <select name="ALLSI_plugin_main_settings[image_block][0][based_on]" class="form-control based-on-select" style="max-width: 300px;" data-block-index="0">
                         <option value="title"><?php esc_html_e( 'Title', 'all-sources-images' ); ?></option>
                         <option value="text_analyser"><?php esc_html_e( 'Text Analyzer: Full text', 'all-sources-images' ); ?></option>
                         <option value="text_analyser_previous_paragraph"><?php esc_html_e( 'Text Analyzer: Previous paragraph', 'all-sources-images' ); ?></option>
@@ -188,7 +188,7 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- Text Analyzer Language (for text_analyser options) -->
                 <div class="form-row based-on-fields section_text_analyser">
                     <label><?php esc_html_e( 'Content Language', 'all-sources-images' ); ?></label>
-                    <select name="ASI_plugin_main_settings[image_block][0][text_analyser_lang]" class="form-control" style="max-width: 200px;">
+                    <select name="ALLSI_plugin_main_settings[image_block][0][text_analyser_lang]" class="form-control" style="max-width: 200px;">
                         <option value="en"><?php esc_html_e( 'English', 'all-sources-images' ); ?></option>
                         <option value="es"><?php esc_html_e( 'Spanish', 'all-sources-images' ); ?></option>
                         <option value="fr"><?php esc_html_e( 'French', 'all-sources-images' ); ?></option>
@@ -207,9 +207,9 @@ $blockIndex = count( $image_blocks ) + 1;
                 <div class="form-row based-on-fields section_tags">
                     <label><?php esc_html_e( 'Tag Selection', 'all-sources-images' ); ?></label>
                     <div class="radio-group">
-                        <label><input type="radio" name="ASI_plugin_main_settings[image_block][0][tags]" value="first_tag" checked> <?php esc_html_e( 'First Tag', 'all-sources-images' ); ?></label>
-                        <label><input type="radio" name="ASI_plugin_main_settings[image_block][0][tags]" value="last_tag"> <?php esc_html_e( 'Last Tag', 'all-sources-images' ); ?></label>
-                        <label><input type="radio" name="ASI_plugin_main_settings[image_block][0][tags]" value="random_tag"> <?php esc_html_e( 'Random Tag', 'all-sources-images' ); ?></label>
+                        <label><input type="radio" name="ALLSI_plugin_main_settings[image_block][0][tags]" value="first_tag" checked> <?php esc_html_e( 'First Tag', 'all-sources-images' ); ?></label>
+                        <label><input type="radio" name="ALLSI_plugin_main_settings[image_block][0][tags]" value="last_tag"> <?php esc_html_e( 'Last Tag', 'all-sources-images' ); ?></label>
+                        <label><input type="radio" name="ALLSI_plugin_main_settings[image_block][0][tags]" value="random_tag"> <?php esc_html_e( 'Random Tag', 'all-sources-images' ); ?></label>
                     </div>
                 </div>
                 
@@ -217,12 +217,12 @@ $blockIndex = count( $image_blocks ) + 1;
                 <div class="form-row based-on-fields section_categories">
                     <label><?php esc_html_e( 'Category Selection', 'all-sources-images' ); ?></label>
                     <div class="select-row" style="margin-bottom: 10px;">
-                        <select name="ASI_plugin_main_settings[image_block][0][categories]" class="form-control" style="max-width: 200px;">
+                        <select name="ALLSI_plugin_main_settings[image_block][0][categories]" class="form-control" style="max-width: 200px;">
                             <option value="first_category"><?php esc_html_e( 'First Category', 'all-sources-images' ); ?></option>
                             <option value="last_category"><?php esc_html_e( 'Last Category', 'all-sources-images' ); ?></option>
                             <option value="random_category"><?php esc_html_e( 'Random Category', 'all-sources-images' ); ?></option>
                         </select>
-                        <select name="ASI_plugin_main_settings[image_block][0][categories_level]" class="form-control" style="max-width: 200px;">
+                        <select name="ALLSI_plugin_main_settings[image_block][0][categories_level]" class="form-control" style="max-width: 200px;">
                             <option value="child"><?php esc_html_e( 'Child (Most Specific)', 'all-sources-images' ); ?></option>
                             <option value="parent"><?php esc_html_e( 'Parent', 'all-sources-images' ); ?></option>
                             <option value="grandparent"><?php esc_html_e( 'Grandparent (Top Level)', 'all-sources-images' ); ?></option>
@@ -233,14 +233,14 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- Custom Field Options -->
                 <div class="form-row based-on-fields section_custom_field">
                     <label><?php esc_html_e( 'Custom Field Name', 'all-sources-images' ); ?></label>
-                    <input type="text" name="ASI_plugin_main_settings[image_block][0][custom_field]" class="form-control" style="max-width: 300px;" placeholder="my_custom_field">
+                    <input type="text" name="ALLSI_plugin_main_settings[image_block][0][custom_field]" class="form-control" style="max-width: 300px;" placeholder="my_custom_field">
                     <p class="description"><?php esc_html_e( 'Enter the meta key name of your custom field.', 'all-sources-images' ); ?></p>
                 </div>
                 
                 <!-- Custom Request Options -->
                 <div class="form-row based-on-fields section_custom_request">
                     <label><?php esc_html_e( 'Custom Search Template', 'all-sources-images' ); ?></label>
-                    <input type="text" name="ASI_plugin_main_settings[image_block][0][custom_request]" class="form-control" style="max-width: 400px;" placeholder="%%Title%% %%Category%%" value="%%Title%% %%Category%%">
+                    <input type="text" name="ALLSI_plugin_main_settings[image_block][0][custom_request]" class="form-control" style="max-width: 400px;" placeholder="%%Title%% %%Category%%" value="%%Title%% %%Category%%">
                     <p class="description">
                         <?php esc_html_e( 'Available placeholders:', 'all-sources-images' ); ?> 
                         <code>%%Title%%</code>, <code>%%Category%%</code>, <code>%%Tag%%</code>, <code>%%Taxonomy%%</code>
@@ -250,10 +250,10 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- OpenAI Keyword Extractor Options -->
                 <div class="form-row based-on-fields section_openai_extractor">
                     <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
-                    <input type="password" name="ASI_plugin_main_settings[image_block][0][openai_extractor_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-...">
+                    <input type="password" name="ALLSI_plugin_main_settings[image_block][0][openai_extractor_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-...">
                     <div style="margin-top: 10px;">
                         <label><?php esc_html_e( 'Number of Keywords', 'all-sources-images' ); ?></label>
-                        <select name="ASI_plugin_main_settings[image_block][0][openai_number_of_keywords]" class="form-control" style="max-width: 100px;">
+                        <select name="ALLSI_plugin_main_settings[image_block][0][openai_number_of_keywords]" class="form-control" style="max-width: 100px;">
                             <option value="1-2">1-2</option>
                             <option value="2" selected>2</option>
                             <option value="3">3</option>
@@ -264,10 +264,10 @@ $blockIndex = count( $image_blocks ) + 1;
                 <!-- AI Image Prompt Options -->
                 <div class="form-row based-on-fields section_ai_image_prompt">
                     <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
-                    <input type="password" name="ASI_plugin_main_settings[image_block][0][ai_prompt_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-...">
+                    <input type="password" name="ALLSI_plugin_main_settings[image_block][0][ai_prompt_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-...">
                     <div style="margin-top: 10px;">
                         <label><?php esc_html_e( 'Image Style', 'all-sources-images' ); ?></label>
-                        <select name="ASI_plugin_main_settings[image_block][0][ai_prompt_style]" class="form-control" style="max-width: 200px;">
+                        <select name="ALLSI_plugin_main_settings[image_block][0][ai_prompt_style]" class="form-control" style="max-width: 200px;">
                             <option value="photorealistic"><?php esc_html_e( 'Photorealistic', 'all-sources-images' ); ?></option>
                             <option value="illustration"><?php esc_html_e( 'Illustration', 'all-sources-images' ); ?></option>
                             <option value="digital_art"><?php esc_html_e( 'Digital Art', 'all-sources-images' ); ?></option>
@@ -281,7 +281,7 @@ $blockIndex = count( $image_blocks ) + 1;
                     </div>
                     <div style="margin-top: 10px;">
                         <label><?php esc_html_e( 'Custom Instructions (Optional)', 'all-sources-images' ); ?></label>
-                        <input type="text" name="ASI_plugin_main_settings[image_block][0][ai_prompt_custom_instructions]" class="form-control" style="max-width: 400px;" placeholder="<?php esc_attr_e( 'e.g., vibrant colors, no text', 'all-sources-images' ); ?>">
+                        <input type="text" name="ALLSI_plugin_main_settings[image_block][0][ai_prompt_custom_instructions]" class="form-control" style="max-width: 400px;" placeholder="<?php esc_attr_e( 'e.g., vibrant colors, no text', 'all-sources-images' ); ?>">
                     </div>
                 </div>
                 
@@ -290,13 +290,13 @@ $blockIndex = count( $image_blocks ) + 1;
                     <label><?php esc_html_e( 'Title Selection', 'all-sources-images' ); ?></label>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="ASI_plugin_main_settings[image_block][0][title_selection]" value="full_title" checked>
+                            <input type="radio" name="ALLSI_plugin_main_settings[image_block][0][title_selection]" value="full_title" checked>
                             <?php esc_html_e( 'Full title', 'all-sources-images' ); ?>
                         </label>
                         <label>
-                            <input type="radio" name="ASI_plugin_main_settings[image_block][0][title_selection]" value="cut_title">
+                            <input type="radio" name="ALLSI_plugin_main_settings[image_block][0][title_selection]" value="cut_title">
                             <?php esc_html_e( 'Specific Part', 'all-sources-images' ); ?>:
-                            <input type="number" name="ASI_plugin_main_settings[image_block][0][title_length]" min="1" value="3" class="form-control" style="width: 60px; margin-left: 5px;">
+                            <input type="number" name="ALLSI_plugin_main_settings[image_block][0][title_length]" min="1" value="3" class="form-control" style="width: 60px; margin-left: 5px;">
                             <span style="margin-left: 5px;"><?php esc_html_e( 'first words', 'all-sources-images' ); ?></span>
                         </label>
                     </div>
@@ -307,7 +307,7 @@ $blockIndex = count( $image_blocks ) + 1;
                     <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
                     <div class="field-content">
                         <label class="toggle-switch">
-                            <input type="checkbox" name="ASI_plugin_main_settings[image_block][0][translation_EN]" value="true" checked>
+                            <input type="checkbox" name="ALLSI_plugin_main_settings[image_block][0][translation_EN]" value="true" checked>
                             <span class="toggle-slider"></span>
                             <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
                         </label>
@@ -320,11 +320,11 @@ $blockIndex = count( $image_blocks ) + 1;
                     <label><?php esc_html_e( 'Image Selection', 'all-sources-images' ); ?></label>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="ASI_plugin_main_settings[image_block][0][selected_image]" value="first_result" checked>
+                            <input type="radio" name="ALLSI_plugin_main_settings[image_block][0][selected_image]" value="first_result" checked>
                             <?php esc_html_e( 'First result', 'all-sources-images' ); ?>
                         </label>
                         <label class="<?php echo $class_disabled; ?>">
-                            <input type="radio" name="ASI_plugin_main_settings[image_block][0][selected_image]" value="random_result" <?php echo $disabled; ?>>
+                            <input type="radio" name="ALLSI_plugin_main_settings[image_block][0][selected_image]" value="random_result" <?php echo $disabled; ?>>
                             <?php esc_html_e( 'Random result', 'all-sources-images' ); ?>
                         </label>
                     </div>
@@ -335,7 +335,7 @@ $blockIndex = count( $image_blocks ) + 1;
         
         <form method="post" action="options.php" id="image-placement-form">
             <?php settings_fields( 'ASI-plugin-main-settings' ); ?>
-            <input type="hidden" name="ASI_plugin_main_settings[_saving_tab]" value="image_placement">
+            <input type="hidden" name="ALLSI_plugin_main_settings[_saving_tab]" value="image_placement">
             
             <!-- Container for saved and new blocks -->
             <div id="image-blocks-container">
@@ -356,11 +356,11 @@ $blockIndex = count( $image_blocks ) + 1;
                                 <label><?php esc_html_e( 'Image Location Type', 'all-sources-images' ); ?></label>
                                 <div class="radio-group">
                                     <label>
-                                        <input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_location]" value="featured" <?php checked( isset( $block['image_location'] ) ? $block['image_location'] : 'featured', 'featured' ); ?>>
+                                        <input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_location]" value="featured" <?php checked( isset( $block['image_location'] ) ? $block['image_location'] : 'featured', 'featured' ); ?>>
                                         <?php esc_html_e( 'Featured Image', 'all-sources-images' ); ?>
                                     </label>
                                     <label>
-                                        <input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_location]" value="custom" <?php checked( isset( $block['image_location'] ) ? $block['image_location'] : '', 'custom' ); ?>>
+                                        <input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_location]" value="custom" <?php checked( isset( $block['image_location'] ) ? $block['image_location'] : '', 'custom' ); ?>>
                                         <?php esc_html_e( 'Inline Content', 'all-sources-images' ); ?>
                                     </label>
                                 </div>
@@ -373,12 +373,12 @@ $blockIndex = count( $image_blocks ) + 1;
                                     <label><?php esc_html_e( 'Image Position', 'all-sources-images' ); ?></label>
                                     <div class="select-row">
                                         <span><?php esc_html_e( 'Insert', 'all-sources-images' ); ?></span>
-                                        <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_location_placement]" class="form-control">
+                                        <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_location_placement]" class="form-control">
                                             <option value="before" <?php selected( isset( $block['image_custom_location_placement'] ) ? $block['image_custom_location_placement'] : '', 'before' ); ?>><?php esc_html_e( 'Before', 'all-sources-images' ); ?></option>
                                             <option value="after" <?php selected( isset( $block['image_custom_location_placement'] ) ? $block['image_custom_location_placement'] : '', 'after' ); ?>><?php esc_html_e( 'After', 'all-sources-images' ); ?></option>
                                         </select>
                                         <span><?php esc_html_e( 'the', 'all-sources-images' ); ?></span>
-                                        <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_location_position]" class="form-control">
+                                        <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_location_position]" class="form-control">
                                             <?php 
                                             $positions = array(
                                                 '1' => __( 'First', 'all-sources-images' ),
@@ -397,7 +397,7 @@ $blockIndex = count( $image_blocks ) + 1;
                                                 <option value="<?php echo esc_attr( $val ); ?>" <?php selected( isset( $block['image_custom_location_position'] ) ? $block['image_custom_location_position'] : '', $val ); ?>><?php echo esc_html( $label ); ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_location_tag]" class="form-control">
+                                        <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_location_tag]" class="form-control">
                                             <?php 
                                             $tags = array( 'p' => __( 'paragraph (p)', 'all-sources-images' ), 'h2' => 'h2', 'h3' => 'h3', 'h4' => 'h4', 'h5' => 'h5', 'h6' => 'h6', 'div' => 'div', 'a' => __( 'link (a)', 'all-sources-images' ) );
                                             foreach ( $tags as $val => $label ) : ?>
@@ -409,7 +409,7 @@ $blockIndex = count( $image_blocks ) + 1;
                                 
                                 <div class="form-row">
                                     <label><?php esc_html_e( 'Image Size', 'all-sources-images' ); ?></label>
-                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_image_size]" class="form-control" style="max-width: 200px;">
+                                    <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][image_custom_image_size]" class="form-control" style="max-width: 200px;">
                                         <?php foreach ( $image_sizes as $image_size ) : ?>
                                             <option value="<?php echo esc_attr( $image_size ); ?>" <?php selected( isset( $block['image_custom_image_size'] ) ? $block['image_custom_image_size'] : '', $image_size ); ?>><?php echo esc_html( $image_size ); ?></option>
                                         <?php endforeach; ?>
@@ -420,7 +420,7 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- Image Source -->
                             <div class="form-row">
                                 <label><?php esc_html_e( 'Image Source', 'all-sources-images' ); ?></label>
-                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][api_chosen]" class="form-control" style="max-width: 300px;">
+                                <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][api_chosen]" class="form-control" style="max-width: 300px;">
                                     <?php foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) : ?>
                                         <?php if ( true === $api_auto_id[1] ) : ?>
                                             <option value="<?php echo esc_attr( $api_auto_id[0] ); ?>" <?php selected( isset( $block['api_chosen'] ) ? $block['api_chosen'] : 'pixabay', $api_auto_id[0] ); ?>><?php echo esc_html( $api_auto_name ); ?></option>
@@ -432,7 +432,7 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- Second Image Source -->
                             <div class="form-row">
                                 <label><?php esc_html_e( 'Second Image Source (Fallback)', 'all-sources-images' ); ?></label>
-                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][api_chosen_2]" class="form-control" style="max-width: 300px;">
+                                <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][api_chosen_2]" class="form-control" style="max-width: 300px;">
                                     <option value="none"><?php esc_html_e( 'None', 'all-sources-images' ); ?></option>
                                     <?php foreach ( $list_api_auto as $api_auto_name => $api_auto_id ) : ?>
                                         <?php if ( true === $api_auto_id[1] ) : ?>
@@ -445,7 +445,7 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- Search Based On -->
                             <div class="form-row">
                                 <label><?php esc_html_e( 'Search Based On', 'all-sources-images' ); ?></label>
-                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][based_on]" class="form-control based-on-select" style="max-width: 300px;" data-block-index="<?php echo $displayIndex; ?>">
+                                <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][based_on]" class="form-control based-on-select" style="max-width: 300px;" data-block-index="<?php echo $displayIndex; ?>">
                                     <option value="title" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'title' ); ?>><?php esc_html_e( 'Title', 'all-sources-images' ); ?></option>
                                     <option value="text_analyser" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'text_analyser' ); ?>><?php esc_html_e( 'Text Analyzer: Full text', 'all-sources-images' ); ?></option>
                                     <option value="text_analyser_previous_paragraph" <?php selected( isset( $block['based_on'] ) ? $block['based_on'] : '', 'text_analyser_previous_paragraph' ); ?>><?php esc_html_e( 'Text Analyzer: Previous paragraph', 'all-sources-images' ); ?></option>
@@ -493,7 +493,7 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- Text Analyzer Language -->
                             <div class="form-row based-on-fields section_text_analyser <?php echo $show_text_analyser ? 'visible' : ''; ?>">
                                 <label><?php esc_html_e( 'Content Language', 'all-sources-images' ); ?></label>
-                                <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][text_analyser_lang]" class="form-control" style="max-width: 200px;">
+                                <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][text_analyser_lang]" class="form-control" style="max-width: 200px;">
                                     <?php 
                                     $langs = array( 'en' => 'English', 'es' => 'Spanish', 'fr' => 'French', 'de' => 'German', 'it' => 'Italian', 'pt' => 'Portuguese', 'nl' => 'Dutch', 'ru' => 'Russian', 'ja' => 'Japanese', 'zh' => 'Chinese', 'ar' => 'Arabic' );
                                     $current_lang = isset( $block['text_analyser_lang'] ) ? $block['text_analyser_lang'] : 'en';
@@ -508,9 +508,9 @@ $blockIndex = count( $image_blocks ) + 1;
                                 <label><?php esc_html_e( 'Tag Selection', 'all-sources-images' ); ?></label>
                                 <div class="radio-group">
                                     <?php $current_tags = isset( $block['tags'] ) ? $block['tags'] : 'first_tag'; ?>
-                                    <label><input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="first_tag" <?php checked( $current_tags, 'first_tag' ); ?>> <?php esc_html_e( 'First Tag', 'all-sources-images' ); ?></label>
-                                    <label><input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="last_tag" <?php checked( $current_tags, 'last_tag' ); ?>> <?php esc_html_e( 'Last Tag', 'all-sources-images' ); ?></label>
-                                    <label><input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="random_tag" <?php checked( $current_tags, 'random_tag' ); ?>> <?php esc_html_e( 'Random Tag', 'all-sources-images' ); ?></label>
+                                    <label><input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="first_tag" <?php checked( $current_tags, 'first_tag' ); ?>> <?php esc_html_e( 'First Tag', 'all-sources-images' ); ?></label>
+                                    <label><input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="last_tag" <?php checked( $current_tags, 'last_tag' ); ?>> <?php esc_html_e( 'Last Tag', 'all-sources-images' ); ?></label>
+                                    <label><input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][tags]" value="random_tag" <?php checked( $current_tags, 'random_tag' ); ?>> <?php esc_html_e( 'Random Tag', 'all-sources-images' ); ?></label>
                                 </div>
                             </div>
                             
@@ -518,13 +518,13 @@ $blockIndex = count( $image_blocks ) + 1;
                             <div class="form-row based-on-fields section_categories <?php echo $show_categories ? 'visible' : ''; ?>">
                                 <label><?php esc_html_e( 'Category Selection', 'all-sources-images' ); ?></label>
                                 <div class="select-row" style="margin-bottom: 10px;">
-                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][categories]" class="form-control" style="max-width: 200px;">
+                                    <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][categories]" class="form-control" style="max-width: 200px;">
                                         <?php $current_cat = isset( $block['categories'] ) ? $block['categories'] : 'first_category'; ?>
                                         <option value="first_category" <?php selected( $current_cat, 'first_category' ); ?>><?php esc_html_e( 'First Category', 'all-sources-images' ); ?></option>
                                         <option value="last_category" <?php selected( $current_cat, 'last_category' ); ?>><?php esc_html_e( 'Last Category', 'all-sources-images' ); ?></option>
                                         <option value="random_category" <?php selected( $current_cat, 'random_category' ); ?>><?php esc_html_e( 'Random Category', 'all-sources-images' ); ?></option>
                                     </select>
-                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][categories_level]" class="form-control" style="max-width: 200px;">
+                                    <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][categories_level]" class="form-control" style="max-width: 200px;">
                                         <?php $current_level = isset( $block['categories_level'] ) ? $block['categories_level'] : 'child'; ?>
                                         <option value="child" <?php selected( $current_level, 'child' ); ?>><?php esc_html_e( 'Child (Most Specific)', 'all-sources-images' ); ?></option>
                                         <option value="parent" <?php selected( $current_level, 'parent' ); ?>><?php esc_html_e( 'Parent', 'all-sources-images' ); ?></option>
@@ -536,14 +536,14 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- Custom Field Options -->
                             <div class="form-row based-on-fields section_custom_field <?php echo $show_custom_field ? 'visible' : ''; ?>">
                                 <label><?php esc_html_e( 'Custom Field Name', 'all-sources-images' ); ?></label>
-                                <input type="text" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][custom_field]" class="form-control" style="max-width: 300px;" placeholder="my_custom_field" value="<?php echo esc_attr( isset( $block['custom_field'] ) ? $block['custom_field'] : '' ); ?>">
+                                <input type="text" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][custom_field]" class="form-control" style="max-width: 300px;" placeholder="my_custom_field" value="<?php echo esc_attr( isset( $block['custom_field'] ) ? $block['custom_field'] : '' ); ?>">
                                 <p class="description"><?php esc_html_e( 'Enter the meta key name of your custom field.', 'all-sources-images' ); ?></p>
                             </div>
                             
                             <!-- Custom Request Options -->
                             <div class="form-row based-on-fields section_custom_request <?php echo $show_custom_request ? 'visible' : ''; ?>">
                                 <label><?php esc_html_e( 'Custom Search Template', 'all-sources-images' ); ?></label>
-                                <input type="text" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][custom_request]" class="form-control" style="max-width: 400px;" placeholder="%%Title%% %%Category%%" value="<?php echo esc_attr( isset( $block['custom_request'] ) ? $block['custom_request'] : '%%Title%% %%Category%%' ); ?>">
+                                <input type="text" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][custom_request]" class="form-control" style="max-width: 400px;" placeholder="%%Title%% %%Category%%" value="<?php echo esc_attr( isset( $block['custom_request'] ) ? $block['custom_request'] : '%%Title%% %%Category%%' ); ?>">
                                 <p class="description">
                                     <?php esc_html_e( 'Available placeholders:', 'all-sources-images' ); ?> 
                                     <code>%%Title%%</code>, <code>%%Category%%</code>, <code>%%Tag%%</code>, <code>%%Taxonomy%%</code>
@@ -553,10 +553,10 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- OpenAI Keyword Extractor Options -->
                             <div class="form-row based-on-fields section_openai_extractor <?php echo $show_openai_extractor ? 'visible' : ''; ?>">
                                 <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
-                                <input type="password" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][openai_extractor_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-..." value="<?php echo esc_attr( isset( $block['openai_extractor_apikey'] ) ? $block['openai_extractor_apikey'] : '' ); ?>">
+                                <input type="password" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][openai_extractor_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-..." value="<?php echo esc_attr( isset( $block['openai_extractor_apikey'] ) ? $block['openai_extractor_apikey'] : '' ); ?>">
                                 <div style="margin-top: 10px;">
                                     <label><?php esc_html_e( 'Number of Keywords', 'all-sources-images' ); ?></label>
-                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][openai_number_of_keywords]" class="form-control" style="max-width: 100px;">
+                                    <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][openai_number_of_keywords]" class="form-control" style="max-width: 100px;">
                                         <?php $current_num = isset( $block['openai_number_of_keywords'] ) ? $block['openai_number_of_keywords'] : '2'; ?>
                                         <option value="1-2" <?php selected( $current_num, '1-2' ); ?>>1-2</option>
                                         <option value="2" <?php selected( $current_num, '2' ); ?>>2</option>
@@ -568,10 +568,10 @@ $blockIndex = count( $image_blocks ) + 1;
                             <!-- AI Image Prompt Options -->
                             <div class="form-row based-on-fields section_ai_image_prompt <?php echo $show_ai_image_prompt ? 'visible' : ''; ?>">
                                 <label><?php esc_html_e( 'OpenAI API Key', 'all-sources-images' ); ?></label>
-                                <input type="password" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-..." value="<?php echo esc_attr( isset( $block['ai_prompt_apikey'] ) ? $block['ai_prompt_apikey'] : '' ); ?>">
+                                <input type="password" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_apikey]" class="form-control" style="max-width: 400px;" placeholder="sk-..." value="<?php echo esc_attr( isset( $block['ai_prompt_apikey'] ) ? $block['ai_prompt_apikey'] : '' ); ?>">
                                 <div style="margin-top: 10px;">
                                     <label><?php esc_html_e( 'Image Style', 'all-sources-images' ); ?></label>
-                                    <select name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_style]" class="form-control" style="max-width: 200px;">
+                                    <select name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_style]" class="form-control" style="max-width: 200px;">
                                         <?php $current_style = isset( $block['ai_prompt_style'] ) ? $block['ai_prompt_style'] : 'photorealistic'; ?>
                                         <option value="photorealistic" <?php selected( $current_style, 'photorealistic' ); ?>><?php esc_html_e( 'Photorealistic', 'all-sources-images' ); ?></option>
                                         <option value="illustration" <?php selected( $current_style, 'illustration' ); ?>><?php esc_html_e( 'Illustration', 'all-sources-images' ); ?></option>
@@ -586,7 +586,7 @@ $blockIndex = count( $image_blocks ) + 1;
                                 </div>
                                 <div style="margin-top: 10px;">
                                     <label><?php esc_html_e( 'Custom Instructions (Optional)', 'all-sources-images' ); ?></label>
-                                    <input type="text" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_custom_instructions]" class="form-control" style="max-width: 400px;" placeholder="<?php esc_attr_e( 'e.g., vibrant colors, no text', 'all-sources-images' ); ?>" value="<?php echo esc_attr( isset( $block['ai_prompt_custom_instructions'] ) ? $block['ai_prompt_custom_instructions'] : '' ); ?>">
+                                    <input type="text" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][ai_prompt_custom_instructions]" class="form-control" style="max-width: 400px;" placeholder="<?php esc_attr_e( 'e.g., vibrant colors, no text', 'all-sources-images' ); ?>" value="<?php echo esc_attr( isset( $block['ai_prompt_custom_instructions'] ) ? $block['ai_prompt_custom_instructions'] : '' ); ?>">
                                 </div>
                             </div>
                             
@@ -595,13 +595,13 @@ $blockIndex = count( $image_blocks ) + 1;
                                 <label><?php esc_html_e( 'Title Selection', 'all-sources-images' ); ?></label>
                                 <div class="radio-group">
                                     <label>
-                                        <input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_selection]" value="full_title" <?php checked( isset( $block['title_selection'] ) ? $block['title_selection'] : 'full_title', 'full_title' ); ?>>
+                                        <input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_selection]" value="full_title" <?php checked( isset( $block['title_selection'] ) ? $block['title_selection'] : 'full_title', 'full_title' ); ?>>
                                         <?php esc_html_e( 'Full title', 'all-sources-images' ); ?>
                                     </label>
                                     <label>
-                                        <input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_selection]" value="cut_title" <?php checked( isset( $block['title_selection'] ) ? $block['title_selection'] : '', 'cut_title' ); ?>>
+                                        <input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_selection]" value="cut_title" <?php checked( isset( $block['title_selection'] ) ? $block['title_selection'] : '', 'cut_title' ); ?>>
                                         <?php esc_html_e( 'Specific Part', 'all-sources-images' ); ?>:
-                                        <input type="number" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_length]" min="1" value="<?php echo isset( $block['title_length'] ) ? esc_attr( $block['title_length'] ) : '3'; ?>" class="form-control" style="width: 60px; margin-left: 5px;">
+                                        <input type="number" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][title_length]" min="1" value="<?php echo isset( $block['title_length'] ) ? esc_attr( $block['title_length'] ) : '3'; ?>" class="form-control" style="width: 60px; margin-left: 5px;">
                                         <span style="margin-left: 5px;"><?php esc_html_e( 'first words', 'all-sources-images' ); ?></span>
                                     </label>
                                 </div>
@@ -612,7 +612,7 @@ $blockIndex = count( $image_blocks ) + 1;
                                 <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
                                 <div class="field-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][translation_EN]" value="true" <?php checked( isset( $block['translation_EN'] ) && $block['translation_EN'] == 'true' ); ?>>
+                                        <input type="checkbox" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][translation_EN]" value="true" <?php checked( isset( $block['translation_EN'] ) && $block['translation_EN'] == 'true' ); ?>>
                                         <span class="toggle-slider"></span>
                                         <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
                                     </label>
@@ -625,11 +625,11 @@ $blockIndex = count( $image_blocks ) + 1;
                                 <label><?php esc_html_e( 'Image Selection', 'all-sources-images' ); ?></label>
                                 <div class="radio-group">
                                     <label>
-                                        <input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][selected_image]" value="first_result" <?php checked( isset( $block['selected_image'] ) ? $block['selected_image'] : 'first_result', 'first_result' ); ?>>
+                                        <input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][selected_image]" value="first_result" <?php checked( isset( $block['selected_image'] ) ? $block['selected_image'] : 'first_result', 'first_result' ); ?>>
                                         <?php esc_html_e( 'First result', 'all-sources-images' ); ?>
                                     </label>
                                     <label class="<?php echo $class_disabled; ?>">
-                                        <input type="radio" name="ASI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][selected_image]" value="random_result" <?php echo $disabled; ?> <?php checked( isset( $block['selected_image'] ) ? $block['selected_image'] : '', 'random_result' ); ?>>
+                                        <input type="radio" name="ALLSI_plugin_main_settings[image_block][<?php echo $displayIndex; ?>][selected_image]" value="random_result" <?php echo $disabled; ?> <?php checked( isset( $block['selected_image'] ) ? $block['selected_image'] : '', 'random_result' ); ?>>
                                         <?php esc_html_e( 'Random result', 'all-sources-images' ); ?>
                                     </label>
                                 </div>

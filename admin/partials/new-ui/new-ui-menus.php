@@ -3,11 +3,11 @@
  * New UI Menu Registration
  * 
  * This file registers the new admin menu pages for the redesigned UI.
- * To activate, add this line in class-all-sources-images-admin.php ASI_main_settings():
+ * To activate, add this line in class-all-sources-images-admin.php ALLSI_main_settings():
  *     include_once plugin_dir_path( __FILE__ ) . 'partials/new-ui/new-ui-menus.php';
  *
  * Or hook it via functions.php or a custom plugin:
- *     add_action( 'admin_menu', 'asi_register_new_ui_menus', 100 );
+ *     add_action( 'admin_menu', 'ALLSI_register_new_ui_menus', 100 );
  *
  * @package All_Sources_Images
  * @since 6.2.0
@@ -20,17 +20,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Store the admin instance globally for use in render functions
  */
-global $ASI_new_ui_admin;
-$ASI_new_ui_admin = null;
+global $ALLSI_new_ui_admin;
+$ALLSI_new_ui_admin = null;
 
 /**
  * Set the admin instance for new UI pages
  * 
  * @param All_Sources_Images_Admin $instance
  */
-function asi_set_new_ui_admin( $instance ) {
-    global $ASI_new_ui_admin;
-    $ASI_new_ui_admin = $instance;
+function ALLSI_set_new_ui_admin( $instance ) {
+    global $ALLSI_new_ui_admin;
+    $ALLSI_new_ui_admin = $instance;
 }
 
 /**
@@ -38,9 +38,9 @@ function asi_set_new_ui_admin( $instance ) {
  * 
  * @return All_Sources_Images_Admin|null
  */
-function asi_get_new_ui_admin() {
-    global $ASI_new_ui_admin;
-    return $ASI_new_ui_admin;
+function ALLSI_get_new_ui_admin() {
+    global $ALLSI_new_ui_admin;
+    return $ALLSI_new_ui_admin;
 }
 
 /**
@@ -48,46 +48,46 @@ function asi_get_new_ui_admin() {
  * 
  * This should be called from the admin class or after admin_menu hook
  */
-function asi_register_new_ui_menus() {
+function ALLSI_register_new_ui_menus() {
     // Settings submenu (first item, replaces Dashboard)
     add_submenu_page(
-        'asi-new-settings',
+        'allsi-new-settings',
         __( 'Settings', 'all-sources-images' ),
         __( 'Settings', 'all-sources-images' ),
-        'asi_manage',
-        'asi-new-settings',
-        'asi_render_new_settings_page'
+        'ALLSI_manage',
+        'allsi-new-settings',
+        'ALLSI_render_new_settings_page'
     );
     
     // Bulk Settings submenu (formerly Automatic)
     add_submenu_page(
-        'asi-new-settings',
+        'allsi-new-settings',
         __( 'Bulk Settings', 'all-sources-images' ),
         __( 'Bulk Settings', 'all-sources-images' ),
-        'asi_manage',
-        'asi-new-automatic',
-        'asi_render_new_automatic_page'
+        'ALLSI_manage',
+        'allsi-new-automatic',
+        'ALLSI_render_new_automatic_page'
     );
     
     // Bulk Generation submenu
     add_submenu_page(
-        'asi-new-settings',
+        'allsi-new-settings',
         __( 'Bulk Generation', 'all-sources-images' ),
         __( 'Bulk Generation', 'all-sources-images' ),
-        'asi_manage',
-        'asi-new-bulk-generation',
-        'asi_render_new_bulk_generation_page'
+        'ALLSI_manage',
+        'allsi-new-bulk-generation',
+        'ALLSI_render_new_bulk_generation_page'
     );
 }
 
 /**
  * Render the New Settings page
  */
-function asi_render_new_settings_page() {
-    $admin = asi_get_new_ui_admin();
+function ALLSI_render_new_settings_page() {
+    $admin = ALLSI_get_new_ui_admin();
     
     if ( ! $admin ) {
-        $admin = asi_try_get_admin_instance();
+        $admin = ALLSI_try_get_admin_instance();
     }
     
     if ( $admin ) {
@@ -98,18 +98,18 @@ function asi_render_new_settings_page() {
         $render = Closure::bind( $render, $admin, get_class( $admin ) );
         $render();
     } else {
-        asi_render_error_page();
+        ALLSI_render_error_page();
     }
 }
 
 /**
  * Render the New Automatic page
  */
-function asi_render_new_automatic_page() {
-    $admin = asi_get_new_ui_admin();
+function ALLSI_render_new_automatic_page() {
+    $admin = ALLSI_get_new_ui_admin();
     
     if ( ! $admin ) {
-        $admin = asi_try_get_admin_instance();
+        $admin = ALLSI_try_get_admin_instance();
     }
     
     if ( $admin ) {
@@ -120,18 +120,18 @@ function asi_render_new_automatic_page() {
         $render = Closure::bind( $render, $admin, get_class( $admin ) );
         $render();
     } else {
-        asi_render_error_page();
+        ALLSI_render_error_page();
     }
 }
 
 /**
  * Render the New Bulk Generation page
  */
-function asi_render_new_bulk_generation_page() {
-    $admin = asi_get_new_ui_admin();
+function ALLSI_render_new_bulk_generation_page() {
+    $admin = ALLSI_get_new_ui_admin();
     
     if ( ! $admin ) {
-        $admin = asi_try_get_admin_instance();
+        $admin = ALLSI_try_get_admin_instance();
     }
     
     if ( $admin ) {
@@ -142,7 +142,7 @@ function asi_render_new_bulk_generation_page() {
         $render = Closure::bind( $render, $admin, get_class( $admin ) );
         $render();
     } else {
-        asi_render_error_page();
+        ALLSI_render_error_page();
     }
 }
 
@@ -151,11 +151,11 @@ function asi_render_new_bulk_generation_page() {
  * 
  * @return object|null
  */
-function asi_try_get_admin_instance() {
+function ALLSI_try_get_admin_instance() {
     // Method 1: Check global
-    global $ASI_admin_instance;
-    if ( isset( $ASI_admin_instance ) && is_object( $ASI_admin_instance ) ) {
-        return $ASI_admin_instance;
+    global $ALLSI_admin_instance;
+    if ( isset( $ALLSI_admin_instance ) && is_object( $ALLSI_admin_instance ) ) {
+        return $ALLSI_admin_instance;
     }
     
     // Method 2: Try to instantiate the admin class directly
@@ -170,7 +170,7 @@ function asi_try_get_admin_instance() {
 /**
  * Render error page when admin instance not available
  */
-function asi_render_error_page() {
+function ALLSI_render_error_page() {
     ?>
     <div class="wrap">
         <h1><?php esc_html_e( 'Error', 'all-sources-images' ); ?></h1>
@@ -181,5 +181,5 @@ function asi_render_error_page() {
     <?php
 }
 
-// Note: Menus are registered via ASI_main_settings() which calls asi_register_new_ui_menus()
-// Do NOT call asi_register_new_ui_menus() here as this file may be loaded before admin_menu hook
+// Note: Menus are registered via ALLSI_main_settings() which calls ALLSI_register_new_ui_menus()
+// Do NOT call ALLSI_register_new_ui_menus() here as this file may be loaded before admin_menu hook

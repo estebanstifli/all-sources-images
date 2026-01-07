@@ -1,4 +1,4 @@
-﻿/* Rating div */
+/* Rating div */
 jQuery(document).ready(function($){
     $('#mpt-rate').on('click', function(e){
       e.preventDefault();
@@ -7,19 +7,19 @@ jQuery(document).ready(function($){
   
     $(document).on('click', '#mpt-hide-notice', function(e){
       e.preventDefault();
-      $.post(ajaxurl, {action: 'ASI_hide_notice'});
+      $.post(ajaxurl, {action: 'allsi_hide_notice'});
       $('#mpt-rating-notice').hide();
     });
   
     $(document).on('click', '#mpt-remind-later', function(e){
       e.preventDefault();
-      $.post(ajaxurl, {action: 'ASI_remind_later', delay: 30});
+      $.post(ajaxurl, {action: 'allsi_remind_later', delay: 30});
       $('#mpt-rating-notice').hide();
     });
   
     $(document).on('click', '#mpt-already-done', function(e){
       e.preventDefault();
-      $.post(ajaxurl, {action: 'ASI_remind_later', delay: 180});
+      $.post(ajaxurl, {action: 'allsi_remind_later', delay: 180});
       $('#mpt-rating-notice').hide();
     });
   });

@@ -15,9 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $has_woocommerce = class_exists( 'WooCommerce' );
 
 // Get configured post types from settings
-$options = get_option( 'ASI_plugin_main_settings' );
-if ( isset( $this ) && method_exists( $this, 'ASI_default_options_main_settings' ) ) {
-    $options = wp_parse_args( $options, $this->ASI_default_options_main_settings() );
+$options = get_option( 'ALLSI_plugin_main_settings' );
+if ( isset( $this ) && method_exists( $this, 'ALLSI_default_options_main_settings' ) ) {
+    $options = wp_parse_args( $options, $this->ALLSI_default_options_main_settings() );
 }
 
 // Get categories for posts
@@ -45,8 +45,8 @@ if ( $has_woocommerce ) {
     <!-- Select Sources Card -->
     <div class="card card100 shadow-sm mb-4">
         <!-- Hidden fields for job creation -->
-        <input type="hidden" id="asi-job-name" name="job_name" value="">
-        <input type="hidden" id="asi-images-per-post" name="images_per_post" value="<?php echo esc_attr( $block_count ); ?>">
+        <input type="hidden" id="allsi-job-name" name="job_name" value="">
+        <input type="hidden" id="allsi-images-per-post" name="images_per_post" value="<?php echo esc_attr( $block_count ); ?>">
         <div class="card-body">
             <h5 class="card-title mb-3">
                 <i class="bi bi-check2-square me-2 text-secondary"></i><?php esc_html_e( 'Select Content', 'all-sources-images' ); ?>
@@ -60,28 +60,28 @@ if ( $has_woocommerce ) {
                 </div>
                 <div class="d-flex gap-3 flex-wrap mb-2">
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_posts_mode" value="all" class="asi-mode-checkbox" data-type="post">
+                        <input type="checkbox" name="ALLSI_select_posts_mode" value="all" class="allsi-mode-checkbox" data-type="post">
                         <span><?php esc_html_e( 'All Posts', 'all-sources-images' ); ?></span>
                     </label>
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_posts_mode" value="no_featured" class="asi-mode-checkbox" data-type="post">
+                        <input type="checkbox" name="ALLSI_select_posts_mode" value="no_featured" class="allsi-mode-checkbox" data-type="post">
                         <span><?php esc_html_e( 'Without Featured Image', 'all-sources-images' ); ?></span>
                     </label>
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_posts_mode" value="custom" class="asi-mode-checkbox" data-type="post">
+                        <input type="checkbox" name="ALLSI_select_posts_mode" value="custom" class="allsi-mode-checkbox" data-type="post">
                         <span><?php esc_html_e( 'Custom Selection', 'all-sources-images' ); ?></span>
                     </label>
                 </div>
 
                 <!-- Accordion for custom selection -->
-                <div class="accordion" id="asi-post-accordion" style="display:none;">
+                <div class="accordion" id="allsi-post-accordion" style="display:none;">
                     <div class="accordion-item" data-post-type="post">
                         <h2 class="accordion-header" id="heading-post">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-post" aria-expanded="false" aria-controls="collapse-post">
                                 <?php esc_html_e( 'Select Posts', 'all-sources-images' ); ?>
                             </button>
                         </h2>
-                        <div id="collapse-post" class="accordion-collapse collapse" aria-labelledby="heading-post" data-bs-parent="#asi-post-accordion">
+                        <div id="collapse-post" class="accordion-collapse collapse" aria-labelledby="heading-post" data-bs-parent="#allsi-post-accordion">
                             <div class="accordion-body">
                                 <!-- Sub-tabs -->
                                 <ul class="nav nav-tabs mb-3" id="tabs-post" role="tablist">
@@ -110,35 +110,35 @@ if ( $has_woocommerce ) {
                                     <!-- Recent -->
                                     <div class="tab-pane fade show active" id="recent-post" role="tabpanel" aria-labelledby="recent-tab-post">
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#recent-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#recent-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="recent-items-post" class="asi-items"></div>
+                                        <div id="recent-items-post" class="allsi-items"></div>
                                     </div>
                                     <!-- All -->
                                     <div class="tab-pane fade" id="all-post" role="tabpanel" aria-labelledby="all-tab-post">
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#all-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#all-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="all-items-post" class="asi-items"></div>
-                                        <div id="all-pagination-post" class="asi-pagination mt-2"></div>
+                                        <div id="all-items-post" class="allsi-items"></div>
+                                        <div id="all-pagination-post" class="allsi-pagination mt-2"></div>
                                     </div>
                                     <!-- Search -->
                                     <div class="tab-pane fade" id="search-post" role="tabpanel" aria-labelledby="search-tab-post">
                                         <div class="input-group mb-2">
                                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                            <input type="text" id="search-input-post" class="form-control asi-search-input" placeholder="<?php esc_attr_e( 'Search posts...', 'all-sources-images' ); ?>" data-post-type="post">
+                                            <input type="text" id="search-input-post" class="form-control allsi-search-input" placeholder="<?php esc_attr_e( 'Search posts...', 'all-sources-images' ); ?>" data-post-type="post">
                                         </div>
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#search-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#search-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="search-items-post" class="asi-items"></div>
-                                        <div id="search-pagination-post" class="asi-pagination mt-2"></div>
+                                        <div id="search-items-post" class="allsi-items"></div>
+                                        <div id="search-pagination-post" class="allsi-pagination mt-2"></div>
                                     </div>
                                     <!-- Categories -->
                                     <div class="tab-pane fade" id="category-post" role="tabpanel" aria-labelledby="category-tab-post">
                                         <div class="row mb-2">
                                             <div class="col-md-6">
-                                                <select id="category-select-post" class="form-select asi-category-select" data-post-type="post">
+                                                <select id="category-select-post" class="form-select allsi-category-select" data-post-type="post">
                                                     <option value=""><?php esc_html_e( '-- Select Category --', 'all-sources-images' ); ?></option>
                                                     <?php foreach ( $post_categories as $cat ) : ?>
                                                         <option value="<?php echo esc_attr( $cat->term_id ); ?>"><?php echo esc_html( $cat->name ); ?> (<?php echo esc_html( $cat->count ); ?>)</option>
@@ -147,10 +147,10 @@ if ( $has_woocommerce ) {
                                             </div>
                                         </div>
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#category-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#category-items-post"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="category-items-post" class="asi-items"></div>
-                                        <div id="category-pagination-post" class="asi-pagination mt-2"></div>
+                                        <div id="category-items-post" class="allsi-items"></div>
+                                        <div id="category-pagination-post" class="allsi-pagination mt-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -167,28 +167,28 @@ if ( $has_woocommerce ) {
                 </div>
                 <div class="d-flex gap-3 flex-wrap mb-2">
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_pages_mode" value="all" class="asi-mode-checkbox" data-type="page">
+                        <input type="checkbox" name="ALLSI_select_pages_mode" value="all" class="allsi-mode-checkbox" data-type="page">
                         <span><?php esc_html_e( 'All Pages', 'all-sources-images' ); ?></span>
                     </label>
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_pages_mode" value="no_featured" class="asi-mode-checkbox" data-type="page">
+                        <input type="checkbox" name="ALLSI_select_pages_mode" value="no_featured" class="allsi-mode-checkbox" data-type="page">
                         <span><?php esc_html_e( 'Without Featured Image', 'all-sources-images' ); ?></span>
                     </label>
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_pages_mode" value="custom" class="asi-mode-checkbox" data-type="page">
+                        <input type="checkbox" name="ALLSI_select_pages_mode" value="custom" class="allsi-mode-checkbox" data-type="page">
                         <span><?php esc_html_e( 'Custom Selection', 'all-sources-images' ); ?></span>
                     </label>
                 </div>
 
                 <!-- Accordion for custom selection -->
-                <div class="accordion" id="asi-page-accordion" style="display:none;">
+                <div class="accordion" id="allsi-page-accordion" style="display:none;">
                     <div class="accordion-item" data-post-type="page">
                         <h2 class="accordion-header" id="heading-page">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-page" aria-expanded="false" aria-controls="collapse-page">
                                 <?php esc_html_e( 'Select Pages', 'all-sources-images' ); ?>
                             </button>
                         </h2>
-                        <div id="collapse-page" class="accordion-collapse collapse" aria-labelledby="heading-page" data-bs-parent="#asi-page-accordion">
+                        <div id="collapse-page" class="accordion-collapse collapse" aria-labelledby="heading-page" data-bs-parent="#allsi-page-accordion">
                             <div class="accordion-body">
                                 <!-- Sub-tabs -->
                                 <ul class="nav nav-tabs mb-3" id="tabs-page" role="tablist">
@@ -212,29 +212,29 @@ if ( $has_woocommerce ) {
                                     <!-- Recent -->
                                     <div class="tab-pane fade show active" id="recent-page" role="tabpanel" aria-labelledby="recent-tab-page">
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#recent-items-page"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#recent-items-page"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="recent-items-page" class="asi-items"></div>
+                                        <div id="recent-items-page" class="allsi-items"></div>
                                     </div>
                                     <!-- All -->
                                     <div class="tab-pane fade" id="all-page" role="tabpanel" aria-labelledby="all-tab-page">
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#all-items-page"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#all-items-page"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="all-items-page" class="asi-items"></div>
-                                        <div id="all-pagination-page" class="asi-pagination mt-2"></div>
+                                        <div id="all-items-page" class="allsi-items"></div>
+                                        <div id="all-pagination-page" class="allsi-pagination mt-2"></div>
                                     </div>
                                     <!-- Search -->
                                     <div class="tab-pane fade" id="search-page" role="tabpanel" aria-labelledby="search-tab-page">
                                         <div class="input-group mb-2">
                                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                            <input type="text" id="search-input-page" class="form-control asi-search-input" placeholder="<?php esc_attr_e( 'Search pages...', 'all-sources-images' ); ?>" data-post-type="page">
+                                            <input type="text" id="search-input-page" class="form-control allsi-search-input" placeholder="<?php esc_attr_e( 'Search pages...', 'all-sources-images' ); ?>" data-post-type="page">
                                         </div>
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#search-items-page"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#search-items-page"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="search-items-page" class="asi-items"></div>
-                                        <div id="search-pagination-page" class="asi-pagination mt-2"></div>
+                                        <div id="search-items-page" class="allsi-items"></div>
+                                        <div id="search-pagination-page" class="allsi-pagination mt-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -253,28 +253,28 @@ if ( $has_woocommerce ) {
                 </div>
                 <div class="d-flex gap-3 flex-wrap mb-2">
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_products_mode" value="all" class="asi-mode-checkbox" data-type="product">
+                        <input type="checkbox" name="ALLSI_select_products_mode" value="all" class="allsi-mode-checkbox" data-type="product">
                         <span><?php esc_html_e( 'All Products', 'all-sources-images' ); ?></span>
                     </label>
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_products_mode" value="no_featured" class="asi-mode-checkbox" data-type="product">
+                        <input type="checkbox" name="ALLSI_select_products_mode" value="no_featured" class="allsi-mode-checkbox" data-type="product">
                         <span><?php esc_html_e( 'Without Featured Image', 'all-sources-images' ); ?></span>
                     </label>
                     <label class="d-flex align-items-center gap-2 m-0">
-                        <input type="checkbox" name="asi_select_products_mode" value="custom" class="asi-mode-checkbox" data-type="product">
+                        <input type="checkbox" name="ALLSI_select_products_mode" value="custom" class="allsi-mode-checkbox" data-type="product">
                         <span><?php esc_html_e( 'Custom Selection', 'all-sources-images' ); ?></span>
                     </label>
                 </div>
 
                 <!-- Accordion for custom selection -->
-                <div class="accordion" id="asi-product-accordion" style="display:none;">
+                <div class="accordion" id="allsi-product-accordion" style="display:none;">
                     <div class="accordion-item" data-post-type="product">
                         <h2 class="accordion-header" id="heading-product">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-product" aria-expanded="false" aria-controls="collapse-product">
                                 <?php esc_html_e( 'Select Products', 'all-sources-images' ); ?>
                             </button>
                         </h2>
-                        <div id="collapse-product" class="accordion-collapse collapse" aria-labelledby="heading-product" data-bs-parent="#asi-product-accordion">
+                        <div id="collapse-product" class="accordion-collapse collapse" aria-labelledby="heading-product" data-bs-parent="#allsi-product-accordion">
                             <div class="accordion-body">
                                 <!-- Sub-tabs -->
                                 <ul class="nav nav-tabs mb-3" id="tabs-product" role="tablist">
@@ -303,35 +303,35 @@ if ( $has_woocommerce ) {
                                     <!-- Recent -->
                                     <div class="tab-pane fade show active" id="recent-product" role="tabpanel" aria-labelledby="recent-tab-product">
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#recent-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#recent-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="recent-items-product" class="asi-items"></div>
+                                        <div id="recent-items-product" class="allsi-items"></div>
                                     </div>
                                     <!-- All -->
                                     <div class="tab-pane fade" id="all-product" role="tabpanel" aria-labelledby="all-tab-product">
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#all-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#all-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="all-items-product" class="asi-items"></div>
-                                        <div id="all-pagination-product" class="asi-pagination mt-2"></div>
+                                        <div id="all-items-product" class="allsi-items"></div>
+                                        <div id="all-pagination-product" class="allsi-pagination mt-2"></div>
                                     </div>
                                     <!-- Search -->
                                     <div class="tab-pane fade" id="search-product" role="tabpanel" aria-labelledby="search-tab-product">
                                         <div class="input-group mb-2">
                                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                            <input type="text" id="search-input-product" class="form-control asi-search-input" placeholder="<?php esc_attr_e( 'Search products...', 'all-sources-images' ); ?>" data-post-type="product">
+                                            <input type="text" id="search-input-product" class="form-control allsi-search-input" placeholder="<?php esc_attr_e( 'Search products...', 'all-sources-images' ); ?>" data-post-type="product">
                                         </div>
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#search-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#search-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="search-items-product" class="asi-items"></div>
-                                        <div id="search-pagination-product" class="asi-pagination mt-2"></div>
+                                        <div id="search-items-product" class="allsi-items"></div>
+                                        <div id="search-pagination-product" class="allsi-pagination mt-2"></div>
                                     </div>
                                     <!-- Categories -->
                                     <div class="tab-pane fade" id="category-product" role="tabpanel" aria-labelledby="category-tab-product">
                                         <div class="row mb-2">
                                             <div class="col-md-6">
-                                                <select id="category-select-product" class="form-select asi-category-select" data-post-type="product">
+                                                <select id="category-select-product" class="form-select allsi-category-select" data-post-type="product">
                                                     <option value=""><?php esc_html_e( '-- Select Category --', 'all-sources-images' ); ?></option>
                                                     <?php if ( ! is_wp_error( $product_categories ) ) : ?>
                                                         <?php foreach ( $product_categories as $cat ) : ?>
@@ -342,10 +342,10 @@ if ( $has_woocommerce ) {
                                             </div>
                                         </div>
                                         <label class="d-block mb-2">
-                                            <input type="checkbox" class="asi-select-all me-1" data-target="#category-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
+                                            <input type="checkbox" class="allsi-select-all me-1" data-target="#category-items-product"> <?php esc_html_e( 'Select All', 'all-sources-images' ); ?>
                                         </label>
-                                        <div id="category-items-product" class="asi-items"></div>
-                                        <div id="category-pagination-product" class="asi-pagination mt-2"></div>
+                                        <div id="category-items-product" class="allsi-items"></div>
+                                        <div id="category-pagination-product" class="allsi-pagination mt-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -378,7 +378,7 @@ if ( $has_woocommerce ) {
                     <h5 class="card-title mb-3">
                         <i class="bi bi-list-check me-2 text-secondary"></i><?php esc_html_e( 'Selection Summary', 'all-sources-images' ); ?>
                     </h5>
-                    <div id="asi-selection-summary" class="p-3 bg-light rounded">
+                    <div id="allsi-selection-summary" class="p-3 bg-light rounded">
                         <span class="text-muted"><?php esc_html_e( 'No content selected yet.', 'all-sources-images' ); ?></span>
                     </div>
                 </div>
@@ -386,10 +386,10 @@ if ( $has_woocommerce ) {
                     <h5 class="card-title mb-3">
                         <i class="bi bi-play-circle me-2 text-secondary"></i><?php esc_html_e( 'Actions', 'all-sources-images' ); ?>
                     </h5>
-                    <button type="button" id="asi-create-job-btn" class="btn btn-primary btn-lg" disabled>
+                    <button type="button" id="allsi-create-job-btn" class="btn btn-primary btn-lg" disabled>
                         <i class="bi bi-plus-circle me-2"></i><?php esc_html_e( 'Create Job', 'all-sources-images' ); ?>
                     </button>
-                    <button type="button" id="asi-create-start-btn" class="btn btn-success btn-lg ms-2" disabled>
+                    <button type="button" id="allsi-create-start-btn" class="btn btn-success btn-lg ms-2" disabled>
                         <i class="bi bi-play-fill me-2"></i><?php esc_html_e( 'Create & Start', 'all-sources-images' ); ?>
                     </button>
                 </div>

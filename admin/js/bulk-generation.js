@@ -6,7 +6,7 @@
  * @package All_Sources_Images
  */
 
-/* global jQuery, asiBulkAjax */
+/* global jQuery, allsiBulkAjax */
 jQuery(document).ready(function($) {
     'use strict';
 
@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
     // =====================
     // Mode Checkbox Handlers
     // =====================
-    $(document).on('change', '.asi-mode-checkbox', function() {
+    $(document).on('change', '.allsi-mode-checkbox', function() {
         const $this = $(this);
         const postType = $this.data('type');
         const value = $this.val();
@@ -43,7 +43,7 @@ jQuery(document).ready(function($) {
 
         // Uncheck other modes for same post type
         if (isChecked) {
-            $(`input[name="asi_select_${postType}s_mode"]`).not(this).prop('checked', false);
+            $(`input[name="allsi_select_${postType}s_mode"]`).not(this).prop('checked', false);
             selectedPosts[postType].mode = value;
             selectedPosts[postType].ids = [];
         } else {
@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
         }
 
         // Show/hide accordion
-        const $accordion = $(`#asi-${postType}-accordion`);
+        const $accordion = $(`#allsi-${postType}-accordion`);
         if (value === 'custom' && isChecked) {
             $accordion.slideDown();
             expandAccordionFor(postType);
@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
         loadItems(postType, 'all', '', 1);
 
         // Setup search handler
-        $(`#search-input-${postType}`).off('keyup.asi').on('keyup.asi', debounce(function() {
+        $(`#search-input-${postType}`).off('keyup.allsi').on('keyup.allsi', debounce(function() {
             loadItems(postType, 'search', $(this).val(), 1);
         }, 300));
     }
@@ -100,11 +100,11 @@ jQuery(document).ready(function($) {
         if ($pagination.length) $pagination.empty();
 
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_load_items',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_load_items',
+                nonce: allsiBulkAjax.nonce,
                 post_type: postType,
                 tab: tab,
                 search: search,
@@ -153,7 +153,7 @@ jQuery(document).ready(function($) {
 
         let html = '';
         if (currentPage > 1) {
-            html += `<a href="#" class="asi-page-link" data-pt="${postType}" data-tab="${tab}" data-page="${currentPage - 1}" data-search="${search}" data-category="${category}">«</a>`;
+            html += `<a href="#" class="allsi-page-link" data-pt="${postType}" data-tab="${tab}" data-page="${currentPage - 1}" data-search="${search}" data-category="${category}">«</a>`;
         }
         
         // Show max 5 page numbers
@@ -167,19 +167,19 @@ jQuery(document).ready(function($) {
             if (i === currentPage) {
                 html += `<span class="current-page">${i}</span>`;
             } else {
-                html += `<a href="#" class="asi-page-link" data-pt="${postType}" data-tab="${tab}" data-page="${i}" data-search="${search}" data-category="${category}">${i}</a>`;
+                html += `<a href="#" class="allsi-page-link" data-pt="${postType}" data-tab="${tab}" data-page="${i}" data-search="${search}" data-category="${category}">${i}</a>`;
             }
         }
 
         if (currentPage < maxPages) {
-            html += `<a href="#" class="asi-page-link" data-pt="${postType}" data-tab="${tab}" data-page="${currentPage + 1}" data-search="${search}" data-category="${category}">»</a>`;
+            html += `<a href="#" class="allsi-page-link" data-pt="${postType}" data-tab="${tab}" data-page="${currentPage + 1}" data-search="${search}" data-category="${category}">»</a>`;
         }
 
         $pagination.html(html);
     }
 
     // Pagination click handler
-    $(document).on('click', '.asi-page-link', function(e) {
+    $(document).on('click', '.allsi-page-link', function(e) {
         e.preventDefault();
         const $this = $(this);
         loadItems(
@@ -192,7 +192,7 @@ jQuery(document).ready(function($) {
     });
 
     // Category select handler
-    $(document).on('change', '.asi-category-select', function() {
+    $(document).on('change', '.allsi-category-select', function() {
         const postType = $(this).data('post-type');
         const category = $(this).val();
         loadItems(postType, 'category', '', 1, category);
@@ -217,7 +217,7 @@ jQuery(document).ready(function($) {
     }
 
     // Select All handler
-    $(document).on('change', '.asi-select-all', function() {
+    $(document).on('change', '.allsi-select-all', function() {
         const target = $(this).data('target');
         const isChecked = $(this).is(':checked');
         $(target).find('input[type="checkbox"]').prop('checked', isChecked).trigger('change');
@@ -266,13 +266,13 @@ jQuery(document).ready(function($) {
             if (totalCount >= 0) totalCount += selectedPosts.product.ids.length;
         }
 
-        const $summary = $('#asi-selection-summary');
+        const $summary = $('#allsi-selection-summary');
         if (lines.length > 0) {
             $summary.html(lines.join('<br>'));
-            $('#asi-create-job-btn, #asi-create-start-btn').prop('disabled', false);
+            $('#allsi-create-job-btn, #allsi-create-start-btn').prop('disabled', false);
         } else {
             $summary.html('<span class="text-muted">No content selected yet.</span>');
-            $('#asi-create-job-btn, #asi-create-start-btn').prop('disabled', true);
+            $('#allsi-create-job-btn, #allsi-create-start-btn').prop('disabled', true);
         }
     }
 
@@ -280,8 +280,8 @@ jQuery(document).ready(function($) {
     // Create Job
     // =====================
     function createJob(startImmediately = false) {
-        const jobName = $('#asi-job-name').val().trim() || ('Bulk Job ' + new Date().toISOString().slice(0, 19).replace('T', ' '));
-        const imagesPerPost = parseInt($('#asi-images-per-post').val()) || 1;
+        const jobName = $('#allsi-job-name').val().trim() || ('Bulk Job ' + new Date().toISOString().slice(0, 19).replace('T', ' '));
+        const imagesPerPost = parseInt($('#allsi-images-per-post').val()) || 1;
 
         // Collect selection data
         const selection = {
@@ -293,19 +293,19 @@ jQuery(document).ready(function($) {
         // Check if anything selected
         const hasSelection = Object.values(selection).some(s => s.mode !== '' || s.ids.length > 0);
         if (!hasSelection) {
-            alert(asiBulkAjax.i18n.no_selection || 'Please select content to generate images for.');
+            alert(allsiBulkAjax.i18n.no_selection || 'Please select content to generate images for.');
             return;
         }
 
         // Disable buttons
-        $('#asi-create-job-btn, #asi-create-start-btn').prop('disabled', true).addClass('loading');
+        $('#allsi-create-job-btn, #allsi-create-start-btn').prop('disabled', true).addClass('loading');
 
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_create_job',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_create_job',
+                nonce: allsiBulkAjax.nonce,
                 job_name: jobName,
                 images_per_post: imagesPerPost,
                 selection: JSON.stringify(selection),
@@ -343,27 +343,27 @@ jQuery(document).ready(function($) {
             alert('Network error');
         })
         .always(function() {
-            $('#asi-create-job-btn, #asi-create-start-btn').prop('disabled', false).removeClass('loading');
+            $('#allsi-create-job-btn, #allsi-create-start-btn').prop('disabled', false).removeClass('loading');
         });
     }
 
-    $('#asi-create-job-btn').on('click', function() {
+    $('#allsi-create-job-btn').on('click', function() {
         createJob(false);
     });
 
-    $('#asi-create-start-btn').on('click', function() {
+    $('#allsi-create-start-btn').on('click', function() {
         createJob(true);
     });
 
     function resetForm() {
         // Reset form fields
-        $('#asi-job-name').val('');
+        $('#allsi-job-name').val('');
         
         // Uncheck all mode checkboxes
-        $('.asi-mode-checkbox').prop('checked', false);
+        $('.allsi-mode-checkbox').prop('checked', false);
         
         // Hide all accordions
-        $('[id^="asi-"][id$="-accordion"]').hide();
+        $('[id^="allsi-"][id$="-accordion"]').hide();
         
         // Reset state
         selectedPosts = {
@@ -379,15 +379,15 @@ jQuery(document).ready(function($) {
     // Jobs List
     // =====================
     function loadJobs(page = 1) {
-        const $tbody = $('#asi-jobs-tbody');
+        const $tbody = $('#allsi-jobs-tbody');
         // Don't show loading indicator, just fetch and update directly
 
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_get_jobs',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_get_jobs',
+                nonce: allsiBulkAjax.nonce,
                 page: page
             }
         })
@@ -404,7 +404,7 @@ jQuery(document).ready(function($) {
     }
 
     function renderJobsTable(data) {
-        const $tbody = $('#asi-jobs-tbody');
+        const $tbody = $('#allsi-jobs-tbody');
         const jobs = data.jobs || [];
 
         if (jobs.length === 0) {
@@ -430,26 +430,26 @@ jQuery(document).ready(function($) {
                 </td>
                 <td><small>${job.created_at}</small></td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary asi-view-job" data-job-id="${job.id}" title="View">
+                    <button class="btn btn-sm btn-outline-primary allsi-view-job" data-job-id="${job.id}" title="View">
                         <i class="bi bi-eye"></i>
                     </button>
                     ${job.job_status === 'pending' ? `
-                        <button class="btn btn-sm btn-outline-success asi-start-job" data-job-id="${job.id}" title="Start">
+                        <button class="btn btn-sm btn-outline-success allsi-start-job" data-job-id="${job.id}" title="Start">
                             <i class="bi bi-play-fill"></i>
                         </button>
                     ` : ''}
                     ${job.job_status === 'processing' ? `
-                        <button class="btn btn-sm btn-outline-warning asi-pause-job" data-job-id="${job.id}" title="Pause">
+                        <button class="btn btn-sm btn-outline-warning allsi-pause-job" data-job-id="${job.id}" title="Pause">
                             <i class="bi bi-pause-fill"></i>
                         </button>
                     ` : ''}
                     ${job.job_status === 'paused' ? `
-                        <button class="btn btn-sm btn-outline-success asi-resume-job" data-job-id="${job.id}" title="Resume">
+                        <button class="btn btn-sm btn-outline-success allsi-resume-job" data-job-id="${job.id}" title="Resume">
                             <i class="bi bi-play-fill"></i>
                         </button>
                     ` : ''}
                     ${['pending', 'processing', 'paused', 'completed', 'failed'].includes(job.job_status) ? `
-                        <button class="btn btn-sm btn-outline-danger asi-delete-job" data-job-id="${job.id}" title="Delete">
+                        <button class="btn btn-sm btn-outline-danger allsi-delete-job" data-job-id="${job.id}" title="Delete">
                             <i class="bi bi-trash"></i>
                         </button>
                     ` : ''}
@@ -464,7 +464,7 @@ jQuery(document).ready(function($) {
     }
 
     function renderJobsPagination(data) {
-        const $pagination = $('#asi-jobs-pagination');
+        const $pagination = $('#allsi-jobs-pagination');
         const maxPages = data.pages || 1;
         const currentPage = data.page || 1;
 
@@ -473,31 +473,31 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        let html = '<div class="asi-pagination">';
+        let html = '<div class="allsi-pagination">';
         if (currentPage > 1) {
-            html += `<a href="#" class="asi-jobs-page" data-page="${currentPage - 1}">«</a>`;
+            html += `<a href="#" class="allsi-jobs-page" data-page="${currentPage - 1}">«</a>`;
         }
         for (let i = 1; i <= maxPages; i++) {
             if (i === currentPage) {
                 html += `<span class="current-page">${i}</span>`;
             } else {
-                html += `<a href="#" class="asi-jobs-page" data-page="${i}">${i}</a>`;
+                html += `<a href="#" class="allsi-jobs-page" data-page="${i}">${i}</a>`;
             }
         }
         if (currentPage < maxPages) {
-            html += `<a href="#" class="asi-jobs-page" data-page="${currentPage + 1}">»</a>`;
+            html += `<a href="#" class="allsi-jobs-page" data-page="${currentPage + 1}">»</a>`;
         }
         html += '</div>';
 
         $pagination.html(html);
     }
 
-    $(document).on('click', '.asi-jobs-page', function(e) {
+    $(document).on('click', '.allsi-jobs-page', function(e) {
         e.preventDefault();
         loadJobs($(this).data('page'));
     });
 
-    $('#asi-refresh-jobs').on('click', function() {
+    $('#allsi-refresh-jobs').on('click', function() {
         loadJobs();
     });
 
@@ -509,47 +509,47 @@ jQuery(document).ready(function($) {
     // =====================
     // Job Actions
     // =====================
-    $(document).on('click', '.asi-view-job', function() {
+    $(document).on('click', '.allsi-view-job', function() {
         const jobId = $(this).data('job-id');
         viewJobDetails(jobId);
     });
 
-    $(document).on('click', '.asi-start-job, .asi-resume-job', function() {
+    $(document).on('click', '.allsi-start-job, .allsi-resume-job', function() {
         const jobId = $(this).data('job-id');
         startJob(jobId);
     });
 
-    $(document).on('click', '.asi-pause-job', function() {
+    $(document).on('click', '.allsi-pause-job', function() {
         const jobId = $(this).data('job-id');
         pauseJob(jobId);
     });
 
-    $(document).on('click', '.asi-delete-job', function() {
+    $(document).on('click', '.allsi-delete-job', function() {
         const jobId = $(this).data('job-id');
-        if (confirm(asiBulkAjax.i18n.confirm_delete || 'Are you sure you want to delete this job?')) {
+        if (confirm(allsiBulkAjax.i18n.confirm_delete || 'Are you sure you want to delete this job?')) {
             deleteJob(jobId);
         }
     });
 
-    $('#asi-close-job-details').on('click', function() {
-        $('#asi-job-details').slideUp();
+    $('#allsi-close-job-details').on('click', function() {
+        $('#allsi-job-details').slideUp();
         stopStatusRefresh();
     });
 
     function viewJobDetails(jobId) {
         currentJobId = jobId;
-        $('#asi-job-details').slideDown();
+        $('#allsi-job-details').slideDown();
         loadJobDetails(jobId);
         startStatusRefresh(jobId);
     }
 
     function loadJobDetails(jobId, postsPage = 1) {
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_get_job_details',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_get_job_details',
+                nonce: allsiBulkAjax.nonce,
                 job_id: jobId,
                 posts_page: postsPage
             }
@@ -567,23 +567,23 @@ jQuery(document).ready(function($) {
         const posts = data.posts;
 
         // Title
-        $('#asi-job-details-title').text(`Job #${job.id}: ${job.job_name}`);
+        $('#allsi-job-details-title').text(`Job #${job.id}: ${job.job_name}`);
 
         // Progress
         const progress = job.total_posts > 0 
             ? Math.round((job.processed_posts / job.total_posts) * 100) 
             : 0;
-        $('#asi-job-progress-bar').css('width', progress + '%');
-        $('#asi-job-progress-text').text(progress + '%');
+        $('#allsi-job-progress-bar').css('width', progress + '%');
+        $('#allsi-job-progress-text').text(progress + '%');
 
         // Stats
-        $('#asi-job-stat-total').text(stats.total);
-        $('#asi-job-stat-pending').text(stats.pending);
-        $('#asi-job-stat-completed').text(stats.completed);
-        $('#asi-job-stat-failed').text(stats.failed);
+        $('#allsi-job-stat-total').text(stats.total);
+        $('#allsi-job-stat-pending').text(stats.pending);
+        $('#allsi-job-stat-completed').text(stats.completed);
+        $('#allsi-job-stat-failed').text(stats.failed);
 
         // Posts table
-        const $tbody = $('#asi-job-posts-tbody');
+        const $tbody = $('#allsi-job-posts-tbody');
         if (posts.posts.length === 0) {
             $tbody.html('<tr><td colspan="5" class="text-center text-muted">No posts in this job</td></tr>');
         } else {
@@ -615,7 +615,7 @@ jQuery(document).ready(function($) {
                 
                 html += `<tr>
                     <td>
-                        <a href="${asiBulkAjax.edit_url}?post=${post.post_id}&action=edit" target="_blank">
+                        <a href="${allsiBulkAjax.edit_url}?post=${post.post_id}&action=edit" target="_blank">
                             ${escapeHtml(post.post_title)}
                         </a>
                     </td>
@@ -633,7 +633,7 @@ jQuery(document).ready(function($) {
     }
 
     function renderJobPostsPagination(posts) {
-        const $pagination = $('#asi-job-posts-pagination');
+        const $pagination = $('#allsi-job-posts-pagination');
         const maxPages = posts.pages || 1;
         const currentPage = posts.page || 1;
 
@@ -642,26 +642,26 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        let html = '<div class="asi-pagination">';
+        let html = '<div class="allsi-pagination">';
         if (currentPage > 1) {
-            html += `<a href="#" class="asi-job-posts-page" data-page="${currentPage - 1}">«</a>`;
+            html += `<a href="#" class="allsi-job-posts-page" data-page="${currentPage - 1}">«</a>`;
         }
         for (let i = 1; i <= Math.min(maxPages, 10); i++) {
             if (i === currentPage) {
                 html += `<span class="current-page">${i}</span>`;
             } else {
-                html += `<a href="#" class="asi-job-posts-page" data-page="${i}">${i}</a>`;
+                html += `<a href="#" class="allsi-job-posts-page" data-page="${i}">${i}</a>`;
             }
         }
         if (currentPage < maxPages) {
-            html += `<a href="#" class="asi-job-posts-page" data-page="${currentPage + 1}">»</a>`;
+            html += `<a href="#" class="allsi-job-posts-page" data-page="${currentPage + 1}">»</a>`;
         }
         html += '</div>';
 
         $pagination.html(html);
     }
 
-    $(document).on('click', '.asi-job-posts-page', function(e) {
+    $(document).on('click', '.allsi-job-posts-page', function(e) {
         e.preventDefault();
         if (currentJobId) {
             loadJobDetails(currentJobId, $(this).data('page'));
@@ -673,11 +673,11 @@ jQuery(document).ready(function($) {
     // =====================
     function startJob(jobId) {
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_start_job',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_start_job',
+                nonce: allsiBulkAjax.nonce,
                 job_id: jobId
             }
         })
@@ -695,11 +695,11 @@ jQuery(document).ready(function($) {
 
     function pauseJob(jobId) {
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_pause_job',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_pause_job',
+                nonce: allsiBulkAjax.nonce,
                 job_id: jobId
             }
         })
@@ -713,11 +713,11 @@ jQuery(document).ready(function($) {
 
     function deleteJob(jobId) {
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_delete_job',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_delete_job',
+                nonce: allsiBulkAjax.nonce,
                 job_id: jobId
             }
         })
@@ -725,7 +725,7 @@ jQuery(document).ready(function($) {
             if (res && res.success) {
                 loadJobs();
                 if (currentJobId === jobId) {
-                    $('#asi-job-details').slideUp();
+                    $('#allsi-job-details').slideUp();
                     stopStatusRefresh();
                 }
             }
@@ -775,7 +775,7 @@ jQuery(document).ready(function($) {
         
         // Show loading overlay
         const $overlay = $(`
-            <div id="asi-auto-generate-overlay" style="
+            <div id="allsi-auto-generate-overlay" style="
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -792,8 +792,8 @@ jQuery(document).ready(function($) {
                     <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <h4>${asiBulkAjax.i18n.creating_job || 'Creating job...'}</h4>
-                    <p class="text-muted">${asiBulkAjax.i18n.please_wait || 'Please wait while we set up your image generation job.'}</p>
+                    <h4>${allsiBulkAjax.i18n.creating_job || 'Creating job...'}</h4>
+                    <p class="text-muted">${allsiBulkAjax.i18n.please_wait || 'Please wait while we set up your image generation job.'}</p>
                 </div>
             </div>
         `);
@@ -801,18 +801,18 @@ jQuery(document).ready(function($) {
         
         // Create job via AJAX
         $.ajax({
-            url: asiBulkAjax.ajax_url,
+            url: allsiBulkAjax.ajax_url,
             method: 'POST',
             data: {
-                action: 'asi_bulk_create_job_from_ids',
-                nonce: asiBulkAjax.nonce,
+                action: 'allsi_bulk_create_job_from_ids',
+                nonce: allsiBulkAjax.nonce,
                 post_ids: autoIds
             }
         })
         .done(function(res) {
             if (res && res.success) {
                 // Remove URL parameter to prevent re-triggering
-                const newUrl = window.location.pathname + '?page=asi-new-bulk-generation';
+                const newUrl = window.location.pathname + '?page=allsi-new-bulk-generation';
                 window.history.replaceState({}, document.title, newUrl);
                 
                 // Switch to jobs tab
@@ -839,7 +839,7 @@ jQuery(document).ready(function($) {
                     $(this).remove();
                 });
             } else {
-                $overlay.find('h4').text(asiBulkAjax.i18n.error || 'Error');
+                $overlay.find('h4').text(allsiBulkAjax.i18n.error || 'Error');
                 $overlay.find('p').text(res.data.message || 'Failed to create job');
                 $overlay.find('.spinner-border').hide();
                 
@@ -851,8 +851,8 @@ jQuery(document).ready(function($) {
             }
         })
         .fail(function() {
-            $overlay.find('h4').text(asiBulkAjax.i18n.error || 'Error');
-            $overlay.find('p').text(asiBulkAjax.i18n.network_error || 'Network error');
+            $overlay.find('h4').text(allsiBulkAjax.i18n.error || 'Error');
+            $overlay.find('p').text(allsiBulkAjax.i18n.network_error || 'Network error');
             $overlay.find('.spinner-border').hide();
             
             setTimeout(function() {

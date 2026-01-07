@@ -25,9 +25,9 @@ class All_Sources_Images_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-		ASI_log( 'Activator::activate() called', 'ACTIVATOR' );
-		if ( false === ASI_ensure_logs_dir() ) {
-			ASI_log( 'Unable to prepare logs directory during activation', 'ACTIVATOR' );
+		ALLSI_log( 'Activator::activate() called', 'ACTIVATOR' );
+		if ( false === ALLSI_ensure_logs_dir() ) {
+			ALLSI_log( 'Unable to prepare logs directory during activation', 'ACTIVATOR' );
 		}
 		
 		// CRITICAL: Add capabilities immediately during activation
@@ -37,14 +37,14 @@ class All_Sources_Images_Activator {
 		// Create bulk generation database tables
 		self::create_bulk_generation_tables();
 		
-		if ( ! get_option( 'ASI_plugin_activation_date' ) ) {
-			$result = update_option( 'ASI_plugin_activation_date', time() );
-			ASI_log( 'Activation date set: ' . ( $result ? 'SUCCESS' : 'FAILED' ), 'ACTIVATOR' );
+		if ( ! get_option( 'ALLSI_plugin_activation_date' ) ) {
+			$result = update_option( 'ALLSI_plugin_activation_date', time() );
+			ALLSI_log( 'Activation date set: ' . ( $result ? 'SUCCESS' : 'FAILED' ), 'ACTIVATOR' );
 		} else {
-			ASI_log( 'Activation date already exists', 'ACTIVATOR' );
+			ALLSI_log( 'Activation date already exists', 'ACTIVATOR' );
 		}
 		
-		ASI_log( 'Activator::activate() completed', 'ACTIVATOR' );
+		ALLSI_log( 'Activator::activate() completed', 'ACTIVATOR' );
 	}
 
 	/**
@@ -53,16 +53,16 @@ class All_Sources_Images_Activator {
 	 * @since    6.1.7
 	 */
 	private static function create_bulk_generation_tables() {
-		ASI_log( 'Creating bulk generation database tables', 'ACTIVATOR' );
+		ALLSI_log( 'Creating bulk generation database tables', 'ACTIVATOR' );
 		
 		// Load the DB class
-		$db_class_path = plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-db.php';
+		$db_class_path = plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-allsi-bulk-generation-db.php';
 		if ( file_exists( $db_class_path ) ) {
 			require_once $db_class_path;
-			ASI_Bulk_Generation_DB::create_tables();
-			ASI_log( 'Bulk generation tables created successfully', 'ACTIVATOR' );
+			ALLSI_Bulk_Generation_DB::create_tables();
+			ALLSI_log( 'Bulk generation tables created successfully', 'ACTIVATOR' );
 		} else {
-			ASI_log( 'Bulk generation DB class not found: ' . $db_class_path, 'ACTIVATOR' );
+			ALLSI_log( 'Bulk generation DB class not found: ' . $db_class_path, 'ACTIVATOR' );
 		}
 	}
 
@@ -72,24 +72,24 @@ class All_Sources_Images_Activator {
 	 * @since    1.0.0
 	 */
 	private static function add_capabilities() {
-		ASI_log( 'Adding capabilities during activation', 'ACTIVATOR' );
+		ALLSI_log( 'Adding capabilities during activation', 'ACTIVATOR' );
 		
 		// Add capability to administrator role
 		$admin_role = get_role( 'administrator' );
 		if ( $admin_role ) {
-			$admin_role->add_cap( 'asi_manage', true );
-			ASI_log( 'Added asi_manage capability to administrator role', 'ACTIVATOR' );
+			$admin_role->add_cap( 'ALLSI_manage', true );
+			ALLSI_log( 'Added ALLSI_manage capability to administrator role', 'ACTIVATOR' );
 		}
 		
 		// Also add capability to current user immediately (in case role update doesn't take effect yet)
 		$current_user = wp_get_current_user();
 		if ( $current_user && $current_user->ID > 0 ) {
-			$current_user->add_cap( 'asi_manage', true );
-			ASI_log( 'Added asi_manage capability to current user (ID: ' . $current_user->ID . ')', 'ACTIVATOR' );
+			$current_user->add_cap( 'ALLSI_manage', true );
+			ALLSI_log( 'Added ALLSI_manage capability to current user (ID: ' . $current_user->ID . ')', 'ACTIVATOR' );
 		}
 		
 		// Load rights settings and add capabilities to other roles if configured
-		$options = get_option( 'ASI_plugin_rights_settings' );
+		$options = get_option( 'ALLSI_plugin_rights_settings' );
 		if ( $options ) {
 			$roles = array(
 				'editor'      => 'rights_editor',
@@ -100,8 +100,8 @@ class All_Sources_Images_Activator {
 			foreach ( $roles as $role_name => $option_key ) {
 				$role = get_role( $role_name );
 				if ( $role && isset( $options[$option_key] ) && $options[$option_key] === 'true' ) {
-					$role->add_cap( 'asi_manage', true );
-					ASI_log( 'Added asi_manage capability to ' . $role_name . ' role', 'ACTIVATOR' );
+					$role->add_cap( 'ALLSI_manage', true );
+					ALLSI_log( 'Added ALLSI_manage capability to ' . $role_name . ' role', 'ACTIVATOR' );
 				}
 			}
 		}

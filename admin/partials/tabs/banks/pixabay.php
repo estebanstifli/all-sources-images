@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Pixabay username', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="text" name="ASI_plugin_banks_settings[pixabay][username]" class="form-control" value="<?php echo( isset( $options['pixabay']['username'] ) && !empty( $options['pixabay']['username']) )? esc_attr( $options['pixabay']['username'] ): ''; ?>" >
+		<input type="text" name="ALLSI_plugin_banks_settings[pixabay][username]" class="form-control" value="<?php echo( isset( $options['pixabay']['username'] ) && !empty( $options['pixabay']['username']) )? esc_attr( $options['pixabay']['username'] ): ''; ?>" >
 	</td>
 </tr>
 <tr valign="top">
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Api key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-pixabay" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[pixabay][apikey]" class="form-control" value="<?php echo( isset( $options['pixabay']['apikey'] ) && !empty( $options['pixabay']['apikey']) )? esc_attr( $options['pixabay']['apikey'] ): ''; ?>" >
+		<input type="password" name="ALLSI_plugin_banks_settings[pixabay][apikey]" class="form-control" value="<?php echo( isset( $options['pixabay']['apikey'] ) && !empty( $options['pixabay']['apikey']) )? esc_attr( $options['pixabay']['apikey'] ): ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -55,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pixabay][imgtype]" class="form-control" >
+		<select name="ALLSI_plugin_banks_settings[pixabay][imgtype]" class="form-control" >
 			<?php
 			$selected = $options['pixabay']['imgtype'];
 
@@ -80,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Choose the language', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pixabay][search_country]" class="form-control" >
+		<select name="ALLSI_plugin_banks_settings[pixabay][search_country]" class="form-control" >
 			<?php
 
 				$selected = $options['pixabay']['search_country'];
@@ -128,7 +128,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Orientation', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pixabay][orientation]" class="form-control" >
+		<select name="ALLSI_plugin_banks_settings[pixabay][orientation]" class="form-control" >
 			<?php
 			$selected = $options['pixabay']['orientation'];
 
@@ -153,7 +153,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Minimum width', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="number" name="ASI_plugin_banks_settings[pixabay][min_width]" min="0" class="form-control" value="<?php echo( isset( $options['pixabay']['min_width'] ) && !empty( $options['pixabay']['min_width']) )? (int)$options['pixabay']['min_width']: '0'; ?>" >
+		<input type="number" name="ALLSI_plugin_banks_settings[pixabay][min_width]" min="0" class="form-control" value="<?php echo( isset( $options['pixabay']['min_width'] ) && !empty( $options['pixabay']['min_width']) )? (int)$options['pixabay']['min_width']: '0'; ?>" >
 		<i><?php esc_html_e( 'px minimum for width', 'all-sources-images' ); ?></i>
 	</td>
 </tr>
@@ -165,7 +165,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Minimum height', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="number" name="ASI_plugin_banks_settings[pixabay][min_height]" min="0" class="form-control" value="<?php echo( isset( $options['pixabay']['min_height'] ) && !empty( $options['pixabay']['min_height']) )? (int)$options['pixabay']['min_height']: '0'; ?>" >
+		<input type="number" name="ALLSI_plugin_banks_settings[pixabay][min_height]" min="0" class="form-control" value="<?php echo( isset( $options['pixabay']['min_height'] ) && !empty( $options['pixabay']['min_height']) )? (int)$options['pixabay']['min_height']: '0'; ?>" >
 		<i><?php esc_html_e( 'px minimum for height', 'all-sources-images' ); ?></i>
 	</td>
 </tr>
@@ -177,7 +177,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Safesearch', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pixabay][safesearch]" class="form-control" >
+		<select name="ALLSI_plugin_banks_settings[pixabay][safesearch]" class="form-control" >
 			<?php
 			$selected = $options['pixabay']['safesearch'];
 

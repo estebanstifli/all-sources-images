@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$options = get_option('ASI_plugin_banks_settings');
+$options = get_option('ALLSI_plugin_banks_settings');
 $apikey = isset($options['youtube']['apikey']) ? $options['youtube']['apikey'] : '';
 $thumbnail_quality = isset($options['youtube']['thumbnail_quality']) ? $options['youtube']['thumbnail_quality'] : 'high';
 $search_order = isset($options['youtube']['search_order']) ? $options['youtube']['search_order'] : 'relevance';
@@ -56,7 +56,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('API Key', 'all-sources-images'); ?></td>
     <td id="password-youtube" class="password">
-        <input type="password" class="form-control" name="ASI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr($apikey); ?>" />
+        <input type="password" class="form-control" name="ALLSI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr($apikey); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
     </td>
 </tr>
@@ -76,7 +76,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Thumbnail Quality', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[youtube][thumbnail_quality]">
+        <select name="ALLSI_plugin_banks_settings[youtube][thumbnail_quality]">
             <?php
             $qualities = array(
                 'default' => __('Default (120x90px)', 'all-sources-images'),
@@ -98,7 +98,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Search Order', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[youtube][search_order]">
+        <select name="ALLSI_plugin_banks_settings[youtube][search_order]">
             <?php
             $orders = array(
                 'relevance' => __('Relevance (Default)', 'all-sources-images'),
@@ -120,7 +120,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Video Duration Filter', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[youtube][video_duration]">
+        <select name="ALLSI_plugin_banks_settings[youtube][video_duration]">
             <?php
             $durations = array(
                 'any' => __('Any Duration', 'all-sources-images'),
@@ -141,7 +141,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Safe Search', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[youtube][safe_search]">
+        <select name="ALLSI_plugin_banks_settings[youtube][safe_search]">
             <?php
             $safe_search_options = array(
                 'none' => __('None (No filtering)', 'all-sources-images'),
@@ -161,7 +161,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Max Results', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[youtube][max_results]">
+        <select name="ALLSI_plugin_banks_settings[youtube][max_results]">
             <?php
             $max_results_options = array(
                 5 => '5',
@@ -184,7 +184,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Region Code', 'all-sources-images'); ?></td>
     <td>
-        <input type="text" class="regular-text" name="ASI_plugin_banks_settings[youtube][region_code]" value="<?php echo esc_attr($region_code); ?>" maxlength="2" placeholder="US" />
+        <input type="text" class="regular-text" name="ALLSI_plugin_banks_settings[youtube][region_code]" value="<?php echo esc_attr($region_code); ?>" maxlength="2" placeholder="US" />
         <p class="description"><?php esc_html_e('Optional 2-letter ISO 3166-1 country code (e.g., US, GB, ES, FR, DE). Filters videos viewable in specified region.', 'all-sources-images'); ?></p>
     </td>
 </tr>

@@ -11,19 +11,19 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
 
     console.log('ASI Elementor: Executing main function, jQuery version:', $.fn.jquery);
 
-    // Check if asiAjax is available
-    if (typeof asiAjax === 'undefined') {
-        console.error('ASI Elementor: asiAjax is not defined. Plugin may not work correctly.');
+    // Check if allsiAjax is available
+    if (typeof allsiAjax === 'undefined') {
+        console.error('ASI Elementor: allsiAjax is not defined. Plugin may not work correctly.');
         console.log('ASI Elementor: Available global objects:', Object.keys(window));
         return;
     }
 
-    console.log('ASI Elementor Widget initialized with asiAjax:', asiAjax);
+    console.log('ASI Elementor Widget initialized with allsiAjax:', allsiAjax);
 
     /**
      * ASI Image Browser for Elementor
      */
-    var ASIElementorBrowser = {
+    var allsiElementorBrowser = {
 
         /**
          * Initialize
@@ -41,10 +41,10 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             console.log('ASI Elementor: Binding events');
 
             // Handle search trigger button click
-            $(document).on('click', '.asi-search-trigger', function(e) {
+            $(document).on('click', '.allsi-search-trigger', function(e) {
                 e.preventDefault();
                 console.log('ASI Elementor: Search trigger clicked', this);
-                var $wrapper = $(this).closest('.asi-elementor-image-wrapper');
+                var $wrapper = $(this).closest('.allsi-elementor-image-wrapper');
                 console.log('ASI Elementor: Wrapper found', $wrapper.length);
                 self.openBrowser($wrapper);
             });
@@ -52,9 +52,9 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             // Handle Elementor custom event (from button control)
             if (typeof elementor !== 'undefined') {
                 console.log('ASI Elementor: Elementor editor detected');
-                elementor.channels.editor.on('asi:openBrowser', function(view) {
+                elementor.channels.editor.on('allsi:openBrowser', function(view) {
                     console.log('ASI Elementor: Custom event triggered', view);
-                    var $wrapper = view.$el.find('.asi-elementor-image-wrapper');
+                    var $wrapper = view.$el.find('.allsi-elementor-image-wrapper');
                     self.openBrowser($wrapper);
                 });
             }
@@ -77,8 +77,8 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             var postId = 0;
             if (typeof elementor !== 'undefined' && elementor.config && elementor.config.initial_document) {
                 postId = elementor.config.initial_document.id;
-            } else if (typeof asiAjax !== 'undefined' && asiAjax.default_post_id) {
-                postId = asiAjax.default_post_id;
+            } else if (typeof allsiAjax !== 'undefined' && allsiAjax.default_post_id) {
+                postId = allsiAjax.default_post_id;
             }
 
             // Create modal HTML
@@ -88,7 +88,7 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             
             // Insert modal
             var $modal = $(modalHtml);
-            $wrapper.find('.asi-modal-container').html($modal);
+            $wrapper.find('.allsi-modal-container').html($modal);
             
             // Show modal
             $modal.fadeIn(200);
@@ -127,11 +127,11 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
                 bankOptions += '<option value="' + key + '"' + selected + '>' + banks[key] + '</option>';
             }
 
-            // Translation indicator (only shown if asiAjax.translation_en is true)
+            // Translation indicator (only shown if allsiAjax.translation_en is true)
             var translationIndicator = '';
-            if (typeof asiAjax !== 'undefined' && asiAjax.translation_en) {
+            if (typeof allsiAjax !== 'undefined' && allsiAjax.translation_en) {
                 translationIndicator = `
-                    <span class="asi-translation-indicator" style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #1e88e5; background-color: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-weight: 500; margin-left: 10px;">
+                    <span class="allsi-translation-indicator" style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #1e88e5; background-color: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-weight: 500; margin-left: 10px;">
                         <span class="dashicons dashicons-translation" style="font-size: 14px; width: 14px; height: 14px;"></span>
                         Auto-translate ON
                     </span>
@@ -139,25 +139,25 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             }
 
             return `
-                <div class="asi-modal-overlay">
-                    <div class="asi-modal-content">
-                        <div class="asi-modal-header">
+                <div class="allsi-modal-overlay">
+                    <div class="allsi-modal-content">
+                        <div class="allsi-modal-header">
                             <h3>Search Images</h3>
-                            <button type="button" class="asi-modal-close">&times;</button>
+                            <button type="button" class="allsi-modal-close">&times;</button>
                         </div>
-                        <div class="asi-modal-body">
-                            <div class="asi-search-controls">
-                                <input type="text" class="asi-search-input" placeholder="Enter search term..." value="${defaultSearch}">
-                                <select class="asi-bank-select">
+                        <div class="allsi-modal-body">
+                            <div class="allsi-search-controls">
+                                <input type="text" class="allsi-search-input" placeholder="Enter search term..." value="${defaultSearch}">
+                                <select class="allsi-bank-select">
                                     ${bankOptions}
                                 </select>
-                                <button type="button" class="asi-search-button">Search</button>
+                                <button type="button" class="allsi-search-button">Search</button>
                                 ${translationIndicator}
                             </div>
-                            <div class="asi-results-container">
-                                <div class="asi-image-grid"></div>
+                            <div class="allsi-results-container">
+                                <div class="allsi-image-grid"></div>
                             </div>
-                            <div class="asi-pagination" style="display:none;"></div>
+                            <div class="allsi-pagination" style="display:none;"></div>
                         </div>
                     </div>
                 </div>
@@ -171,7 +171,7 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             var self = this;
 
             // Close modal
-            $modal.find('.asi-modal-close, .asi-modal-overlay').on('click', function(e) {
+            $modal.find('.allsi-modal-close, .allsi-modal-overlay').on('click', function(e) {
                 if (e.target === this) {
                     $modal.fadeOut(200, function() {
                         $(this).remove();
@@ -180,26 +180,26 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
             });
 
             // Prevent closing when clicking inside modal
-            $modal.find('.asi-modal-content').on('click', function(e) {
+            $modal.find('.allsi-modal-content').on('click', function(e) {
                 e.stopPropagation();
             });
 
             // Search button
-            $modal.find('.asi-search-button').on('click', function() {
-                var searchTerm = $modal.find('.asi-search-input').val();
-                var bank = $modal.find('.asi-bank-select').val();
+            $modal.find('.allsi-search-button').on('click', function() {
+                var searchTerm = $modal.find('.allsi-search-input').val();
+                var bank = $modal.find('.allsi-bank-select').val();
                 self.performSearch($modal, searchTerm, bank, postId);
             });
 
             // Enter key to search
-            $modal.find('.asi-search-input').on('keypress', function(e) {
+            $modal.find('.allsi-search-input').on('keypress', function(e) {
                 if (e.which === 13) {
-                    $modal.find('.asi-search-button').click();
+                    $modal.find('.allsi-search-button').click();
                 }
             });
 
             // Image selection
-            $modal.on('click', '.asi-image-item', function() {
+            $modal.on('click', '.allsi-image-item', function() {
                 var imageUrl = $(this).data('url');
                 var imageAlt = $(this).data('alt') || '';
                 var imageTitle = $(this).data('title') || '';
@@ -214,18 +214,18 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
          */
         translateSearch: function(searchTerm, callback) {
             // Check if translation is enabled
-            if (typeof asiAjax === 'undefined' || !asiAjax.translation_en) {
+            if (typeof allsiAjax === 'undefined' || !allsiAjax.translation_en) {
                 // Translation disabled, return original term
                 callback(searchTerm, false);
                 return;
             }
 
             $.ajax({
-                url: asiAjax.ajax_url,
+                url: allsiAjax.ajax_url,
                 type: 'GET',
                 data: {
-                    action: 'asi_translate_search',
-                    nonce: asiAjax.nonce,
+                    action: 'allsi_translate_search',
+                    nonce: allsiAjax.nonce,
                     search: searchTerm
                 },
                 success: function(response) {
@@ -253,30 +253,30 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
                 return;
             }
 
-            // Check if asiAjax is available (from main plugin)
-            if (typeof asiAjax === 'undefined') {
+            // Check if allsiAjax is available (from main plugin)
+            if (typeof allsiAjax === 'undefined') {
                 alert('ASI plugin not properly loaded. Please refresh the page.');
                 return;
             }
 
             // Show loading
-            $modal.find('.asi-results-container').html('<div class="asi-loading">Loading images...</div>');
-            $modal.find('.asi-pagination').hide();
+            $modal.find('.allsi-results-container').html('<div class="allsi-loading">Loading images...</div>');
+            $modal.find('.allsi-pagination').hide();
 
             // Translate once, then search
             self.translateSearch(searchTerm, function(translatedTerm, wasTranslated) {
                 // Update search input if translated
                 if (wasTranslated && translatedTerm !== searchTerm) {
-                    $modal.find('.asi-search-input').val(translatedTerm);
+                    $modal.find('.allsi-search-input').val(translatedTerm);
                 }
 
                 // AJAX call to search endpoint with skip_translation flag
                 $.ajax({
-                    url: asiAjax.ajax_url,
+                    url: allsiAjax.ajax_url,
                     type: 'GET',
                     data: {
-                        action: 'asi_block_searching_images',
-                        nonce: asiAjax.nonce,
+                        action: 'allsi_block_searching_images',
+                        nonce: allsiAjax.nonce,
                         search: translatedTerm,
                         bank: bank,
                         id: postId,
@@ -288,15 +288,15 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
                         if (response.success && response.data) {
                             self.renderResults($modal, response.data, bank, translatedTerm, postId);
                         } else {
-                            $modal.find('.asi-results-container').html(
-                                '<div class="asi-no-results">No images found. Try a different search term.</div>'
+                            $modal.find('.allsi-results-container').html(
+                                '<div class="allsi-no-results">No images found. Try a different search term.</div>'
                             );
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('ASI Search Error:', error);
-                        $modal.find('.asi-results-container').html(
-                            '<div class="asi-no-results">Error loading images. Please try again.</div>'
+                        $modal.find('.allsi-results-container').html(
+                            '<div class="allsi-no-results">Error loading images. Please try again.</div>'
                         );
                     }
                 });
@@ -308,22 +308,22 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
          */
         renderResults: function($modal, data, bank, searchTerm, postId) {
             var self = this;
-            var $grid = $modal.find('.asi-image-grid');
+            var $grid = $modal.find('.allsi-image-grid');
             $grid.empty();
 
             // Extract images from response based on bank
             var images = this.extractImages(data, bank);
 
             if (!images || images.length === 0) {
-                $modal.find('.asi-results-container').html(
-                    '<div class="asi-no-results">No images found for this search.</div>'
+                $modal.find('.allsi-results-container').html(
+                    '<div class="allsi-no-results">No images found for this search.</div>'
                 );
                 return;
             }
 
             // Render images
             images.forEach(function(image) {
-                var $item = $('<div class="asi-image-item"></div>')
+                var $item = $('<div class="allsi-image-item"></div>')
                     .data('url', image.url)
                     .data('alt', image.alt)
                     .data('title', image.title)
@@ -380,7 +380,7 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
          */
         renderPagination: function($modal, pagination, searchTerm, bank, postId) {
             var self = this;
-            var $pagination = $modal.find('.asi-pagination');
+            var $pagination = $modal.find('.allsi-pagination');
             
             if (!pagination.has_more && pagination.page === 1) {
                 $pagination.hide();
@@ -421,11 +421,11 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
 
             // Download image to WordPress media library via AJAX
             $.ajax({
-                url: asiAjax.ajax_url,
+                url: allsiAjax.ajax_url,
                 type: 'POST',
                 data: {
-                    action: 'asi_block_downloading_image',
-                    nonce: asiAjax.nonce,
+                    action: 'allsi_block_downloading_image',
+                    nonce: allsiAjax.nonce,
                     url_image: imageUrl,
                     alt_image: imageAlt,
                     title_image: imageTitle,
@@ -450,7 +450,7 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
                         }
 
                         // Update preview immediately
-                        $wrapper.find('.asi-elementor-image').html(
+                        $wrapper.find('.allsi-elementor-image').html(
                             '<img src="' + response.data.url + '" alt="' + imageAlt + '" loading="lazy" />'
                         );
 
@@ -472,7 +472,7 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
     // Initialize when document ready
     $(document).ready(function() {
         console.log('ASI Elementor: Document ready, initializing...');
-        ASIElementorBrowser.init();
+        allsiElementorBrowser.init();
     });
 
     // Also initialize when Elementor editor loads
@@ -480,7 +480,7 @@ console.log('=== ASI Elementor Widget JS File Loaded ===');
         console.log('ASI Elementor: Elementor detected, binding to preview:loaded');
         elementor.on('preview:loaded', function() {
             console.log('ASI Elementor: Preview loaded, re-initializing...');
-            ASIElementorBrowser.init();
+            allsiElementorBrowser.init();
         });
     }
 

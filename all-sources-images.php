@@ -33,12 +33,12 @@ if ( !defined( 'WPINC' ) ) {
  * 
  * @since 1.0.0
  */
-if ( ! defined( 'ASI_DEBUG' ) ) {
-    define( 'ASI_DEBUG', false );
+if ( ! defined( 'ALLSI_DEBUG' ) ) {
+    define( 'ALLSI_DEBUG', true );
 }
 
-if ( ! defined( 'ASI_DIAGNOSTIC_TOKEN' ) ) {
-    define( 'ASI_DIAGNOSTIC_TOKEN', '' ); // Provide your own token via wp-config.php when needed
+if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {
+    define( 'ALLSI_DIAGNOSTIC_TOKEN', '' ); // Provide your own token via wp-config.php when needed
 }
 
 /**
@@ -50,20 +50,20 @@ define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.1' );
 /**
  * Load helper functions
  */
-require_once plugin_dir_path( __FILE__ ) . 'includes/asi-helpers.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/allsi-helpers.php';
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-all-sources-images-activator.php
  */
-function asi_activate_plugin() {
-    ASI_log( 'Plugin activation started', 'ACTIVATION' );
+function ALLSI_activate_plugin() {
+    ALLSI_log( 'Plugin activation started', 'ACTIVATION' );
     try {
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images-activator.php';
         All_Sources_Images_Activator::activate();
-        ASI_log( 'Plugin activation completed successfully', 'ACTIVATION' );
+        ALLSI_log( 'Plugin activation completed successfully', 'ACTIVATION' );
     } catch ( Exception $e ) {
-        ASI_log_error( 'Plugin activation failed', $e );
+        ALLSI_log_error( 'Plugin activation failed', $e );
         throw $e;
     }
 }
@@ -72,22 +72,22 @@ function asi_activate_plugin() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-all-sources-images-deactivator.php
  */
-function asi_deactivate_plugin() {
+function ALLSI_deactivate_plugin() {
         require_once plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images-deactivator.php';
     All_Sources_Images_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'asi_activate_plugin' );
-register_deactivation_hook( __FILE__, 'asi_deactivate_plugin' );
+register_activation_hook( __FILE__, 'ALLSI_activate_plugin' );
+register_deactivation_hook( __FILE__, 'ALLSI_deactivate_plugin' );
 
 /**
  * Log when plugin is successfully activated
  */
 add_action( 'activated_plugin', function( $plugin ) {
     if ( $plugin === plugin_basename( __FILE__ ) ) {
-        ASI_log( 'Plugin successfully activated by WordPress', 'ACTIVATION' );
-        ASI_log( 'Current user ID: ' . get_current_user_id(), 'ACTIVATION' );
-        ASI_log( 'User capabilities: ' . print_r( wp_get_current_user()->allcaps, true ), 'ACTIVATION' );
+        ALLSI_log( 'Plugin successfully activated by WordPress', 'ACTIVATION' );
+        ALLSI_log( 'Current user ID: ' . get_current_user_id(), 'ACTIVATION' );
+        ALLSI_log( 'User capabilities: ' . print_r( wp_get_current_user()->allcaps, true ), 'ACTIVATION' );
     }
 } );
 
@@ -100,16 +100,16 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images.php';
 /**
  * Add capabilities
  */
-function ASI_add_capability() {
+function ALLSI_add_capability() {
     // Don't log on every request
-    // ASI_log_entry( 'ASI_add_capability' );
+    // ALLSI_log_entry( 'ALLSI_add_capability' );
     
-    $options = get_option( 'ASI_plugin_rights_settings' );
+    $options = get_option( 'ALLSI_plugin_rights_settings' );
     
     // Administrators always have the capability
     $admin_role = get_role( 'administrator' );
     if ( $admin_role ) {
-        $admin_role->add_cap( 'asi_manage', true );
+        $admin_role->add_cap( 'ALLSI_manage', true );
     }
         // Manage other roles by adding or removing capabilities according to options
         $roles = array(
@@ -123,10 +123,10 @@ function ASI_add_capability() {
             if ( $role ) {
                 if ( isset( $options[$option_key] ) && $options[$option_key] === 'true' ) {
                     // Adds capacity if the option is enabled
-                    $role->add_cap( 'asi_manage', true );
+                    $role->add_cap( 'ALLSI_manage', true );
                 } else {
                     // Removes the capacity if the option is deactivated
-                    $role->remove_cap( 'asi_manage' );
+                    $role->remove_cap( 'ALLSI_manage' );
                 }
         }
     }
@@ -137,7 +137,7 @@ function ASI_add_capability() {
  *
  * @since    6.0.0
  */
-function ASI_check_hook() {
+function ALLSI_check_hook() {
 }
 
 /**
@@ -145,21 +145,21 @@ function ASI_check_hook() {
  *
  * @since    5.0.0
  */
-function ASI_check_capability() {
+function ALLSI_check_capability() {
     // Don't log on every request to avoid flooding the log
-    // ASI_log_entry( 'ASI_check_capability' );
+    // ALLSI_log_entry( 'ALLSI_check_capability' );
     
     $additional_check = false;
     // add capability for the cron
     if ( wp_doing_cron() || true == $additional_check ) {
         global $current_user;
-        $current_user->add_cap( 'asi_manage' );
-        ASI_log( 'Added asi_manage capability for cron', 'CAPABILITY' );
+        $current_user->add_cap( 'ALLSI_manage' );
+        ALLSI_log( 'Added ALLSI_manage capability for cron', 'CAPABILITY' );
     }
     
-    // CRITICAL: Always allow administrators, even if asi_manage capability not assigned
+    // CRITICAL: Always allow administrators, even if ALLSI_manage capability not assigned
     // This prevents blocking the entire WordPress admin
-    if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'asi_manage' ) ) {
+    if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'ALLSI_manage' ) ) {
         // User doesn't have permission - just don't load plugin features
         // DON'T block WordPress or show errors
         return;
@@ -170,7 +170,7 @@ function ASI_check_capability() {
         $plugin = new All_Sources_Images();
         $plugin->run();
     } catch ( Exception $e ) {
-        ASI_log_error( 'Failed to initialize plugin', $e );
+        ALLSI_log_error( 'Failed to initialize plugin', $e );
     }
 }
 
@@ -183,15 +183,15 @@ function ASI_check_capability() {
  *
  * @since    4.0.0
  */
-function asi_run_plugin() {
+function ALLSI_run_plugin() {
     // User role & capacity
-    add_action( 'init', 'ASI_add_capability', 1 );
-    add_action( 'init', 'ASI_check_capability', 2 );
+    add_action( 'init', 'ALLSI_add_capability', 1 );
+    add_action( 'init', 'ALLSI_check_capability', 2 );
     // Features with hooks
-    add_action( 'init', 'ASI_check_hook', 5 );
+    add_action( 'init', 'ALLSI_check_hook', 5 );
 }
 
-asi_run_plugin();
+ALLSI_run_plugin();
 
 /**
  * Load New Admin UI

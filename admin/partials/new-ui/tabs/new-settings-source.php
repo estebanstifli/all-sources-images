@@ -17,7 +17,7 @@ settings_errors();
 
             <?php 
 settings_fields( 'ASI-plugin-banks-settings' );
-$options = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( FALSE ) );
+$options = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( FALSE ) );
 // Remove 'envato' from saved options if present (Envato Elements no longer working)
 if ( isset( $options['api_chosen_auto'] ) && is_array( $options['api_chosen_auto'] ) ) {
     unset($options['api_chosen_auto']['envato']);
@@ -31,14 +31,14 @@ if ( isset( $options['api_chosen'] ) && 'envato' === $options['api_chosen'] ) {
 }
 
 /* Banks for Manual Search with Gutenberg Block - Only Manual for this page */
-$list_api_manual = $this->ASI_banks_name_manual();
-$ai_sources = method_exists( $this, 'ASI_ai_source_codes' ) ? $this->ASI_ai_source_codes() : array('dallev1', 'stability', 'replicate');
+$list_api_manual = $this->ALLSI_banks_name_manual();
+$ai_sources = method_exists( $this, 'ALLSI_ai_source_codes' ) ? $this->ALLSI_ai_source_codes() : array('dallev1', 'stability', 'replicate');
 $render_source_badge = function( $slug ) use ( $ai_sources ) {
     if ( ! in_array( $slug, $ai_sources, true ) ) {
         return '';
     }
 
-    return '<span class="asi-source-badge"><span class="asi-source-dot"></span><span class="asi-source-badge__label">' . esc_html__( 'AI', 'all-sources-images' ) . '</span></span>';
+    return '<span class="allsi-source-badge"><span class="allsi-source-dot"></span><span class="allsi-source-badge__label">' . esc_html__( 'AI', 'all-sources-images' ) . '</span></span>';
 };
 
 $render_checkboxes = function( $items, $option_key ) use ( $options, $render_source_badge ) {
@@ -72,7 +72,7 @@ $render_checkboxes = function( $items, $option_key ) use ( $options, $render_sou
 
         $badge_markup = $render_source_badge( $slug );
 
-        $rendered_list[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . esc_attr( $slug ) . '" name="ASI_plugin_banks_settings[' . esc_attr( $option_key ) . '][' . esc_attr( $slug ) . ']"> <span></span> ' . esc_html( $api ) . ' ' . $badge_markup . '</label></li>';
+        $rendered_list[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . esc_attr( $slug ) . '" name="ALLSI_plugin_banks_settings[' . esc_attr( $option_key ) . '][' . esc_attr( $slug ) . ']"> <span></span> ' . esc_html( $api ) . ' ' . $badge_markup . '</label></li>';
     }
 
     ksort( $rendered_list );
@@ -132,7 +132,7 @@ $render_checkboxes( $list_api_manual, 'api_chosen_manual' );
 esc_html_e( 'Source Settings', 'all-sources-images' );
 ?></h3>
 
-			<div id="tabs" class="asi-tabs">
+			<div id="tabs" class="allsi-tabs">
 				<ul>
 					<?php 
 $a = 0;

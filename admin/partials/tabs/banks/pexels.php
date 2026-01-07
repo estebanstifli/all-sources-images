@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-pexels" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[pexels][apikey]" class="form-control" value="<?php echo( isset( $options['pexels']['apikey'] ) && !empty( $options['pexels']['apikey']) )? esc_attr( $options['pexels']['apikey'] ) : ''; ?>" >
+		<input type="password" name="ALLSI_plugin_banks_settings[pexels][apikey]" class="form-control" value="<?php echo( isset( $options['pexels']['apikey'] ) && !empty( $options['pexels']['apikey']) )? esc_attr( $options['pexels']['apikey'] ) : ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Orientation', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pexels][orientation]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[pexels][orientation]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['pexels']['orientation']) ? $options['pexels']['orientation'] : 'all';
 
@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Minimum Size', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pexels][size]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[pexels][size]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['pexels']['size']) ? $options['pexels']['size'] : 'all';
 
@@ -98,7 +98,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Color Filter', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pexels][color]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[pexels][color]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['pexels']['color']) ? $options['pexels']['color'] : 'all';
 
@@ -133,7 +133,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Locale', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pexels][locale]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[pexels][locale]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['pexels']['locale']) ? $options['pexels']['locale'] : 'en-US';
 
@@ -165,7 +165,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Results Per Search', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pexels][per_page]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[pexels][per_page]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['pexels']['per_page']) ? $options['pexels']['per_page'] : '15';
 
@@ -192,7 +192,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Preferred Image Size', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[pexels][preferred_size]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[pexels][preferred_size]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['pexels']['preferred_size']) ? $options['pexels']['preferred_size'] : 'large';
 
@@ -222,13 +222,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ASI_plugin_banks_settings[pexels][use_curated]" type="checkbox" value="true" <?php echo( !empty( $options['pexels']['use_curated'] ) && $options['pexels']['use_curated'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[pexels][use_curated]" type="checkbox" value="true" <?php echo( !empty( $options['pexels']['use_curated'] ) && $options['pexels']['use_curated'] == 'true' )? 'checked': ''; ?>><span></span>
 			<?php esc_html_e( 'Prefer curated photos', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'When enabled, fallback to Pexels curated photos if search query returns no results. Curated photos are hand-picked daily.', 'all-sources-images' ); ?></p>
 		
 		<label class="checkbox ">
-			<input name="ASI_plugin_banks_settings[pexels][add_attribution]" type="checkbox" value="true" <?php echo( !empty( $options['pexels']['add_attribution'] ) && $options['pexels']['add_attribution'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[pexels][add_attribution]" type="checkbox" value="true" <?php echo( !empty( $options['pexels']['add_attribution'] ) && $options['pexels']['add_attribution'] == 'true' )? 'checked': ''; ?>><span></span>
 			<?php esc_html_e( 'Automatically add attribution to image caption', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'Adds photographer credit to image caption: "Photo by [Name] on Pexels". Required by Pexels license.', 'all-sources-images' ); ?></p>

@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Ensure tables exist
-ASI_Bulk_Generation_DB::maybe_create_tables();
+ALLSI_Bulk_Generation_DB::maybe_create_tables();
 
 // Include the bulk generation create page
 include_once plugin_dir_path( __FILE__ ) . 'tabs/new-bulk-create.php';

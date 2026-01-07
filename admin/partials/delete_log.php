@@ -15,7 +15,7 @@ if ( 'deletelog' === $action ) {
 }
 
 // Check the file
-$dir    = ASI_ensure_logs_dir();
+$dir    = ALLSI_ensure_logs_dir();
 if ( false === $dir ) {
     return false;
 }

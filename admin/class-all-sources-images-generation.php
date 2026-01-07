@@ -1,21 +1,21 @@
 <?php
 
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-image-source.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-manager.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-text-helper.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-gemini.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-workers-ai.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-pexels.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-pixabay.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-flickr.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-giphy.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-openverse.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-unsplash.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-google-image.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-youtube.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-dallev1.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-stability.php';
-require_once plugin_dir_path( __FILE__ ) . 'sources/class-asi-source-replicate.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-image-source.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-manager.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-text-helper.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-gemini.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-workers-ai.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-pexels.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-pixabay.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-flickr.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-giphy.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-openverse.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-unsplash.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-google-image.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-youtube.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-dallev1.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-stability.php';
+require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-replicate.php';
 
 /**
  * The functionalities for ASI Images generation
@@ -45,7 +45,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
     /**
      * Lazy-loaded source manager used to resolve modular image providers.
      *
-     * @var ASI_Source_Manager|null
+     * @var ALLSI_Source_Manager|null
      */
     private $source_manager = null;
 
@@ -68,13 +68,13 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $this->version = $version;
         // Ajax calls
         // AJAX endpoints for image generation (authenticated users only)
-        add_action( 'wp_ajax_asi_generate_image', array(&$this, 'ASI_ajax_call') );
-        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( FALSE ) );
+        add_action( 'wp_ajax_allsi_generate_image', array(&$this, 'ALLSI_ajax_call') );
+        $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( FALSE ) );
         // Enable save_post hook
         if ( isset( $main_settings['enable_save_post_hook'] ) && 'enable' == $main_settings['enable_save_post_hook'] ) {
             add_action(
                 'save_post',
-                array(&$this, 'ASI_check_post_type'),
+                array(&$this, 'ALLSI_check_post_type'),
                 10,
                 3
             );
@@ -84,19 +84,19 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
     /**
      * Retrieve the shared source manager and register built-in sources on demand.
      *
-     * @return ASI_Source_Manager|null
+     * @return ALLSI_Source_Manager|null
      */
-    private function ASI_get_source_manager_instance() {
-        if ( ! class_exists( 'ASI_Source_Manager' ) ) {
+    private function ALLSI_get_source_manager_instance() {
+        if ( ! class_exists( 'ALLSI_Source_Manager' ) ) {
             return null;
         }
 
         if ( null === $this->source_manager ) {
-            $this->source_manager = ASI_Source_Manager::instance();
+            $this->source_manager = ALLSI_Source_Manager::instance();
         }
 
         if ( false === $this->sources_registered ) {
-            $this->ASI_register_builtin_sources();
+            $this->ALLSI_register_builtin_sources();
             $this->sources_registered = true;
         }
 
@@ -106,65 +106,65 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
     /**
      * Register core sources shipped with the plugin.
      */
-    private function ASI_register_builtin_sources() {
+    private function ALLSI_register_builtin_sources() {
         if ( ! $this->source_manager ) {
             return;
         }
 
-        if ( class_exists( 'ASI_Source_Gemini' ) && ! $this->source_manager->has_source( 'gemini' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Gemini() );
+        if ( class_exists( 'ALLSI_Source_Gemini' ) && ! $this->source_manager->has_source( 'gemini' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Gemini() );
         }
 
-        if ( class_exists( 'ASI_Source_Workers_AI' ) && ! $this->source_manager->has_source( 'workers_ai' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Workers_AI() );
+        if ( class_exists( 'ALLSI_Source_Workers_AI' ) && ! $this->source_manager->has_source( 'workers_ai' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Workers_AI() );
         }
 
-        if ( class_exists( 'ASI_Source_Pexels' ) && ! $this->source_manager->has_source( 'pexels' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Pexels() );
+        if ( class_exists( 'ALLSI_Source_Pexels' ) && ! $this->source_manager->has_source( 'pexels' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Pexels() );
         }
 
-        if ( class_exists( 'ASI_Source_Pixabay' ) && ! $this->source_manager->has_source( 'pixabay' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Pixabay() );
+        if ( class_exists( 'ALLSI_Source_Pixabay' ) && ! $this->source_manager->has_source( 'pixabay' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Pixabay() );
         }
 
-        if ( class_exists( 'ASI_Source_Flickr' ) && ! $this->source_manager->has_source( 'flickr' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Flickr() );
+        if ( class_exists( 'ALLSI_Source_Flickr' ) && ! $this->source_manager->has_source( 'flickr' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Flickr() );
         }
 
-        if ( class_exists( 'ASI_Source_Giphy' ) && ! $this->source_manager->has_source( 'giphy' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Giphy() );
+        if ( class_exists( 'ALLSI_Source_Giphy' ) && ! $this->source_manager->has_source( 'giphy' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Giphy() );
         }
 
-        if ( class_exists( 'ASI_Source_Stability' ) && ! $this->source_manager->has_source( 'stability' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Stability() );
+        if ( class_exists( 'ALLSI_Source_Stability' ) && ! $this->source_manager->has_source( 'stability' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Stability() );
         }
 
-        if ( class_exists( 'ASI_Source_Replicate' ) && ! $this->source_manager->has_source( 'replicate' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Replicate() );
+        if ( class_exists( 'ALLSI_Source_Replicate' ) && ! $this->source_manager->has_source( 'replicate' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Replicate() );
         }
 
-        if ( class_exists( 'ASI_Source_Google_Image' ) && ! $this->source_manager->has_source( 'google_image' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Google_Image() );
+        if ( class_exists( 'ALLSI_Source_Google_Image' ) && ! $this->source_manager->has_source( 'google_image' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Google_Image() );
         }
 
-        if ( class_exists( 'ASI_Source_Youtube' ) && ! $this->source_manager->has_source( 'youtube' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Youtube() );
+        if ( class_exists( 'ALLSI_Source_Youtube' ) && ! $this->source_manager->has_source( 'youtube' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Youtube() );
         }
 
-        if ( class_exists( 'ASI_Source_Dallev1' ) && ! $this->source_manager->has_source( 'dallev1' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Dallev1() );
+        if ( class_exists( 'ALLSI_Source_Dallev1' ) && ! $this->source_manager->has_source( 'dallev1' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Dallev1() );
         }
 
-        if ( class_exists( 'ASI_Source_Unsplash' ) && ! $this->source_manager->has_source( 'unsplash' ) ) {
-            $this->source_manager->register_source( new ASI_Source_Unsplash() );
+        if ( class_exists( 'ALLSI_Source_Unsplash' ) && ! $this->source_manager->has_source( 'unsplash' ) ) {
+            $this->source_manager->register_source( new ALLSI_Source_Unsplash() );
         }
 
-        if ( class_exists( 'ASI_Source_Openverse' ) ) {
+        if ( class_exists( 'ALLSI_Source_Openverse' ) ) {
             if ( ! $this->source_manager->has_source( 'openverse' ) ) {
-                $this->source_manager->register_source( new ASI_Source_Openverse( 'openverse' ) );
+                $this->source_manager->register_source( new ALLSI_Source_Openverse( 'openverse' ) );
             }
             if ( ! $this->source_manager->has_source( 'cc_search' ) ) {
-                $this->source_manager->register_source( new ASI_Source_Openverse( 'cc_search' ) );
+                $this->source_manager->register_source( new ALLSI_Source_Openverse( 'cc_search' ) );
             }
         }
     }
@@ -174,7 +174,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    4.0.0
      */
-    public function ASI_ajax_call() {
+    public function ALLSI_ajax_call() {
         // Security check: Verify nonce first before processing any input
         $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'ajax_nonce_All_Sources_Images' ) ) {
@@ -208,7 +208,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $current_post_index = isset( $_POST['currentPostIndex'] ) ? absint( $_POST['currentPostIndex'] ) : 0;
         $current_post_id = $post_ids_with_keys[$current_post_index];
         // Load plugin settings for image generation (with defaults).
-        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
+        $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( true ) );
         // Check if forceRewrite is set from AJAX request (user confirmed replacement)
         $force_rewrite = isset( $_POST['forceRewrite'] ) && filter_var( wp_unslash( $_POST['forceRewrite'] ), FILTER_VALIDATE_BOOLEAN );
         // Check if the 'rewrite featured image' option is enabled or forceRewrite is set.
@@ -241,14 +241,14 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         // Determine image location (featured or content).
         $image_location = ( !empty( $img_block['image_location'] ) ? $img_block['image_location'] : 'featured' );
         $generation_status = 'pending';
-        $ASI_return = null;
+        $ALLSI_return = null;
         // Handle generation of the featured image.
         if ( has_post_thumbnail( $current_post_id ) && $rewrite_featured == false && $image_location == 'featured' ) {
             $generation_status = 'already-done';
             // Image already exists and rewriting is not needed.
         } elseif ( (!has_post_thumbnail( $current_post_id ) || $rewrite_featured == true || $image_location != 'featured') && $current_post_id != 0 ) {
             // Generate featured image if not present or if rewriting is enabled.
-            $image_generation_result = $this->ASI_create_thumb(
+            $image_generation_result = $this->ALLSI_create_thumb(
                 $current_post_id,       // $id
                 '0',                     // $check_value_enable
                 '0',                     // $check_post_type
@@ -264,26 +264,26 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             );
 
             if ( is_array( $image_generation_result ) ) {
-                $ASI_return = isset( $image_generation_result['id'] ) ? $image_generation_result['id'] : null;
-                $generation_status = $ASI_return ? 'successful' : 'error';
+                $ALLSI_return = isset( $image_generation_result['id'] ) ? $image_generation_result['id'] : null;
+                $generation_status = $ALLSI_return ? 'successful' : 'error';
             } else {
-                $ASI_return = $image_generation_result;
-                $generation_status = $ASI_return ? 'successful' : 'error';
+                $ALLSI_return = $image_generation_result;
+                $generation_status = $ALLSI_return ? 'successful' : 'error';
             }
         } else {
             $generation_status = 'error';
         }
         // Load compatibility settings for external plugins.
-        $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
+        $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         $thumbnail_url = '';
         // Handle image preview when using the FIFU plugin.
-        if ( true == $compatibility['enable_FIFU'] && 'FIFU' == $img_block['image_location'] && (is_plugin_active( 'featured-image-from-url/featured-image-from-url.php' ) || is_plugin_active( 'fifu-premium/fifu-premium.php' )) && $ASI_return != null ) {
-        } elseif ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $ASI_return ) ) {
+        if ( true == $compatibility['enable_FIFU'] && 'FIFU' == $img_block['image_location'] && (is_plugin_active( 'featured-image-from-url/featured-image-from-url.php' ) || is_plugin_active( 'fifu-premium/fifu-premium.php' )) && $ALLSI_return != null ) {
+        } elseif ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $ALLSI_return ) ) {
             // Display the newly generated image.
-            $new_image = wp_get_attachment_image_src( $ASI_return, array(70, 70) );
-            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . $ASI_return . '"><img src="' . $new_image[0] . '" width="70" height="70" /></a>';
-            $datas['thumbnail_id'] = $ASI_return;
-            $datas['postimagediv'] = _wp_post_thumbnail_html( $ASI_return, $current_post_id );
+            $new_image = wp_get_attachment_image_src( $ALLSI_return, array(70, 70) );
+            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . $ALLSI_return . '"><img src="' . $new_image[0] . '" width="70" height="70" /></a>';
+            $datas['thumbnail_id'] = $ALLSI_return;
+            $datas['postimagediv'] = _wp_post_thumbnail_html( $ALLSI_return, $current_post_id );
         } elseif ( $generation_status == 'already-done' && "featured" === $image_location ) {
             // Display existing featured image.
             $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . get_post_thumbnail_id( $current_post_id ) . '">' . get_the_post_thumbnail( $current_post_id, array('70', '70') ) . '</a>';
@@ -321,17 +321,17 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         }
     }
 
-    public function ASI_check_post_type( $ID, $post, $update ) {
+    public function ALLSI_check_post_type( $ID, $post, $update ) {
         // Checks whether the capacity has already been checked for this session
-        if ( get_option( 'ASI_hook_checked' ) ) {
+        if ( get_option( 'ALLSI_hook_checked' ) ) {
             // Deletes the option immediately after execution
-            delete_option( 'ASI_hook_checked' );
+            delete_option( 'ALLSI_hook_checked' );
             return;
             // Exits the function if it has already been executed
         }
         // Set capacity as verified to avoid additional calls
-        update_option( 'ASI_hook_checked', true );
-        $transient_key = 'ASI_wp_insert_processing_post_' . $ID;
+        update_option( 'ALLSI_hook_checked', true );
+        $transient_key = 'ALLSI_wp_insert_processing_post_' . $ID;
         if ( wp_is_post_revision( $ID ) || wp_is_post_autosave( $ID ) ) {
             return;
         }
@@ -345,27 +345,27 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         }
         global $pagenow;
         // Avoid not selected post types
-        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( FALSE ) );
+        $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( FALSE ) );
         if ( empty( $main_settings['choosed_save_post_post_type'] ) ) {
-            $choosed_post_type = $this->ASI_default_posts_types();
+            $choosed_post_type = $this->ALLSI_default_posts_types();
             $main_settings['choosed_save_post_post_type'] = $choosed_post_type["choosed_post_type"];
         }
         if ( !in_array( get_post_type( $ID ), $main_settings['choosed_save_post_post_type'] ) ) {
             return false;
         }
-        //$active_posts_types	= wp_parse_args( get_option( 'ASI_plugin_posts_settings' ), $this->ASI_default_options_posts_settings( FALSE ) );
-        $active_posts_types = $this->ASI_default_posts_types();
+        //$active_posts_types	= wp_parse_args( get_option( 'ALLSI_plugin_posts_settings' ), $this->ALLSI_default_options_posts_settings( FALSE ) );
+        $active_posts_types = $this->ALLSI_default_posts_types();
         // Avoid generation when click "Add New"
         if ( ($pagenow == 'index.php' || $pagenow == 'post.php') && in_array( get_post_type( $ID ), $active_posts_types['choosed_post_type'] ) ) {
-            $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
+            $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( true ) );
             if ( isset( $main_settings['rewrite_featured'] ) && $main_settings['rewrite_featured'] == true ) {
                 $rewrite_featured = true;
             } else {
                 $rewrite_featured = false;
             }
-            $img_blocks = isset( $main_settings['image_block'] ) && is_array( $main_settings['image_block'] ) ? $main_settings['image_block'] : $this->ASI_default_options_main_settings( true )['image_block'];
+            $img_blocks = isset( $main_settings['image_block'] ) && is_array( $main_settings['image_block'] ) ? $main_settings['image_block'] : $this->ALLSI_default_options_main_settings( true )['image_block'];
             foreach ( $img_blocks as $key_img_block => $img_block ) {
-                $this->ASI_create_thumb(
+                $this->ALLSI_create_thumb(
                     $ID,
                     '0',
                     '1',
@@ -389,7 +389,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @access private
      */
-    private function ASI_check_existing_image( $title, $filename ) {
+    private function ALLSI_check_existing_image( $title, $filename ) {
         // Clean the base filename (remove extension and numbers)
         $base_filename = preg_replace( '/[0-9]+\\./', '.', $filename );
         $base_filename = pathinfo( $base_filename, PATHINFO_FILENAME );
@@ -417,7 +417,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    4.0.0
      */
-    public function ASI_create_thumb(
+    public function ALLSI_create_thumb(
         $id,
         $check_value_enable = 0,
         $check_post_type = 1,
@@ -432,7 +432,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $button_autogenerate = false,
         $additional_context = array()
     ) {
-        ASI_log( array(
+        ALLSI_log( array(
             'id' => $id,
             'get_only_thumb' => $get_only_thumb,
             'api_chosen' => $api_chosen,
@@ -440,20 +440,20 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         ), 'CREATE_THUMB_START' );
         
         // Launch logs
-        $log = $this->ASI_monolog_call();
+        $log = $this->ALLSI_monolog_call();
         $log->info( 'New generation starting', array(
             'post' => $id,
         ) );
         //Avoid revision post type
         if ( 'revision' == get_post_type( $id ) && true !== $avoid_revision ) {
-            ASI_log( 'Post is revision, avoiding', 'CREATE_THUMB_SKIP' );
+            ALLSI_log( 'Post is revision, avoiding', 'CREATE_THUMB_SKIP' );
             $log->error( 'This post is a revision. Avoided.', array(
                 'post' => $id,
             ) );
             return false;
         }
         // Settings
-        $main_settings = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( true ) );
+        $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( true ) );
         
         // For Gutenberg block (get_only_thumb), we don't need image_block config
         if ( TRUE == $get_only_thumb ) {
@@ -467,7 +467,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             // one shot generation - use saved configuration
             if ( null == $key_img_block ) {
                 if ( !isset($main_settings['image_block']) || empty($main_settings['image_block']) ) {
-                    ASI_log( 'No image_block configuration found', 'CREATE_THUMB_ERROR' );
+                    ALLSI_log( 'No image_block configuration found', 'CREATE_THUMB_ERROR' );
                     return false;
                 }
                 $key_img_block = array_key_first( $main_settings['image_block'] );
@@ -479,7 +479,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             
             // Ensure api_chosen is set from banks settings if not in img_block
             if ( !isset( $img_block['api_chosen'] ) || empty( $img_block['api_chosen'] ) ) {
-                $banks_settings = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( true ) );
+                $banks_settings = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( true ) );
                 $img_block['api_chosen'] = isset( $banks_settings['api_chosen_auto'] ) ? $banks_settings['api_chosen_auto'] : array( 'openverse' );
             }
         }
@@ -498,7 +498,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
             // Check if thumbnail already exists
             if ( has_post_thumbnail( $id ) && $rewrite_featured == false && "featured" === $image_location ) {
-                ASI_log( 'Featured image already exists', 'CREATE_THUMB_SKIP' );
+                ALLSI_log( 'Featured image already exists', 'CREATE_THUMB_SKIP' );
                 $log->error( 'Featured image already exists', array(
                     'post' => $id,
                 ) );
@@ -506,21 +506,21 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
             /* Action 'save_post' triggered when deleting posts. Check if post not trashed */
             if ( 'trash' == get_post_status( $id ) ) {
-                ASI_log( 'Post is trashed', 'CREATE_THUMB_SKIP' );
+                ALLSI_log( 'Post is trashed', 'CREATE_THUMB_SKIP' );
                 $log->error( 'Post is in the trash', array(
                     'post' => $id,
                 ) );
                 return false;
             }
-            if ( !current_user_can( 'asi_manage' ) && !class_exists( 'Main_WPeMatico' ) && !class_exists( 'FeedWordPress' ) && !class_exists( 'rssPostImporter' ) && !class_exists( 'CyberSyn_Syndicator' ) && !class_exists( 'wp_automatic' ) ) {
-                ASI_log( 'User lacks permissions', 'CREATE_THUMB_SKIP' );
+            if ( !current_user_can( 'ALLSI_manage' ) && !class_exists( 'Main_WPeMatico' ) && !class_exists( 'FeedWordPress' ) && !class_exists( 'rssPostImporter' ) && !class_exists( 'CyberSyn_Syndicator' ) && !class_exists( 'wp_automatic' ) ) {
+                ALLSI_log( 'User lacks permissions', 'CREATE_THUMB_SKIP' );
                 $log->error( 'The user does not have sufficient rights', array(
                     'post' => $id,
                 ) );
                 return false;
             }
             // Choosed Post types
-            $post_types_default = $this->ASI_default_posts_types();
+            $post_types_default = $this->ALLSI_default_posts_types();
             $post_type_availables = $post_types_default['choosed_post_type'];
             $categories_availables = $post_types_default['choosed_categories'];
             /*
@@ -529,7 +529,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             		$categories_availables = ( ! empty( $posts_settings['choosed_categories'] ) ) ? $posts_settings['choosed_categories'] : '';*/
             if ( !empty( $post_type_availables ) && $check_post_type ) {
                 if ( !in_array( get_post_type( $id ), $post_type_availables ) ) {
-                    ASI_log( 'Post type not in allowed list', 'CREATE_THUMB_SKIP' );
+                    ALLSI_log( 'Post type not in allowed list', 'CREATE_THUMB_SKIP' );
                     $log->error( 'The post is not in selected post types', array(
                         'post' => $id,
                     ) );
@@ -539,7 +539,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             // Check if category match and is a post
             if ( !empty( $categories_availables ) && $check_category && 'post' == get_post_type( $id ) ) {
                 if ( !in_category( $categories_availables, $id ) ) {
-                    ASI_log( 'Post category not in allowed list', 'CREATE_THUMB_SKIP' );
+                    ALLSI_log( 'Post category not in allowed list', 'CREATE_THUMB_SKIP' );
                     $log->error( 'The post is not in selected categories', array(
                         'post' => $id,
                     ) );
@@ -547,9 +547,9 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 }
             }
         }
-        $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
-        $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
-        $options_cron = wp_parse_args( get_option( 'ASI_plugin_cron_settings' ), $this->ASI_default_options_cron_settings( TRUE ) );
+        $options = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( TRUE ) );
+        $options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
+        $options_cron = wp_parse_args( get_option( 'ALLSI_plugin_cron_settings' ), $this->ALLSI_default_options_cron_settings( TRUE ) );
         $options = array_merge( $options, $options_banks, $options_cron );
         if ( isset( $api_chosen ) ) {
             $options['api_chosen'] = $api_chosen;
@@ -759,7 +759,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                             $post_content = wp_strip_all_tags( $post_content );
                             $post_content = substr( $post_content, 0, 1000 ); // Limit content length
                             
-                            $extracted = $this->ASI_openai_extract_keywords( $api_key, $post_title, $post_content, $num_keywords );
+                            $extracted = $this->ALLSI_openai_extract_keywords( $api_key, $post_title, $post_content, $num_keywords );
                             
                             if ( $extracted ) {
                                 $search = $extracted;
@@ -789,7 +789,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                             $post_content = wp_strip_all_tags( $post_content );
                             $post_content = substr( $post_content, 0, 1500 ); // Limit content length
                             
-                            $generated_prompt = $this->ASI_openai_generate_image_prompt( $api_key, $post_title, $post_content, $style, $custom_instructions );
+                            $generated_prompt = $this->ALLSI_openai_generate_image_prompt( $api_key, $post_title, $post_content, $style, $custom_instructions );
                             
                             if ( $generated_prompt ) {
                                 $search = $generated_prompt;
@@ -828,7 +828,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         // Translate search keywords to English if enabled
         if ( isset( $img_block['translation_EN'] ) && $img_block['translation_EN'] == 'true' ) {
             // Use configured source language or auto-detect from WordPress
-            $block_settings = wp_parse_args( get_option( 'ASI_plugin_block_settings' ), array( 'source_lang' => '' ) );
+            $block_settings = wp_parse_args( get_option( 'ALLSI_plugin_block_settings' ), array( 'source_lang' => '' ) );
             if ( ! empty( $block_settings['source_lang'] ) ) {
                 $source_lang = $block_settings['source_lang'];
             } else {
@@ -836,7 +836,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 $source_lang = substr( $wp_lang, 0, 2 );
             }
             if ( $source_lang !== 'en' ) {
-                $translated_search = $this->ASI_translate_text( $search, $source_lang, 'en' );
+                $translated_search = $this->ALLSI_translate_text( $search, $source_lang, 'en' );
                 if ( $translated_search !== false ) {
                     $search = $translated_search;
                     $log->info( 'Search term translated to English', array(
@@ -847,7 +847,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
         }
         if ( TRUE == $get_only_thumb ) {
-            $source_manager = $this->ASI_get_source_manager_instance();
+            $source_manager = $this->ALLSI_get_source_manager_instance();
             if ( $source_manager && $source_manager->has_source( $img_block['api_chosen'] ) ) {
                 $source = $source_manager->get_source( $img_block['api_chosen'] );
                 $result = $source->generate( array(
@@ -858,7 +858,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                     'post_id'        => $id,
                     'get_only_thumb' => true,
                     'selected_image' => $img_block['selected_image'],
-                    'proxy_args'     => $this->ASI_get_proxy_args(),
+                    'proxy_args'     => $this->ALLSI_get_proxy_args(),
                     'generation'     => $this,
                     'page'           => isset( $additional_context['page'] ) ? max( 1, intval( $additional_context['page'] ) ) : 1,
                 ) );
@@ -867,7 +867,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                         'post'  => $id,
                         'error' => $result->get_error_message(),
                     ) );
-                    ASI_log( array(
+                    ALLSI_log( array(
                         'post'    => $id,
                         'bank'    => $img_block['api_chosen'],
                         'message' => $result->get_error_message(),
@@ -879,9 +879,9 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
 
             /* SET ALL PARAMETERS */
-            $array_parameters = $this->ASI_Get_Parameters( $img_block, $options, $search );
+            $array_parameters = $this->ALLSI_Get_Parameters( $img_block, $options, $search );
             
-            ASI_log( array(
+            ALLSI_log( array(
                 'array_parameters' => $array_parameters,
                 'has_url' => isset($array_parameters['url'])
             ), 'CREATE_THUMB_PARAMS' );
@@ -889,13 +889,13 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             $api_url = $array_parameters['url'];
             unset($array_parameters['url']);
             if ( !isset( $api_url ) ) {
-                ASI_log( 'API URL not provided for bank: ' . $img_block['api_chosen'], 'CREATE_THUMB_ERROR' );
+                ALLSI_log( 'API URL not provided for bank: ' . $img_block['api_chosen'], 'CREATE_THUMB_ERROR' );
                 $log->error( 'API URL not provided', array(
                     'post' => $id,
                 ) );
                 return false;
             }
-            $result_body = $this->ASI_Generate(
+            $result_body = $this->ALLSI_Generate(
                 $img_block['api_chosen'],
                 $api_url,
                 $array_parameters,
@@ -911,12 +911,12 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'post' => $id,
             ) );
             $last_bank_element = end( $options_banks['api_chosen_auto'] );
-            $proxy_args = $this->ASI_get_proxy_args();
+            $proxy_args = $this->ALLSI_get_proxy_args();
             foreach ( $options_banks['api_chosen_auto'] as $bank ) {
                 // Reset options according new image bank
                 $options['api_chosen'] = $bank;
 
-                $source_manager = $this->ASI_get_source_manager_instance();
+                $source_manager = $this->ALLSI_get_source_manager_instance();
                 if ( $source_manager && $source_manager->has_source( $bank ) ) {
                     $context_block = $img_block;
                     $context_block['api_chosen'] = $bank;
@@ -970,7 +970,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
         } else {
             // Process the main image block
-            $result = $this->ASI_Process_Image_Block(
+            $result = $this->ALLSI_Process_Image_Block(
                 $img_block,
                 $options,
                 $search,
@@ -983,7 +983,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                     'post' => $id,
                 ) );
                 $img_block['api_chosen'] = $img_block['api_chosen_2'];
-                $result = $this->ASI_Process_Image_Block(
+                $result = $this->ALLSI_Process_Image_Block(
                     $img_block,
                     $options,
                     $search,
@@ -998,7 +998,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             // Extract results and continue processing
             extract( $result );
         }
-        $compatibility = wp_parse_args( get_option( 'ASI_plugin_compatibility_settings' ), $this->ASI_default_options_compatibility_settings( TRUE ) );
+        $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         $path_parts = pathinfo( $url_results );
         $filename = $path_parts['basename'];
         $wp_upload_dir = wp_upload_dir();
@@ -1051,7 +1051,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         if ( isset( $main_settings['image_reuse'] ) && $main_settings['image_reuse'] == true ) {
             // Check if image file already exist if option is set
             $proposed_filename = sanitize_title( $search );
-            $existing_image_id = $this->ASI_check_existing_image( get_the_title( $id ), $proposed_filename );
+            $existing_image_id = $this->ALLSI_check_existing_image( get_the_title( $id ), $proposed_filename );
             if ( $existing_image_id ) {
                 // Use the existing image instead of downloading a new one
                 $log->info( 'Featured image with existing image (option set)', array(
@@ -1059,7 +1059,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                     'image' => $existing_image_id,
                 ) );
                 set_post_thumbnail( $id, $existing_image_id );
-                do_action( 'ASI_after_create_thumb', $id, $existing_image_id );
+                do_action( 'ALLSI_after_create_thumb', $id, $existing_image_id );
                 return $existing_image_id;
             }
         }
@@ -1137,7 +1137,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                         $placement = $img_block['image_custom_location_placement'];
                         $position = $img_block['image_custom_location_position'];
                         $image_size = $img_block['image_custom_image_size'];
-                        $content = $this->ASI_insert_content_image(
+                        $content = $this->ALLSI_insert_content_image(
                             $content_post->post_content,
                             $attach_id,
                             $tag,
@@ -1168,7 +1168,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                      * Remove save_post Action to avoid infinite loop.
                      * cf https://developer.wordpress.org/reference/hooks/save_post/#avoiding-infinite-loops
                      * Use "remove_all_actions" instead of "remove_action". Otherwise the log file bug
-                     * remove_action( 'save_post', array( &$this, 'ASI_create_thumb' ) );
+                     * remove_action( 'save_post', array( &$this, 'ALLSI_create_thumb' ) );
                      */
                     remove_all_actions( 'save_post' );
                     wp_insert_post( array(
@@ -1195,19 +1195,19 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                         'post_type'             => $content_post->post_type,
                         'post_mime_type'        => $content_post->post_mime_type,
                     ) );
-                    add_action( 'save_post', array(&$this, 'ASI_create_thumb') );
+                    add_action( 'save_post', array(&$this, 'ALLSI_create_thumb') );
                     $log->info( 'Image added into the post', array(
                         'post'  => $id,
                         'image' => $attach_id,
                     ) );
                 }
-                do_action( 'ASI_after_create_thumb', $id, $attach_id );
+                do_action( 'ALLSI_after_create_thumb', $id, $attach_id );
                 if ( true === $include_datas ) {
                     return array(
                         'id'             => $attach_id,
                         'keyword'        => $keywords_search,
                         'img_resolution' => $attach_data['width'] . 'x' . $attach_data['height'] . 'px',
-                        'img_size'       => $this->ASI_get_image_size_in_bytes( $attach_id ),
+                        'img_size'       => $this->ALLSI_get_image_size_in_bytes( $attach_id ),
                         'api_chosen'     => $img_block['api_chosen'],
                     );
                 } else {
@@ -1227,14 +1227,14 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      * @param int $id Post ID
      * @return array|false Returns generated image data or false on failure
      */
-    private function ASI_Process_Image_Block(
+    private function ALLSI_Process_Image_Block(
         $img_block,
         $options,
         $search,
         $log,
         $id
     ) {
-        $source_manager = $this->ASI_get_source_manager_instance();
+        $source_manager = $this->ALLSI_get_source_manager_instance();
         if ( $source_manager && $source_manager->has_source( $img_block['api_chosen'] ) ) {
             $source = $source_manager->get_source( $img_block['api_chosen'] );
             $result = $source->generate( array(
@@ -1245,7 +1245,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'post_id'        => $id,
                 'get_only_thumb' => false,
                 'selected_image' => $img_block['selected_image'],
-                'proxy_args'     => $this->ASI_get_proxy_args(),
+                'proxy_args'     => $this->ALLSI_get_proxy_args(),
                 'generation'     => $this,
             ) );
             if ( is_wp_error( $result ) ) {
@@ -1259,7 +1259,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         }
 
         // Set all parameters
-        $array_parameters = $this->ASI_Get_Parameters( $img_block, $options, $search );
+        $array_parameters = $this->ALLSI_Get_Parameters( $img_block, $options, $search );
         $api_url = ( isset( $array_parameters['url'] ) ? $array_parameters['url'] : null );
         unset($array_parameters['url']);
         // Check if API URL is provided
@@ -1270,7 +1270,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             return false;
         }
         // Get the image URL
-        list( $url_results, $file_media, $alt_img, $caption_img ) = $this->ASI_Generate(
+        list( $url_results, $file_media, $alt_img, $caption_img ) = $this->ALLSI_Generate(
             $img_block['api_chosen'],
             $api_url,
             $array_parameters,
@@ -1299,7 +1299,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since 6.0.0
      */
-    private function ASI_get_image_size_in_bytes( $attachment_id ) {
+    private function ALLSI_get_image_size_in_bytes( $attachment_id ) {
         // Full path of the image
         $image_path = get_attached_file( $attachment_id );
         if ( $image_path && file_exists( $image_path ) ) {
@@ -1316,7 +1316,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since 5.2.0
      */
-    private function ASI_insert_content_image(
+    private function ALLSI_insert_content_image(
         $content,
         $attach_id,
         $tag = 'p',
@@ -1331,7 +1331,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         }
         
         // Check if the Classic Editor is being used
-        $classic_editor = $this->ASI_is_using_classic_editor();
+        $classic_editor = $this->ALLSI_is_using_classic_editor();
         $match = false;
         $loop_count = 0;
         $max_loops = 2; // Prevent infinite loops
@@ -1359,7 +1359,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 $alt_text = get_post_meta( $attach_id, '_wp_attachment_image_alt', true );
                 $image = '<img src="' . esc_url( $image_src[0] ) . '" alt="' . esc_attr( $alt_text ) . '" class="wp-image-' . esc_attr( $attach_id ) . '"/>';
                 // Include caption if enabled in settings
-                $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
+                $options = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( TRUE ) );
                 if ( isset( $options['enable_caption'] ) && 'enable' == $options['enable_caption'] ) {
                     $caption_text = wp_get_attachment_caption( $attach_id );
                     $image .= '<figcaption class="wp-element-caption">' . esc_html( $caption_text ) . '</figcaption>';
@@ -1466,7 +1466,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    6.0.0
      */
-    private function ASI_extract_adjacent_element(
+    private function ALLSI_extract_adjacent_element(
         $content,
         $element = 'p',
         $element_number = 1,
@@ -1538,7 +1538,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    5.2.0
      */
-    private function ASI_is_using_classic_editor() {
+    private function ALLSI_is_using_classic_editor() {
         // Include the is_plugin_active function if it's not already defined
         if ( !function_exists( 'is_plugin_active' ) ) {
             include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -1552,8 +1552,8 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    4.0.0
      */
-    private function ASI_Get_Parameters( $img_block, $options, $search ) {
-        ASI_log( array(
+    private function ALLSI_Get_Parameters( $img_block, $options, $search ) {
+        ALLSI_log( array(
             'bank' => $img_block['api_chosen'],
             'search' => $search
         ), 'GET_PARAMETERS' );
@@ -1658,11 +1658,11 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'body'    => $body,
             );
         } else {
-            ASI_log( 'Unknown bank: ' . $img_block['api_chosen'], 'GET_PARAMETERS_ERROR' );
+            ALLSI_log( 'Unknown bank: ' . $img_block['api_chosen'], 'GET_PARAMETERS_ERROR' );
             return false;
         }
         
-        ASI_log( array(
+        ALLSI_log( array(
             'url' => isset($array_parameters['url']) ? $array_parameters['url'] : 'NO URL',
             'params_count' => count($array_parameters)
         ), 'GET_PARAMETERS_SUCCESS' );
@@ -1675,7 +1675,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    4.0.0
      */
-    public function ASI_Generate(
+    public function ALLSI_Generate(
         $service,
         $url,
         $url_parameters,
@@ -1683,24 +1683,24 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $get_only_thumb = false,
         $search = ''
     ) {
-        ASI_log( array(
+        ALLSI_log( array(
             'service' => $service,
             'url' => $url,
             'search' => $search,
             'get_only_thumb' => $get_only_thumb
-        ), 'ASI_GENERATE_START' );
+        ), 'ALLSI_GENERATE_START' );
         
-        $log = $this->ASI_monolog_call();
-        list( $result_body, $result ) = $this->ASI_get_results( $service, $url, $url_parameters );
+        $log = $this->ALLSI_monolog_call();
+        list( $result_body, $result ) = $this->ALLSI_get_results( $service, $url, $url_parameters );
         // In case of API problem
         if ( empty( $result_body ) ) {
-            ASI_log( 'Empty result_body from API: ' . $service, 'ASI_GENERATE_ERROR' );
+            ALLSI_log( 'Empty result_body from API: ' . $service, 'ALLSI_GENERATE_ERROR' );
             return false;
         }
         
-        ASI_log( 'API response received for: ' . $service, 'ASI_GENERATE_RESPONSE' );
+        ALLSI_log( 'API response received for: ' . $service, 'ALLSI_GENERATE_RESPONSE' );
 
-        $log = $this->ASI_monolog_call();
+        $log = $this->ALLSI_monolog_call();
         $log->info( 'Source used', array(
             'Service' => $service,
         ) );
@@ -1710,7 +1710,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             $predictionId = $result_body['id'];
             $getUrl = $result_body['urls']['get'];
             // retrieve API token from settings
-            $options = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( true ) );
+            $options = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( true ) );
             $apiToken = ( !empty( $options['replicate']['apikey'] ) ? $options['replicate']['apikey'] : '' );
             // poll until prediction is complete
             do {
@@ -1723,7 +1723,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                     ),
                     'timeout' => 10,
                 );
-                $resp = $this->ASI_remote_get( 'replicate', $getUrl, $request_args );
+                $resp = $this->ALLSI_remote_get( 'replicate', $getUrl, $request_args );
                 // DEBUG
                 /*
                 			$log->info( 'Replicate polling status', [
@@ -1786,7 +1786,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 } else {
                     $url_result = $fetch_result[$url_path];
                 }
-                $options = wp_parse_args( get_option( 'ASI_plugin_main_settings' ), $this->ASI_default_options_main_settings( TRUE ) );
+                $options = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( TRUE ) );
                 
                 // ALT text generation
                 $alt = '';
@@ -1804,7 +1804,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                     if ( !empty( $alt ) && isset( $options['translate_alt'] ) && $options['translate_alt'] == 'true' ) {
                         $target_lang = ( !empty( $options['translate_alt_lang'] ) ? $options['translate_alt_lang'] : 'en' );
                         if ( $target_lang !== 'en' ) {
-                            $translated_alt = $this->ASI_translate_text( $alt, 'en', $target_lang );
+                            $translated_alt = $this->ALLSI_translate_text( $alt, 'en', $target_lang );
                             if ( $translated_alt !== false ) {
                                 $alt = $translated_alt;
                             }
@@ -1860,7 +1860,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                         if ( base64_decode( $url_result, true ) !== false ) {
                             // Decoding the image in Base64
                             $image_data = base64_decode( $url_result );
-                            $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+                            $options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
                             // Specify a file path for the image in the download directory
                             $upload_dir = wp_upload_dir();
                             $file_path = $upload_dir['path'] . '/temp_mpt_stability_' . uniqid() . '.' . $options_banks['stability']['output_format'];
@@ -1876,7 +1876,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                             wp_delete_file( $file_path );
                         }
                     } else {
-                        $proxy_args = $this->ASI_get_proxy_args();
+                        $proxy_args = $this->ALLSI_get_proxy_args();
                         $file_media = @wp_remote_request( $url_result, $proxy_args );
                         if ( isset( $file_media->errors ) || $file_media['response']['code'] != 200 || strpos( $file_media['headers']['content-type'], 'text/html' ) !== false ) {
                             if ( ++$loop_count === $numUrl ) {
@@ -1909,7 +1909,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    4.0.0
      */
-    private function ASI_get_results( $service, $url, $url_parameters ) {
+    private function ALLSI_get_results( $service, $url, $url_parameters ) {
         if ( $service == 'stability' || $service == 'replicate' ) {
             $defaults = $url_parameters;
         } else {
@@ -1923,22 +1923,22 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'sslverify'          => false,
             );
         }
-        $proxy_args = $this->ASI_get_proxy_args();
-        ASI_log( array(
+        $proxy_args = $this->ALLSI_get_proxy_args();
+        ALLSI_log( array(
             'service'     => $service,
             'url'         => $url,
             'has_proxy'   => ! empty( $proxy_args ),
-            'proxy_mode'  => $this->ASI_current_proxy_mode(),
+            'proxy_mode'  => $this->ALLSI_current_proxy_mode(),
         ), 'HTTP_REQUEST' );
 
-        $result = $this->ASI_remote_request( $service, $url, $defaults );
+        $result = $this->ALLSI_remote_request( $service, $url, $defaults );
         
         $response_code = is_wp_error( $result ) ? 'ERROR' : wp_remote_retrieve_response_code( $result );
         $body_preview = '';
         if ( ! is_wp_error( $result ) && isset( $result['body'] ) ) {
             $body_preview = substr( $result['body'], 0, 1200 );
         }
-        ASI_log( array(
+        ALLSI_log( array(
             'response_code' => $response_code,
             'is_error' => is_wp_error( $result ),
             'error_message' => is_wp_error( $result ) ? $result->get_error_message() : '',
@@ -1972,7 +1972,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @since    4.0.0
      */
-    public function ASI_order_array_urls( $str, $str_alt, $str_caption ) {
+    public function ALLSI_order_array_urls( $str, $str_alt, $str_caption ) {
         // Get only the url and exclude Google image url (domain gstatic)
         $pattern = '/,\\["(http[^"]((?!gstatic).)*)",\\d+?,\\d+?\\]/';
         $replacement = '$1';
@@ -2184,13 +2184,13 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      * @param    string    $target_lang   Target language code (default: en)
      * @return   string|false             Translated text or false on error
      */
-    public function ASI_translate_text( $text, $source_lang = 'auto', $target_lang = 'en' ) {
+    public function ALLSI_translate_text( $text, $source_lang = 'auto', $target_lang = 'en' ) {
         if ( empty( $text ) || $source_lang === $target_lang ) {
             return $text;
         }
         
-        $log = $this->ASI_monolog_call();
-        $options_banks = wp_parse_args( get_option( 'ASI_plugin_banks_settings' ), $this->ASI_default_options_banks_settings( TRUE ) );
+        $log = $this->ALLSI_monolog_call();
+        $options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
         $api_key = ( !empty( $options_banks['google_translate']['apikey'] ) ? $options_banks['google_translate']['apikey'] : '' );
         
         // Use official Google Translate API if API key is provided
@@ -2204,7 +2204,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'format' => 'text',
             );
             
-            $response = $this->ASI_remote_post( 'google_translate', $url, array(
+            $response = $this->ALLSI_remote_post( 'google_translate', $url, array(
                 'body'    => $params,
                 'timeout' => 10,
             ) );
@@ -2238,7 +2238,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         );
         
         $url = add_query_arg( $params, $url );
-        $response = $this->ASI_remote_get( 'google_translate', $url, array(
+        $response = $this->ALLSI_remote_get( 'google_translate', $url, array(
             'timeout' => 10,
         ) );
         
@@ -2274,8 +2274,8 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      * @param string $num_keywords Number of keywords to extract ('1-2', '2', '3')
      * @return string|false Extracted keywords or false on failure
      */
-    public function ASI_openai_extract_keywords( $api_key, $title, $content = '', $num_keywords = '2' ) {
-        $log = $this->ASI_monolog_call();
+    public function ALLSI_openai_extract_keywords( $api_key, $title, $content = '', $num_keywords = '2' ) {
+        $log = $this->ALLSI_monolog_call();
         
         if ( empty( $api_key ) ) {
             return false;
@@ -2362,8 +2362,8 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      * @param string $custom_instructions Additional user instructions
      * @return string|false Generated prompt or false on failure
      */
-    public function ASI_openai_generate_image_prompt( $api_key, $title, $content = '', $style = 'photorealistic', $custom_instructions = '' ) {
-        $log = $this->ASI_monolog_call();
+    public function ALLSI_openai_generate_image_prompt( $api_key, $title, $content = '', $style = 'photorealistic', $custom_instructions = '' ) {
+        $log = $this->ALLSI_monolog_call();
         
         if ( empty( $api_key ) ) {
             return false;

@@ -1,4 +1,4 @@
-﻿jQuery(function($) {
+jQuery(function($) {
 
     // Drag & Drop Banks
     $(".chosen_api .radio-list").sortable({
@@ -24,7 +24,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const btnPixabay    = document.getElementById("btnPixabay");
     const resultPixabay = document.getElementById("resultPixabay");
-    const apiKeyInput   = document.querySelector('input[name="ASI_plugin_banks_settings[pixabay][apikey]"]');
+    const apiKeyInput   = document.querySelector('input[name="allsi_plugin_banks_settings[pixabay][apikey]"]');
     const imagePixabay  = document.querySelector("#resultPixabay img");
 
     if (!btnPixabay || !resultPixabay || !apiKeyInput || !imagePixabay) {
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=asi_test_apis&apibank=pixabay&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=pixabay&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnDalle          = document.getElementById("btnDalle");
     const resultDalle       = document.getElementById("resultDalle");
-    const apiKeyInputDalle  = document.querySelector('input[name="ASI_plugin_banks_settings[dallev1][apikey]"]');
+    const apiKeyInputDalle  = document.querySelector('input[name="allsi_plugin_banks_settings[dallev1][apikey]"]');
     const imageDalle        = document.querySelector("#resultDalle img");
 
     if (!btnDalle || !resultDalle || !apiKeyInputDalle || !imageDalle) {
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=asi_test_apis&apibank=dalle&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInputDalle.value
+            body: "action=allsi_test_apis&apibank=dalle&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInputDalle.value
         })
         .then(response => response.json())
         .then(data => {
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnStability          = document.getElementById("btnStability");
     const resultStability       = document.getElementById("resultStability");
-    const apiKeyInputStability  = document.querySelector('input[name="ASI_plugin_banks_settings[stability][apikey]"]');
+    const apiKeyInputStability  = document.querySelector('input[name="allsi_plugin_banks_settings[stability][apikey]"]');
     const imageStability        = document.querySelector("#resultStability img");
 
     if (!btnStability || !resultStability || !apiKeyInputStability || !imageStability) {
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnGemini          = document.getElementById("btnGemini");
     const resultGemini       = document.getElementById("resultGemini");
-    const apiKeyInputGemini  = document.querySelector('input[name="ASI_plugin_banks_settings[gemini][apikey]"]');
+    const apiKeyInputGemini  = document.querySelector('input[name="allsi_plugin_banks_settings[gemini][apikey]"]');
     const imageGemini        = document.querySelector("#resultGemini img");
 
     if (!btnGemini || !resultGemini || !apiKeyInputGemini || !imageGemini) {
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                action:  "asi_test_apis",
+                action:  "allsi_test_apis",
                 apibank: "gemini",
                 nonce:   apisTestingAjax.nonce,
                 apikey:  apiKeyInputGemini.value
@@ -193,8 +193,8 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnWorkersAI      = document.getElementById("btnWorkersAI");
     const resultWorkersAI   = document.getElementById("resultWorkersAI");
-    const tokenInputWorkers = document.querySelector('input[name="ASI_plugin_banks_settings[workers_ai][api_token]"]');
-    const accountInput      = document.querySelector('input[name="ASI_plugin_banks_settings[workers_ai][account_id]"]');
+    const tokenInputWorkers = document.querySelector('input[name="allsi_plugin_banks_settings[workers_ai][api_token]"]');
+    const accountInput      = document.querySelector('input[name="allsi_plugin_banks_settings[workers_ai][account_id]"]');
     const imageWorkersAI    = document.querySelector("#resultWorkersAI img");
 
     if (!btnWorkersAI || !resultWorkersAI || !tokenInputWorkers || !accountInput || !imageWorkersAI) {
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                action:     "asi_test_apis",
+                action:     "allsi_test_apis",
                 apibank:    "workers_ai",
                 nonce:      apisTestingAjax.nonce,
                 apikey:     tokenInputWorkers.value,
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnReplicate    = document.getElementById("btnReplicate");
     const resultReplicate = document.getElementById("resultReplicate");
-    const apiKeyInput     = document.querySelector('input[name="ASI_plugin_banks_settings[replicate][apitoken]"]');
+    const apiKeyInput     = document.querySelector('input[name="allsi_plugin_banks_settings[replicate][apitoken]"]');
     const imageReplicate  = document.querySelector("#resultReplicate img");
 
     if (!btnReplicate || !resultReplicate || !apiKeyInput || !imageReplicate) {
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                action:  "asi_test_apis",
+                action:  "allsi_test_apis",
                 apibank: "replicate",
                 nonce:   apisTestingAjax.nonce,
                 apikey:  apiKeyInput.value
@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnYoutube    = document.getElementById("btnYouTube");
     const resultYoutube = document.getElementById("resultYoutube");
-    const apiKeyInput   = document.querySelector('input[name="ASI_plugin_banks_settings[youtube][apikey]"]');
+    const apiKeyInput   = document.querySelector('input[name="allsi_plugin_banks_settings[youtube][apikey]"]');
     const imageYt       = document.querySelector("#resultYoutube img");
 
     if (!btnYoutube || !resultYoutube || !apiKeyInput || !imageYt) {
@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=asi_test_apis&apibank=youtube&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=youtube&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -330,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnUnsplash       = document.getElementById("btnUnsplash");
     const resultUnsplash    = document.getElementById("resultUnsplash");
-    const apiKeyInput       = document.querySelector('input[name="ASI_plugin_banks_settings[unsplash][apikey]"]');
+    const apiKeyInput       = document.querySelector('input[name="allsi_plugin_banks_settings[unsplash][apikey]"]');
     const imageUnsplash     = document.querySelector("#resultUnsplash img");
 
     if (!btnUnsplash || !resultUnsplash || !apiKeyInput || !imageUnsplash) {
@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=asi_test_apis&apibank=unsplash&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=unsplash&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnPexels         = document.getElementById("btnPexels");
     const resultPexels      = document.getElementById("resultPexels");
-    const apiKeyInput       = document.querySelector('input[name="ASI_plugin_banks_settings[pexels][apikey]"]');
+    const apiKeyInput       = document.querySelector('input[name="allsi_plugin_banks_settings[pexels][apikey]"]');
     const imagePexels       = document.querySelector("#resultPexels img");
 
     if (!btnPexels || !resultPexels || !apiKeyInput || !imagePexels) {
@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=asi_test_apis&apibank=pexels&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=pexels&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnGiphy    = document.getElementById("btnGiphy");
     const resultGiphy = document.getElementById("resultGiphy");
-    const apiKeyInput = document.querySelector('input[name="ASI_plugin_banks_settings[giphy][apikey]"]');
+    const apiKeyInput = document.querySelector('input[name="allsi_plugin_banks_settings[giphy][apikey]"]');
     const imageGiphy  = document.querySelector("#resultGiphy img");
 
     if (!btnGiphy || !resultGiphy || !apiKeyInput || !imageGiphy) {
@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-                action:  "asi_test_apis",
+                action:  "allsi_test_apis",
                 apibank: "giphy",
                 nonce:   apisTestingAjax.nonce,
                 apikey:  apiKeyInput.value
@@ -466,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnEnvato         = document.getElementById("btnEnvato");
     const resultEnvato      = document.getElementById("resultEnvato");
-    const envatoTokenInput  = document.querySelector('input[name="ASI_plugin_banks_settings[envato][envato_token]"]');
+    const envatoTokenInput  = document.querySelector('input[name="allsi_plugin_banks_settings[envato][envato_token]"]');
     const imageEnvato       = document.querySelector("#resultEnvato img");
 
     btnEnvato.addEventListener("click", function() {
@@ -478,7 +478,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=asi_test_apis&apibank=envato&nonce=" + apisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
+            body: "action=allsi_test_apis&apibank=envato&nonce=" + apisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
         })
         .then(response => response.json())
         .then(data => {
@@ -502,8 +502,8 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnGoogleImage = document.getElementById("btnGoogleImage");
     const resultGoogleImage = document.getElementById("resultGoogleImage");
-    const apiKeyInput = document.querySelector('input[name="ASI_plugin_banks_settings[googleimage][apikey]"]');
-    const cxIdInput = document.querySelector('input[name="ASI_plugin_banks_settings[googleimage][cxid]"]');
+    const apiKeyInput = document.querySelector('input[name="allsi_plugin_banks_settings[googleimage][apikey]"]');
+    const cxIdInput = document.querySelector('input[name="allsi_plugin_banks_settings[googleimage][cxid]"]');
     const imageGoogleImage = document.querySelector("#resultGoogleImage img");
 
     if (!btnGoogleImage || !resultGoogleImage || !apiKeyInput || !cxIdInput || !imageGoogleImage) {
@@ -518,7 +518,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: "action=asi_test_apis&apibank=google_image&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value + "&cxid=" + cxIdInput.value
+                body: "action=allsi_test_apis&apibank=google_image&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value + "&cxid=" + cxIdInput.value
             })
             .then(response => response.json())
             .then(data => {

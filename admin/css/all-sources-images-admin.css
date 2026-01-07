@@ -582,13 +582,13 @@ form i#togglePassword.close-eye {
     cursor: pointer;
 }
 
-.asi-tabs,
+.allsi-tabs,
 #tabs {
     margin-top: 20px;
     display: block !important;
 }
 
-.asi-source-badge {
+.allsi-source-badge {
     display: inline-flex;
     align-items: center;
     font-size: 11px;
@@ -601,7 +601,7 @@ form i#togglePassword.close-eye {
     color: #b96a00;
 }
 
-.asi-source-dot {
+.allsi-source-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -636,7 +636,7 @@ form i#togglePassword.close-eye {
     display: inline-block;
 }
 
-.asi-tabs table a,
+.allsi-tabs table a,
 #tabs table a {
     text-decoration: underline;
 }
@@ -661,12 +661,12 @@ form i#togglePassword.close-eye {
     border-top: 0;
 }
 
-.asi-tabs .form-table tr th,
+.allsi-tabs .form-table tr th,
 #tabs .form-table tr th {
     padding-left: 10px;
 }
 
-.asi-tabs .form-table td,
+.allsi-tabs .form-table td,
 #tabs .form-table td {
     padding: 13px 10px 6px;
 }

@@ -15,13 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Enqueue admin styles - same as original pages
  */
-function asi_enqueue_new_ui_assets( $hook ) {
+function ALLSI_enqueue_new_ui_assets( $hook ) {
     // Only load on our new pages
     $new_ui_pages = array(
-        'toplevel_page_asi-new-settings',
-        'all-sources-images_page_asi-new-settings',
-        'all-sources-images_page_asi-new-automatic',
-        'all-sources-images_page_asi-new-bulk-generation',
+        'toplevel_page_allsi-new-settings',
+        'all-sources-images_page_allsi-new-settings',
+        'all-sources-images_page_allsi-new-automatic',
+        'all-sources-images_page_allsi-new-bulk-generation',
     );
     
     if ( ! in_array( $hook, $new_ui_pages, true ) ) {
@@ -134,21 +134,21 @@ function asi_enqueue_new_ui_assets( $hook ) {
     
     // New UI Scripts (handles all inline script functionality)
     wp_enqueue_script(
-        'asi-new-ui',
-        $plugin_url . 'js/asi-new-ui.js',
+        'allsi-new-ui',
+        $plugin_url . 'js/allsi-new-ui.js',
         array('jquery'),
         $version,
         true
     );
     
     // Localize script data for Image Placement page
-    if ( $hook === 'all-sources-images_page_asi-new-automatic' ) {
+    if ( $hook === 'all-sources-images_page_allsi-new-automatic' ) {
         // Get current block index from settings
-        $options = get_option( 'ASI_plugin_main_settings', array() );
+        $options = get_option( 'ALLSI_plugin_main_settings', array() );
         $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
         $block_index = empty( $image_blocks ) ? 1 : max( array_keys( $image_blocks ) ) + 1;
         
-        wp_localize_script( 'asi-new-ui', 'asiNewUI', array(
+        wp_localize_script( 'allsi-new-ui', 'allsiNewUI', array(
             'imagePlacement' => array(
                 'blockIndex' => $block_index,
                 'helpTexts'  => array(
@@ -176,7 +176,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
     );
     
     // Bulk Generation JS (only on bulk generation page)
-    if ( $hook === 'all-sources-images_page_asi-new-bulk-generation' ) {
+    if ( $hook === 'all-sources-images_page_allsi-new-bulk-generation' ) {
         // Bootstrap 5 JS for tabs/accordions (local)
         wp_enqueue_script(
             'bootstrap5',
@@ -195,15 +195,15 @@ function asi_enqueue_new_ui_assets( $hook ) {
         );
         
         wp_enqueue_script(
-            'asi-bulk-generation',
+            'allsi-bulk-generation',
             $plugin_url . 'js/bulk-generation.js',
             array('jquery', 'bootstrap5'),
             $version,
             true
         );
-        wp_localize_script( 'asi-bulk-generation', 'asiBulkAjax', array(
+        wp_localize_script( 'allsi-bulk-generation', 'allsiBulkAjax', array(
             'ajax_url' => admin_url( 'admin-ajax.php' ),
-            'nonce'    => wp_create_nonce( 'asi_bulk_nonce' ),
+            'nonce'    => wp_create_nonce( 'ALLSI_bulk_nonce' ),
             'edit_url' => admin_url( 'post.php' ),
             'i18n'     => array(
                 'no_selection'   => esc_html__( 'Please select content to generate images for.', 'all-sources-images' ),
@@ -219,7 +219,7 @@ function asi_enqueue_new_ui_assets( $hook ) {
     
     // Custom styles for new UI pages (loaded last to override)
     wp_enqueue_style(
-        'asi-new-ui-styles',
+        'allsi-new-ui-styles',
         plugin_dir_url( __FILE__ ) . 'new-ui-styles.css',
         array( 'all-sources-images', 'style.bundle' ),
         $version,
@@ -227,25 +227,25 @@ function asi_enqueue_new_ui_assets( $hook ) {
     );
     
     // Image Placement styles (only on automatic page)
-    if ( $hook === 'all-sources-images_page_asi-new-automatic' ) {
+    if ( $hook === 'all-sources-images_page_allsi-new-automatic' ) {
         wp_enqueue_style(
-            'asi-image-placement',
-            $plugin_url . 'css/asi-image-placement.css',
-            array( 'asi-new-ui-styles' ),
+            'allsi-image-placement',
+            $plugin_url . 'css/allsi-image-placement.css',
+            array( 'allsi-new-ui-styles' ),
             $version,
             'all'
         );
     }
     
     // Bulk Generation styles (only on bulk generation page)
-    if ( $hook === 'all-sources-images_page_asi-new-bulk-generation' ) {
+    if ( $hook === 'all-sources-images_page_allsi-new-bulk-generation' ) {
         wp_enqueue_style(
-            'asi-bulk-generation',
-            $plugin_url . 'css/asi-bulk-generation.css',
-            array( 'asi-new-ui-styles' ),
+            'allsi-bulk-generation',
+            $plugin_url . 'css/allsi-bulk-generation.css',
+            array( 'allsi-new-ui-styles' ),
             $version,
             'all'
         );
     }
 }
-add_action( 'admin_enqueue_scripts', 'asi_enqueue_new_ui_assets' );
+add_action( 'admin_enqueue_scripts', 'ALLSI_enqueue_new_ui_assets' );

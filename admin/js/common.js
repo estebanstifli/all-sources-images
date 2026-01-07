@@ -806,8 +806,8 @@ var KTBootstrapSwitch = function() {
 jQuery(document).ready(function() {
   KTBootstrapSwitch.init();
 
-  // Tabs for settings (new .asi-tabs plus legacy #tabs containers)
-  jQuery('.asi-tabs, #tabs').each(function() {
+  // Tabs for settings (new .allsi-tabs plus legacy #tabs containers)
+  jQuery('.allsi-tabs, #tabs').each(function() {
     var $tabs = jQuery(this);
     if ( $tabs.find('> ul > li').length ) {
       $tabs.tabs();

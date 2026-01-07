@@ -31,7 +31,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
         <label for="gemini-apikey"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
     </th>
     <td id="password-gemini" class="password">
-        <input id="gemini-apikey" type="password" name="ASI_plugin_banks_settings[gemini][apikey]" class="form-control" value="<?php echo isset( $gemini_options['apikey'] ) ? esc_attr( $gemini_options['apikey'] ) : ''; ?>" />
+        <input id="gemini-apikey" type="password" name="ALLSI_plugin_banks_settings[gemini][apikey]" class="form-control" value="<?php echo isset( $gemini_options['apikey'] ) ? esc_attr( $gemini_options['apikey'] ) : ''; ?>" />
         <i id="togglePassword"></i>
     </td>
 </tr>
@@ -50,10 +50,10 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
         <label for="gemini-model"><?php esc_html_e( 'Model', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <select name="ASI_plugin_banks_settings[gemini][model]" id="gemini-model" class="form-control form-control-lg">
+        <select name="ALLSI_plugin_banks_settings[gemini][model]" id="gemini-model" class="form-control form-control-lg">
             <?php
             $models = apply_filters(
-                'asi_gemini_supported_models',
+                'ALLSI_gemini_supported_models',
                 array(
                     'gemini-2.5-flash-image'         => esc_html__( 'Gemini 2.5 Flash Image (Nano Banana)', 'all-sources-images' ),
                     'gemini-2.5-flash-preview-image' => esc_html__( 'Gemini 2.5 Flash Image Preview', 'all-sources-images' ),
@@ -65,7 +65,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
             }
             ?>
         </select>
-        <p class="description"><?php esc_html_e( 'Only the image-ready Nano Banana models are listed here. If Google adds new versions you can extend the list with the asi_gemini_supported_models filter.', 'all-sources-images' ); ?></p>
+        <p class="description"><?php esc_html_e( 'Only the image-ready Nano Banana models are listed here. If Google adds new versions you can extend the list with the ALLSI_gemini_supported_models filter.', 'all-sources-images' ); ?></p>
     </td>
 </tr>
 
@@ -74,7 +74,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
         <label for="gemini-aspect"><?php esc_html_e( 'Aspect ratio', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <select name="ASI_plugin_banks_settings[gemini][aspect_ratio]" id="gemini-aspect" class="form-control form-control-lg">
+        <select name="ALLSI_plugin_banks_settings[gemini][aspect_ratio]" id="gemini-aspect" class="form-control form-control-lg">
             <?php
             $ratios = array(
                 '1:1'  => esc_html__( 'Square (1:1)', 'all-sources-images' ),
@@ -97,7 +97,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
         <label for="gemini-size"><?php esc_html_e( 'Image size', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <select name="ASI_plugin_banks_settings[gemini][image_size]" id="gemini-size" class="form-control form-control-lg">
+        <select name="ALLSI_plugin_banks_settings[gemini][image_size]" id="gemini-size" class="form-control form-control-lg">
             <?php
             $sizes = array(
                 ''         => esc_html__( 'Auto (model default)', 'all-sources-images' ),

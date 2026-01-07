@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Custom Search Engine ID', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="text" name="ASI_plugin_banks_settings[googleimage][cxid]" class="form-control" value="<?php echo( isset( $options['googleimage']['cxid'] ) && !empty( $options['googleimage']['cxid'] ) )? esc_attr( trim( $options['googleimage']['cxid'] ) ): ''; ?>" >
+		<input type="text" name="ALLSI_plugin_banks_settings[googleimage][cxid]" class="form-control" value="<?php echo( isset( $options['googleimage']['cxid'] ) && !empty( $options['googleimage']['cxid'] ) )? esc_attr( trim( $options['googleimage']['cxid'] ) ): ''; ?>" >
 	</td>
 </tr>
 <tr valign="top">
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Google API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-googleAPI" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[googleimage][apikey]" class="form-control" value="<?php echo( isset( $options['googleimage']['apikey'] ) && !empty( $options['googleimage']['apikey']) )? esc_attr( trim( $options['googleimage']['apikey'] ) ): ''; ?>" >
+		<input type="password" name="ALLSI_plugin_banks_settings[googleimage][apikey]" class="form-control" value="<?php echo( isset( $options['googleimage']['apikey'] ) && !empty( $options['googleimage']['apikey']) )? esc_attr( trim( $options['googleimage']['apikey'] ) ): ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Choose the language', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[googleimage][search_country]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[googleimage][search_country]" class="form-control form-control-lg" >
 			<?php
 				$selected = $options['googleimage']['search_country'];
 				$country_choose = array(
@@ -159,7 +159,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Specified color predominantly', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[googleimage][img_color]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[googleimage][img_color]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['googleimage']['img_color'];
 
@@ -197,7 +197,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Filetype', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[googleimage][filetype]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[googleimage][filetype]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['googleimage']['filetype'];
 
@@ -245,7 +245,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			foreach ( $rights_array  as $right => $right_code ) {
 				$checked= ( isset( $options['googleimage']['rights'] ) && !empty( $options['googleimage']['rights'] ) && in_array( $right_code, $options['googleimage']['rights'] ) )? 'checked="checked""' : '';
 				echo '<label class="checkbox">
-					<input '. $checked .' name="ASI_plugin_banks_settings[googleimage][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
+					<input '. $checked .' name="ALLSI_plugin_banks_settings[googleimage][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
 				</label>';
 			}
 		?>
@@ -258,7 +258,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Image size', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[googleimage][imgsz]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[googleimage][imgsz]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['googleimage']['imgsz'];
 
@@ -288,7 +288,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[googleimage][imgtype]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[googleimage][imgtype]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['googleimage']['imgtype'];
 
@@ -314,7 +314,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Safety level', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[googleimage][safe]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[googleimage][safe]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['googleimage']['safe'];
 

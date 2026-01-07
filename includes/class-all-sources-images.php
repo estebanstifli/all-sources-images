@@ -121,24 +121,24 @@ class All_Sources_Images {
 		/**
 		 * Bulk Generation Database Class
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-db.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-allsi-bulk-generation-db.php';
 
 		/**
 		 * Bulk Generation AJAX Handlers
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-ajax.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-allsi-bulk-generation-ajax.php';
 
 		/**
 		 * Bulk Generation Cron Processor
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-asi-bulk-generation-cron.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-allsi-bulk-generation-cron.php';
 
 		/**
 		 * Plugin Integrations (WP All Import, WPeMatico, FeedWordPress, etc.)
 		 * DISABLED: Plugin compatibility features have been removed from the UI.
 		 * The file is kept for backward compatibility but not loaded by default.
 		 */
-		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-asi-plugin-integrations.php';
+		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-allsi-plugin-integrations.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -152,7 +152,7 @@ class All_Sources_Images {
 		 * Initialize Plugin Integrations
 		 * DISABLED: Plugin compatibility features have been removed from the UI.
 		 */
-		// ASI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
+		// ALLSI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
 
 	}
 
@@ -171,9 +171,9 @@ class All_Sources_Images {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
-    	$this->loader->add_action( 'admin_menu', $plugin_admin, 'ASI_main_settings' );
+    	$this->loader->add_action( 'admin_menu', $plugin_admin, 'ALLSI_main_settings' );
 
-    	$this->loader->add_action( 'init', $plugin_admin, 'ASI_main_actions' );
+    	$this->loader->add_action( 'init', $plugin_admin, 'ALLSI_main_actions' );
 
 	}
 

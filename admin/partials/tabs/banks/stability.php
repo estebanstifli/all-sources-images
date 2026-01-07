@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-stability" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[stability][apikey]" class="form-control" value="<?php echo( isset( $options['stability']['apikey'] ) && !empty( $options['stability']['apikey']) )? esc_attr( $options['stability']['apikey'] ) : ''; ?>" >
+		<input type="password" name="ALLSI_plugin_banks_settings[stability][apikey]" class="form-control" value="<?php echo( isset( $options['stability']['apikey'] ) && !empty( $options['stability']['apikey']) )? esc_attr( $options['stability']['apikey'] ) : ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Model', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[stability][model]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[stability][model]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['stability']['model']) ? $options['stability']['model'] : 'sd3-large';
 
@@ -70,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Aspect Ratio', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[stability][aspect_ratio]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[stability][aspect_ratio]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['stability']['aspect_ratio']) ? $options['stability']['aspect_ratio'] : '1:1';
 
@@ -100,7 +100,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Output Format', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[stability][output_format]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[stability][output_format]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['stability']['output_format']) ? $options['stability']['output_format'] : 'jpeg';
 
@@ -125,7 +125,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ASI_plugin_banks_settings[stability][use_negative_prompt]" type="checkbox" value="true" <?php echo( !empty( $options['stability']['use_negative_prompt'] ) && $options['stability']['use_negative_prompt'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[stability][use_negative_prompt]" type="checkbox" value="true" <?php echo( !empty( $options['stability']['use_negative_prompt'] ) && $options['stability']['use_negative_prompt'] == 'true' )? 'checked': ''; ?>><span></span>
 			<?php esc_html_e( 'Use default negative prompt', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'Adds common exclusions: "blurry, low quality, distorted, disfigured, ugly, low resolution"', 'all-sources-images' ); ?></p>

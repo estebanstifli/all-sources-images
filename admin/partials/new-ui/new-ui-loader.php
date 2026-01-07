@@ -17,19 +17,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Prevent double loading
-if ( defined( 'ASI_NEW_UI_LOADED' ) ) {
+if ( defined( 'ALLSI_NEW_UI_LOADED' ) ) {
     return;
 }
-define( 'ASI_NEW_UI_LOADED', true );
+define( 'ALLSI_NEW_UI_LOADED', true );
 
 // Get the directory of this file
-$asi_new_ui_dir = plugin_dir_path( __FILE__ );
+$ALLSI_new_ui_dir = plugin_dir_path( __FILE__ );
 
 // Load menu registration
-require_once $asi_new_ui_dir . 'new-ui-menus.php';
+require_once $ALLSI_new_ui_dir . 'new-ui-menus.php';
 
 // Load asset enqueuing
-require_once $asi_new_ui_dir . 'new-ui-assets.php';
+require_once $ALLSI_new_ui_dir . 'new-ui-assets.php';
 
 /**
  * Initialize new UI with admin instance
@@ -39,8 +39,8 @@ require_once $asi_new_ui_dir . 'new-ui-assets.php';
  * 
  * @param All_Sources_Images_Admin $admin_instance
  */
-function asi_init_new_ui( $admin_instance = null ) {
-    if ( $admin_instance && function_exists( 'asi_set_new_ui_admin' ) ) {
-        asi_set_new_ui_admin( $admin_instance );
+function ALLSI_init_new_ui( $admin_instance = null ) {
+    if ( $admin_instance && function_exists( 'ALLSI_set_new_ui_admin' ) ) {
+        ALLSI_set_new_ui_admin( $admin_instance );
     }
 }

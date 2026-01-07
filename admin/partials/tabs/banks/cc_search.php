@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</th>
 	<td>
 
-		<select name="ASI_plugin_banks_settings[cc_search][source]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[cc_search][source]" class="form-control form-control-lg" >
 			<?php
 				$selected = $options['cc_search']['source'];
 				$source_choose = array(
@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			foreach ( $rights_array as $right => $right_code ) {
 				$checked= ( isset( $options['cc_search']['rights'] ) && !empty( $options['cc_search']['rights'] ) && in_array( $right_code, $options['cc_search']['rights'] ) )? 'checked="checked""' : '';
 				echo '<label class="checkbox">
-					<input '. $checked .' name="ASI_plugin_banks_settings[cc_search][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
+					<input '. $checked .' name="ALLSI_plugin_banks_settings[cc_search][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
 				</label>';
 			}
 		?>
@@ -78,7 +78,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[cc_search][imgtype]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[cc_search][imgtype]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['cc_search']['imgtype'];
 
@@ -104,7 +104,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Aspect Ratio', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[cc_search][aspect_ratio]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[cc_search][aspect_ratio]" class="form-control form-control-lg" >
 			<?php
 			$selected = $options['cc_search']['aspect_ratio'];
 

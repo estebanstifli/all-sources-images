@@ -1,4 +1,4 @@
-﻿// Use destructuring with different variable names to avoid conflicts
+// Use destructuring with different variable names to avoid conflicts
 const { dispatch: wpDispatch, select: wpSelect } = wp.data;
 const { createBlock } = wp.blocks;
 
@@ -12,8 +12,8 @@ function addMPTBlockAndOpenModal() {
     }).indexOf(true) + 1;*/
 
 
-    // Create an instance of the asi/asi-images block
-    const block = createBlock('asi/asi-images');
+    // Create an instance of the allsi/allsi-images block
+    const block = createBlock('allsi/allsi-images');
 
     //wpDispatch('core/block-editor').insertBlock(block, indexBlock);
     wpDispatch('core/block-editor').insertBlock(block);

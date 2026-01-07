@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'API Token', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-replicate" class="password">
-		<input type="password" name="ASI_plugin_banks_settings[replicate][apitoken]" class="form-control" value="<?php echo( isset( $options['replicate']['apitoken'] ) && !empty( $options['replicate']['apitoken']) )? esc_attr( $options['replicate']['apitoken'] ) : ''; ?>" >
+		<input type="password" name="ALLSI_plugin_banks_settings[replicate][apitoken]" class="form-control" value="<?php echo( isset( $options['replicate']['apitoken'] ) && !empty( $options['replicate']['apitoken']) )? esc_attr( $options['replicate']['apitoken'] ) : ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Model', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[replicate][model]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[replicate][model]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['replicate']['model']) ? $options['replicate']['model'] : 'black-forest-labs/flux-schnell';
 
@@ -100,7 +100,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Model Version (Optional)', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="text" name="ASI_plugin_banks_settings[replicate][version]" class="form-control" value="<?php echo( isset( $options['replicate']['version'] ) && !empty( $options['replicate']['version']) )? esc_attr( $options['replicate']['version'] ) : ''; ?>" placeholder="Leave empty for latest version">
+		<input type="text" name="ALLSI_plugin_banks_settings[replicate][version]" class="form-control" value="<?php echo( isset( $options['replicate']['version'] ) && !empty( $options['replicate']['version']) )? esc_attr( $options['replicate']['version'] ) : ''; ?>" placeholder="Leave empty for latest version">
 		<p class="description"><?php esc_html_e( 'Specify a 64-character version ID for exact model version, or leave empty to use latest. Format: owner/model:version_id or just version_id', 'all-sources-images' ); ?></p>
 	</td>
 </tr>
@@ -110,7 +110,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Prediction Timeout', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[replicate][timeout]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[replicate][timeout]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['replicate']['timeout']) ? $options['replicate']['timeout'] : '60';
 
@@ -138,7 +138,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Polling Interval', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[replicate][polling_interval]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[replicate][polling_interval]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['replicate']['polling_interval']) ? $options['replicate']['polling_interval'] : '2';
 
@@ -165,7 +165,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Webhook URL (Optional)', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="url" name="ASI_plugin_banks_settings[replicate][webhook_url]" class="form-control" value="<?php echo( isset( $options['replicate']['webhook_url'] ) && !empty( $options['replicate']['webhook_url']) )? esc_attr( $options['replicate']['webhook_url'] ) : ''; ?>" placeholder="https://yoursite.com/webhook">
+		<input type="url" name="ALLSI_plugin_banks_settings[replicate][webhook_url]" class="form-control" value="<?php echo( isset( $options['replicate']['webhook_url'] ) && !empty( $options['replicate']['webhook_url']) )? esc_attr( $options['replicate']['webhook_url'] ) : ''; ?>" placeholder="https://yoursite.com/webhook">
 		<p class="description"><?php esc_html_e( 'HTTPS URL to receive webhook notifications when prediction completes. Leave empty to use polling instead.', 'all-sources-images' ); ?></p>
 	</td>
 </tr>
@@ -175,7 +175,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Image Size', 'all-sources-images' ); ?></label>
 	</th>
 	<td class="checkbox-list">
-		<select name="ASI_plugin_banks_settings[replicate][image_size]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[replicate][image_size]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['replicate']['image_size']) ? $options['replicate']['image_size'] : '1024x1024';
 
@@ -202,7 +202,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Guidance Scale', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="number" name="ASI_plugin_banks_settings[replicate][guidance_scale]" class="form-control" min="1" max="20" step="0.5" value="<?php echo( isset( $options['replicate']['guidance_scale'] ) && !empty( $options['replicate']['guidance_scale']) )? esc_attr( $options['replicate']['guidance_scale'] ) : '7.5'; ?>" >
+		<input type="number" name="ALLSI_plugin_banks_settings[replicate][guidance_scale]" class="form-control" min="1" max="20" step="0.5" value="<?php echo( isset( $options['replicate']['guidance_scale'] ) && !empty( $options['replicate']['guidance_scale']) )? esc_attr( $options['replicate']['guidance_scale'] ) : '7.5'; ?>" >
 		<p class="description"><?php esc_html_e( 'How closely to follow the prompt. Higher values (10-15) follow prompt strictly, lower values (5-7) allow more creativity. Default: 7.5', 'all-sources-images' ); ?></p>
 	</td>
 </tr>
@@ -212,7 +212,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Number of Outputs', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[replicate][num_outputs]" class="form-control form-control-lg" >
+		<select name="ALLSI_plugin_banks_settings[replicate][num_outputs]" class="form-control form-control-lg" >
 			<?php
 			$selected = isset($options['replicate']['num_outputs']) ? $options['replicate']['num_outputs'] : '1';
 
@@ -238,7 +238,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ASI_plugin_banks_settings[replicate][use_negative_prompt]" type="checkbox" value="true" <?php echo( !empty( $options['replicate']['use_negative_prompt'] ) && $options['replicate']['use_negative_prompt'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[replicate][use_negative_prompt]" type="checkbox" value="true" <?php echo( !empty( $options['replicate']['use_negative_prompt'] ) && $options['replicate']['use_negative_prompt'] == 'true' )? 'checked': ''; ?>><span></span>
 			<?php esc_html_e( 'Use default negative prompt', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'Adds common exclusions: "blurry, low quality, distorted, disfigured, ugly, low resolution, watermark"', 'all-sources-images' ); ?></p>

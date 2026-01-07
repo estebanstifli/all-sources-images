@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<div class="wrap asi-bulk-generation-wrap">
+<div class="wrap allsi-bulk-generation-wrap">
     
     <!-- Header -->
     <div class="d-flex align-items-center mb-3">

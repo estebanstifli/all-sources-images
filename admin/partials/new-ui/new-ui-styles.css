@@ -80,14 +80,14 @@
 /* ==========================================================================
    Base Layout
    ========================================================================== */
-.asi-new-settings,
-.asi-new-automatic,
+.allsi-new-settings,
+.allsi-new-automatic,
 .new-bulk-generation-wrap {
     margin: 20px 20px 20px 0;
 }
 
-.asi-new-settings h1,
-.asi-new-automatic h1 {
+.allsi-new-settings h1,
+.allsi-new-automatic h1 {
     font-size: 24px;
     font-weight: 600;
     color: var(--asi-dark);
@@ -97,13 +97,13 @@
 /* ==========================================================================
    Navigation Tabs
    ========================================================================== */
-.asi-nav-tabs {
+.allsi-nav-tabs {
     border-bottom: 2px solid var(--asi-gray-200);
     margin-bottom: 20px;
     padding-bottom: 0;
 }
 
-.asi-nav-tabs .nav-tab {
+.allsi-nav-tabs .nav-tab {
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
@@ -114,13 +114,13 @@
     transition: all 0.2s ease;
 }
 
-.asi-nav-tabs .nav-tab:hover {
+.allsi-nav-tabs .nav-tab:hover {
     background: var(--asi-gray-100);
     color: var(--asi-primary);
 }
 
-.asi-nav-tabs .nav-tab-active,
-.asi-nav-tabs .nav-tab-active:hover {
+.allsi-nav-tabs .nav-tab-active,
+.allsi-nav-tabs .nav-tab-active:hover {
     background: transparent;
     border-bottom-color: var(--asi-primary);
     color: var(--asi-primary);
@@ -129,7 +129,7 @@
 /* ==========================================================================
    Alerts
    ========================================================================== */
-.asi-alert {
+.allsi-alert {
     display: flex;
     align-items: flex-start;
     padding: 15px 20px;
@@ -137,77 +137,77 @@
     margin-bottom: 20px;
 }
 
-.asi-alert-icon {
+.allsi-alert-icon {
     flex-shrink: 0;
     margin-right: 15px;
 }
 
-.asi-alert-icon .dashicons {
+.allsi-alert-icon .dashicons {
     font-size: 24px;
     width: 24px;
     height: 24px;
 }
 
-.asi-alert-content {
+.allsi-alert-content {
     flex: 1;
 }
 
-.asi-alert-content strong {
+.allsi-alert-content strong {
     display: block;
     margin-bottom: 5px;
 }
 
-.asi-alert-content p {
+.allsi-alert-content p {
     margin: 0 0 10px;
 }
 
-.asi-alert-content p:last-child {
+.allsi-alert-content p:last-child {
     margin-bottom: 0;
 }
 
-.asi-alert-primary {
+.allsi-alert-primary {
     background: var(--asi-primary-light);
     color: var(--asi-primary);
 }
 
-.asi-alert-info {
+.allsi-alert-info {
     background: var(--asi-info-light);
     color: var(--asi-info);
 }
 
-.asi-alert-success {
+.allsi-alert-success {
     background: var(--asi-success-light);
     color: var(--asi-success);
 }
 
-.asi-alert-warning {
+.allsi-alert-warning {
     background: var(--asi-warning-light);
     color: var(--asi-warning);
 }
 
-.asi-alert-danger {
+.allsi-alert-danger {
     background: var(--asi-danger-light);
     color: var(--asi-danger);
 }
 
 /* Feature List in Alerts */
-.asi-feature-list {
+.allsi-feature-list {
     list-style: none;
     margin: 10px 0 0;
     padding: 0;
 }
 
-.asi-feature-list li {
+.allsi-feature-list li {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
 }
 
-.asi-feature-list li:last-child {
+.allsi-feature-list li:last-child {
     margin-bottom: 0;
 }
 
-.asi-feature-list .dashicons {
+.allsi-feature-list .dashicons {
     margin-right: 8px;
     font-size: 18px;
 }
@@ -215,7 +215,7 @@
 /* ==========================================================================
    Cards
    ========================================================================== */
-.asi-card {
+.allsi-card {
     background: #fff;
     border-radius: var(--asi-border-radius);
     box-shadow: var(--asi-box-shadow);
@@ -223,7 +223,7 @@
     margin-bottom: 20px;
 }
 
-.asi-card-title {
+.allsi-card-title {
     font-size: 18px;
     font-weight: 600;
     color: var(--asi-dark);
@@ -232,7 +232,7 @@
     align-items: center;
 }
 
-.asi-card-title .dashicons {
+.allsi-card-title .dashicons {
     margin-right: 10px;
     color: var(--asi-primary);
 }
@@ -240,13 +240,13 @@
 /* ==========================================================================
    Source Lists
    ========================================================================== */
-.asi-source-list {
+.allsi-source-list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.asi-source-list li {
+.allsi-source-list li {
     padding: 10px 15px;
     margin-bottom: 5px;
     background: var(--asi-gray-100);
@@ -254,22 +254,22 @@
     transition: all 0.2s ease;
 }
 
-.asi-source-list li:hover {
+.allsi-source-list li:hover {
     background: var(--asi-gray-200);
 }
 
-.asi-source-list label {
+.allsi-source-list label {
     display: flex;
     align-items: center;
     cursor: pointer;
 }
 
-.asi-source-list input[type="checkbox"] {
+.allsi-source-list input[type="checkbox"] {
     margin-right: 10px;
 }
 
 /* Source Badges */
-.asi-source-badge {
+.allsi-source-badge {
     display: inline-flex;
     align-items: center;
     background: var(--asi-info-light);
@@ -281,7 +281,7 @@
     margin-left: 8px;
 }
 
-.asi-source-dot {
+.allsi-source-dot {
     width: 6px;
     height: 6px;
     background: var(--asi-info);
@@ -302,64 +302,64 @@
 /* ==========================================================================
    Form Tables
    ========================================================================== */
-.asi-tab-content .form-table th {
+.allsi-tab-content .form-table th {
     padding: 15px 10px 15px 0;
     width: 200px;
 }
 
-.asi-tab-content .form-table td {
+.allsi-tab-content .form-table td {
     padding: 15px 10px;
 }
 
-.asi-tab-content .form-table tr {
+.allsi-tab-content .form-table tr {
     border-bottom: 1px solid var(--asi-gray-200);
 }
 
-.asi-tab-content .form-table tr:last-child {
+.allsi-tab-content .form-table tr:last-child {
     border-bottom: none;
 }
 
 /* ==========================================================================
    Form Controls
    ========================================================================== */
-.asi-tab-content input[type="text"],
-.asi-tab-content input[type="password"],
-.asi-tab-content input[type="number"],
-.asi-tab-content select,
-.asi-tab-content textarea {
+.allsi-tab-content input[type="text"],
+.allsi-tab-content input[type="password"],
+.allsi-tab-content input[type="number"],
+.allsi-tab-content select,
+.allsi-tab-content textarea {
     border: 1px solid var(--asi-gray-300);
     border-radius: 6px;
     padding: 8px 12px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.asi-tab-content input[type="text"]:focus,
-.asi-tab-content input[type="password"]:focus,
-.asi-tab-content input[type="number"]:focus,
-.asi-tab-content select:focus,
-.asi-tab-content textarea:focus {
+.allsi-tab-content input[type="text"]:focus,
+.allsi-tab-content input[type="password"]:focus,
+.allsi-tab-content input[type="number"]:focus,
+.allsi-tab-content select:focus,
+.allsi-tab-content textarea:focus {
     border-color: var(--asi-primary);
     box-shadow: 0 0 0 3px var(--asi-primary-light);
     outline: none;
 }
 
 /* Checkboxes */
-.asi-tab-content .checkbox,
-.asi-tab-content .radio {
+.allsi-tab-content .checkbox,
+.allsi-tab-content .radio {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
 }
 
-.asi-tab-content .checkbox input,
-.asi-tab-content .radio input {
+.allsi-tab-content .checkbox input,
+.allsi-tab-content .radio input {
     margin-right: 8px;
 }
 
 /* ==========================================================================
    Buttons
    ========================================================================== */
-.asi-tab-content .button-primary {
+.allsi-tab-content .button-primary {
     background: var(--asi-primary);
     border-color: var(--asi-primary);
     border-radius: 6px;
@@ -368,7 +368,7 @@
     transition: all 0.2s ease;
 }
 
-.asi-tab-content .button-primary:hover {
+.allsi-tab-content .button-primary:hover {
     background: #2684FF;
     border-color: #2684FF;
 }
@@ -394,24 +394,24 @@
    Responsive
    ========================================================================== */
 @media screen and (max-width: 782px) {
-    .asi-new-settings,
-    .asi-new-automatic,
+    .allsi-new-settings,
+    .allsi-new-automatic,
     .new-bulk-generation-wrap {
         margin: 10px;
     }
     
-    .asi-nav-tabs .nav-tab {
+    .allsi-nav-tabs .nav-tab {
         padding: 8px 12px;
         font-size: 13px;
     }
     
-    .asi-tab-content .form-table th {
+    .allsi-tab-content .form-table th {
         width: 100%;
         display: block;
         padding-bottom: 5px;
     }
     
-    .asi-tab-content .form-table td {
+    .allsi-tab-content .form-table td {
         display: block;
         padding-top: 0;
     }
@@ -721,7 +721,7 @@ form i#togglePassword.close-eye {
 /* ==========================================================================
    Plugin Status Badges
    ========================================================================== */
-.asi-badge {
+.allsi-badge {
     display: inline-flex;
     align-items: center;
     font-size: 11px;
@@ -732,32 +732,32 @@ form i#togglePassword.close-eye {
     vertical-align: middle;
 }
 
-.asi-badge .dashicons {
+.allsi-badge .dashicons {
     font-size: 14px;
     width: 14px;
     height: 14px;
     margin-right: 4px;
 }
 
-.asi-badge-success {
+.allsi-badge-success {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
 
-.asi-badge-warning {
+.allsi-badge-warning {
     background-color: #fff3cd;
     color: #856404;
     border: 1px solid #ffeeba;
 }
 
-.asi-badge-danger {
+.allsi-badge-danger {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
 
-.asi-badge-info {
+.allsi-badge-info {
     background-color: #d1ecf1;
     color: #0c5460;
     border: 1px solid #bee5eb;

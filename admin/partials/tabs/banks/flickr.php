@@ -10,10 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <tr valign="top">
 	<th scope="row">
-		<label for="ASI_plugin_banks_settings_flickr_apikey"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
+		<label for="ALLSI_plugin_banks_settings_flickr_apikey"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-flickr" class="password">
-		<input type="password" id="ASI_plugin_banks_settings_flickr_apikey" name="ASI_plugin_banks_settings[flickr][apikey]" class="form-control" value="<?php echo ( isset( $options['flickr']['apikey'] ) && ! empty( $options['flickr']['apikey'] ) ) ? esc_attr( $options['flickr']['apikey'] ) : ''; ?>" />
+		<input type="password" id="ALLSI_plugin_banks_settings_flickr_apikey" name="ALLSI_plugin_banks_settings[flickr][apikey]" class="form-control" value="<?php echo ( isset( $options['flickr']['apikey'] ) && ! empty( $options['flickr']['apikey'] ) ) ? esc_attr( $options['flickr']['apikey'] ) : ''; ?>" />
 		<i id="togglePassword"></i>
 		<p class="description">
 			<?php esc_html_e( 'Create a Flickr App at flickr.com/services/apps/create/ to obtain your API key. Each site needs its own key.', 'all-sources-images' ); ?>
@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$checked= ( isset( $options['flickr']['rights'] ) && !empty( $options['flickr']['rights'] ) && in_array( $right_code, $options['flickr']['rights'] ) )? 'checked="checked""' : '';
 				echo '
 				<label class="checkbox">
-					<input '. $checked .' name="ASI_plugin_banks_settings[flickr][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
+					<input '. $checked .' name="ALLSI_plugin_banks_settings[flickr][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
 				</label>';
 			}
 		?>
@@ -63,7 +63,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<select name="ASI_plugin_banks_settings[flickr][imgtype]" class="form-control" >
+		<select name="ALLSI_plugin_banks_settings[flickr][imgtype]" class="form-control" >
 			<?php
 			$selected = $options['flickr']['imgtype'];
 			

@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label for="giphy-apikey"><?php esc_html_e( 'API key', 'all-sources-images' ); ?></label>
     </th>
     <td id="password-giphy" class="password">
-        <input id="giphy-apikey" type="password" name="ASI_plugin_banks_settings[giphy][apikey]" class="form-control" value="<?php echo ( isset( $options['giphy']['apikey'] ) && ! empty( $options['giphy']['apikey'] ) ) ? esc_attr( $options['giphy']['apikey'] ) : ''; ?>">
+        <input id="giphy-apikey" type="password" name="ALLSI_plugin_banks_settings[giphy][apikey]" class="form-control" value="<?php echo ( isset( $options['giphy']['apikey'] ) && ! empty( $options['giphy']['apikey'] ) ) ? esc_attr( $options['giphy']['apikey'] ) : ''; ?>">
         <i id="togglePassword"></i>
     </td>
 </tr>
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label for="giphy-media-type"><?php esc_html_e( 'Content type', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <select id="giphy-media-type" name="ASI_plugin_banks_settings[giphy][media_type]" class="form-control">
+        <select id="giphy-media-type" name="ALLSI_plugin_banks_settings[giphy][media_type]" class="form-control">
             <?php
             $media_selected = isset( $options['giphy']['media_type'] ) ? $options['giphy']['media_type'] : 'gifs';
             $media_types = array(
@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label for="giphy-rating"><?php esc_html_e( 'Rating filter', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <select id="giphy-rating" name="ASI_plugin_banks_settings[giphy][rating]" class="form-control">
+        <select id="giphy-rating" name="ALLSI_plugin_banks_settings[giphy][rating]" class="form-control">
             <?php
             $rating_selected = isset( $options['giphy']['rating'] ) ? $options['giphy']['rating'] : 'g';
             $ratings = array(
@@ -88,7 +88,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label for="giphy-lang"><?php esc_html_e( 'Language', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <select id="giphy-lang" name="ASI_plugin_banks_settings[giphy][lang]" class="form-control">
+        <select id="giphy-lang" name="ALLSI_plugin_banks_settings[giphy][lang]" class="form-control">
             <?php
             $lang_selected = isset( $options['giphy']['lang'] ) ? $options['giphy']['lang'] : 'en';
             $languages = array(
@@ -118,7 +118,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label for="giphy-limit"><?php esc_html_e( 'Max results per search', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <input id="giphy-limit" type="number" min="1" max="50" name="ASI_plugin_banks_settings[giphy][limit]" class="form-control" value="<?php echo isset( $options['giphy']['limit'] ) ? intval( $options['giphy']['limit'] ) : 25; ?>">
+        <input id="giphy-limit" type="number" min="1" max="50" name="ALLSI_plugin_banks_settings[giphy][limit]" class="form-control" value="<?php echo isset( $options['giphy']['limit'] ) ? intval( $options['giphy']['limit'] ) : 25; ?>">
         <i><?php esc_html_e( 'GIPHY caps beta keys at 50 results per request.', 'all-sources-images' ); ?></i>
     </td>
 </tr>
@@ -128,7 +128,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label for="giphy-bundle"><?php esc_html_e( 'Rendition bundle (optional)', 'all-sources-images' ); ?></label>
     </th>
     <td>
-        <input id="giphy-bundle" type="text" name="ASI_plugin_banks_settings[giphy][bundle]" class="form-control" value="<?php echo ( isset( $options['giphy']['bundle'] ) && ! empty( $options['giphy']['bundle'] ) ) ? esc_attr( $options['giphy']['bundle'] ) : ''; ?>">
+        <input id="giphy-bundle" type="text" name="ALLSI_plugin_banks_settings[giphy][bundle]" class="form-control" value="<?php echo ( isset( $options['giphy']['bundle'] ) && ! empty( $options['giphy']['bundle'] ) ) ? esc_attr( $options['giphy']['bundle'] ) : ''; ?>">
         <i><?php esc_html_e( 'Restrict responses to a specific renditions bundle (e.g. messaging_non_clips).', 'all-sources-images' ); ?></i>
     </td>
 </tr>

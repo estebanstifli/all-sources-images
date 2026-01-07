@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$options = get_option('ASI_plugin_banks_settings');
+$options = get_option('ALLSI_plugin_banks_settings');
 $apikey = isset($options['unsplash']['apikey']) ? $options['unsplash']['apikey'] : '';
 $orientation = isset($options['unsplash']['orientation']) ? $options['unsplash']['orientation'] : 'all';
 $content_filter = isset($options['unsplash']['content_filter']) ? $options['unsplash']['content_filter'] : 'low';
@@ -66,7 +66,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Access Key', 'all-sources-images'); ?></td>
     <td id="password-unsplash" class="password">
-        <input type="password" class="form-control" name="ASI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr($apikey); ?>" />
+        <input type="password" class="form-control" name="ALLSI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr($apikey); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
     </td>
 </tr>
@@ -86,7 +86,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Orientation Filter', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[unsplash][orientation]">
+        <select name="ALLSI_plugin_banks_settings[unsplash][orientation]">
             <?php
             $orientations = array(
                 '' => __('All Orientations', 'all-sources-images'),
@@ -107,7 +107,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Content Safety Filter', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[unsplash][content_filter]">
+        <select name="ALLSI_plugin_banks_settings[unsplash][content_filter]">
             <?php
             $filters = array(
                 'low' => __('Low (Default - No NSFW content)', 'all-sources-images'),
@@ -126,7 +126,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Color Filter', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[unsplash][color]">
+        <select name="ALLSI_plugin_banks_settings[unsplash][color]">
             <?php
             $colors = array(
                 '' => __('All Colors', 'all-sources-images'),
@@ -155,7 +155,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Results Per Search', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[unsplash][per_page]">
+        <select name="ALLSI_plugin_banks_settings[unsplash][per_page]">
             <?php
             $per_page_options = array(
                 10 => '10',
@@ -176,7 +176,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Preferred Image Size', 'all-sources-images'); ?></td>
     <td>
-        <select name="ASI_plugin_banks_settings[unsplash][preferred_size]">
+        <select name="ALLSI_plugin_banks_settings[unsplash][preferred_size]">
             <?php
             $sizes = array(
                 'raw' => __('Raw (Original unprocessed)', 'all-sources-images'),
@@ -199,7 +199,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td><?php esc_html_e('Auto-add Attribution', 'all-sources-images'); ?></td>
     <td>
         <label class="checkbox">
-            <input type="checkbox" name="ASI_plugin_banks_settings[unsplash][add_attribution]" value="yes" <?php checked($add_attribution, 'yes'); ?> />
+            <input type="checkbox" name="ALLSI_plugin_banks_settings[unsplash][add_attribution]" value="yes" <?php checked($add_attribution, 'yes'); ?> />
             <span></span>
             <?php esc_html_e('Automatically add photographer credit to image caption', 'all-sources-images'); ?>
         </label>
@@ -211,7 +211,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td><?php esc_html_e('Track Downloads', 'all-sources-images'); ?></td>
     <td>
         <label class="checkbox">
-            <input type="checkbox" name="ASI_plugin_banks_settings[unsplash][track_downloads]" value="yes" <?php checked($track_downloads, 'yes'); ?> />
+            <input type="checkbox" name="ALLSI_plugin_banks_settings[unsplash][track_downloads]" value="yes" <?php checked($track_downloads, 'yes'); ?> />
             <span></span>
             <?php esc_html_e('Trigger download tracking endpoint (REQUIRED by Unsplash TOS)', 'all-sources-images'); ?>
         </label>

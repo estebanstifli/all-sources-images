@@ -1,14 +1,14 @@
-﻿sendposts( asiGenerationVars.sendposts.posts, asiGenerationVars.sendposts.block_counter, 1, asiGenerationVars.sendposts.count, 0, asiGenerationVars.sendposts.interval, asiGenerationVars.sendposts.nonce, 0 );
+sendposts( allsiGenerationVars.sendposts.posts, allsiGenerationVars.sendposts.block_counter, 1, allsiGenerationVars.sendposts.count, 0, allsiGenerationVars.sendposts.interval, allsiGenerationVars.sendposts.nonce, 0 );
 
 
 function sendposts( postIds, totalBlocks, currentPostIndex, count, imageCounter, interval, nonce, blockIndex ) {
 
 	// Send data to WordPress admin-ajax file
 	jQuery.ajax({
-			url : asiGenerationVars.wp_ajax_url,
+			url : allsiGenerationVars.wp_ajax_url,
 			method : 'POST',
 			data : {	
-				action				: 'asi_generate_image',
+				action				: 'allsi_generate_image',
 				ids_mpt_generation	: postIds,
 				currentPostIndex	: currentPostIndex, // Current index of the post being processed
 				count				: count, // Total number of posts
@@ -53,16 +53,16 @@ function sendposts( postIds, totalBlocks, currentPostIndex, count, imageCounter,
 						hiddenDatas = '<hr/>';
 						hiddenDatas += '<strong>' + statusGeneration + '</strong><br>';
 						if (data.data.keyword !== undefined) {
-							hiddenDatas += asiGenerationVars.translations.search_terms + ' : ' + data.data.keyword + '<br>';
+							hiddenDatas += allsiGenerationVars.translations.search_terms + ' : ' + data.data.keyword + '<br>';
 						}
 						if (data.data.img_resolution !== undefined) {
-							hiddenDatas += asiGenerationVars.translations.img_resolution + ' : ' + data.data.img_resolution + '<br>';
+							hiddenDatas += allsiGenerationVars.translations.img_resolution + ' : ' + data.data.img_resolution + '<br>';
 						}
 						if (data.data.img_size !== undefined) {
-							hiddenDatas += asiGenerationVars.translations.img_size + ' : ' + data.data.img_size + '<br>';
+							hiddenDatas += allsiGenerationVars.translations.img_size + ' : ' + data.data.img_size + '<br>';
 						}
 						if (data.data.api_chosen !== undefined) {
-							hiddenDatas += asiGenerationVars.translations.img_bank + ' : ' + data.data.api_chosen + '<br>';
+							hiddenDatas += allsiGenerationVars.translations.img_bank + ' : ' + data.data.api_chosen + '<br>';
 						}
 						jQuery('.wp-list-mpt #post-' + data.data.id + ' .image-details').append(hiddenDatas);
 					}
@@ -138,12 +138,12 @@ function sendposts( postIds, totalBlocks, currentPostIndex, count, imageCounter,
 					}
 				} else {
 					// Display an error message if the generation fails
-					jQuery("#results").append( asiGenerationVars.translations.error_generation );
+					jQuery("#results").append( allsiGenerationVars.translations.error_generation );
 				}
 			},
 			error : function( data ) {
 				// Display a general plugin error message
-				jQuery("#results").append( asiGenerationVars.translations.error_plugin );
+				jQuery("#results").append( allsiGenerationVars.translations.error_plugin );
 			}
 	}).responseText;
 }
