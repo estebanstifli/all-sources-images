@@ -68,8 +68,9 @@ class ALLSI_Bulk_Generation_Cron {
                 // Get current retry count
                 global $wpdb;
                 ALLSI_Bulk_Generation_DB::init();
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
                 $job_post = $wpdb->get_row( $wpdb->prepare(
-                    "SELECT * FROM " . ALLSI_Bulk_Generation_DB::$table_posts . " WHERE id = %d",
+                    "SELECT * FROM `" . esc_sql( ALLSI_Bulk_Generation_DB::$table_posts ) . "` WHERE id = %d",
                     self::$current_job_post_id
                 ) );
                 
@@ -129,8 +130,9 @@ class ALLSI_Bulk_Generation_Cron {
         $timeout_time = date( 'Y-m-d H:i:s', time() - self::PROCESSING_TIMEOUT );
         
         // Find posts stuck in 'processing' status
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
         $stuck_posts = $wpdb->get_results( $wpdb->prepare(
-            "SELECT * FROM " . ALLSI_Bulk_Generation_DB::$table_posts . " 
+            "SELECT * FROM `" . esc_sql( ALLSI_Bulk_Generation_DB::$table_posts ) . "` 
              WHERE job_id = %d 
              AND status = 'processing'",
             $job_id

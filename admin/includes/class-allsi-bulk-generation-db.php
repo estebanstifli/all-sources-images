@@ -128,7 +128,8 @@ class ALLSI_Bulk_Generation_DB {
         ) );
         
         if ( empty( $column_exists ) ) {
-            $wpdb->query( "ALTER TABLE " . self::$table_posts . " ADD COLUMN retry_count TINYINT(3) UNSIGNED DEFAULT 0 AFTER status" );
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe internal constant, not user input.
+            $wpdb->query( "ALTER TABLE `" . esc_sql( self::$table_posts ) . "` ADD COLUMN retry_count TINYINT(3) UNSIGNED DEFAULT 0 AFTER status" );
         }
     }
 
@@ -151,8 +152,10 @@ class ALLSI_Bulk_Generation_DB {
         
         self::init();
         
-        $wpdb->query( "DROP TABLE IF EXISTS " . self::$table_posts );
-        $wpdb->query( "DROP TABLE IF EXISTS " . self::$table_jobs );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table names are safe internal constants.
+        $wpdb->query( "DROP TABLE IF EXISTS `" . esc_sql( self::$table_posts ) . "`" );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table names are safe internal constants.
+        $wpdb->query( "DROP TABLE IF EXISTS `" . esc_sql( self::$table_jobs ) . "`" );
         
         delete_option( 'ALLSI_bulk_db_version' );
     }
@@ -228,8 +231,9 @@ class ALLSI_Bulk_Generation_DB {
         
         self::init();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
         $job = $wpdb->get_row(
-            $wpdb->prepare( "SELECT * FROM " . self::$table_jobs . " WHERE id = %d", $job_id )
+            $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE id = %d", $job_id )
         );
 
         if ( $job ) {
@@ -272,11 +276,17 @@ class ALLSI_Bulk_Generation_DB {
 
         $offset = ( $args['page'] - 1 ) * $args['per_page'];
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare(), $orderby and $order are whitelisted values.
         $jobs = $wpdb->get_results(
-            "SELECT * FROM " . self::$table_jobs . " $where ORDER BY $orderby $order LIMIT " . absint( $args['per_page'] ) . " OFFSET " . absint( $offset )
+            $wpdb->prepare(
+                "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` $where ORDER BY $orderby $order LIMIT %d OFFSET %d",
+                absint( $args['per_page'] ),
+                absint( $offset )
+            )
         );
 
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM " . self::$table_jobs . " $where" );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare().
+        $total = $wpdb->get_var( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_jobs ) . "` $where" );
 
         foreach ( $jobs as &$job ) {
             $job->post_types = maybe_unserialize( $job->post_types );
@@ -381,9 +391,9 @@ class ALLSI_Bulk_Generation_DB {
             return false;
         }
 
-        $result = $wpdb->query(
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and counter are safe (whitelisted).\n        $result = $wpdb->query(
             $wpdb->prepare(
-                "UPDATE " . self::$table_jobs . " SET $counter = $counter + %d WHERE id = %d",
+                "UPDATE `" . esc_sql( self::$table_jobs ) . "` SET $counter = $counter + %d WHERE id = %d",
                 absint( $amount ),
                 absint( $job_id )
             )
@@ -473,11 +483,17 @@ class ALLSI_Bulk_Generation_DB {
 
         $offset = ( $args['page'] - 1 ) * $args['per_page'];
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare(), $orderby and $order are whitelisted values.
         $posts = $wpdb->get_results(
-            "SELECT * FROM " . self::$table_posts . " $where ORDER BY $orderby $order LIMIT " . absint( $args['per_page'] ) . " OFFSET " . absint( $offset )
+            $wpdb->prepare(
+                "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` $where ORDER BY $orderby $order LIMIT %d OFFSET %d",
+                absint( $args['per_page'] ),
+                absint( $offset )
+            )
         );
 
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM " . self::$table_posts . " $where" );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare().
+        $total = $wpdb->get_var( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_posts ) . "` $where" );
 
         foreach ( $posts as &$post ) {
             $post->additional_images = maybe_unserialize( $post->additional_images );
@@ -503,9 +519,10 @@ class ALLSI_Bulk_Generation_DB {
         
         self::init();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
         return $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM " . self::$table_posts . " WHERE job_id = %d AND status = 'pending' ORDER BY id ASC LIMIT 1",
+                "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = 'pending' ORDER BY id ASC LIMIT 1",
                 $job_id
             )
         );
@@ -567,6 +584,7 @@ class ALLSI_Bulk_Generation_DB {
         
         self::init();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
         $stats = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT 
@@ -576,7 +594,7 @@ class ALLSI_Bulk_Generation_DB {
                     SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
                     SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
                     SUM(CASE WHEN status = 'skipped' THEN 1 ELSE 0 END) as skipped
-                FROM " . self::$table_posts . " WHERE job_id = %d",
+                FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d",
                 $job_id
             ),
             ARRAY_A
@@ -603,7 +621,10 @@ class ALLSI_Bulk_Generation_DB {
         self::init();
 
         return $wpdb->get_row(
-            "SELECT * FROM " . self::$table_jobs . " WHERE job_status = 'processing' ORDER BY started_at DESC LIMIT 1"
+            $wpdb->prepare(
+                "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY started_at DESC LIMIT 1",
+                'processing'
+            )
         );
     }
 
@@ -618,9 +639,10 @@ class ALLSI_Bulk_Generation_DB {
         
         self::init();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM " . self::$table_jobs . " WHERE job_status = 'pending' ORDER BY created_at ASC LIMIT %d",
+                "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = 'pending' ORDER BY created_at ASC LIMIT %d",
                 $limit
             )
         );

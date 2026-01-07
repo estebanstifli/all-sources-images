@@ -59,7 +59,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $orientations as $name_orientation => $code_orientation ) {
 				$choose = ($selected == $code_orientation) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_orientation .'">'. $name_orientation .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_orientation ) . '">' . esc_html( $name_orientation ) . '</option>';
 			}
 			?>
 		</select>
@@ -85,7 +85,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $sizes as $name_size => $code_size ) {
 				$choose = ($selected == $code_size) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_size .'">'. $name_size .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_size ) . '">' . esc_html( $name_size ) . '</option>';
 			}
 			?>
 		</select>
@@ -120,7 +120,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $colors as $name_color => $code_color ) {
 				$choose = ($selected == $code_color) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_color .'">'. $name_color .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_color ) . '">' . esc_html( $name_color ) . '</option>';
 			}
 			?>
 		</select>
@@ -152,7 +152,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $locales as $name_locale => $code_locale ) {
 				$choose = ($selected == $code_locale) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_locale .'">'. $name_locale .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_locale ) . '">' . esc_html( $name_locale ) . '</option>';
 			}
 			?>
 		</select>
@@ -179,7 +179,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $per_pages as $name_per_page => $code_per_page ) {
 				$choose = ($selected == $code_per_page) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_per_page .'">'. $name_per_page .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_per_page ) . '">' . esc_html( $name_per_page ) . '</option>';
 			}
 			?>
 		</select>
@@ -208,7 +208,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $preferred_sizes as $name_preferred_size => $code_preferred_size ) {
 				$choose = ($selected == $code_preferred_size) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_preferred_size .'">'. $name_preferred_size .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_preferred_size ) . '">' . esc_html( $name_preferred_size ) . '</option>';
 			}
 			?>
 		</select>

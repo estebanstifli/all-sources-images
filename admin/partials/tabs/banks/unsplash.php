@@ -96,7 +96,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             );
             foreach ($orientations as $value => $label) {
                 $selected = ($orientation === $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -115,7 +115,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             );
             foreach ($filters as $value => $label) {
                 $selected = ($content_filter == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -144,7 +144,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             );
             foreach ($colors as $value => $label) {
                 $selected = ($color === $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -165,7 +165,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             );
             foreach ($per_page_options as $value => $label) {
                 $selected = ($per_page == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -187,7 +187,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
             );
             foreach ($sizes as $value => $label) {
                 $selected = ($preferred_size == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>

@@ -64,7 +64,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 
 			foreach( $sizes as $name_size => $code_size ) {
 				$choose=($selected == $code_size)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_size .'">'. $name_size .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_size ) . '">' . esc_html( $name_size ) . '</option>';
 			}
 			?>
 		</select>

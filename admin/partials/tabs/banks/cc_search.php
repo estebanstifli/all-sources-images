@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				foreach( $source_choose as $name_source => $code_source ) {
 					$choose = ( $selected == $code_source) ? 'selected="selected"': '';
-					echo '<option '. $choose .' value="'. $code_source .'">'. $name_source .'</option>';
+					echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_source ) . '">' . esc_html( $name_source ) . '</option>';
 				}
 			?>
 		</select>
@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			foreach ( $rights_array as $right => $right_code ) {
 				$checked= ( isset( $options['cc_search']['rights'] ) && !empty( $options['cc_search']['rights'] ) && in_array( $right_code, $options['cc_search']['rights'] ) )? 'checked="checked""' : '';
 				echo '<label class="checkbox">
-					<input '. $checked .' name="ALLSI_plugin_banks_settings[cc_search][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
+					<input ' . esc_attr( $checked ) . ' name="ALLSI_plugin_banks_settings[cc_search][rights][' . esc_attr( $right_code ) . ']" type="checkbox" value="' . esc_attr( $right_code ) . '"> <span></span> ' . esc_html( $right ) . '
 				</label>';
 			}
 		?>
@@ -92,7 +92,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// format
 			foreach( $formats as $name_format => $code_format ) {
 				$choose=($selected == $code_format)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_format .'">'. $name_format .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_format ) . '">' . esc_html( $name_format ) . '</option>';
 			}
 			?>
 		</select>
@@ -116,7 +116,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $aspect_ratio as $name_aspect_ratio => $code_aspect_ratio ) {
 				$choose = ( $selected == $code_aspect_ratio ) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_aspect_ratio .'">'. $name_aspect_ratio .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_aspect_ratio ) . '">' . esc_html( $name_aspect_ratio ) . '</option>';
 			}
 			?>
 		</select>

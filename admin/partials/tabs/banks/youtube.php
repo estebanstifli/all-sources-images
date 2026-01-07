@@ -87,7 +87,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             );
             foreach ($qualities as $value => $label) {
                 $selected = ($thumbnail_quality == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -109,7 +109,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             );
             foreach ($orders as $value => $label) {
                 $selected = ($search_order == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -130,7 +130,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             );
             foreach ($durations as $value => $label) {
                 $selected = ($video_duration == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -150,7 +150,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             );
             foreach ($safe_search_options as $value => $label) {
                 $selected = ($safe_search == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>
@@ -173,7 +173,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
             );
             foreach ($max_results_options as $value => $label) {
                 $selected = ($max_results == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
             }
             ?>
         </select>

@@ -4,7 +4,7 @@ Donate link: https://github.com/estebanstifli/all-sources-images
 Tags: image, pixabay, openverse, ai, auto
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -162,21 +162,17 @@ Absolutely! You can configure the plugin to extract keywords from:
 
 == Changelog ==
 
-= 1.0.0 - December 2025 =
+= 1.0.2 - December 2025 =
 * 🎉 Initial release
 * ✨ Support for 10+ image sources (AI + Stock Photos)
 * ✨ Gutenberg block for image search
 * ✨ Elementor widget for page builder integration
 * ✨ Bulk generation system with database-backed job queue
-* ✨ Automatic generation on post publish
-* ✨ REST API support
-* ✨ WPeMatico, FeedWordPress, WP All Import compatibility
 * ✨ Multi-language keyword search
-* ✨ Comprehensive logging system
 
 == Upgrade Notice ==
 
-= 1.0.0 =
+= 1.0.2 =
 Initial release. Welcome to All Sources Images!
 
 == Additional Info ==

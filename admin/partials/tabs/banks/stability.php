@@ -57,7 +57,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $models as $name_model => $code_model ) {
 				$choose = ($selected == $code_model) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_model .'">'. $name_model .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_model ) . '">' . esc_html( $name_model ) . '</option>';
 			}
 			?>
 		</select>
@@ -88,7 +88,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $ratios as $name_ratio => $code_ratio ) {
 				$choose = ($selected == $code_ratio) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_ratio .'">'. $name_ratio .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_ratio ) . '">' . esc_html( $name_ratio ) . '</option>';
 			}
 			?>
 		</select>
@@ -112,7 +112,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $formats as $name_format => $code_format ) {
 				$choose = ($selected == $code_format) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_format .'">'. $name_format .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_format ) . '">' . esc_html( $name_format ) . '</option>';
 			}
 			?>
 		</select>

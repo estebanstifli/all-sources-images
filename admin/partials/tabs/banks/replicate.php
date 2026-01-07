@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $models as $name_model => $code_model ) {
 				$choose = ($selected == $code_model) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_model .'">'. $name_model .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_model ) . '">' . esc_html( $name_model ) . '</option>';
 			}
 			?>
 		</select>
@@ -125,7 +125,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $timeouts as $name_timeout => $code_timeout ) {
 				$choose = ($selected == $code_timeout) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_timeout .'">'. $name_timeout .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_timeout ) . '">' . esc_html( $name_timeout ) . '</option>';
 			}
 			?>
 		</select>
@@ -152,7 +152,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $intervals as $name_interval => $code_interval ) {
 				$choose = ($selected == $code_interval) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_interval .'">'. $name_interval .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_interval ) . '">' . esc_html( $name_interval ) . '</option>';
 			}
 			?>
 		</select>
@@ -189,7 +189,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $sizes as $name_size => $code_size ) {
 				$choose = ($selected == $code_size) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_size .'">'. $name_size .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_size ) . '">' . esc_html( $name_size ) . '</option>';
 			}
 			?>
 		</select>
@@ -224,7 +224,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $outputs as $name_output => $code_output ) {
 				$choose = ($selected == $code_output) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_output .'">'. $name_output .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_output ) . '">' . esc_html( $name_output ) . '</option>';
 			}
 			?>
 		</select>

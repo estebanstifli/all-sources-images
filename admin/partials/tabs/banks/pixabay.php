@@ -68,7 +68,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $imgtype as $name_imgtype => $code_imgtype ) {
 				$choose=($selected == $code_imgtype)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_imgtype .'">'. $name_imgtype .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgtype ) . '">' . esc_html( $name_imgtype ) . '</option>';
 			}
 			?>
 		</select>
@@ -116,7 +116,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				foreach( $country_choose as $name_country => $code_country ) {
 					$choose=($selected == $code_country)?'selected="selected"': '';
-					echo '<option '. $choose .' value="'. $code_country .'">'. $name_country .'</option>';
+					echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_country ) . '">' . esc_html( $name_country ) . '</option>';
 				}
 			?>
 		</select>
@@ -140,7 +140,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $orientation as $name_orientation => $code_orientation ) {
 				$choose=($selected == $code_orientation)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_orientation .'">'. $name_orientation .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_orientation ) . '">' . esc_html( $name_orientation ) . '</option>';
 			}
 			?>
 		</select>
@@ -188,7 +188,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $safesearch as $name_safesearch => $code_safesearch ) {
 				$choose=($selected == $code_safesearch)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_safesearch .'">'. $name_safesearch .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_safesearch ) . '">' . esc_html( $name_safesearch ) . '</option>';
 			}
 			?>
 		</select>

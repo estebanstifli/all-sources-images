@@ -79,7 +79,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $imgtype as $name_imgtype => $code_imgtype ) {
 				$choose=($selected == $code_imgtype)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_imgtype .'">'. $name_imgtype .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgtype ) . '">' . esc_html( $name_imgtype ) . '</option>';
 			}
 			?>
 		</select>

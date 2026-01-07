@@ -147,7 +147,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				foreach( $country_choose as $name_country => $code_country ) {
 					$choose = ( $selected == $code_country) ? 'selected="selected"': '';
-					echo '<option '. $choose .' value="'. $code_country .'">'. $name_country .'</option>';
+					echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_country ) . '">' . esc_html( $name_country ) . '</option>';
 				}
 			?>
 		</select>
@@ -180,7 +180,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $img_color as $name_color => $code_color ) {
 				$choose=($selected == $code_color)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_color .'">'. $name_color .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_color ) . '">' . esc_html( $name_color ) . '</option>';
 			}
 			?>
 		</select>
@@ -213,7 +213,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $filetype as $name_filetype => $code_filetype ) {
 				$choose=($selected == $code_filetype)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_filetype .'">'. $name_filetype .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_filetype ) . '">' . esc_html( $name_filetype ) . '</option>';
 			}
 			?>
 		</select>
@@ -245,7 +245,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			foreach ( $rights_array  as $right => $right_code ) {
 				$checked= ( isset( $options['googleimage']['rights'] ) && !empty( $options['googleimage']['rights'] ) && in_array( $right_code, $options['googleimage']['rights'] ) )? 'checked="checked""' : '';
 				echo '<label class="checkbox">
-					<input '. $checked .' name="ALLSI_plugin_banks_settings[googleimage][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
+					<input ' . esc_attr( $checked ) . ' name="ALLSI_plugin_banks_settings[googleimage][rights][' . esc_attr( $right_code ) . ']" type="checkbox" value="' . esc_attr( $right_code ) . '"> <span></span> ' . wp_kses( $right, array( 'i' => array() ) ) . '
 				</label>';
 			}
 		?>
@@ -275,7 +275,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $imgsz as $name_imgsz => $code_imgsz ) {
 				$choose=($selected == $code_imgsz)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_imgsz .'">'. $name_imgsz .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgsz ) . '">' . esc_html( $name_imgsz ) . '</option>';
 			}
 			?>
 		</select>
@@ -302,7 +302,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $imgtype as $name_imgtype => $code_imgtype ) {
 				$choose=($selected == $code_imgtype)?'selected="selected"': '';
-				echo '<option '. $choose .' value="'. $code_imgtype .'">'. $name_imgtype .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgtype ) . '">' . esc_html( $name_imgtype ) . '</option>';
 			}
 			?>
 		</select>
@@ -326,7 +326,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			foreach( $safe as $name_safe => $code_safe ) {
 				$choose = ( $selected == $code_safe ) ? 'selected="selected"' : '';
-				echo '<option '. $choose .' value="'. $code_safe .'">'. $name_safe .'</option>';
+				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_safe ) . '">' . esc_html( $name_safe ) . '</option>';
 			}
 			?>
 		</select>
