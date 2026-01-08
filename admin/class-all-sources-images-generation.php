@@ -1088,6 +1088,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         }
         if ( $file_media['body'] ) {
             /* Upload the file to wordpress directory */
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing image data to wp_upload_dir path.
             $file_upload = file_put_contents( $folder, $file_media['body'] );
             /* Convert png to jpeg for dalle */
             $png_jpg = ( !empty( $options['dallev1']['convert_jpg'] ) ? $options['dallev1']['convert_jpg'] : '' );
@@ -1872,8 +1873,10 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                             $upload_dir = wp_upload_dir();
                             $file_path = $upload_dir['path'] . '/temp_mpt_stability_' . uniqid() . '.' . $options_banks['stability']['output_format'];
                             // Save the decoded image in the file
+                            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Saving temporary image to uploads.
                             file_put_contents( $file_path, $image_data );
                             if ( file_exists( $file_path ) ) {
+                                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading local temp file.
                                 $file_content = file_get_contents( $file_path );
                             }
                             $file_media['response']['code'] = '200';

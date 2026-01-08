@@ -104,12 +104,12 @@ if( !isset( $options['translate_alt_lang'] ) ) {
                 <?php esc_html_e( 'Image Modifications', 'all-sources-images' ); ?>
             </th>
             <td class="checkbox-list">
-                <label class="checkbox <?php echo $checkbox_disabled; ?>">
-                    <input <?php echo( !empty( $options['image_flip']) && $options['image_flip'] == 'true' )? 'checked': ''; ?> name="ALLSI_plugin_main_settings[image_flip]" type="checkbox" value="true" <?php echo $disabled; ?>>
+                <label class="checkbox <?php echo esc_attr( $checkbox_disabled ); ?>">
+                    <input <?php echo( !empty( $options['image_flip']) && $options['image_flip'] == 'true' )? 'checked': ''; ?> name="ALLSI_plugin_main_settings[image_flip]" type="checkbox" value="true" <?php echo esc_attr( $disabled ); ?>>
                     <span></span> <?php esc_html_e( 'Flip horizontally', 'all-sources-images' ); ?>
                 </label>
-                <label class="checkbox <?php echo $checkbox_disabled; ?>">
-                    <input <?php echo( !empty( $options['image_crop']) && $options['image_crop'] == 'true' )? 'checked': ''; ?> name="ALLSI_plugin_main_settings[image_crop]" type="checkbox" value="true" <?php echo $disabled; ?>>
+                <label class="checkbox <?php echo esc_attr( $checkbox_disabled ); ?>">
+                    <input <?php echo( !empty( $options['image_crop']) && $options['image_crop'] == 'true' )? 'checked': ''; ?> name="ALLSI_plugin_main_settings[image_crop]" type="checkbox" value="true" <?php echo esc_attr( $disabled ); ?>>
                     <span></span> <?php esc_html_e( 'Crop Image by 10%', 'all-sources-images' ); ?>
                 </label>
                 <?php if ( $disabled ) : ?>

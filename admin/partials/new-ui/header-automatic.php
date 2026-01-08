@@ -46,12 +46,12 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 									<!-- Tabs BEFORE the card -->
 									<ul class="nav nav-tabs nav-tabs-line nav-tabs-line-2x nav-tabs-primary" role="tablist" style="margin-bottom: 0; border-bottom: none;">
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'placement' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=placement' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $active_tab === 'placement' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=placement' ) ); ?>">
 												<?php esc_html_e( 'Image Placement', 'all-sources-images' ); ?>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'postprocessing' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=postprocessing' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $active_tab === 'postprocessing' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=postprocessing' ) ); ?>">
 												<?php esc_html_e( 'Post-Processing', 'all-sources-images' ); ?>
 											</a>
 										</li>

@@ -2810,6 +2810,7 @@ class All_Sources_Images_Admin {
                     wp_send_json_error( array( 'erreur' => 'Unable to create temporary file.' ) );
                     return;
                 }
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Saving decoded base64 image to temp file.
                 file_put_contents( $tmp, $decoded );
             } else {
                 wp_send_json_error( array( 'erreur' => 'Invalid data URI.' ) );
@@ -3103,6 +3104,9 @@ class All_Sources_Images_Admin {
             return $existing;
         }
         
+        // First, sanitize all input values
+        $input = $this->ALLSI_sanitize_main_settings_values( $input );
+        
         // Fields that belong to Post-Processing tab
         $post_processing_fields = array(
             'image_filename',
@@ -3188,26 +3192,198 @@ class All_Sources_Images_Admin {
         
         return $input;
     }
+    
+    /**
+     * Sanitize main settings values recursively
+     *
+     * @since    6.2.0
+     * @param    array    $input    Raw input array
+     * @return   array              Sanitized array
+     */
+    private function ALLSI_sanitize_main_settings_values( $input ) {
+        if ( ! is_array( $input ) ) {
+            return sanitize_text_field( $input );
+        }
+        
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            $clean_key = sanitize_key( $key );
+            
+            if ( is_array( $value ) ) {
+                // Recursively sanitize nested arrays (like image_block)
+                $sanitized[ $clean_key ] = $this->ALLSI_sanitize_main_settings_values( $value );
+            } else {
+                // Sanitize based on field type
+                switch ( $clean_key ) {
+                    case 'image_filename':
+                    case 'alt_from':
+                    case 'caption_from':
+                    case 'image_location':
+                    case 'based_on':
+                    case 'selected_image':
+                    case 'title_selection':
+                    case 'tags':
+                    case 'categories':
+                    case 'api_chosen':
+                    case 'api_chosen_2':
+                    case 'text_analyser_lang':
+                    case 'translate_alt_lang':
+                    case 'ai_prompt_style':
+                    case 'image_custom_location_placement':
+                    case 'image_custom_location_position':
+                    case 'image_custom_location_tag':
+                    case 'image_custom_image_size':
+                    case 'categories_level':
+                        $sanitized[ $clean_key ] = sanitize_text_field( $value );
+                        break;
+                        
+                    case 'title_length':
+                    case 'openai_number_of_keywords':
+                        $sanitized[ $clean_key ] = absint( $value );
+                        break;
+                        
+                    case 'rewrite_featured':
+                    case 'image_reuse':
+                    case 'image_flip':
+                    case 'image_crop':
+                    case 'enable_alt':
+                    case 'translate_alt':
+                    case 'enable_caption':
+                    case 'translation_en':
+                        // Boolean-like values
+                        $sanitized[ $clean_key ] = sanitize_text_field( $value );
+                        break;
+                        
+                    case 'custom_field':
+                    case 'custom_request':
+                    case 'ai_prompt_custom_instructions':
+                        $sanitized[ $clean_key ] = sanitize_text_field( $value );
+                        break;
+                        
+                    case 'openai_extractor_apikey':
+                    case 'ai_prompt_apikey':
+                        // API keys - sanitize but preserve
+                        $sanitized[ $clean_key ] = sanitize_text_field( $value );
+                        break;
+                        
+                    case 'image_custom_post_type':
+                        // Array of post types
+                        if ( is_array( $value ) ) {
+                            $sanitized[ $clean_key ] = array_map( 'sanitize_key', $value );
+                        } else {
+                            $sanitized[ $clean_key ] = sanitize_key( $value );
+                        }
+                        break;
+                        
+                    default:
+                        $sanitized[ $clean_key ] = sanitize_text_field( $value );
+                        break;
+                }
+            }
+        }
+        
+        return $sanitized;
+    }
 
     /**
-     * Sanitize banks settings - Remove 'envato' if present (no longer working)
+     * Sanitize banks settings - Sanitize all fields and remove 'envato' if present (no longer working)
      *
      * @since    4.2.0
      */
     public function ALLSI_sanitize_banks_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        $sanitized = array();
+        
+        // Recursively sanitize the input array
+        foreach ( $input as $key => $value ) {
+            $clean_key = sanitize_key( $key );
+            if ( is_array( $value ) ) {
+                // For nested arrays (like bank-specific settings)
+                $sanitized[ $clean_key ] = $this->ALLSI_sanitize_banks_array_recursive( $value );
+            } else {
+                // Sanitize based on expected field types
+                $sanitized[ $clean_key ] = $this->ALLSI_sanitize_bank_field( $clean_key, $value );
+            }
+        }
+        
         // Remove 'envato' from api_chosen_auto if present
-        if ( isset( $input['api_chosen_auto'] ) && is_array( $input['api_chosen_auto'] ) ) {
-            unset($input['api_chosen_auto']['envato']);
+        if ( isset( $sanitized['api_chosen_auto'] ) && is_array( $sanitized['api_chosen_auto'] ) ) {
+            unset( $sanitized['api_chosen_auto']['envato'] );
         }
         // Remove 'envato' from api_chosen_manual if present
-        if ( isset( $input['api_chosen_manual'] ) && is_array( $input['api_chosen_manual'] ) ) {
-            unset($input['api_chosen_manual']['envato']);
+        if ( isset( $sanitized['api_chosen_manual'] ) && is_array( $sanitized['api_chosen_manual'] ) ) {
+            unset( $sanitized['api_chosen_manual']['envato'] );
         }
         // Clear api_chosen if it's 'envato'
-        if ( isset( $input['api_chosen'] ) && 'envato' === $input['api_chosen'] ) {
-            $input['api_chosen'] = '';
+        if ( isset( $sanitized['api_chosen'] ) && 'envato' === $sanitized['api_chosen'] ) {
+            $sanitized['api_chosen'] = '';
         }
-        return $input;
+        
+        return $sanitized;
+    }
+    
+    /**
+     * Recursively sanitize banks array
+     *
+     * @since    6.2.0
+     * @param    array    $array    Array to sanitize
+     * @return   array              Sanitized array
+     */
+    private function ALLSI_sanitize_banks_array_recursive( $array ) {
+        if ( ! is_array( $array ) ) {
+            return sanitize_text_field( $array );
+        }
+        
+        $sanitized = array();
+        foreach ( $array as $key => $value ) {
+            $clean_key = sanitize_key( $key );
+            if ( is_array( $value ) ) {
+                $sanitized[ $clean_key ] = $this->ALLSI_sanitize_banks_array_recursive( $value );
+            } else {
+                $sanitized[ $clean_key ] = $this->ALLSI_sanitize_bank_field( $clean_key, $value );
+            }
+        }
+        return $sanitized;
+    }
+    
+    /**
+     * Sanitize individual bank field based on field name
+     *
+     * @since    6.2.0
+     * @param    string   $key     Field key
+     * @param    mixed    $value   Field value
+     * @return   mixed             Sanitized value
+     */
+    private function ALLSI_sanitize_bank_field( $key, $value ) {
+        // API keys and tokens - sanitize as text but preserve case
+        if ( strpos( $key, 'apikey' ) !== false || strpos( $key, 'api_key' ) !== false || 
+             strpos( $key, 'token' ) !== false || strpos( $key, 'secret' ) !== false ) {
+            return sanitize_text_field( $value );
+        }
+        
+        // URLs
+        if ( strpos( $key, 'url' ) !== false || strpos( $key, 'endpoint' ) !== false ) {
+            return esc_url_raw( $value );
+        }
+        
+        // Numeric fields
+        if ( strpos( $key, 'max_results' ) !== false || strpos( $key, 'count' ) !== false ||
+             strpos( $key, 'width' ) !== false || strpos( $key, 'height' ) !== false ||
+             strpos( $key, 'size' ) !== false || strpos( $key, 'steps' ) !== false ||
+             strpos( $key, 'seed' ) !== false ) {
+            return absint( $value );
+        }
+        
+        // Boolean-like fields
+        if ( in_array( $value, array( 'true', 'false', '1', '0', 'yes', 'no', 'on', 'off' ), true ) ) {
+            return sanitize_text_field( $value );
+        }
+        
+        // Default: sanitize as text field
+        return sanitize_text_field( $value );
     }
 
     /**
@@ -3218,6 +3394,39 @@ class All_Sources_Images_Admin {
      * @return   array             Sanitized settings
      */
     public function ALLSI_sanitize_cron_settings( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        
+        // Sanitize input values first
+        $sanitized = array();
+        foreach ( $input as $key => $value ) {
+            $clean_key = sanitize_key( $key );
+            switch ( $clean_key ) {
+                case 'enable_cron':
+                    $allowed = array( 'enable', 'disable' );
+                    $sanitized[ $clean_key ] = in_array( $value, $allowed, true ) ? $value : 'disable';
+                    break;
+                case 'cron_interval_value':
+                    $sanitized[ $clean_key ] = absint( $value );
+                    break;
+                case 'cron_interval_unit':
+                    $allowed = array( 'minutes', 'hours', 'days' );
+                    $sanitized[ $clean_key ] = in_array( $value, $allowed, true ) ? $value : 'minutes';
+                    break;
+                case 'cron_post_types':
+                    if ( is_array( $value ) ) {
+                        $sanitized[ $clean_key ] = array_map( 'sanitize_key', $value );
+                    } else {
+                        $sanitized[ $clean_key ] = array();
+                    }
+                    break;
+                default:
+                    $sanitized[ $clean_key ] = sanitize_text_field( $value );
+                    break;
+            }
+        }
+        
         // Clear existing scheduled event
         $timestamp = wp_next_scheduled( 'ALLSI_cron_image_generation' );
         if ( $timestamp ) {
@@ -3225,10 +3434,10 @@ class All_Sources_Images_Admin {
         }
 
         // If cron is enabled, schedule new event
-        if ( isset( $input['enable_cron'] ) && $input['enable_cron'] === 'enable' ) {
+        if ( isset( $sanitized['enable_cron'] ) && $sanitized['enable_cron'] === 'enable' ) {
             // Convert interval to seconds
-            $interval_value = isset( $input['cron_interval_value'] ) ? absint( $input['cron_interval_value'] ) : 5;
-            $interval_unit = isset( $input['cron_interval_unit'] ) ? $input['cron_interval_unit'] : 'minutes';
+            $interval_value = isset( $sanitized['cron_interval_value'] ) ? $sanitized['cron_interval_value'] : 5;
+            $interval_unit = isset( $sanitized['cron_interval_unit'] ) ? $sanitized['cron_interval_unit'] : 'minutes';
             
             $seconds = 0;
             switch ( $interval_unit ) {
@@ -3262,7 +3471,7 @@ class All_Sources_Images_Admin {
             }
         }
         
-        return $input;
+        return $sanitized;
     }
 
     /**

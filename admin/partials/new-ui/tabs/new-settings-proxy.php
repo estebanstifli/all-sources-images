@@ -72,7 +72,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
         </table>
 
         <!-- Proxy Settings (shown when enabled) -->
-        <div id="allsi-proxy-settings" style="display: <?php echo $is_proxy_enabled ? 'block' : 'none'; ?>;">
+        <div id="allsi-proxy-settings" style="display: <?php echo esc_attr( $is_proxy_enabled ? 'block' : 'none' ); ?>;">
             <table class="form-table">
                 <tbody>
                     <!-- Proxy Address -->

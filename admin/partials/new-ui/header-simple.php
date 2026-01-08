@@ -46,17 +46,17 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 									<!-- Tabs BEFORE the card -->
 									<ul class="nav nav-tabs nav-tabs-line nav-tabs-line-2x nav-tabs-primary" role="tablist" style="margin-bottom: 0; border-bottom: none;">
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'source' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=source' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $active_tab === 'source' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=source' ) ); ?>">
 												<?php esc_html_e( 'Source', 'all-sources-images' ); ?>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'proxy' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=proxy' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $active_tab === 'proxy' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=proxy' ) ); ?>">
 												<?php esc_html_e( 'Proxy', 'all-sources-images' ); ?>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a class="nav-link <?php echo $active_tab === 'others' ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=others' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $active_tab === 'others' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=others' ) ); ?>">
 												<?php esc_html_e( 'Others', 'all-sources-images' ); ?>
 											</a>
 										</li>
