@@ -38,7 +38,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 </tr>
 <tr valign="top">
 	<td colspan="2">
-		<button class="btn btn-primary" id="btnDalle" onclick="return false;">
+		<button type="button" class="btn btn-primary" id="btnDalle">
 			<?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
 		</button>
 		<span id="resultDalle"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>

@@ -10,8 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @package    All_Sources_Images
  * @subpackage All_Sources_Images/includes
  * @since      1.0.0
- */;
-}
+ */
 
 /**
  * ASI Logger class

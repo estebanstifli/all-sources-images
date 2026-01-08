@@ -71,7 +71,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td></td>
     <td>
-        <button class="btn btn-primary" id="btnUnsplash" onclick="return false;">
+        <button type="button" class="btn btn-primary" id="btnUnsplash">
             <?php esc_html_e('Test Unsplash Connection', 'all-sources-images'); ?>
         </button>
         <span id="resultUnsplash">

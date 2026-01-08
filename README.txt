@@ -200,12 +200,6 @@ A lightweight dependency-free masonry layout library used for the image grid dis
 * License: MIT
 * Version: 1.3.2
 
-**PHP-ML**
-A machine learning library for PHP used for keyword extraction from post content.
-* Source code: https://github.com/php-ai/php-ml
-* License: MIT
-* Version: 0.10.0
-
 = External Services =
 
 This plugin connects to external third-party APIs to fetch and generate images. When you use any of these services, your post titles, keywords, or prompts are sent to these services to search for or generate relevant images.

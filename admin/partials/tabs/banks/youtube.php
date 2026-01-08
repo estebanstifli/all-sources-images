@@ -61,7 +61,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td></td>
     <td>
-        <button class="btn btn-primary" id="btnYouTube" onclick="return false;">
+        <button type="button" class="btn btn-primary" id="btnYouTube">
             <?php esc_html_e('Test YouTube Connection', 'all-sources-images'); ?>
         </button>
         <span id="resultYoutube">

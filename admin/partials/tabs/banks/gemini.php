@@ -38,7 +38,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
 
 <tr valign="top">
     <td colspan="2">
-        <button class="btn btn-primary" id="btnGemini" onclick="return false;">
+        <button type="button" class="btn btn-primary" id="btnGemini">
             <?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
         </button>
         <span id="resultGemini"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>

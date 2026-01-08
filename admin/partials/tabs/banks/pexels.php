@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <tr valign="top">
 	<td colspan="2">
-		<button class="btn btn-primary" id="btnPexels" onclick="return false;">
+		<button type="button" class="btn btn-primary" id="btnPexels">
 			<?php esc_html_e( 'API testing', 'all-sources-images' ); ?>
 		</button>
 		<span id="resultPexels"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>

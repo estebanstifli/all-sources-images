@@ -1,18 +1,22 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-require_once 'vendor/autoload.php';
-
-use Phpml\Tokenization\WordTokenizer;
+/**
+ * Simple Keyword Extractor
+ * 
+ * Extracts keywords from text using TF-IDF-like weighting.
+ * Uses a simple word tokenizer (no external dependencies).
+ *
+ * @package All_Sources_Images
+ * @since 1.0.0
+ */
 
 class KeywordExtractor
 {
     private $stopWords;
-    private $ngramRange;
-    private $tokenizer;
 
     /**
-     * Constructor to initialize stop words and the tokenizer.
+     * Constructor to initialize stop words.
      * Selects the appropriate stop words file based on the specified language.
      *
      * @param string $selected_lang Language code for stop words (default: 'en').
@@ -30,10 +34,25 @@ class KeywordExtractor
         }
 
         // Load and prepare stop words as lowercase
-        $this->stopWords = array_map('strtolower', array_map('trim', file($stopWordsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)));
+        if ( file_exists( $stopWordsFile ) ) {
+            $this->stopWords = array_map('strtolower', array_map('trim', file($stopWordsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)));
+        } else {
+            $this->stopWords = array();
+        }
+    }
 
-        // Initialize the tokenizer
-        $this->tokenizer = new WordTokenizer();
+    /**
+     * Simple word tokenizer - splits text into words.
+     * Replaces the php-ml WordTokenizer dependency.
+     *
+     * @param string $text The input text to tokenize.
+     * @return array List of words/tokens.
+     */
+    private function tokenize($text)
+    {
+        // Match word characters (letters, numbers, underscores) with Unicode support
+        preg_match_all('/\w+/u', $text, $matches);
+        return $matches[0];
     }
 
     /**
@@ -49,8 +68,11 @@ class KeywordExtractor
         $cleanedText = $this->cleanPostContent($text);
 
         // Tokenize and filter words by removing stop words
-        $words = $this->tokenizer->tokenize($cleanedText);
-        $filteredWords = array_filter($words, fn($word) => !in_array(strtolower($word), $this->stopWords));
+        $words = $this->tokenize($cleanedText);
+        $filteredWords = array_filter($words, function($word) {
+            return !in_array(strtolower($word), $this->stopWords) && strlen($word) > 2;
+        });
+        $filteredWords = array_values($filteredWords); // Re-index array
         
         // Count unigrams, bigrams, and trigrams
         $unigrams = array_count_values($filteredWords);
@@ -58,7 +80,7 @@ class KeywordExtractor
         $trigrams = array_count_values($this->generateNgrams($filteredWords, 3));
 
         // Combine the counts of unigrams, bigrams, and trigrams
-        $combinedCounts = [];
+        $combinedCounts = array();
         $this->mergeCounts($unigrams, $combinedCounts);
         $this->mergeCounts($bigrams, $combinedCounts);
         $this->mergeCounts($trigrams, $combinedCounts);
@@ -100,8 +122,9 @@ class KeywordExtractor
      */
     private function generateNgrams($words, $n)
     {
-        $ngrams = [];
-        for ($i = 0; $i <= count($words) - $n; $i++) {
+        $ngrams = array();
+        $wordCount = count($words);
+        for ($i = 0; $i <= $wordCount - $n; $i++) {
             $ngram = array_slice($words, $i, $n);
 
             // Ensure the n-gram contains no stop words and no repeated words
@@ -121,7 +144,11 @@ class KeywordExtractor
     private function mergeCounts($counts, &$combinedCounts)
     {
         foreach ($counts as $phrase => $count) {
-            $combinedCounts[$phrase] = ($combinedCounts[$phrase] ?? 0) + $count;
+            if ( isset( $combinedCounts[$phrase] ) ) {
+                $combinedCounts[$phrase] += $count;
+            } else {
+                $combinedCounts[$phrase] = $count;
+            }
         }
     }
 
@@ -135,7 +162,11 @@ class KeywordExtractor
      */
     private function getTopKeywords($combinedCounts, $totalWords, $topResults)
     {
-        $weightedCounts = [];
+        if ( $totalWords === 0 ) {
+            return array();
+        }
+        
+        $weightedCounts = array();
         foreach ($combinedCounts as $phrase => $count) {
             // Weight based on phrase length for higher relevance
             $lengthWeight = strlen($phrase) / 10;
@@ -147,4 +178,3 @@ class KeywordExtractor
         return array_keys(array_slice($weightedCounts, 0, $topResults, true));
     }
 }
-?>
