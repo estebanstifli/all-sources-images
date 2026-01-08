@@ -177,6 +177,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      */
     public function ALLSI_ajax_call() {
         // Security check: Verify nonce first before processing any input
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This line is where nonce is retrieved for verification
         $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'ajax_nonce_All_Sources_Images' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'all-sources-images' ) ) );
@@ -187,13 +188,16 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             wp_send_json_error( array( 'message' => __( 'Permission denied.', 'all-sources-images' ) ) );
         }
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above with wp_verify_nonce
         // Check if button "Generate Automatically" is clicked
         $button_autogenerate = ( isset( $_POST['buttonAutoGenerate'] ) ? filter_var( wp_unslash( $_POST['buttonAutoGenerate'] ), FILTER_VALIDATE_BOOLEAN ) : false );
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above
         // Convert the JSON-encoded post IDs into an array and sanitize them.
         $ids_json = isset( $_POST['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_POST['ids_mpt_generation'] ) ) : '[]';
         $post_ids = array_map( 'absint', json_decode( $ids_json ) );
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above
         // Validate the presence of post IDs.
         if ( ! isset( $_POST['ids_mpt_generation'] ) ) {
             wp_send_json_error( array( 'message' => __( 'No posts selected.', 'all-sources-images' ) ) );
@@ -205,11 +209,13 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         foreach ( $post_ids as $key => $val ) {
             $post_ids_with_keys[$key + 1] = $val;
         }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above
         // Retrieve the current post index and ID from the AJAX request.
         $current_post_index = isset( $_POST['currentPostIndex'] ) ? absint( $_POST['currentPostIndex'] ) : 0;
         $current_post_id = $post_ids_with_keys[$current_post_index];
         // Load plugin settings for image generation (with defaults).
         $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( true ) );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above
         // Check if forceRewrite is set from AJAX request (user confirmed replacement)
         $force_rewrite = isset( $_POST['forceRewrite'] ) && filter_var( wp_unslash( $_POST['forceRewrite'] ), FILTER_VALIDATE_BOOLEAN );
         // Check if the 'rewrite featured image' option is enabled or forceRewrite is set.

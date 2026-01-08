@@ -747,6 +747,7 @@ class All_Sources_Images_Admin {
         );
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification not required here, data is only used to prepare JS variables for AJAX which has its own nonce verification
         if ( !empty( $_POST['all-sources-images'] ) || !empty( $_REQUEST['ids_mpt_generation'] ) || !empty( $_REQUEST['cats'] ) ) {
+            $ids_from_cats = '';
             // phpcs:ignore WordPress.Security.NonceVerification.Missing
             if ( !empty( $_REQUEST['cats'] ) ) {
                 // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -778,11 +779,12 @@ class All_Sources_Images_Admin {
                 foreach ( $post_ids as $post_id ) {
                     $ids .= $post_id . ',';
                 }
-                $_GET['ids'] = substr_replace( $ids, '', -1 );
-                $_GET['ids_mpt_generation'] = $_GET['ids'];
+                $ids_from_cats = substr_replace( $ids, '', -1 );
             }
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified earlier in the function.
-            $ids = isset( $_GET['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_GET['ids_mpt_generation'] ) ) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not needed here, only used to prepare JS variables, actual AJAX calls have nonce verification
+            $ids_param = isset( $_GET['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_GET['ids_mpt_generation'] ) ) : '';
+            // Use IDs from category if available, otherwise from URL parameter
+            $ids = ! empty( $ids_from_cats ) ? $ids_from_cats : $ids_param;
             $ids = array_map( 'intval', explode( ',', trim( $ids, ',' ) ) );
             $count = count( $ids );
             $ids = json_encode( $ids );
@@ -1050,6 +1052,7 @@ class All_Sources_Images_Admin {
         // Check if the capability being checked is 'manage_options'
         if ( $cap === 'manage_options' ) {
             // Check if the form is submitting a specific option related to your plugin
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified by WordPress Settings API in options.php
             $option_page = isset( $_POST['option_page'] ) ? sanitize_text_field( wp_unslash( $_POST['option_page'] ) ) : '';
             if ( $option_page && in_array( $option_page, array(
                 'ASI-plugin-proxy-settings',
@@ -1659,9 +1662,12 @@ class All_Sources_Images_Admin {
             wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
         }
         
-        $apiKey = sanitize_text_field( $_POST['apikey'] );
-        $cxId = isset( $_POST['cxid'] ) ? sanitize_text_field( $_POST['cxid'] ) : '';
-        $apiBank = sanitize_text_field( $_POST['apibank'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer().
+        $apiKey = isset( $_POST['apikey'] ) ? sanitize_text_field( wp_unslash( $_POST['apikey'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer().
+        $cxId = isset( $_POST['cxid'] ) ? sanitize_text_field( wp_unslash( $_POST['cxid'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer().
+        $apiBank = isset( $_POST['apibank'] ) ? sanitize_text_field( wp_unslash( $_POST['apibank'] ) ) : '';
         $response = '';
         if ( 'pixabay' === $apiBank ) {
             $apiUrl = "https://pixabay.com/api/?key=" . $apiKey . "&q=exemple";
@@ -1876,7 +1882,8 @@ class All_Sources_Images_Admin {
             $message = isset( $decoded['error']['message'] ) ? $decoded['error']['message'] : __( 'Unexpected Gemini API response.', 'all-sources-images' );
             wp_send_json_error( $message, $code );
         } elseif ( 'workers_ai' === $apiBank ) {
-            $account_id = isset( $_POST['account_id'] ) ? sanitize_text_field( $_POST['account_id'] ) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified at function start with check_ajax_referer().
+            $account_id = isset( $_POST['account_id'] ) ? sanitize_text_field( wp_unslash( $_POST['account_id'] ) ) : '';
             if ( empty( $account_id ) ) {
                 wp_send_json_error( __( 'Account ID is required.', 'all-sources-images' ) );
             }
@@ -2149,17 +2156,24 @@ class All_Sources_Images_Admin {
             error_log( '[All Sources Images] ALLSI_block_searching_images CALLED' );
         }
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above with check_ajax_referer
         if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
             wp_send_json_error( 'Missing required parameters' );
             return;
         }
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above with check_ajax_referer
         $search_term = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $bank = sanitize_text_field( strtolower( wp_unslash( $_GET['bank'] ) ) );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $index = isset( $_GET['index'] ) ? absint( $_GET['index'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $id = absint( $_GET['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $page = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         // Skip translation if already translated by frontend (skip_translation=1)
         $skip_translation = isset( $_GET['skip_translation'] ) && absint( $_GET['skip_translation'] ) === 1;
         
@@ -2666,12 +2680,14 @@ class All_Sources_Images_Admin {
             wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
         }
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above with check_ajax_referer
         if ( ! isset( $_GET['search'] ) ) {
             wp_send_json_error( 'Missing search parameter' );
             return;
         }
         
-        $search_term = sanitize_text_field( $_GET['search'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above with check_ajax_referer
+        $search_term = sanitize_text_field( wp_unslash( $_GET['search'] ) );
         $original_term = $search_term;
         $was_translated = false;
         
@@ -2723,12 +2739,14 @@ class All_Sources_Images_Admin {
             wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
         }
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer
         $raw_url_image = isset( $_POST['url_image'] ) ? wp_unslash( $_POST['url_image'] ) : '';
         if ( 0 === strpos( $raw_url_image, 'data:image' ) ) {
             $url_image = $raw_url_image;
         } else {
             $url_image = esc_url_raw( $raw_url_image );
         }
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer
         $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : 'image' );
         $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( wp_unslash( $_POST['bank'] ) ) : '' );
         $alt = ( isset( $_POST['alt_image'] ) ? sanitize_text_field( wp_unslash( $_POST['alt_image'] ) ) : '' );
@@ -2744,6 +2762,7 @@ class All_Sources_Images_Admin {
         if ( !$post_id && isset( $_POST['id'] ) ) {
             $post_id = intval( $_POST['id'] );
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
 
         ALLSI_log( array(
             'url'      => $url_image,

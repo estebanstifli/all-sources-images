@@ -9,7 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 
 // Determine active tab - Default is now 'placement' since Sources tab is removed
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'placement';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Tab parameter is used for display purposes only, no data modification
+$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
 
 // Set title based on active tab
 switch ( $active_tab ) {

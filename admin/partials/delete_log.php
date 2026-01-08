@@ -4,8 +4,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Verify nonce
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified on line 10 below
 $action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
 if ( 'deletelog' === $action ) {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is where nonce is verified
     $nonce = isset( $_REQUEST['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '';
     if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'delete_log' ) ) {
         return false;

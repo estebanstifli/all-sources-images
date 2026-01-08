@@ -289,7 +289,8 @@ class ALLSI_Bulk_Generation_Ajax {
     public function create_job_from_ids() {
         $this->verify_request();
 
-        $post_ids_raw = sanitize_text_field( $_POST['post_ids'] ?? '' );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $post_ids_raw = isset( $_POST['post_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['post_ids'] ) ) : '';
         
         if ( empty( $post_ids_raw ) ) {
             wp_send_json_error( array( 'message' => __( 'No posts provided', 'all-sources-images' ) ) );
@@ -368,8 +369,10 @@ class ALLSI_Bulk_Generation_Ajax {
     public function get_jobs() {
         $this->verify_request();
 
-        $page = absint( $_POST['page'] ?? 1 );
-        $status = sanitize_text_field( $_POST['status'] ?? '' );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $page = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 1;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $status = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 
         $result = ALLSI_Bulk_Generation_DB::get_jobs( array(
             'page'   => $page,
@@ -385,8 +388,10 @@ class ALLSI_Bulk_Generation_Ajax {
     public function get_job_details() {
         $this->verify_request();
 
-        $job_id     = absint( $_POST['job_id'] ?? 0 );
-        $posts_page = absint( $_POST['posts_page'] ?? 1 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $job_id     = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $posts_page = isset( $_POST['posts_page'] ) ? absint( $_POST['posts_page'] ) : 1;
 
         if ( ! $job_id ) {
             wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
@@ -452,7 +457,8 @@ class ALLSI_Bulk_Generation_Ajax {
     public function start_job() {
         $this->verify_request();
 
-        $job_id = absint( $_POST['job_id'] ?? 0 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
 
         if ( ! $job_id ) {
             wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
@@ -483,7 +489,8 @@ class ALLSI_Bulk_Generation_Ajax {
     public function pause_job() {
         $this->verify_request();
 
-        $job_id = absint( $_POST['job_id'] ?? 0 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
 
         if ( ! $job_id ) {
             wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
@@ -503,7 +510,8 @@ class ALLSI_Bulk_Generation_Ajax {
     public function delete_job() {
         $this->verify_request();
 
-        $job_id = absint( $_POST['job_id'] ?? 0 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
 
         if ( ! $job_id ) {
             wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
