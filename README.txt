@@ -4,7 +4,7 @@ Donate link: https://github.com/estebanstifli/all-sources-images
 Tags: image, pixabay, openverse, ai, auto
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -162,7 +162,7 @@ Absolutely! You can configure the plugin to extract keywords from:
 
 == Changelog ==
 
-= 1.0.2 - December 2025 =
+= 1.0.3 - January 2026 =
 * 🎉 Initial release
 * ✨ Support for 10+ image sources (AI + Stock Photos)
 * ✨ Gutenberg block for image search
@@ -172,7 +172,7 @@ Absolutely! You can configure the plugin to extract keywords from:
 
 == Upgrade Notice ==
 
-= 1.0.2 =
+= 1.0.3 =
 Initial release. Welcome to All Sources Images!
 
 == Additional Info ==
