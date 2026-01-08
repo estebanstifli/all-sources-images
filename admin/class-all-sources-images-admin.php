@@ -1631,15 +1631,18 @@ class All_Sources_Images_Admin {
      * @since    4.0.0
      */
     public function ALLSI_add_bulk_actions( $actions ) {
-        // Get translated text for the bulk action option
-        $option_text = esc_html__( 'Generate Images (ASI)', 'all-sources-images' );
+        // Enqueue the bulk actions script with localized text
+        wp_enqueue_script(
+            'allsi-bulk-actions',
+            plugin_dir_url( __FILE__ ) . 'js/bulk-actions.js',
+            array( 'jquery' ),
+            $this->version,
+            true
+        );
         
-        // Add inline script to jQuery (which is always loaded in admin)
-        $inline_script = "jQuery(document).ready(function($){" .
-            "\$('select[name^=\"action\"] option:last-child').before('<option value=\"bulk_regenerate_thumbnails\">" . esc_js( $option_text ) . "</option>');" .
-        "});";
-        
-        wp_add_inline_script( 'jquery', $inline_script );
+        wp_localize_script( 'allsi-bulk-actions', 'allsiBulkActions', array(
+            'optionText' => esc_html__( 'Generate Images (ASI)', 'all-sources-images' ),
+        ) );
         
         return $actions;
     }
@@ -2046,8 +2049,14 @@ class All_Sources_Images_Admin {
         wp_enqueue_style( 'allsi-images-editor-style' );
         wp_enqueue_script( 'allsi-images-script' );
 
-        $inline = 'document.addEventListener("DOMContentLoaded",function(){if(window.allsiImagesExplorerMount){var fallbackId=0;var asiData=window.allsiAjax||{};if(typeof asiData.default_post_id!=="undefined"){var parsed=parseInt(asiData.default_post_id,10);if(!isNaN(parsed)){fallbackId=parsed;}}window.allsiImagesExplorerMount("allsi-media-picker-root",{openOnLoad:true,postId:fallbackId});}});';
-        wp_add_inline_script( 'allsi-images-script', $inline, 'after' );
+        // Enqueue the media picker initialization script
+        wp_enqueue_script(
+            'allsi-media-picker-init',
+            plugin_dir_url( __FILE__ ) . 'js/media-picker-init.js',
+            array( 'allsi-images-script' ),
+            $this->version,
+            true
+        );
     }
 
     /**
