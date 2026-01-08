@@ -3,10 +3,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$gemini_options = isset( $options['gemini'] ) ? $options['gemini'] : array();
-$selected_model = isset( $gemini_options['model'] ) ? $gemini_options['model'] : 'gemini-2.5-flash-image';
-$selected_ratio = isset( $gemini_options['aspect_ratio'] ) ? $gemini_options['aspect_ratio'] : '1:1';
-$selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['image_size'] : '';
+$allsi_gemini_options = isset( $options['gemini'] ) ? $options['gemini'] : array();
+$allsi_selected_model = isset( $allsi_gemini_options['model'] ) ? $allsi_gemini_options['model'] : 'gemini-2.5-flash-image';
+$allsi_selected_ratio = isset( $allsi_gemini_options['aspect_ratio'] ) ? $allsi_gemini_options['aspect_ratio'] : '1:1';
+$allsi_selected_size  = isset( $allsi_gemini_options['image_size'] ) ? $allsi_gemini_options['image_size'] : '';
 ?>
 
 <tr valign="top">
@@ -31,7 +31,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
         <label for="gemini-apikey"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
     </th>
     <td id="password-gemini" class="password">
-        <input id="gemini-apikey" type="password" name="ALLSI_plugin_banks_settings[gemini][apikey]" class="form-control" value="<?php echo isset( $gemini_options['apikey'] ) ? esc_attr( $gemini_options['apikey'] ) : ''; ?>" />
+        <input id="gemini-apikey" type="password" name="ALLSI_plugin_banks_settings[gemini][apikey]" class="form-control" value="<?php echo isset( $allsi_gemini_options['apikey'] ) ? esc_attr( $allsi_gemini_options['apikey'] ) : ''; ?>" />
         <i id="togglePassword"></i>
     </td>
 </tr>
@@ -52,7 +52,7 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
     <td>
         <select name="ALLSI_plugin_banks_settings[gemini][model]" id="gemini-model" class="form-control form-control-lg">
             <?php
-            $models = apply_filters(
+            $allsi_models = apply_filters(
                 'ALLSI_gemini_supported_models',
                 array(
                     'gemini-2.5-flash-image'         => esc_html__( 'Gemini 2.5 Flash Image (Nano Banana)', 'all-sources-images' ),
@@ -60,8 +60,8 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
                     'gemini-3-pro-image-preview'     => esc_html__( 'Gemini 3 Pro Image Preview (4K capable)', 'all-sources-images' ),
                 )
             );
-            foreach ( $models as $value => $label ) {
-                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $value ), esc_html( $label ), selected( $selected_model, $value, false ) );
+            foreach ( $allsi_models as $allsi_value => $allsi_label ) {
+                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $allsi_value ), esc_html( $allsi_label ), selected( $allsi_selected_model, $allsi_value, false ) );
             }
             ?>
         </select>
@@ -76,15 +76,15 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
     <td>
         <select name="ALLSI_plugin_banks_settings[gemini][aspect_ratio]" id="gemini-aspect" class="form-control form-control-lg">
             <?php
-            $ratios = array(
+            $allsi_ratios = array(
                 '1:1'  => esc_html__( 'Square (1:1)', 'all-sources-images' ),
                 '16:9' => esc_html__( 'Landscape (16:9)', 'all-sources-images' ),
                 '3:2'  => esc_html__( 'Photo (3:2)', 'all-sources-images' ),
                 '4:5'  => esc_html__( 'Portrait (4:5)', 'all-sources-images' ),
                 '9:16' => esc_html__( 'Vertical (9:16)', 'all-sources-images' ),
             );
-            foreach ( $ratios as $value => $label ) {
-                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $value ), esc_html( $label ), selected( $selected_ratio, $value, false ) );
+            foreach ( $allsi_ratios as $allsi_value => $allsi_label ) {
+                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $allsi_value ), esc_html( $allsi_label ), selected( $allsi_selected_ratio, $allsi_value, false ) );
             }
             ?>
         </select>
@@ -99,15 +99,15 @@ $selected_size  = isset( $gemini_options['image_size'] ) ? $gemini_options['imag
     <td>
         <select name="ALLSI_plugin_banks_settings[gemini][image_size]" id="gemini-size" class="form-control form-control-lg">
             <?php
-            $sizes = array(
+            $allsi_sizes = array(
                 ''         => esc_html__( 'Auto (model default)', 'all-sources-images' ),
                 '1024x1024'=> '1024 × 1024',
                 '1152x896' => '1152 × 896',
                 '896x1152' => '896 × 1152',
                 '1536x1536'=> '1536 × 1536',
             );
-            foreach ( $sizes as $value => $label ) {
-                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $value ), esc_html( $label ), selected( $selected_size, $value, false ) );
+            foreach ( $allsi_sizes as $allsi_value => $allsi_label ) {
+                printf( '<option value="%1$s" %3$s>%2$s</option>', esc_attr( $allsi_value ), esc_html( $allsi_label ), selected( $allsi_selected_size, $allsi_value, false ) );
             }
             ?>
         </select>

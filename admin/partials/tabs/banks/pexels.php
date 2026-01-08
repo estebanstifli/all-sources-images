@@ -48,18 +48,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pexels][orientation]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['pexels']['orientation']) ? $options['pexels']['orientation'] : 'all';
+			$allsi_selected_orientation = isset( $options['pexels']['orientation'] ) ? $options['pexels']['orientation'] : 'all';
 
-			$orientations = array(
+			$allsi_orientations = array(
 				esc_html__( 'All Orientations', 'all-sources-images' ) => 'all',
 				esc_html__( 'Landscape', 'all-sources-images' )        => 'landscape',
 				esc_html__( 'Portrait', 'all-sources-images' )         => 'portrait',
 				esc_html__( 'Square', 'all-sources-images' )           => 'square',
 			);
 
-			foreach( $orientations as $name_orientation => $code_orientation ) {
-				$choose = ($selected == $code_orientation) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_orientation ) . '">' . esc_html( $name_orientation ) . '</option>';
+			foreach ( $allsi_orientations as $allsi_name_orientation => $allsi_code_orientation ) {
+				echo '<option ' . selected( $allsi_selected_orientation, $allsi_code_orientation, false ) . ' value="' . esc_attr( $allsi_code_orientation ) . '">' . esc_html( $allsi_name_orientation ) . '</option>';
 			}
 			?>
 		</select>
@@ -74,18 +73,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pexels][size]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['pexels']['size']) ? $options['pexels']['size'] : 'all';
+			$allsi_selected_size = isset( $options['pexels']['size'] ) ? $options['pexels']['size'] : 'all';
 
-			$sizes = array(
+			$allsi_sizes = array(
 				esc_html__( 'All Sizes', 'all-sources-images' )       => 'all',
 				esc_html__( 'Large (24MP+)', 'all-sources-images' )   => 'large',
 				esc_html__( 'Medium (12MP+)', 'all-sources-images' )  => 'medium',
 				esc_html__( 'Small (4MP+)', 'all-sources-images' )    => 'small',
 			);
 
-			foreach( $sizes as $name_size => $code_size ) {
-				$choose = ($selected == $code_size) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_size ) . '">' . esc_html( $name_size ) . '</option>';
+			foreach ( $allsi_sizes as $allsi_name_size => $allsi_code_size ) {
+				echo '<option ' . selected( $allsi_selected_size, $allsi_code_size, false ) . ' value="' . esc_attr( $allsi_code_size ) . '">' . esc_html( $allsi_name_size ) . '</option>';
 			}
 			?>
 		</select>
@@ -100,9 +98,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pexels][color]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['pexels']['color']) ? $options['pexels']['color'] : 'all';
+			$allsi_selected_color = isset( $options['pexels']['color'] ) ? $options['pexels']['color'] : 'all';
 
-			$colors = array(
+			$allsi_colors = array(
 				esc_html__( 'All Colors', 'all-sources-images' )      => 'all',
 				esc_html__( 'Red', 'all-sources-images' )             => 'red',
 				esc_html__( 'Orange', 'all-sources-images' )          => 'orange',
@@ -118,9 +116,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'White', 'all-sources-images' )           => 'white',
 			);
 
-			foreach( $colors as $name_color => $code_color ) {
-				$choose = ($selected == $code_color) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_color ) . '">' . esc_html( $name_color ) . '</option>';
+			foreach ( $allsi_colors as $allsi_name_color => $allsi_code_color ) {
+				echo '<option ' . selected( $allsi_selected_color, $allsi_code_color, false ) . ' value="' . esc_attr( $allsi_code_color ) . '">' . esc_html( $allsi_name_color ) . '</option>';
 			}
 			?>
 		</select>
@@ -135,9 +132,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pexels][locale]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['pexels']['locale']) ? $options['pexels']['locale'] : 'en-US';
+			$allsi_selected_locale = isset( $options['pexels']['locale'] ) ? $options['pexels']['locale'] : 'en-US';
 
-			$locales = array(
+			$allsi_locales = array(
 				esc_html__( 'English (US)', 'all-sources-images' )    => 'en-US',
 				esc_html__( 'Spanish (ES)', 'all-sources-images' )    => 'es-ES',
 				esc_html__( 'French (FR)', 'all-sources-images' )     => 'fr-FR',
@@ -150,9 +147,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'Korean (KR)', 'all-sources-images' )     => 'ko-KR',
 			);
 
-			foreach( $locales as $name_locale => $code_locale ) {
-				$choose = ($selected == $code_locale) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_locale ) . '">' . esc_html( $name_locale ) . '</option>';
+			foreach ( $allsi_locales as $allsi_name_locale => $allsi_code_locale ) {
+				echo '<option ' . selected( $allsi_selected_locale, $allsi_code_locale, false ) . ' value="' . esc_attr( $allsi_code_locale ) . '">' . esc_html( $allsi_name_locale ) . '</option>';
 			}
 			?>
 		</select>
@@ -167,9 +163,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pexels][per_page]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['pexels']['per_page']) ? $options['pexels']['per_page'] : '15';
+			$allsi_selected_per_page = isset( $options['pexels']['per_page'] ) ? $options['pexels']['per_page'] : '15';
 
-			$per_pages = array(
+			$allsi_per_pages = array(
 				esc_html__( '10 results', 'all-sources-images' ) => '10',
 				esc_html__( '15 results', 'all-sources-images' ) => '15',
 				esc_html__( '30 results', 'all-sources-images' ) => '30',
@@ -177,9 +173,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( '80 results', 'all-sources-images' ) => '80',
 			);
 
-			foreach( $per_pages as $name_per_page => $code_per_page ) {
-				$choose = ($selected == $code_per_page) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_per_page ) . '">' . esc_html( $name_per_page ) . '</option>';
+			foreach ( $allsi_per_pages as $allsi_name_per_page => $allsi_code_per_page ) {
+				echo '<option ' . selected( $allsi_selected_per_page, $allsi_code_per_page, false ) . ' value="' . esc_attr( $allsi_code_per_page ) . '">' . esc_html( $allsi_name_per_page ) . '</option>';
 			}
 			?>
 		</select>
@@ -194,9 +189,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pexels][preferred_size]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['pexels']['preferred_size']) ? $options['pexels']['preferred_size'] : 'large';
+			$allsi_selected_preferred_size = isset( $options['pexels']['preferred_size'] ) ? $options['pexels']['preferred_size'] : 'large';
 
-			$preferred_sizes = array(
+			$allsi_preferred_sizes = array(
 				esc_html__( 'Original (Full resolution)', 'all-sources-images' ) => 'original',
 				esc_html__( 'Large 2x (High DPI)', 'all-sources-images' )        => 'large2x',
 				esc_html__( 'Large (940px width)', 'all-sources-images' )        => 'large',
@@ -206,9 +201,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'Landscape (1200x627)', 'all-sources-images' )       => 'landscape',
 			);
 
-			foreach( $preferred_sizes as $name_preferred_size => $code_preferred_size ) {
-				$choose = ($selected == $code_preferred_size) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_preferred_size ) . '">' . esc_html( $name_preferred_size ) . '</option>';
+			foreach ( $allsi_preferred_sizes as $allsi_name_preferred_size => $allsi_code_preferred_size ) {
+				echo '<option ' . selected( $allsi_selected_preferred_size, $allsi_code_preferred_size, false ) . ' value="' . esc_attr( $allsi_code_preferred_size ) . '">' . esc_html( $allsi_name_preferred_size ) . '</option>';
 			}
 			?>
 		</select>

@@ -24,17 +24,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<select name="ALLSI_plugin_banks_settings[cc_search][source]" class="form-control form-control-lg" >
 			<?php
-				$selected = $options['cc_search']['source'];
-				$source_choose = array(
+				$allsi_selected = $options['cc_search']['source'];
+				$allsi_source_choose = array(
 					esc_html__( 'All sources', 'all-sources-images' )          => 1,
 					esc_html__( 'All except flickr', 'all-sources-images' )    => 2,
 					esc_html__( 'Other', 'all-sources-images' )                => 3
 				);
 				//ksort( $country_choose );
 
-				foreach( $source_choose as $name_source => $code_source ) {
-					$choose = ( $selected == $code_source) ? 'selected="selected"': '';
-					echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_source ) . '">' . esc_html( $name_source ) . '</option>';
+				foreach( $allsi_source_choose as $allsi_name_source => $allsi_code_source ) {
+					echo '<option ' . selected( $allsi_selected, $allsi_code_source, false ) . ' value="' . esc_attr( $allsi_code_source ) . '">' . esc_html( $allsi_name_source ) . '</option>';
 				}
 			?>
 		</select>
@@ -50,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php esc_html_e( 'Choose these options can reduce relevance of results, but permit to use free-to-use images.', 'all-sources-images' ); ?>
 		</p>
 		<?php
-			$rights_array = array(
+			$allsi_rights_array = array(
         		esc_html__( 'Zéro', 'all-sources-images' )                                            => 'CC0',
 				esc_html__( 'Attribution-NoDerivs', 'all-sources-images' )                     => 'BY-ND',
 				esc_html__( 'Attribution-NonCommercial', 'all-sources-images' )                => 'BY-NC',
@@ -61,11 +60,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'Public Domain Mark', 'all-sources-images' )                       => 'PDM',
 			);
 
-
-			foreach ( $rights_array as $right => $right_code ) {
-				$checked= ( isset( $options['cc_search']['rights'] ) && !empty( $options['cc_search']['rights'] ) && in_array( $right_code, $options['cc_search']['rights'] ) )? 'checked="checked""' : '';
+			foreach ( $allsi_rights_array as $allsi_right => $allsi_right_code ) {
+				$allsi_is_checked = ( isset( $options['cc_search']['rights'] ) && ! empty( $options['cc_search']['rights'] ) && in_array( $allsi_right_code, $options['cc_search']['rights'], true ) );
 				echo '<label class="checkbox">
-					<input ' . esc_attr( $checked ) . ' name="ALLSI_plugin_banks_settings[cc_search][rights][' . esc_attr( $right_code ) . ']" type="checkbox" value="' . esc_attr( $right_code ) . '"> <span></span> ' . esc_html( $right ) . '
+					<input ' . checked( $allsi_is_checked, true, false ) . ' name="ALLSI_plugin_banks_settings[cc_search][rights][' . esc_attr( $allsi_right_code ) . ']" type="checkbox" value="' . esc_attr( $allsi_right_code ) . '"> <span></span> ' . esc_html( $allsi_right ) . '
 				</label>';
 			}
 		?>
@@ -80,9 +78,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[cc_search][imgtype]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['cc_search']['imgtype'];
+			$allsi_selected = $options['cc_search']['imgtype'];
 
-			$formats = array(
+			$allsi_formats = array(
 				esc_html__( '-- Default --', 'all-sources-images' )            => '',
 				esc_html__( 'Illustration', 'all-sources-images' )             => 'illustration',
 				esc_html__( 'Photography', 'all-sources-images' )             => 'photograph',
@@ -90,9 +88,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			);
 
 			// format
-			foreach( $formats as $name_format => $code_format ) {
-				$choose=($selected == $code_format)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_format ) . '">' . esc_html( $name_format ) . '</option>';
+			foreach( $allsi_formats as $allsi_name_format => $allsi_code_format ) {
+				echo '<option ' . selected( $allsi_selected, $allsi_code_format, false ) . ' value="' . esc_attr( $allsi_code_format ) . '">' . esc_html( $allsi_name_format ) . '</option>';
 			}
 			?>
 		</select>
@@ -106,17 +103,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[cc_search][aspect_ratio]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['cc_search']['aspect_ratio'];
+			$allsi_selected = $options['cc_search']['aspect_ratio'];
 
-			$aspect_ratio = array(
+			$allsi_aspect_ratio = array(
 				esc_html__( 'Tall', 'all-sources-images' )     => 'tall',
 				esc_html__( 'Wide', 'all-sources-images' )     => 'wide',
 				esc_html__( 'Square', 'all-sources-images' )   => 'square'
 			);
 
-			foreach( $aspect_ratio as $name_aspect_ratio => $code_aspect_ratio ) {
-				$choose = ( $selected == $code_aspect_ratio ) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_aspect_ratio ) . '">' . esc_html( $name_aspect_ratio ) . '</option>';
+			foreach( $allsi_aspect_ratio as $allsi_name_aspect_ratio => $allsi_code_aspect_ratio ) {
+				echo '<option ' . selected( $allsi_selected, $allsi_code_aspect_ratio, false ) . ' value="' . esc_attr( $allsi_code_aspect_ratio ) . '">' . esc_html( $allsi_name_aspect_ratio ) . '</option>';
 			}
 			?>
 		</select>

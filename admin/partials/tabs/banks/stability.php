@@ -45,9 +45,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[stability][model]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['stability']['model']) ? $options['stability']['model'] : 'sd3-large';
+			$allsi_selected_model = isset( $options['stability']['model'] ) ? $options['stability']['model'] : 'sd3-large';
 
-			$models = array(
+			$allsi_models = array(
 				esc_html__( 'Stable Diffusion 3 Large', 'all-sources-images' )       => 'sd3-large',
 				esc_html__( 'Stable Diffusion 3 Large Turbo', 'all-sources-images' ) => 'sd3-large-turbo',
 				esc_html__( 'Stable Diffusion 3 Medium', 'all-sources-images' )      => 'sd3-medium',
@@ -55,9 +55,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'Stable Image Ultra', 'all-sources-images' )             => 'ultra',
 			);
 
-			foreach( $models as $name_model => $code_model ) {
-				$choose = ($selected == $code_model) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_model ) . '">' . esc_html( $name_model ) . '</option>';
+			foreach ( $allsi_models as $allsi_name_model => $allsi_code_model ) {
+				echo '<option ' . selected( $allsi_selected_model, $allsi_code_model, false ) . ' value="' . esc_attr( $allsi_code_model ) . '">' . esc_html( $allsi_name_model ) . '</option>';
 			}
 			?>
 		</select>
@@ -72,9 +71,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[stability][aspect_ratio]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['stability']['aspect_ratio']) ? $options['stability']['aspect_ratio'] : '1:1';
+			$allsi_selected_ratio = isset( $options['stability']['aspect_ratio'] ) ? $options['stability']['aspect_ratio'] : '1:1';
 
-			$ratios = array(
+			$allsi_ratios = array(
 				esc_html__( '1:1 (Square)', 'all-sources-images' )      => '1:1',
 				esc_html__( '16:9 (Landscape)', 'all-sources-images' )  => '16:9',
 				esc_html__( '21:9 (Ultrawide)', 'all-sources-images' )  => '21:9',
@@ -86,9 +85,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( '9:21 (Mobile)', 'all-sources-images' )     => '9:21',
 			);
 
-			foreach( $ratios as $name_ratio => $code_ratio ) {
-				$choose = ($selected == $code_ratio) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_ratio ) . '">' . esc_html( $name_ratio ) . '</option>';
+			foreach ( $allsi_ratios as $allsi_name_ratio => $allsi_code_ratio ) {
+				echo '<option ' . selected( $allsi_selected_ratio, $allsi_code_ratio, false ) . ' value="' . esc_attr( $allsi_code_ratio ) . '">' . esc_html( $allsi_name_ratio ) . '</option>';
 			}
 			?>
 		</select>
@@ -102,17 +100,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[stability][output_format]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['stability']['output_format']) ? $options['stability']['output_format'] : 'jpeg';
+			$allsi_selected_format = isset( $options['stability']['output_format'] ) ? $options['stability']['output_format'] : 'jpeg';
 
-			$formats = array(
+			$allsi_formats = array(
 				esc_html__( 'JPEG', 'all-sources-images' ) => 'jpeg',
 				esc_html__( 'PNG', 'all-sources-images' )  => 'png',
 				esc_html__( 'WebP', 'all-sources-images' ) => 'webp',
 			);
 
-			foreach( $formats as $name_format => $code_format ) {
-				$choose = ($selected == $code_format) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_format ) . '">' . esc_html( $name_format ) . '</option>';
+			foreach ( $allsi_formats as $allsi_name_format => $allsi_code_format ) {
+				echo '<option ' . selected( $allsi_selected_format, $allsi_code_format, false ) . ' value="' . esc_attr( $allsi_code_format ) . '">' . esc_html( $allsi_name_format ) . '</option>';
 			}
 			?>
 		</select>

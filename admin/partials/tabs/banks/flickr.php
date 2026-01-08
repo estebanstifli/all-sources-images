@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php esc_html_e( 'If none of these options are chosen, every licences will be used.', 'all-sources-images' ); ?>
 		</p>
 		<?php 
-			$rights_array = array(
+			$allsi_rights_array = array(
 				__( 'All Rights Reserved', 'all-sources-images' )																																	=> '0',
 				__( 'Attribution-NonCommercial-ShareAlike License - <i><a href="http://creativecommons.org/licenses/by-nc-sa/2.0/" target="_blank">More detail</a></i>', 'all-sources-images' )	=> '1',
 				__( 'Attribution-NonCommercial License - <i><a href="http://creativecommons.org/licenses/by-nc/2.0/" target="_blank">More detail</a></i>', 'all-sources-images' )					=> '2',
@@ -45,11 +45,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			);
 		
 		
-			foreach ( $rights_array  as $right => $right_code ) {
-				$is_checked = ( isset( $options['flickr']['rights'] ) && ! empty( $options['flickr']['rights'] ) && is_array( $options['flickr']['rights'] ) && in_array( $right_code, $options['flickr']['rights'], true ) );
+			foreach ( $allsi_rights_array as $allsi_right => $allsi_right_code ) {
+				$allsi_is_checked = ( isset( $options['flickr']['rights'] ) && ! empty( $options['flickr']['rights'] ) && is_array( $options['flickr']['rights'] ) && in_array( $allsi_right_code, $options['flickr']['rights'], true ) );
 				echo '
 				<label class="checkbox">
-					<input ' . checked( $is_checked, true, false ) . ' name="ALLSI_plugin_banks_settings[flickr][rights][' . esc_attr( $right_code ) . ']" type="checkbox" value="' . esc_attr( $right_code ) . '"> <span></span> ' . wp_kses_post( $right ) . '
+					<input ' . checked( $allsi_is_checked, true, false ) . ' name="ALLSI_plugin_banks_settings[flickr][rights][' . esc_attr( $allsi_right_code ) . ']" type="checkbox" value="' . esc_attr( $allsi_right_code ) . '"> <span></span> ' . wp_kses_post( $allsi_right ) . '
 				</label>';
 			}
 		?>
@@ -65,9 +65,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[flickr][imgtype]" class="form-control" >
 			<?php
-			$selected = $options['flickr']['imgtype'];
+			$allsi_selected = $options['flickr']['imgtype'];
 			
-			$imgtype = array(
+			$allsi_imgtype = array(
 				__( '-- All --', 'all-sources-images' )				=> '7',
 				__( 'Photo', 'all-sources-images' )					=> '1',
 				__( 'Screenshot', 'all-sources-images' )				=> '2',
@@ -77,9 +77,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				__( 'Photo and "other"', 'all-sources-images' ) 		=> '6',
 			);
 
-			foreach( $imgtype as $name_imgtype => $code_imgtype ) {
-				$choose=($selected == $code_imgtype)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgtype ) . '">' . esc_html( $name_imgtype ) . '</option>';
+			foreach( $allsi_imgtype as $allsi_name_imgtype => $allsi_code_imgtype ) {
+				echo '<option ' . selected( $allsi_selected, $allsi_code_imgtype, false ) . ' value="' . esc_attr( $allsi_code_imgtype ) . '">' . esc_html( $allsi_name_imgtype ) . '</option>';
 			}
 			?>
 		</select>

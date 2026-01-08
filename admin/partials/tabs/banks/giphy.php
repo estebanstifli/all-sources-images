@@ -46,13 +46,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     <td>
         <select id="giphy-media-type" name="ALLSI_plugin_banks_settings[giphy][media_type]" class="form-control">
             <?php
-            $media_selected = isset( $options['giphy']['media_type'] ) ? $options['giphy']['media_type'] : 'gifs';
-            $media_types = array(
+                $allsi_media_selected = isset( $options['giphy']['media_type'] ) ? $options['giphy']['media_type'] : 'gifs';
+                $allsi_media_types = array(
                 __( 'GIFs', 'all-sources-images' )     => 'gifs',
                 __( 'Stickers', 'all-sources-images' ) => 'stickers',
             );
-            foreach ( $media_types as $label => $value ) {
-                    echo '<option value="' . esc_attr( $value ) . '" ' . selected( $media_selected, $value, false ) . '>' . esc_html( $label ) . '</option>';
+                foreach ( $allsi_media_types as $allsi_label => $allsi_value ) {
+                    echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_media_selected, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -66,15 +66,15 @@ if ( ! defined( 'ABSPATH' ) ) {
     <td>
         <select id="giphy-rating" name="ALLSI_plugin_banks_settings[giphy][rating]" class="form-control">
             <?php
-            $rating_selected = isset( $options['giphy']['rating'] ) ? $options['giphy']['rating'] : 'g';
-            $ratings = array(
+                $allsi_rating_selected = isset( $options['giphy']['rating'] ) ? $options['giphy']['rating'] : 'g';
+                $allsi_ratings = array(
                 __( 'G – suitable for all ages', 'all-sources-images' )      => 'g',
                 __( 'PG – mild suggestive content', 'all-sources-images' )    => 'pg',
                 __( 'PG-13 – may contain moderate content', 'all-sources-images' ) => 'pg-13',
                 __( 'R – restricted content', 'all-sources-images' )        => 'r',
             );
-            foreach ( $ratings as $label => $value ) {
-                    echo '<option value="' . esc_attr( $value ) . '" ' . selected( $rating_selected, $value, false ) . '>' . esc_html( $label ) . '</option>';
+                foreach ( $allsi_ratings as $allsi_label => $allsi_value ) {
+                    echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_rating_selected, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -88,8 +88,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     <td>
         <select id="giphy-lang" name="ALLSI_plugin_banks_settings[giphy][lang]" class="form-control">
             <?php
-            $lang_selected = isset( $options['giphy']['lang'] ) ? $options['giphy']['lang'] : 'en';
-            $languages = array(
+                $allsi_lang_selected = isset( $options['giphy']['lang'] ) ? $options['giphy']['lang'] : 'en';
+                $allsi_languages = array(
                 __( 'English', 'all-sources-images' ) => 'en',
                 __( 'Spanish', 'all-sources-images' ) => 'es',
                 __( 'Portuguese', 'all-sources-images' ) => 'pt',
@@ -102,8 +102,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                 __( 'Japanese', 'all-sources-images' ) => 'ja',
                 __( 'Korean', 'all-sources-images' ) => 'ko',
             );
-            foreach ( $languages as $label => $value ) {
-                    echo '<option value="' . esc_attr( $value ) . '" ' . selected( $lang_selected, $value, false ) . '>' . esc_html( $label ) . '</option>';
+                foreach ( $allsi_languages as $allsi_label => $allsi_value ) {
+                    echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_lang_selected, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>

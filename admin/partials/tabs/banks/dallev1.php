@@ -3,9 +3,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$dalle_options = array();
+
+$allsi_dalle_options = array();
 if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
-	$dalle_options = $options['dallev1'];
+	$allsi_dalle_options = $options['dallev1'];
 }
 ?>
 
@@ -32,7 +33,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 		<label for="hseparator"><?php esc_html_e( 'API Key', 'all-sources-images' ); ?></label>
 	</th>
 	<td id="password-dalle" class="password">
-		<input type="password" name="ALLSI_plugin_banks_settings[dallev1][apikey]" class="form-control" value="<?php echo( isset( $dalle_options['apikey'] ) && !empty( $dalle_options['apikey']) )? esc_attr( $dalle_options['apikey'] ) : ''; ?>" >
+		<input type="password" name="ALLSI_plugin_banks_settings[dallev1][apikey]" class="form-control" value="<?php echo ( isset( $allsi_dalle_options['apikey'] ) && ! empty( $allsi_dalle_options['apikey'] ) ) ? esc_attr( $allsi_dalle_options['apikey'] ) : ''; ?>" >
 		<i id="togglePassword"></i>
 	</td>
 </tr>
@@ -54,17 +55,16 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[dallev1][imgsize]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset( $dalle_options['imgsize'] ) ? $dalle_options['imgsize'] : '1024x1024';
+			$allsi_selected = isset( $allsi_dalle_options['imgsize'] ) ? $allsi_dalle_options['imgsize'] : '1024x1024';
 
-			$sizes = array(
+			$allsi_sizes = array(
 				esc_html__( '1024x1024', 'all-sources-images' )   => '1024x1024',
 				esc_html__( '1792x1024', 'all-sources-images' )   => '1792x1024',
 				esc_html__( '1024x1792', 'all-sources-images' )   => '1024x1792',
 			);
 
-			foreach( $sizes as $name_size => $code_size ) {
-				$choose=($selected == $code_size)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_size ) . '">' . esc_html( $name_size ) . '</option>';
+			foreach( $allsi_sizes as $allsi_name_size => $allsi_code_size ) {
+				echo '<option ' . selected( $allsi_selected, $allsi_code_size, false ) . ' value="' . esc_attr( $allsi_code_size ) . '">' . esc_html( $allsi_name_size ) . '</option>';
 			}
 			?>
 		</select>
@@ -77,7 +77,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ALLSI_plugin_banks_settings[dallev1][convert_jpg]" type="checkbox" value="true" <?php checked( ! empty( $dalle_options['convert_jpg'] ) && $dalle_options['convert_jpg'] == 'true' ); ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[dallev1][convert_jpg]" type="checkbox" value="true" <?php checked( ! empty( $allsi_dalle_options['convert_jpg'] ) && $allsi_dalle_options['convert_jpg'] == 'true' ); ?>><span></span>
 			<?php esc_html_e( 'Convert to Jpeg image extension', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'DALL-E will create a PNG file, click this option if you want to convert the file to a Jpeg image.', 'all-sources-images' ); ?></p>

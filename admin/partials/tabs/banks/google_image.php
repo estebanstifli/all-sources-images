@@ -55,8 +55,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[googleimage][search_country]" class="form-control form-control-lg" >
 			<?php
-				$selected = $options['googleimage']['search_country'];
-				$country_choose = array(
+				$allsi_selected_country = $options['googleimage']['search_country'];
+				$allsi_country_choose   = array(
 					esc_html__( 'English (default)', 'all-sources-images' )     => 'en',
 					esc_html__( 'Afrikaans', 'all-sources-images' )             => 'af',
 					esc_html__( 'Afrikaans', 'all-sources-images' )             => 'af',
@@ -143,11 +143,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 					esc_html__( 'Xhosa', 'all-sources-images' )                 => 'xh',
 					esc_html__( 'Zulu', 'all-sources-images' )                  => 'zu',
 				);
-				//ksort( $country_choose );
+				//ksort( $allsi_country_choose );
 
-				foreach( $country_choose as $name_country => $code_country ) {
-					$choose = ( $selected == $code_country) ? 'selected="selected"': '';
-					echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_country ) . '">' . esc_html( $name_country ) . '</option>';
+				foreach ( $allsi_country_choose as $allsi_name_country => $allsi_code_country ) {
+					echo '<option ' . selected( $allsi_selected_country, $allsi_code_country, false ) . ' value="' . esc_attr( $allsi_code_country ) . '">' . esc_html( $allsi_name_country ) . '</option>';
 				}
 			?>
 		</select>
@@ -161,9 +160,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[googleimage][img_color]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['googleimage']['img_color'];
+			$allsi_selected_color = $options['googleimage']['img_color'];
 
-			$img_color = array(
+			$allsi_img_color = array(
 				esc_html__( '-- Default --', 'all-sources-images' ) => '',
 				esc_html__( 'Black', 'all-sources-images' )         => 'black',
 				esc_html__( 'Blue', 'all-sources-images' )          => 'blue',
@@ -176,11 +175,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'White', 'all-sources-images' )         => 'white',
 				esc_html__( 'Yellow', 'all-sources-images' )        => 'yellow',
 			);
-			ksort( $img_color );
+			ksort( $allsi_img_color );
 
-			foreach( $img_color as $name_color => $code_color ) {
-				$choose=($selected == $code_color)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_color ) . '">' . esc_html( $name_color ) . '</option>';
+			foreach ( $allsi_img_color as $allsi_name_color => $allsi_code_color ) {
+				echo '<option ' . selected( $allsi_selected_color, $allsi_code_color, false ) . ' value="' . esc_attr( $allsi_code_color ) . '">' . esc_html( $allsi_name_color ) . '</option>';
 			}
 			?>
 		</select>
@@ -199,9 +197,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[googleimage][filetype]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['googleimage']['filetype'];
+			$allsi_selected_filetype = $options['googleimage']['filetype'];
 
-			$filetype = array(
+			$allsi_filetype = array(
 				esc_html__( '-- Default --', 'all-sources-images' ) => '',
 				esc_html__( 'jpg', 'all-sources-images' )           => 'jpg',
 				esc_html__( 'png', 'all-sources-images' )           => 'png',
@@ -209,11 +207,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'bmp', 'all-sources-images' )           => 'bmp',
 				esc_html__( 'webp', 'all-sources-images' )          => 'webp'
 			);
-			ksort( $filetype );
+			ksort( $allsi_filetype );
 
-			foreach( $filetype as $name_filetype => $code_filetype ) {
-				$choose=($selected == $code_filetype)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_filetype ) . '">' . esc_html( $name_filetype ) . '</option>';
+			foreach ( $allsi_filetype as $allsi_name_filetype => $allsi_code_filetype ) {
+				echo '<option ' . selected( $allsi_selected_filetype, $allsi_code_filetype, false ) . ' value="' . esc_attr( $allsi_code_filetype ) . '">' . esc_html( $allsi_name_filetype ) . '</option>';
 			}
 			?>
 		</select>
@@ -233,7 +230,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php esc_html_e( 'Choose these options can reduce relevance of results, but permit to use free-to-use images.', 'all-sources-images' ); ?>
 		</p>
 		<?php
-			$rights_array = array(
+			$allsi_rights_array = array(
 				__( 'Publicdomain - <i>restricts search results to images with the publicdomain label.</i>', 'all-sources-images' ) 		=> 'cc_publicdomain',
 				__( 'Attribute - <i>restricts search results to images with the attribute label.</i>', 'all-sources-images' )          => 'cc_attribute',
 				__( 'Sharealike - <i>restricts search results to images with the sharealike label.</i>', 'all-sources-images' )        => 'cc_sharealike',
@@ -241,11 +238,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				__( 'Nonderived - <i>restricts search results to images with the nonderived label.</i>', 'all-sources-images' )     		=> 'cc_nonderived',
 			);
 
-
-			foreach ( $rights_array  as $right => $right_code ) {
-				$checked= ( isset( $options['googleimage']['rights'] ) && !empty( $options['googleimage']['rights'] ) && in_array( $right_code, $options['googleimage']['rights'] ) )? 'checked="checked""' : '';
+			foreach ( $allsi_rights_array as $allsi_right => $allsi_right_code ) {
+				$allsi_is_checked = ( isset( $options['googleimage']['rights'] ) && ! empty( $options['googleimage']['rights'] ) && is_array( $options['googleimage']['rights'] ) && in_array( $allsi_right_code, $options['googleimage']['rights'], true ) );
 				echo '<label class="checkbox">
-					<input ' . esc_attr( $checked ) . ' name="ALLSI_plugin_banks_settings[googleimage][rights][' . esc_attr( $right_code ) . ']" type="checkbox" value="' . esc_attr( $right_code ) . '"> <span></span> ' . wp_kses( $right, array( 'i' => array() ) ) . '
+					<input ' . checked( $allsi_is_checked, true, false ) . ' name="ALLSI_plugin_banks_settings[googleimage][rights][' . esc_attr( $allsi_right_code ) . ']" type="checkbox" value="' . esc_attr( $allsi_right_code ) . '"> <span></span> ' . wp_kses( $allsi_right, array( 'i' => array() ) ) . '
 				</label>';
 			}
 		?>
@@ -260,9 +256,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[googleimage][imgsz]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['googleimage']['imgsz'];
+			$allsi_selected_imgsz = $options['googleimage']['imgsz'];
 
-			$imgsz = array(
+			$allsi_imgsz = array(
 				esc_html__( '-- Default --', 'all-sources-images' ) => '',
 				esc_html__( 'icon', 'all-sources-images' )          => 'icon',
 				esc_html__( 'small', 'all-sources-images' )         => 'small',
@@ -273,9 +269,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'huge', 'all-sources-images' )          => 'huge',
 			);
 
-			foreach( $imgsz as $name_imgsz => $code_imgsz ) {
-				$choose=($selected == $code_imgsz)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgsz ) . '">' . esc_html( $name_imgsz ) . '</option>';
+			foreach ( $allsi_imgsz as $allsi_name_imgsz => $allsi_code_imgsz ) {
+				echo '<option ' . selected( $allsi_selected_imgsz, $allsi_code_imgsz, false ) . ' value="' . esc_attr( $allsi_code_imgsz ) . '">' . esc_html( $allsi_name_imgsz ) . '</option>';
 			}
 			?>
 		</select>
@@ -290,9 +285,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[googleimage][imgtype]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['googleimage']['imgtype'];
+			$allsi_selected_imgtype = $options['googleimage']['imgtype'];
 
-			$imgtype = array(
+			$allsi_imgtype = array(
 				esc_html__( '-- Default --', 'all-sources-images' ) => '',
 				esc_html__( 'Face', 'all-sources-images' )          => 'face',
 				esc_html__( 'Photo', 'all-sources-images' )         => 'photo',
@@ -300,9 +295,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'Lineart', 'all-sources-images' )       => 'lineart',
 			);
 
-			foreach( $imgtype as $name_imgtype => $code_imgtype ) {
-				$choose=($selected == $code_imgtype)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgtype ) . '">' . esc_html( $name_imgtype ) . '</option>';
+			foreach ( $allsi_imgtype as $allsi_name_imgtype => $allsi_code_imgtype ) {
+				echo '<option ' . selected( $allsi_selected_imgtype, $allsi_code_imgtype, false ) . ' value="' . esc_attr( $allsi_code_imgtype ) . '">' . esc_html( $allsi_name_imgtype ) . '</option>';
 			}
 			?>
 		</select>
@@ -316,17 +310,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[googleimage][safe]" class="form-control form-control-lg" >
 			<?php
-			$selected = $options['googleimage']['safe'];
+			$allsi_selected_safe = $options['googleimage']['safe'];
 
-			$safe = array(
+			$allsi_safe = array(
 				esc_html__( 'Moderate (default)', 'all-sources-images' ) => 'moderate',
 				esc_html__( 'Active', 'all-sources-images' )             => 'activate',
 				esc_html__( 'Off', 'all-sources-images' )                => 'off',
 			);
 
-			foreach( $safe as $name_safe => $code_safe ) {
-				$choose = ( $selected == $code_safe ) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_safe ) . '">' . esc_html( $name_safe ) . '</option>';
+			foreach ( $allsi_safe as $allsi_name_safe => $allsi_code_safe ) {
+				echo '<option ' . selected( $allsi_selected_safe, $allsi_code_safe, false ) . ' value="' . esc_attr( $allsi_code_safe ) . '">' . esc_html( $allsi_name_safe ) . '</option>';
 			}
 			?>
 		</select>

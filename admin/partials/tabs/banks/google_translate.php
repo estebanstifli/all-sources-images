@@ -3,9 +3,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$options = wp_parse_args(
-    get_option('ALLSI_plugin_banks_settings'),
-    $this->ALLSI_default_options_banks_settings(TRUE)
+$allsi_options = wp_parse_args(
+    get_option( 'ALLSI_plugin_banks_settings' ),
+    $this->ALLSI_default_options_banks_settings( true )
 );
 ?>
 
@@ -14,7 +14,7 @@ $options = wp_parse_args(
         <label for="hseparator"><?php esc_html_e('Google Translate API Key (Optional)', 'all-sources-images'); ?></label>
     </th>
     <td>
-        <input name="ALLSI_plugin_banks_settings[google_translate][apikey]" type="text" class="form-control form-control-lg" placeholder="<?php esc_html_e('Leave empty to use free translation', 'all-sources-images'); ?>" value="<?php echo (!empty($options['google_translate']['apikey']) ? esc_attr($options['google_translate']['apikey']) : ''); ?>" />
+        <input name="ALLSI_plugin_banks_settings[google_translate][apikey]" type="text" class="form-control form-control-lg" placeholder="<?php esc_html_e('Leave empty to use free translation', 'all-sources-images'); ?>" value="<?php echo ( ! empty( $allsi_options['google_translate']['apikey'] ) ? esc_attr( $allsi_options['google_translate']['apikey'] ) : '' ); ?>" />
         <p class="description">
             <?php esc_html_e('Optional: Provide your Google Cloud Translation API key for better quality and reliability. If left empty, the plugin will use the free Google Translate service.', 'all-sources-images'); ?>
             <br>

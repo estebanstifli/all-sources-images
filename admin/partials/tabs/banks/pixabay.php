@@ -40,40 +40,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</button>
 		<span id="resultPixabay"><img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . '../../../img/loader-mpt.gif' ); ?>" width="32" class="hidden"/></span>
 	</td>
-</tr>
+	</tr>
 
+	<tr valign="top">
+		<td colspan="2">
+			<hr/>
+		</td>
+	</tr>
 
-<tr valign="top">
-	<td colspan="2">
-		<hr/>
-	</td>
-</tr>
+	<tr valign="top">
+		<th scope="row">
+			<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
+		</th>
+		<td>
+			<select name="ALLSI_plugin_banks_settings[pixabay][imgtype]" class="form-control" >
+				<?php
+				$allsi_selected_imgtype = $options['pixabay']['imgtype'];
 
+				$allsi_imgtype = array(
+					__( '-- All --', 'all-sources-images' )        => 'all',
+					__( 'Photo', 'all-sources-images' )            => 'photo',
+					__( 'Illustration', 'all-sources-images' )     => 'illustration',
+					__( 'Vector image', 'all-sources-images' )     => 'vector',
+				);
 
-<tr valign="top">
-	<th scope="row">
-		<label for="hseparator"><?php esc_html_e( 'Image Type', 'all-sources-images' ); ?></label>
-	</th>
-	<td>
-		<select name="ALLSI_plugin_banks_settings[pixabay][imgtype]" class="form-control" >
-			<?php
-			$selected = $options['pixabay']['imgtype'];
-
-			$imgtype = array(
-				__( '-- All --', 'all-sources-images' )		=> 'all',
-				__( 'Photo', 'all-sources-images' )				=> 'photo',
-				__( 'Illustration', 'all-sources-images' )	=> 'illustration',
-				__( 'Vector image', 'all-sources-images' )				=> 'vector',
-			);
-
-			foreach( $imgtype as $name_imgtype => $code_imgtype ) {
-				$choose=($selected == $code_imgtype)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_imgtype ) . '">' . esc_html( $name_imgtype ) . '</option>';
-			}
-			?>
-		</select>
-	</td>
-</tr>
+				foreach ( $allsi_imgtype as $allsi_name_imgtype => $allsi_code_imgtype ) {
+					echo '<option ' . selected( $allsi_selected_imgtype, $allsi_code_imgtype, false ) . ' value="' . esc_attr( $allsi_code_imgtype ) . '">' . esc_html( $allsi_name_imgtype ) . '</option>';
+				}
+				?>
+			</select>
+		</td>
+	</tr>
 
 <tr valign="top">
 	<th scope="row">
@@ -83,8 +80,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<select name="ALLSI_plugin_banks_settings[pixabay][search_country]" class="form-control" >
 			<?php
 
-				$selected = $options['pixabay']['search_country'];
-				$country_choose = array(
+				$allsi_selected_country = $options['pixabay']['search_country'];
+				$allsi_country_choose   = array(
 					__( 'Czech', 'all-sources-images' )				=> 'cs',
 					__( 'Danish', 'all-sources-images' )				=> 'da',
 					__( 'German', 'all-sources-images' )				=> 'de',
@@ -112,11 +109,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 					__( 'Korean', 'all-sources-images' )				=> 'ko',
 					__( 'Chinese', 'all-sources-images' )			=> 'zh',
 				);
-				ksort( $country_choose );
+				ksort( $allsi_country_choose );
 
-				foreach( $country_choose as $name_country => $code_country ) {
-					$choose=($selected == $code_country)?'selected="selected"': '';
-					echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_country ) . '">' . esc_html( $name_country ) . '</option>';
+				foreach ( $allsi_country_choose as $allsi_name_country => $allsi_code_country ) {
+					echo '<option ' . selected( $allsi_selected_country, $allsi_code_country, false ) . ' value="' . esc_attr( $allsi_code_country ) . '">' . esc_html( $allsi_name_country ) . '</option>';
 				}
 			?>
 		</select>
@@ -130,17 +126,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pixabay][orientation]" class="form-control" >
 			<?php
-			$selected = $options['pixabay']['orientation'];
+			$allsi_selected_orientation = $options['pixabay']['orientation'];
 
-			$orientation = array(
+			$allsi_orientation = array(
 				__( '-- All --', 'all-sources-images' )	=> 'all',
 				__( 'Horizontal', 'all-sources-images' )	=> 'horizontal',
 				__( 'Vertical', 'all-sources-images' )		=> 'vertical',
 			);
 
-			foreach( $orientation as $name_orientation => $code_orientation ) {
-				$choose=($selected == $code_orientation)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_orientation ) . '">' . esc_html( $name_orientation ) . '</option>';
+			foreach ( $allsi_orientation as $allsi_name_orientation => $allsi_code_orientation ) {
+				echo '<option ' . selected( $allsi_selected_orientation, $allsi_code_orientation, false ) . ' value="' . esc_attr( $allsi_code_orientation ) . '">' . esc_html( $allsi_name_orientation ) . '</option>';
 			}
 			?>
 		</select>
@@ -179,16 +174,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[pixabay][safesearch]" class="form-control" >
 			<?php
-			$selected = $options['pixabay']['safesearch'];
+			$allsi_selected_safesearch = $options['pixabay']['safesearch'];
 
-			$safesearch = array(
+			$allsi_safesearch = array(
 				__( 'Off', 'all-sources-images' )		=> 'false',
 				__( 'Active', 'all-sources-images' )	=> 'true',
 			);
 
-			foreach( $safesearch as $name_safesearch => $code_safesearch ) {
-				$choose=($selected == $code_safesearch)?'selected="selected"': '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_safesearch ) . '">' . esc_html( $name_safesearch ) . '</option>';
+			foreach ( $allsi_safesearch as $allsi_name_safesearch => $allsi_code_safesearch ) {
+				echo '<option ' . selected( $allsi_selected_safesearch, $allsi_code_safesearch, false ) . ' value="' . esc_attr( $allsi_code_safesearch ) . '">' . esc_html( $allsi_name_safesearch ) . '</option>';
 			}
 			?>
 		</select>

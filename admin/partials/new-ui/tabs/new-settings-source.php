@@ -1,5 +1,7 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 /**
  * New Settings - Source Tab
@@ -15,71 +17,78 @@ settings_errors();
 
             <?php 
 settings_fields( 'ASI-plugin-banks-settings' );
-$options = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( FALSE ) );
+$allsi_options = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( false ) );
 // Remove 'envato' from saved options if present (Envato Elements no longer working)
-if ( isset( $options['api_chosen_auto'] ) && is_array( $options['api_chosen_auto'] ) ) {
-    unset($options['api_chosen_auto']['envato']);
-    unset($options['api_chosen_auto']['google_translate']);
+if ( isset( $allsi_options['api_chosen_auto'] ) && is_array( $allsi_options['api_chosen_auto'] ) ) {
+    unset( $allsi_options['api_chosen_auto']['envato'] );
+    unset( $allsi_options['api_chosen_auto']['google_translate'] );
 }
-if ( isset( $options['api_chosen_manual'] ) && is_array( $options['api_chosen_manual'] ) ) {
-    unset($options['api_chosen_manual']['envato']);
+if ( isset( $allsi_options['api_chosen_manual'] ) && is_array( $allsi_options['api_chosen_manual'] ) ) {
+    unset( $allsi_options['api_chosen_manual']['envato'] );
 }
-if ( isset( $options['api_chosen'] ) && 'envato' === $options['api_chosen'] ) {
-    $options['api_chosen'] = '';
+if ( isset( $allsi_options['api_chosen'] ) && 'envato' === $allsi_options['api_chosen'] ) {
+    $allsi_options['api_chosen'] = '';
 }
 
 /* Banks for Manual Search with Gutenberg Block - Only Manual for this page */
-$list_api_manual = $this->ALLSI_banks_name_manual();
-$ai_sources = method_exists( $this, 'ALLSI_ai_source_codes' ) ? $this->ALLSI_ai_source_codes() : array('dallev1', 'stability', 'replicate');
-$render_source_badge = function( $slug ) use ( $ai_sources ) {
-    if ( ! in_array( $slug, $ai_sources, true ) ) {
+$allsi_list_api_manual = $this->ALLSI_banks_name_manual();
+$allsi_ai_sources      = method_exists( $this, 'ALLSI_ai_source_codes' ) ? $this->ALLSI_ai_source_codes() : array( 'dallev1', 'stability', 'replicate' );
+$allsi_render_source_badge = function( $allsi_slug ) use ( $allsi_ai_sources ) {
+    if ( ! in_array( $allsi_slug, $allsi_ai_sources, true ) ) {
         return '';
     }
 
     return '<span class="allsi-source-badge"><span class="allsi-source-dot"></span><span class="allsi-source-badge__label">' . esc_html__( 'AI', 'all-sources-images' ) . '</span></span>';
 };
 
-$render_checkboxes = function( $items, $option_key ) use ( $options, $render_source_badge ) {
-    if ( empty( $items ) ) {
+$allsi_render_checkboxes = function( $allsi_items, $allsi_option_key ) use ( $allsi_options, $allsi_render_source_badge ) {
+    if ( empty( $allsi_items ) ) {
         echo '<p class="description">' . esc_html__( 'No sources available yet.', 'all-sources-images' ) . '</p>';
         return;
     }
 
-    $default_bank_order = 99;
-    $rendered_list      = array();
-    $selected_options   = ( isset( $options[$option_key] ) && is_array( $options[$option_key] ) ) ? $options[$option_key] : array();
-    $order_api_chosen   = array_keys( $selected_options );
+    $allsi_default_bank_order = 99;
+    $allsi_rendered_list      = array();
+    $allsi_selected_options   = ( isset( $allsi_options[ $allsi_option_key ] ) && is_array( $allsi_options[ $allsi_option_key ] ) ) ? $allsi_options[ $allsi_option_key ] : array();
+    $allsi_order_api_chosen   = array_keys( $allsi_selected_options );
 
-    foreach ( $items as $api => $api_code ) {
-        $slug = isset( $api_code[0] ) ? $api_code[0] : '';
-        $checked = ( !empty( $selected_options ) && in_array( $slug, $selected_options, true ) ) ? 'checked="checked"' : '';
-        $key_api_chosen = is_array( $order_api_chosen ) ? array_search( $slug, $order_api_chosen, true ) : false;
-        if ( false === $key_api_chosen || ( isset( $rendered_list[0] ) && 0 == $key_api_chosen ) ) {
-            $key_api_chosen = $default_bank_order;
-            $default_bank_order++;
+    foreach ( $allsi_items as $allsi_api => $allsi_api_code ) {
+        $allsi_slug        = isset( $allsi_api_code[0] ) ? $allsi_api_code[0] : '';
+        $allsi_is_selected = ( ! empty( $allsi_selected_options ) && in_array( $allsi_slug, $allsi_selected_options, true ) );
+
+        $allsi_key_api_chosen = is_array( $allsi_order_api_chosen ) ? array_search( $allsi_slug, $allsi_order_api_chosen, true ) : false;
+        if ( false === $allsi_key_api_chosen || ( isset( $allsi_rendered_list[0] ) && 0 == $allsi_key_api_chosen ) ) {
+            $allsi_key_api_chosen = $allsi_default_bank_order;
+            $allsi_default_bank_order++;
         }
 
-        $disabled       = 'disabled';
-        $class_disabled = 'checkbox-disabled';
-        if ( true === $api_code[1] ) {
-            $disabled       = '';
-            $class_disabled = '';
+        $allsi_is_disabled  = true;
+        $allsi_class_disabled = 'checkbox-disabled';
+        if ( true === $allsi_api_code[1] ) {
+            $allsi_is_disabled    = false;
+            $allsi_class_disabled = '';
         } else {
-            $checked = '';
+            $allsi_is_selected = false;
         }
 
-        $badge_markup = $render_source_badge( $slug );
+        $allsi_badge_markup = $allsi_render_source_badge( $allsi_slug );
 
-        $rendered_list[$key_api_chosen] = '<li><label class="checkbox ' . esc_attr( $class_disabled ) . '"><input class="ordered-checkbox" data-order="' . esc_attr( $key_api_chosen ) . '" type="checkbox" ' . esc_attr( $checked ) . ' ' . esc_attr( $disabled ) . ' value="' . esc_attr( $slug ) . '" name="ALLSI_plugin_banks_settings[' . esc_attr( $option_key ) . '][' . esc_attr( $slug ) . ']"> <span></span> ' . esc_html( $api ) . ' ' . $badge_markup . '</label></li>';
+        $allsi_rendered_list[ $allsi_key_api_chosen ] = '<li><label class="checkbox ' . esc_attr( $allsi_class_disabled ) . '"><input class="ordered-checkbox" data-order="' . esc_attr( $allsi_key_api_chosen ) . '" type="checkbox" ' . checked( $allsi_is_selected, true, false ) . ' ' . disabled( $allsi_is_disabled, true, false ) . ' value="' . esc_attr( $allsi_slug ) . '" name="ALLSI_plugin_banks_settings[' . esc_attr( $allsi_option_key ) . '][' . esc_attr( $allsi_slug ) . ']"> <span></span> ' . esc_html( $allsi_api ) . ' ' . $allsi_badge_markup . '</label></li>';
     }
 
-    ksort( $rendered_list );
+    ksort( $allsi_rendered_list );
 
     echo '<ul class="radio-list">';
-    foreach ( $rendered_list as $rendered_item ) {
-        echo $rendered_item; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    foreach ( $allsi_rendered_list as $allsi_rendered_item ) {
+        echo $allsi_rendered_item; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
     echo '</ul>';
+};
+
+$allsi_include_bank_partial = function( $allsi_bank_slug ) use ( $allsi_options ) {
+    // Bank partials expect "$options" to be available.
+    $options = $allsi_options;
+    include plugin_dir_path( __FILE__ ) . '../../tabs/banks/' . $allsi_bank_slug . '.php';
 };
 ?>
 
@@ -117,7 +126,7 @@ esc_html_e( 'Used when picking images manually inside the editor.', 'all-sources
 ?></p>
 
 				   <?php 
-$render_checkboxes( $list_api_manual, 'api_chosen_manual' );
+$allsi_render_checkboxes( $allsi_list_api_manual, 'api_chosen_manual' );
 ?>
                  </td>
 	              </tr>
@@ -133,28 +142,28 @@ esc_html_e( 'Source Settings', 'all-sources-images' );
 			<div id="tabs" class="allsi-tabs">
 				<ul>
 					<?php 
-$a = 0;
-foreach ( $list_api_manual as $api => $api_code ) {
-    if ( false === $api_code[1] ) {
+$allsi_tab_index = 0;
+foreach ( $allsi_list_api_manual as $allsi_api => $allsi_api_code ) {
+    if ( false === $allsi_api_code[1] ) {
         continue;
     }
-    echo '<li><a href="#tab-' . esc_attr( $a ) . '">' . esc_html( $api ) . '</a></li>';
-    $a++;
+    echo '<li><a href="#tab-' . esc_attr( $allsi_tab_index ) . '">' . esc_html( $allsi_api ) . '</a></li>';
+    $allsi_tab_index++;
 }
 ?>
 				</ul>
 				<?php 
-$a = 0;
-foreach ( $list_api_manual as $api => $api_code ) {
-    if ( false === $api_code[1] ) {
+$allsi_tab_index = 0;
+foreach ( $allsi_list_api_manual as $allsi_api => $allsi_api_code ) {
+    if ( false === $allsi_api_code[1] ) {
         continue;
     }
-    echo '<table id="tab-' . esc_attr( $a ) . '" class="form-table" >';
+    echo '<table id="tab-' . esc_attr( $allsi_tab_index ) . '" class="form-table" >';
     echo '<tbody>';
-    include_once plugin_dir_path( __FILE__ ) . '../../tabs/banks/' . $api_code[0] . '.php';
+    $allsi_include_bank_partial( $allsi_api_code[0] );
     echo '</tbody>';
     echo '</table>';
-    $a++;
+    $allsi_tab_index++;
 }
 ?>
 			</div>

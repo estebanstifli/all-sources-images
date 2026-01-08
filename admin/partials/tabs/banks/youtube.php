@@ -1,18 +1,20 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 /**
  * YouTube Data API v3 Configuration
  */
 
-$options = get_option('ALLSI_plugin_banks_settings');
-$apikey = isset($options['youtube']['apikey']) ? $options['youtube']['apikey'] : '';
-$thumbnail_quality = isset($options['youtube']['thumbnail_quality']) ? $options['youtube']['thumbnail_quality'] : 'high';
-$search_order = isset($options['youtube']['search_order']) ? $options['youtube']['search_order'] : 'relevance';
-$video_duration = isset($options['youtube']['video_duration']) ? $options['youtube']['video_duration'] : 'any';
-$safe_search = isset($options['youtube']['safe_search']) ? $options['youtube']['safe_search'] : 'moderate';
-$max_results = isset($options['youtube']['max_results']) ? $options['youtube']['max_results'] : 5;
-$region_code = isset($options['youtube']['region_code']) ? $options['youtube']['region_code'] : '';
+$allsi_options           = get_option( 'ALLSI_plugin_banks_settings' );
+$allsi_apikey            = isset( $allsi_options['youtube']['apikey'] ) ? $allsi_options['youtube']['apikey'] : '';
+$allsi_thumbnail_quality = isset( $allsi_options['youtube']['thumbnail_quality'] ) ? $allsi_options['youtube']['thumbnail_quality'] : 'high';
+$allsi_search_order      = isset( $allsi_options['youtube']['search_order'] ) ? $allsi_options['youtube']['search_order'] : 'relevance';
+$allsi_video_duration    = isset( $allsi_options['youtube']['video_duration'] ) ? $allsi_options['youtube']['video_duration'] : 'any';
+$allsi_safe_search       = isset( $allsi_options['youtube']['safe_search'] ) ? $allsi_options['youtube']['safe_search'] : 'moderate';
+$allsi_max_results       = isset( $allsi_options['youtube']['max_results'] ) ? $allsi_options['youtube']['max_results'] : 5;
+$allsi_region_code       = isset( $allsi_options['youtube']['region_code'] ) ? $allsi_options['youtube']['region_code'] : '';
 ?>
 
 <tr>
@@ -53,7 +55,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('API Key', 'all-sources-images'); ?></td>
     <td id="password-youtube" class="password">
-        <input type="password" class="form-control" name="ALLSI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr($apikey); ?>" />
+        <input type="password" class="form-control" name="ALLSI_plugin_banks_settings[youtube][apikey]" value="<?php echo esc_attr( $allsi_apikey ); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
     </td>
 </tr>
@@ -75,16 +77,15 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td>
         <select name="ALLSI_plugin_banks_settings[youtube][thumbnail_quality]">
             <?php
-            $qualities = array(
-                'default' => __('Default (120x90px)', 'all-sources-images'),
-                'medium' => __('Medium (320x180px)', 'all-sources-images'),
-                'high' => __('High (480x360px - Recommended)', 'all-sources-images'),
-                'standard' => __('Standard (640x480px)', 'all-sources-images'),
-                'maxresdefault' => __('Max Resolution (1280x720px - may not exist)', 'all-sources-images')
+            $allsi_qualities = array(
+                'default'      => __( 'Default (120x90px)', 'all-sources-images' ),
+                'medium'       => __( 'Medium (320x180px)', 'all-sources-images' ),
+                'high'         => __( 'High (480x360px - Recommended)', 'all-sources-images' ),
+                'standard'     => __( 'Standard (640x480px)', 'all-sources-images' ),
+                'maxresdefault' => __( 'Max Resolution (1280x720px - may not exist)', 'all-sources-images' ),
             );
-            foreach ($qualities as $value => $label) {
-                $selected = ($thumbnail_quality == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_qualities as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_thumbnail_quality, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -97,16 +98,15 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td>
         <select name="ALLSI_plugin_banks_settings[youtube][search_order]">
             <?php
-            $orders = array(
-                'relevance' => __('Relevance (Default)', 'all-sources-images'),
-                'date' => __('Upload Date (Newest first)', 'all-sources-images'),
-                'rating' => __('Rating (Highest first)', 'all-sources-images'),
-                'viewCount' => __('View Count (Most viewed)', 'all-sources-images'),
-                'title' => __('Title (Alphabetical)', 'all-sources-images')
+            $allsi_orders = array(
+                'relevance' => __( 'Relevance (Default)', 'all-sources-images' ),
+                'date'      => __( 'Upload Date (Newest first)', 'all-sources-images' ),
+                'rating'    => __( 'Rating (Highest first)', 'all-sources-images' ),
+                'viewCount' => __( 'View Count (Most viewed)', 'all-sources-images' ),
+                'title'     => __( 'Title (Alphabetical)', 'all-sources-images' ),
             );
-            foreach ($orders as $value => $label) {
-                $selected = ($search_order == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_orders as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_search_order, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -119,15 +119,14 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td>
         <select name="ALLSI_plugin_banks_settings[youtube][video_duration]">
             <?php
-            $durations = array(
-                'any' => __('Any Duration', 'all-sources-images'),
-                'short' => __('Short (< 4 minutes)', 'all-sources-images'),
-                'medium' => __('Medium (4-20 minutes)', 'all-sources-images'),
-                'long' => __('Long (> 20 minutes)', 'all-sources-images')
+            $allsi_durations = array(
+                'any'    => __( 'Any Duration', 'all-sources-images' ),
+                'short'  => __( 'Short (< 4 minutes)', 'all-sources-images' ),
+                'medium' => __( 'Medium (4-20 minutes)', 'all-sources-images' ),
+                'long'   => __( 'Long (> 20 minutes)', 'all-sources-images' ),
             );
-            foreach ($durations as $value => $label) {
-                $selected = ($video_duration == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_durations as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_video_duration, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -140,14 +139,13 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td>
         <select name="ALLSI_plugin_banks_settings[youtube][safe_search]">
             <?php
-            $safe_search_options = array(
-                'none' => __('None (No filtering)', 'all-sources-images'),
-                'moderate' => __('Moderate (Filter restricted content - Default)', 'all-sources-images'),
-                'strict' => __('Strict (Filter all sensitive content)', 'all-sources-images')
+            $allsi_safe_search_options = array(
+                'none'     => __( 'None (No filtering)', 'all-sources-images' ),
+                'moderate' => __( 'Moderate (Filter restricted content - Default)', 'all-sources-images' ),
+                'strict'   => __( 'Strict (Filter all sensitive content)', 'all-sources-images' ),
             );
-            foreach ($safe_search_options as $value => $label) {
-                $selected = ($safe_search == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_safe_search_options as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_safe_search, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -160,17 +158,16 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
     <td>
         <select name="ALLSI_plugin_banks_settings[youtube][max_results]">
             <?php
-            $max_results_options = array(
-                5 => '5',
+            $allsi_max_results_options = array(
+                5  => '5',
                 10 => '10',
                 15 => '15',
                 20 => '20',
                 25 => '25',
-                50 => '50 (Max per request)'
+                50 => '50 (Max per request)',
             );
-            foreach ($max_results_options as $value => $label) {
-                $selected = ($max_results == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_max_results_options as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_max_results, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -181,7 +178,7 @@ $region_code = isset($options['youtube']['region_code']) ? $options['youtube']['
 <tr>
     <td><?php esc_html_e('Region Code', 'all-sources-images'); ?></td>
     <td>
-        <input type="text" class="regular-text" name="ALLSI_plugin_banks_settings[youtube][region_code]" value="<?php echo esc_attr($region_code); ?>" maxlength="2" placeholder="US" />
+        <input type="text" class="regular-text" name="ALLSI_plugin_banks_settings[youtube][region_code]" value="<?php echo esc_attr( $allsi_region_code ); ?>" maxlength="2" placeholder="US" />
         <p class="description"><?php esc_html_e('Optional 2-letter ISO 3166-1 country code (e.g., US, GB, ES, FR, DE). Filters videos viewable in specified region.', 'all-sources-images'); ?></p>
     </td>
 </tr>

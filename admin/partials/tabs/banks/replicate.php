@@ -45,9 +45,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[replicate][model]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['replicate']['model']) ? $options['replicate']['model'] : 'black-forest-labs/flux-schnell';
+			$allsi_selected_model = isset( $options['replicate']['model'] ) ? $options['replicate']['model'] : 'black-forest-labs/flux-schnell';
 
-			$models = array(
+			$allsi_models = array(
 				// FLUX Models (Black Forest Labs)
 				esc_html__( 'FLUX.1 [schnell] - Fast, high-quality', 'all-sources-images' )                => 'black-forest-labs/flux-schnell',
 				esc_html__( 'FLUX.1 [dev] - Development version', 'all-sources-images' )                   => 'black-forest-labs/flux-dev',
@@ -85,9 +85,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( 'Custom Model (specify in version field)', 'all-sources-images' )              => 'custom',
 			);
 
-			foreach( $models as $name_model => $code_model ) {
-				$choose = ($selected == $code_model) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_model ) . '">' . esc_html( $name_model ) . '</option>';
+			foreach ( $allsi_models as $allsi_name_model => $allsi_code_model ) {
+				echo '<option ' . selected( $allsi_selected_model, $allsi_code_model, false ) . ' value="' . esc_attr( $allsi_code_model ) . '">' . esc_html( $allsi_name_model ) . '</option>';
 			}
 			?>
 		</select>
@@ -112,9 +111,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[replicate][timeout]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['replicate']['timeout']) ? $options['replicate']['timeout'] : '60';
+			$allsi_selected_timeout = isset( $options['replicate']['timeout'] ) ? $options['replicate']['timeout'] : '60';
 
-			$timeouts = array(
+			$allsi_timeouts = array(
 				esc_html__( '30 seconds', 'all-sources-images' )  => '30',
 				esc_html__( '60 seconds', 'all-sources-images' )  => '60',
 				esc_html__( '90 seconds', 'all-sources-images' )  => '90',
@@ -123,9 +122,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( '300 seconds', 'all-sources-images' ) => '300',
 			);
 
-			foreach( $timeouts as $name_timeout => $code_timeout ) {
-				$choose = ($selected == $code_timeout) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_timeout ) . '">' . esc_html( $name_timeout ) . '</option>';
+			foreach ( $allsi_timeouts as $allsi_name_timeout => $allsi_code_timeout ) {
+				echo '<option ' . selected( $allsi_selected_timeout, $allsi_code_timeout, false ) . ' value="' . esc_attr( $allsi_code_timeout ) . '">' . esc_html( $allsi_name_timeout ) . '</option>';
 			}
 			?>
 		</select>
@@ -140,9 +138,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[replicate][polling_interval]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['replicate']['polling_interval']) ? $options['replicate']['polling_interval'] : '2';
+			$allsi_selected_interval = isset( $options['replicate']['polling_interval'] ) ? $options['replicate']['polling_interval'] : '2';
 
-			$intervals = array(
+			$allsi_intervals = array(
 				esc_html__( '1 second', 'all-sources-images' )  => '1',
 				esc_html__( '2 seconds', 'all-sources-images' ) => '2',
 				esc_html__( '3 seconds', 'all-sources-images' ) => '3',
@@ -150,9 +148,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( '10 seconds', 'all-sources-images' )=> '10',
 			);
 
-			foreach( $intervals as $name_interval => $code_interval ) {
-				$choose = ($selected == $code_interval) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_interval ) . '">' . esc_html( $name_interval ) . '</option>';
+			foreach ( $allsi_intervals as $allsi_name_interval => $allsi_code_interval ) {
+				echo '<option ' . selected( $allsi_selected_interval, $allsi_code_interval, false ) . ' value="' . esc_attr( $allsi_code_interval ) . '">' . esc_html( $allsi_name_interval ) . '</option>';
 			}
 			?>
 		</select>
@@ -177,9 +174,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td class="checkbox-list">
 		<select name="ALLSI_plugin_banks_settings[replicate][image_size]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['replicate']['image_size']) ? $options['replicate']['image_size'] : '1024x1024';
+			$allsi_selected_image_size = isset( $options['replicate']['image_size'] ) ? $options['replicate']['image_size'] : '1024x1024';
 
-			$sizes = array(
+			$allsi_sizes = array(
 				esc_html__( '512x512', 'all-sources-images' )   => '512x512',
 				esc_html__( '768x768', 'all-sources-images' )   => '768x768',
 				esc_html__( '1024x1024', 'all-sources-images' ) => '1024x1024',
@@ -187,9 +184,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				esc_html__( '1920x1080', 'all-sources-images' ) => '1920x1080',
 			);
 
-			foreach( $sizes as $name_size => $code_size ) {
-				$choose = ($selected == $code_size) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_size ) . '">' . esc_html( $name_size ) . '</option>';
+			foreach ( $allsi_sizes as $allsi_name_size => $allsi_code_size ) {
+				echo '<option ' . selected( $allsi_selected_image_size, $allsi_code_size, false ) . ' value="' . esc_attr( $allsi_code_size ) . '">' . esc_html( $allsi_name_size ) . '</option>';
 			}
 			?>
 		</select>
@@ -214,17 +210,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<td>
 		<select name="ALLSI_plugin_banks_settings[replicate][num_outputs]" class="form-control form-control-lg" >
 			<?php
-			$selected = isset($options['replicate']['num_outputs']) ? $options['replicate']['num_outputs'] : '1';
+			$allsi_selected_num_outputs = isset( $options['replicate']['num_outputs'] ) ? $options['replicate']['num_outputs'] : '1';
 
-			$outputs = array(
+			$allsi_outputs = array(
 				esc_html__( '1 image', 'all-sources-images' ) => '1',
 				esc_html__( '2 images', 'all-sources-images' )=> '2',
 				esc_html__( '4 images', 'all-sources-images' )=> '4',
 			);
 
-			foreach( $outputs as $name_output => $code_output ) {
-				$choose = ($selected == $code_output) ? 'selected="selected"' : '';
-				echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_output ) . '">' . esc_html( $name_output ) . '</option>';
+			foreach ( $allsi_outputs as $allsi_name_output => $allsi_code_output ) {
+				echo '<option ' . selected( $allsi_selected_num_outputs, $allsi_code_output, false ) . ' value="' . esc_attr( $allsi_code_output ) . '">' . esc_html( $allsi_name_output ) . '</option>';
 			}
 			?>
 		</select>

@@ -1,19 +1,21 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 /**
  * Unsplash API Configuration
  */
 
-$options = get_option('ALLSI_plugin_banks_settings');
-$apikey = isset($options['unsplash']['apikey']) ? $options['unsplash']['apikey'] : '';
-$orientation = isset($options['unsplash']['orientation']) ? $options['unsplash']['orientation'] : 'all';
-$content_filter = isset($options['unsplash']['content_filter']) ? $options['unsplash']['content_filter'] : 'low';
-$color = isset($options['unsplash']['color']) ? $options['unsplash']['color'] : 'all';
-$per_page = isset($options['unsplash']['per_page']) ? $options['unsplash']['per_page'] : 10;
-$preferred_size = isset($options['unsplash']['preferred_size']) ? $options['unsplash']['preferred_size'] : 'regular';
-$add_attribution = isset($options['unsplash']['add_attribution']) ? $options['unsplash']['add_attribution'] : 'yes';
-$track_downloads = isset($options['unsplash']['track_downloads']) ? $options['unsplash']['track_downloads'] : 'yes';
+$allsi_options         = get_option( 'ALLSI_plugin_banks_settings' );
+$allsi_apikey          = isset( $allsi_options['unsplash']['apikey'] ) ? $allsi_options['unsplash']['apikey'] : '';
+$allsi_orientation     = isset( $allsi_options['unsplash']['orientation'] ) ? $allsi_options['unsplash']['orientation'] : 'all';
+$allsi_content_filter  = isset( $allsi_options['unsplash']['content_filter'] ) ? $allsi_options['unsplash']['content_filter'] : 'low';
+$allsi_color           = isset( $allsi_options['unsplash']['color'] ) ? $allsi_options['unsplash']['color'] : 'all';
+$allsi_per_page        = isset( $allsi_options['unsplash']['per_page'] ) ? $allsi_options['unsplash']['per_page'] : 10;
+$allsi_preferred_size  = isset( $allsi_options['unsplash']['preferred_size'] ) ? $allsi_options['unsplash']['preferred_size'] : 'regular';
+$allsi_add_attribution = isset( $allsi_options['unsplash']['add_attribution'] ) ? $allsi_options['unsplash']['add_attribution'] : 'yes';
+$allsi_track_downloads = isset( $allsi_options['unsplash']['track_downloads'] ) ? $allsi_options['unsplash']['track_downloads'] : 'yes';
 ?>
 
 <tr>
@@ -63,7 +65,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
 <tr>
     <td><?php esc_html_e('Access Key', 'all-sources-images'); ?></td>
     <td id="password-unsplash" class="password">
-        <input type="password" class="form-control" name="ALLSI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr($apikey); ?>" />
+        <input type="password" class="form-control" name="ALLSI_plugin_banks_settings[unsplash][apikey]" value="<?php echo esc_attr( $allsi_apikey ); ?>" />
         <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
     </td>
 </tr>
@@ -85,15 +87,14 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td>
         <select name="ALLSI_plugin_banks_settings[unsplash][orientation]">
             <?php
-            $orientations = array(
-                '' => __('All Orientations', 'all-sources-images'),
-                'landscape' => __('Landscape', 'all-sources-images'),
-                'portrait' => __('Portrait', 'all-sources-images'),
-                'squarish' => __('Square', 'all-sources-images')
+            $allsi_orientations = array(
+                ''          => __( 'All Orientations', 'all-sources-images' ),
+                'landscape' => __( 'Landscape', 'all-sources-images' ),
+                'portrait'  => __( 'Portrait', 'all-sources-images' ),
+                'squarish'  => __( 'Square', 'all-sources-images' ),
             );
-            foreach ($orientations as $value => $label) {
-                $selected = ($orientation === $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_orientations as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_orientation, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -106,13 +107,12 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td>
         <select name="ALLSI_plugin_banks_settings[unsplash][content_filter]">
             <?php
-            $filters = array(
-                'low' => __('Low (Default - No NSFW content)', 'all-sources-images'),
-                'high' => __('High (Family-friendly, suitable for younger audiences)', 'all-sources-images')
+            $allsi_filters = array(
+                'low'  => __( 'Low (Default - No NSFW content)', 'all-sources-images' ),
+                'high' => __( 'High (Family-friendly, suitable for younger audiences)', 'all-sources-images' ),
             );
-            foreach ($filters as $value => $label) {
-                $selected = ($content_filter == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_filters as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_content_filter, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -125,23 +125,22 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td>
         <select name="ALLSI_plugin_banks_settings[unsplash][color]">
             <?php
-            $colors = array(
-                '' => __('All Colors', 'all-sources-images'),
-                'black_and_white' => __('Black & White', 'all-sources-images'),
-                'black' => __('Black', 'all-sources-images'),
-                'white' => __('White', 'all-sources-images'),
-                'yellow' => __('Yellow', 'all-sources-images'),
-                'orange' => __('Orange', 'all-sources-images'),
-                'red' => __('Red', 'all-sources-images'),
-                'purple' => __('Purple', 'all-sources-images'),
-                'magenta' => __('Magenta', 'all-sources-images'),
-                'green' => __('Green', 'all-sources-images'),
-                'teal' => __('Teal', 'all-sources-images'),
-                'blue' => __('Blue', 'all-sources-images')
+            $allsi_colors = array(
+                ''               => __( 'All Colors', 'all-sources-images' ),
+                'black_and_white' => __( 'Black & White', 'all-sources-images' ),
+                'black'          => __( 'Black', 'all-sources-images' ),
+                'white'          => __( 'White', 'all-sources-images' ),
+                'yellow'         => __( 'Yellow', 'all-sources-images' ),
+                'orange'         => __( 'Orange', 'all-sources-images' ),
+                'red'            => __( 'Red', 'all-sources-images' ),
+                'purple'         => __( 'Purple', 'all-sources-images' ),
+                'magenta'        => __( 'Magenta', 'all-sources-images' ),
+                'green'          => __( 'Green', 'all-sources-images' ),
+                'teal'           => __( 'Teal', 'all-sources-images' ),
+                'blue'           => __( 'Blue', 'all-sources-images' ),
             );
-            foreach ($colors as $value => $label) {
-                $selected = ($color === $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_colors as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_color, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -154,15 +153,14 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td>
         <select name="ALLSI_plugin_banks_settings[unsplash][per_page]">
             <?php
-            $per_page_options = array(
+            $allsi_per_page_options = array(
                 10 => '10',
                 15 => '15',
                 20 => '20',
-                30 => '30 (Max)'
+                30 => '30 (Max)',
             );
-            foreach ($per_page_options as $value => $label) {
-                $selected = ($per_page == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_per_page_options as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_per_page, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -175,16 +173,15 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td>
         <select name="ALLSI_plugin_banks_settings[unsplash][preferred_size]">
             <?php
-            $sizes = array(
-                'raw' => __('Raw (Original unprocessed)', 'all-sources-images'),
-                'full' => __('Full (Max quality JPEG, jpg&q=80)', 'all-sources-images'),
-                'regular' => __('Regular (1080px wide, default)', 'all-sources-images'),
-                'small' => __('Small (400px wide)', 'all-sources-images'),
-                'thumb' => __('Thumbnail (200px wide)', 'all-sources-images')
+            $allsi_sizes = array(
+                'raw'     => __( 'Raw (Original unprocessed)', 'all-sources-images' ),
+                'full'    => __( 'Full (Max quality JPEG, jpg&q=80)', 'all-sources-images' ),
+                'regular' => __( 'Regular (1080px wide, default)', 'all-sources-images' ),
+                'small'   => __( 'Small (400px wide)', 'all-sources-images' ),
+                'thumb'   => __( 'Thumbnail (200px wide)', 'all-sources-images' ),
             );
-            foreach ($sizes as $value => $label) {
-                $selected = ($preferred_size == $value) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr($value) . '" ' . esc_attr( $selected ) . '>' . esc_html($label) . '</option>';
+            foreach ( $allsi_sizes as $allsi_value => $allsi_label ) {
+                echo '<option value="' . esc_attr( $allsi_value ) . '" ' . selected( $allsi_preferred_size, $allsi_value, false ) . '>' . esc_html( $allsi_label ) . '</option>';
             }
             ?>
         </select>
@@ -196,7 +193,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td><?php esc_html_e('Auto-add Attribution', 'all-sources-images'); ?></td>
     <td>
         <label class="checkbox">
-            <input type="checkbox" name="ALLSI_plugin_banks_settings[unsplash][add_attribution]" value="yes" <?php checked($add_attribution, 'yes'); ?> />
+            <input type="checkbox" name="ALLSI_plugin_banks_settings[unsplash][add_attribution]" value="yes" <?php checked( $allsi_add_attribution, 'yes' ); ?> />
             <span></span>
             <?php esc_html_e('Automatically add photographer credit to image caption', 'all-sources-images'); ?>
         </label>
@@ -208,7 +205,7 @@ $track_downloads = isset($options['unsplash']['track_downloads']) ? $options['un
     <td><?php esc_html_e('Track Downloads', 'all-sources-images'); ?></td>
     <td>
         <label class="checkbox">
-            <input type="checkbox" name="ALLSI_plugin_banks_settings[unsplash][track_downloads]" value="yes" <?php checked($track_downloads, 'yes'); ?> />
+            <input type="checkbox" name="ALLSI_plugin_banks_settings[unsplash][track_downloads]" value="yes" <?php checked( $allsi_track_downloads, 'yes' ); ?> />
             <span></span>
             <?php esc_html_e('Trigger download tracking endpoint (REQUIRED by Unsplash TOS)', 'all-sources-images'); ?>
         </label>
