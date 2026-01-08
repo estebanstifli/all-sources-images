@@ -34,7 +34,7 @@ if ( !defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 if ( ! defined( 'ALLSI_DEBUG' ) ) {
-    define( 'ALLSI_DEBUG', false );
+    define( 'ALLSI_DEBUG', true );
 }
 
 if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {

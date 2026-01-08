@@ -270,28 +270,87 @@ class ALLSI_Bulk_Generation_DB {
 
         $args = wp_parse_args( $args, $defaults );
 
-        $where = "WHERE 1=1";
+        $per_page = max( 1, absint( $args['per_page'] ) );
+        $page     = max( 1, absint( $args['page'] ) );
+        $offset   = ( $page - 1 ) * $per_page;
+
+        $allowed_statuses = array( 'pending', 'processing', 'paused', 'completed', 'failed', 'cancelled' );
+        $status           = '';
         if ( ! empty( $args['status'] ) ) {
-            $where .= $wpdb->prepare( " AND job_status = %s", $args['status'] );
+            $maybe_status = sanitize_key( (string) $args['status'] );
+            if ( in_array( $maybe_status, $allowed_statuses, true ) ) {
+                $status = $maybe_status;
+            }
         }
 
-        $orderby = in_array( $args['orderby'], array( 'id', 'job_name', 'job_status', 'created_at', 'updated_at' ) ) 
-            ? $args['orderby'] : 'created_at';
-        $order = strtoupper( $args['order'] ) === 'ASC' ? 'ASC' : 'DESC';
+        $allowed_orderby = array( 'id', 'job_name', 'job_status', 'created_at', 'updated_at' );
+        $orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'created_at';
+        $order           = strtoupper( (string) $args['order'] ) === 'ASC' ? 'ASC' : 'DESC';
 
-        $offset = ( $args['page'] - 1 ) * $args['per_page'];
+        $jobs  = array();
+        $total = 0;
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare(), $orderby and $order are whitelisted values.
-        $jobs = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` $where ORDER BY $orderby $order LIMIT %d OFFSET %d",
-                absint( $args['per_page'] ),
-                absint( $offset )
-            )
-        );
+        if ( $status === '' ) {
+            if ( $orderby === 'id' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY id ASC LIMIT %d OFFSET %d", $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY id DESC LIMIT %d OFFSET %d", $per_page, $offset ) );
+            } elseif ( $orderby === 'job_name' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY job_name ASC LIMIT %d OFFSET %d", $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY job_name DESC LIMIT %d OFFSET %d", $per_page, $offset ) );
+            } elseif ( $orderby === 'job_status' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY job_status ASC LIMIT %d OFFSET %d", $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY job_status DESC LIMIT %d OFFSET %d", $per_page, $offset ) );
+            } elseif ( $orderby === 'updated_at' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY updated_at ASC LIMIT %d OFFSET %d", $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY updated_at DESC LIMIT %d OFFSET %d", $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY created_at ASC LIMIT %d OFFSET %d", $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` ORDER BY created_at DESC LIMIT %d OFFSET %d", $per_page, $offset ) );
+            }
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare().
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_jobs ) . "` $where" );
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned.
+            $total = $wpdb->get_var( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_jobs ) . "`" );
+        } else {
+            if ( $orderby === 'id' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY id ASC LIMIT %d OFFSET %d", $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY id DESC LIMIT %d OFFSET %d", $status, $per_page, $offset ) );
+            } elseif ( $orderby === 'job_name' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY job_name ASC LIMIT %d OFFSET %d", $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY job_name DESC LIMIT %d OFFSET %d", $status, $per_page, $offset ) );
+            } elseif ( $orderby === 'job_status' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY job_status ASC LIMIT %d OFFSET %d", $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY job_status DESC LIMIT %d OFFSET %d", $status, $per_page, $offset ) );
+            } elseif ( $orderby === 'updated_at' ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY updated_at ASC LIMIT %d OFFSET %d", $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY updated_at DESC LIMIT %d OFFSET %d", $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $jobs = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY created_at ASC LIMIT %d OFFSET %d", $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d", $status, $per_page, $offset ) );
+            }
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned.
+            $total = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_jobs ) . "` WHERE job_status = %s", $status ) );
+        }
 
         foreach ( $jobs as &$job ) {
             $job->post_types = maybe_unserialize( $job->post_types );
@@ -301,9 +360,9 @@ class ALLSI_Bulk_Generation_DB {
         return array(
             'jobs'       => $jobs,
             'total'      => (int) $total,
-            'pages'      => ceil( $total / $args['per_page'] ),
-            'page'       => $args['page'],
-            'per_page'   => $args['per_page'],
+            'pages'      => ceil( $total / $per_page ),
+            'page'       => $page,
+            'per_page'   => $per_page,
         );
     }
 
@@ -391,19 +450,39 @@ class ALLSI_Bulk_Generation_DB {
         
         self::init();
 
-        $valid_counters = array( 'processed_posts', 'successful_posts', 'failed_posts' );
-        if ( ! in_array( $counter, $valid_counters ) ) {
+        $job_id = absint( $job_id );
+        $amount = absint( $amount );
+
+        if ( $counter === 'processed_posts' ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned.
+            $result = $wpdb->query(
+                $wpdb->prepare(
+                    "UPDATE `" . esc_sql( self::$table_jobs ) . "` SET processed_posts = processed_posts + %d WHERE id = %d",
+                    $amount,
+                    $job_id
+                )
+            );
+        } elseif ( $counter === 'successful_posts' ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned.
+            $result = $wpdb->query(
+                $wpdb->prepare(
+                    "UPDATE `" . esc_sql( self::$table_jobs ) . "` SET successful_posts = successful_posts + %d WHERE id = %d",
+                    $amount,
+                    $job_id
+                )
+            );
+        } elseif ( $counter === 'failed_posts' ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned.
+            $result = $wpdb->query(
+                $wpdb->prepare(
+                    "UPDATE `" . esc_sql( self::$table_jobs ) . "` SET failed_posts = failed_posts + %d WHERE id = %d",
+                    $amount,
+                    $job_id
+                )
+            );
+        } else {
             return false;
         }
-
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and counter are safe (whitelisted).
-        $result = $wpdb->query(
-            $wpdb->prepare(
-                "UPDATE `" . esc_sql( self::$table_jobs ) . "` SET $counter = $counter + %d WHERE id = %d",
-                absint( $amount ),
-                absint( $job_id )
-            )
-        );
 
         return $result !== false;
     }
@@ -478,28 +557,102 @@ class ALLSI_Bulk_Generation_DB {
 
         $args = wp_parse_args( $args, $defaults );
 
-        $where = $wpdb->prepare( "WHERE job_id = %d", $job_id );
+        $job_id   = absint( $job_id );
+        $per_page = max( 1, absint( $args['per_page'] ) );
+        $page     = max( 1, absint( $args['page'] ) );
+        $offset   = ( $page - 1 ) * $per_page;
+
+        $allowed_statuses = array( 'pending', 'processing', 'completed', 'failed', 'skipped' );
+        $status           = '';
         if ( ! empty( $args['status'] ) ) {
-            $where .= $wpdb->prepare( " AND status = %s", $args['status'] );
+            $maybe_status = sanitize_key( (string) $args['status'] );
+            if ( in_array( $maybe_status, $allowed_statuses, true ) ) {
+                $status = $maybe_status;
+            }
         }
 
-        $orderby = in_array( $args['orderby'], array( 'id', 'post_id', 'post_title', 'status', 'processed_at' ) ) 
-            ? $args['orderby'] : 'id';
-        $order = strtoupper( $args['order'] ) === 'DESC' ? 'DESC' : 'ASC';
+        $allowed_orderby = array( 'id', 'post_id', 'post_title', 'status', 'processed_at' );
+        $orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'id';
+        $order           = strtoupper( (string) $args['order'] ) === 'DESC' ? 'DESC' : 'ASC';
 
-        $offset = ( $args['page'] - 1 ) * $args['per_page'];
+        $posts  = array();
+        $total  = 0;
+        $has_status_filter = ( $status !== '' );
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare(), $orderby and $order are whitelisted values.
-        $posts = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` $where ORDER BY $orderby $order LIMIT %d OFFSET %d",
-                absint( $args['per_page'] ),
-                absint( $offset )
-            )
-        );
+        if ( $orderby === 'id' ) {
+            if ( $has_status_filter ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY id ASC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY id DESC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY id ASC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) );
+            }
+        } elseif ( $orderby === 'post_id' ) {
+            if ( $has_status_filter ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY post_id ASC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY post_id DESC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY post_id ASC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY post_id DESC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) );
+            }
+        } elseif ( $orderby === 'post_title' ) {
+            if ( $has_status_filter ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY post_title ASC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY post_title DESC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY post_title ASC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY post_title DESC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) );
+            }
+        } elseif ( $orderby === 'status' ) {
+            if ( $has_status_filter ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY status ASC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY status DESC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY status ASC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY status DESC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) );
+            }
+        } elseif ( $orderby === 'processed_at' ) {
+            if ( $has_status_filter ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY processed_at ASC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY processed_at DESC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = ( $order === 'ASC' )
+                    ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY processed_at ASC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) )
+                    : $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY processed_at DESC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) );
+            }
+        } else {
+            if ( $has_status_filter ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s ORDER BY id ASC LIMIT %d OFFSET %d", $job_id, $status, $per_page, $offset ) );
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned; results are paged.
+                $posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d ORDER BY id ASC LIMIT %d OFFSET %d", $job_id, $per_page, $offset ) );
+            }
+        }
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built with prepare().
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_posts ) . "` $where" );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk tables are plugin-owned.
+        $total = $has_status_filter
+            ? $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d AND status = %s", $job_id, $status ) )
+            : $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . esc_sql( self::$table_posts ) . "` WHERE job_id = %d", $job_id ) );
 
         foreach ( $posts as &$post ) {
             $post->additional_images = maybe_unserialize( $post->additional_images );
@@ -508,9 +661,9 @@ class ALLSI_Bulk_Generation_DB {
         return array(
             'posts'    => $posts,
             'total'    => (int) $total,
-            'pages'    => ceil( $total / $args['per_page'] ),
-            'page'     => $args['page'],
-            'per_page' => $args['per_page'],
+            'pages'    => ceil( $total / $per_page ),
+            'page'     => $page,
+            'per_page' => $per_page,
         );
     }
 
