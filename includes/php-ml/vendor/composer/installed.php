@@ -1,4 +1,6 @@
-<?php return array(
+<?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+ return array(
     'root' => array(
         'pretty_version' => '1.0.0+no-version-set',
         'version' => '1.0.0.0',

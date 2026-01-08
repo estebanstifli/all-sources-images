@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Simple logger class to replace Monolog
  *
@@ -8,11 +10,7 @@
  * @package    All_Sources_Images
  * @subpackage All_Sources_Images/includes
  * @since      1.0.0
- */
-
-// If this file is called directly, abort.
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+ */;
 }
 
 /**

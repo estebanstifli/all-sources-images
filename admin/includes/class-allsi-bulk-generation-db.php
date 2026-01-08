@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bulk Generation Database Class
  * 
@@ -391,7 +393,8 @@ class ALLSI_Bulk_Generation_DB {
             return false;
         }
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and counter are safe (whitelisted).\n        $result = $wpdb->query(
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and counter are safe (whitelisted).
+        $result = $wpdb->query(
             $wpdb->prepare(
                 "UPDATE `" . esc_sql( self::$table_jobs ) . "` SET $counter = $counter + %d WHERE id = %d",
                 absint( $amount ),

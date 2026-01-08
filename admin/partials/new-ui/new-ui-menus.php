@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New UI Menu Registration
  * 
@@ -12,10 +14,6 @@
  * @package All_Sources_Images
  * @since 6.2.0
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 /**
  * Store the admin instance globally for use in render functions

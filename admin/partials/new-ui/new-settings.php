@@ -1,14 +1,12 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New Settings Page - Main container with tabs
  * Uses same layout structure as original admin pages
  *
  * @since 6.2.0
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Determine active tab
 $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'source';

@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bulk Generation - Jobs List Tab
  * 
@@ -6,10 +8,6 @@
  *
  * @package All_Sources_Images
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 ?>
 
 <!-- TAB: Jobs List -->

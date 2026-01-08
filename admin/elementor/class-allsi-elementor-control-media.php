@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 use Elementor\Control_Media;
 use Elementor\Controls_Manager;
 

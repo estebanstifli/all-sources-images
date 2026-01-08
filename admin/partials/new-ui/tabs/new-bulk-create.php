@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bulk Generation Main Page
  * 
@@ -6,10 +8,6 @@
  *
  * @package All_Sources_Images
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 ?>
 
 <div class="wrap allsi-bulk-generation-wrap">

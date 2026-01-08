@@ -1,12 +1,9 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Unsplash API Configuration
  */
-
-// Exit if accessed directly
-if (!defined('ABSPATH')) {
-    exit;
-}
 
 $options = get_option('ALLSI_plugin_banks_settings');
 $apikey = isset($options['unsplash']['apikey']) ? $options['unsplash']['apikey'] : '';

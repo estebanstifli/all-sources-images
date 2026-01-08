@@ -1,13 +1,11 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New Settings - Proxy Tab
  *
  * @since 6.2.0
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 settings_errors();
 

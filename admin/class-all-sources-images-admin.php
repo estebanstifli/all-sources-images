@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! class_exists( 'ALLSI_Image_Source' ) ) {
     require_once plugin_dir_path( __FILE__ ) . 'sources/class-allsi-image-source.php';

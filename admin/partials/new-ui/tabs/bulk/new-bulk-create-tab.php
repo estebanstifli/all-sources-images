@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bulk Generation - Create New Job Tab
  * 
@@ -6,10 +8,6 @@
  *
  * @package All_Sources_Images
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Check if WooCommerce is active
 $has_woocommerce = class_exists( 'WooCommerce' );

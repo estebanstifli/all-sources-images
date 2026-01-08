@@ -1,12 +1,9 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * YouTube Data API v3 Configuration
  */
-
-// Exit if accessed directly
-if (!defined('ABSPATH')) {
-    exit;
-}
 
 $options = get_option('ALLSI_plugin_banks_settings');
 $apikey = isset($options['youtube']['apikey']) ? $options['youtube']['apikey'] : '';

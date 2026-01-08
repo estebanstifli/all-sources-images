@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New Bulk Generation Page
  * 
@@ -7,10 +9,6 @@
  *
  * @package All_Sources_Images
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Ensure tables exist
 ALLSI_Bulk_Generation_DB::maybe_create_tables();

@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bulk Generation - Styles
  * 
@@ -8,10 +10,6 @@
  * @package All_Sources_Images
  * @deprecated Use wp_enqueue_style( 'allsi-bulk-generation' ) instead
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Styles are now enqueued via wp_enqueue_style() in new-ui-assets.php
 // See: admin/css/allsi-bulk-generation.css

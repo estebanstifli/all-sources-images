@@ -1,12 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New UI - Image Placement Tab
  * This file handles the Image Placement configuration in the new admin UI
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Get current settings - use raw option first to see what's actually stored
 $raw_options = get_option( 'ALLSI_plugin_main_settings' );

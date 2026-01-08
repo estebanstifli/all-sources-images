@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bulk Generation Cron Processor
  * 
@@ -127,7 +129,7 @@ class ALLSI_Bulk_Generation_Cron {
         
         ALLSI_Bulk_Generation_DB::init();
         
-        $timeout_time = date( 'Y-m-d H:i:s', time() - self::PROCESSING_TIMEOUT );
+        $timeout_time = gmdate( 'Y-m-d H:i:s', time() - self::PROCESSING_TIMEOUT );
         
         // Find posts stuck in 'processing' status
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
@@ -420,7 +422,7 @@ class ALLSI_Bulk_Generation_Cron {
                 // Get image location for this block
                 $image_location = isset( $current_block['image_location'] ) ? $current_block['image_location'] : 'featured';
                 
-                ALLSI_log( 'Processing block ' . ( $block_index + 1 ) . '/' . $total_blocks . ' for post ' . $post_id . ' - block_key: ' . $current_block_key . ', api_chosen: ' . print_r( $api_chosen, true ) . ', location: ' . $image_location, 'CRON_GENERATE' );
+                ALLSI_log( 'Processing block ' . ( $block_index + 1 ) . '/' . $total_blocks . ' for post ' . $post_id . ' - block_key: ' . $current_block_key . ', api_chosen: ' . wp_json_encode( $api_chosen ) . ', location: ' . $image_location, 'CRON_GENERATE' );
                 
                 // Call the existing generation method with correct parameters
                 // Parameters: $id, $check_value_enable, $check_post_type, $check_category, 

@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New Automatic - Post-Processing Tab
  * 
@@ -7,10 +9,6 @@
  *
  * @package All_Sources_Images
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Get options
 $options = get_option( 'ALLSI_plugin_main_settings' );

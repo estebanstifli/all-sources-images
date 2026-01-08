@@ -126,7 +126,7 @@ class ALLSI_Source_Pixabay extends ALLSI_Image_Source {
             'q'          => $search_term,
             'lang'       => $language,
             'image_type' => $img_type,
-            'per_page'   => 200,
+            'per_page'   => 20,
             'safesearch' => ( 'true' === $safe || true === $safe ) ? 'true' : 'false',
             'page'       => max( 1, intval( $page ) ),
         );

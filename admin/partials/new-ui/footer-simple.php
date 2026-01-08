@@ -1,15 +1,12 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Simple footer template for New UI
  *
  * @package    All_Sources_Images
  * @subpackage All_Sources_Images/admin/partials/new-ui
  */
-
-// If this file is called directly, abort.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 ?>
 <div class="clear"></div>
 

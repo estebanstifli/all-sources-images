@@ -1,14 +1,12 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * New Automatic Page - Main container with tabs
  * Uses same layout structure as new-settings.php
  *
  * @since 6.2.0
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
 
 // Determine active tab - Default is now 'placement' since Sources tab is removed
 $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'placement';
