@@ -1,0 +1,19 @@
+ARCHIVO: admin/partials/tabs/banks/flickr.php
+Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
+52	31	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$checked'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+52	96	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$right_code'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+52	139	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$right_code'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+52	173	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$right'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: admin/partials/tabs/banks/giphy.php
+Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
+56	70	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$selected_attr'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+79	70	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$selected_attr'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+109	70	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$selected_attr'.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)

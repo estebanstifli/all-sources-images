@@ -2483,9 +2483,14 @@ class All_Sources_Images_Admin {
                 // Pixabay format
                 if ( 'pixabay' === $bank ) {
                     $total_hits = isset( $results_thumbs['totalHits'] ) ? intval( $results_thumbs['totalHits'] ) : null;
-                    $requested_per_page = isset( $results_thumbs['per_page'] ) ? intval( $results_thumbs['per_page'] ) : 200;
+                    // Pixabay API does not return a per-page value in responses.
+                    // Keep this in sync with the request (ALLSI_Source_Pixabay::build_query_args uses per_page=20).
+                    $requested_per_page = 20;
+                    if ( isset( $results_thumbs['per_page'] ) ) {
+                        $requested_per_page = intval( $results_thumbs['per_page'] );
+                    }
                     if ( $requested_per_page <= 0 ) {
-                        $requested_per_page = max( 1, count( $results_thumbs['hits'] ) );
+                        $requested_per_page = 20;
                     }
                     $pagination_data['page'] = $page;
                     if ( null !== $total_hits ) {

@@ -46,10 +46,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		
 		
 			foreach ( $rights_array  as $right => $right_code ) {
-				$checked= ( isset( $options['flickr']['rights'] ) && !empty( $options['flickr']['rights'] ) && in_array( $right_code, $options['flickr']['rights'] ) )? 'checked="checked""' : '';
+				$is_checked = ( isset( $options['flickr']['rights'] ) && ! empty( $options['flickr']['rights'] ) && is_array( $options['flickr']['rights'] ) && in_array( $right_code, $options['flickr']['rights'], true ) );
 				echo '
 				<label class="checkbox">
-					<input '. $checked .' name="ALLSI_plugin_banks_settings[flickr][rights]['. $right_code .']" type="checkbox" value="'. $right_code .'"> <span></span> '. $right .'
+					<input ' . checked( $is_checked, true, false ) . ' name="ALLSI_plugin_banks_settings[flickr][rights][' . esc_attr( $right_code ) . ']" type="checkbox" value="' . esc_attr( $right_code ) . '"> <span></span> ' . wp_kses_post( $right ) . '
 				</label>';
 			}
 		?>

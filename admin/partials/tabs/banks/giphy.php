@@ -52,8 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 __( 'Stickers', 'all-sources-images' ) => 'stickers',
             );
             foreach ( $media_types as $label => $value ) {
-                $selected_attr = ( $media_selected === $value ) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr( $value ) . '" ' . $selected_attr . '>' . esc_html( $label ) . '</option>';
+                    echo '<option value="' . esc_attr( $value ) . '" ' . selected( $media_selected, $value, false ) . '>' . esc_html( $label ) . '</option>';
             }
             ?>
         </select>
@@ -75,8 +74,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 __( 'R – restricted content', 'all-sources-images' )        => 'r',
             );
             foreach ( $ratings as $label => $value ) {
-                $selected_attr = ( $rating_selected === $value ) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr( $value ) . '" ' . $selected_attr . '>' . esc_html( $label ) . '</option>';
+                    echo '<option value="' . esc_attr( $value ) . '" ' . selected( $rating_selected, $value, false ) . '>' . esc_html( $label ) . '</option>';
             }
             ?>
         </select>
@@ -105,8 +103,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 __( 'Korean', 'all-sources-images' ) => 'ko',
             );
             foreach ( $languages as $label => $value ) {
-                $selected_attr = ( $lang_selected === $value ) ? 'selected="selected"' : '';
-                echo '<option value="' . esc_attr( $value ) . '" ' . $selected_attr . '>' . esc_html( $label ) . '</option>';
+                    echo '<option value="' . esc_attr( $value ) . '" ' . selected( $lang_selected, $value, false ) . '>' . esc_html( $label ) . '</option>';
             }
             ?>
         </select>
