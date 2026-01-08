@@ -632,14 +632,26 @@ class ALLSI_Plugin_Integrations {
      * @param int $post_id The post ID.
      */
     private function clear_block_status_meta( $post_id ) {
-        global $wpdb;
-        $like_pattern = $wpdb->esc_like( '_ALLSI_block_' ) . '%';
-        $deleted = $wpdb->query( $wpdb->prepare(
-            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE %s",
-            $post_id,
-            $like_pattern
-        ) );
-        $this->log( "Cleared block status meta for post {$post_id}", array( 'deleted_rows' => $deleted ) );
+        $post_id = absint( $post_id );
+        if ( 0 === $post_id ) {
+            return;
+        }
+
+        $all_meta = get_post_meta( $post_id );
+        if ( empty( $all_meta ) || ! is_array( $all_meta ) ) {
+            return;
+        }
+
+        $deleted_count = 0;
+        foreach ( array_keys( $all_meta ) as $meta_key ) {
+            if ( 0 === strpos( (string) $meta_key, '_ALLSI_block_' ) ) {
+                if ( delete_post_meta( $post_id, $meta_key ) ) {
+                    $deleted_count++;
+                }
+            }
+        }
+
+        $this->log( "Cleared block status meta for post {$post_id}", array( 'deleted_keys' => $deleted_count ) );
     }
 
     /**

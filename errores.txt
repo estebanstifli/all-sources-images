@@ -1,19 +1,20 @@
-ARCHIVO: admin/partials/tabs/banks/flickr.php
+ARCHIVO: admin/class-all-sources-images-admin.php
 Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
-52	31	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$checked'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
-52	96	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$right_code'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
-52	139	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$right_code'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
-52	173	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$right'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+312	9	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+312	9	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	Ver en editor de código (abre en una nueva pestaña)
 
-ARCHIVO: admin/partials/tabs/banks/giphy.php
+ARCHIVO: admin/includes/class-allsi-bulk-generation-db.php
 Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
-56	70	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$selected_attr'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
-79	70	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$selected_attr'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
-109	70	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$selected_attr'.
-Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+125	26	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+125	26	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	Ver en editor de código (abre en una nueva pestaña)
+134	27	WARNING	WordPress.DB.DirectDatabaseQuery.SchemaChange	Attempting a database schema change is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+204	19	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+327	19	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+327	19	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	Ver en editor de código (abre en una nueva pestaña)
+350	19	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+350	19	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	Ver en editor de código (abre en una nueva pestaña)
+432	23	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+551	19	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+551	19	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	Ver en editor de código (abre en una nueva pestaña)
+626	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	Ver en editor de código (abre en una nueva pestaña)
+626	16	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	Ver en editor de código (abre en una nueva pestaña)

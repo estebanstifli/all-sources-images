@@ -307,13 +307,21 @@ class All_Sources_Images_Admin {
      * @param int $post_id The post ID.
      */
     public function clear_block_status( $post_id ) {
-        global $wpdb;
-        $like_pattern = $wpdb->esc_like( '_ALLSI_block_' ) . '%';
-        $wpdb->query( $wpdb->prepare(
-            "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key LIKE %s",
-            $post_id,
-            $like_pattern
-        ) );
+        $post_id = absint( $post_id );
+        if ( 0 === $post_id ) {
+            return;
+        }
+
+        $all_meta = get_post_meta( $post_id );
+        if ( empty( $all_meta ) || ! is_array( $all_meta ) ) {
+            return;
+        }
+
+        foreach ( array_keys( $all_meta ) as $meta_key ) {
+            if ( 0 === strpos( (string) $meta_key, '_ALLSI_block_' ) ) {
+                delete_post_meta( $post_id, $meta_key );
+            }
+        }
     }
 
     /**
@@ -745,13 +753,16 @@ class All_Sources_Images_Admin {
                 'img_bank'         => esc_html__( 'Image Bank', 'all-sources-images' ),
             ),
         );
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification not required here, data is only used to prepare JS variables for AJAX which has its own nonce verification
-        if ( !empty( $_POST['all-sources-images'] ) || !empty( $_REQUEST['ids_mpt_generation'] ) || !empty( $_REQUEST['cats'] ) ) {
+
+        $bulk_generation_flag = filter_input( INPUT_POST, 'all-sources-images', FILTER_UNSAFE_RAW );
+        $ids_mpt_generation_raw = filter_input( INPUT_GET, 'ids_mpt_generation', FILTER_UNSAFE_RAW );
+        $cats_raw = filter_input( INPUT_GET, 'cats', FILTER_UNSAFE_RAW );
+
+        if ( ! empty( $bulk_generation_flag ) || ! empty( $ids_mpt_generation_raw ) || ! empty( $cats_raw ) ) {
             $ids_from_cats = '';
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing
-            if ( !empty( $_REQUEST['cats'] ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                $taxo_term = get_term( absint( $_REQUEST['cats'] ) );
+
+            if ( ! empty( $cats_raw ) ) {
+                $taxo_term = get_term( absint( $cats_raw ) );
                 if ( empty( $taxo_term ) ) {
                     return false;
                 }
@@ -781,8 +792,8 @@ class All_Sources_Images_Admin {
                 }
                 $ids_from_cats = substr_replace( $ids, '', -1 );
             }
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not needed here, only used to prepare JS variables, actual AJAX calls have nonce verification
-            $ids_param = isset( $_GET['ids_mpt_generation'] ) ? sanitize_text_field( wp_unslash( $_GET['ids_mpt_generation'] ) ) : '';
+
+            $ids_param = is_string( $ids_mpt_generation_raw ) ? sanitize_text_field( $ids_mpt_generation_raw ) : '';
             // Use IDs from category if available, otherwise from URL parameter
             $ids = ! empty( $ids_from_cats ) ? $ids_from_cats : $ids_param;
             $ids = array_map( 'intval', explode( ',', trim( $ids, ',' ) ) );
@@ -1523,11 +1534,17 @@ class All_Sources_Images_Admin {
     public function ALLSI_do_interval_cron( $new_ids_to_add = false ) {
         // Get processing  ids
         $interval_posts_to_generate = get_transient( 'ALLSI_interval_generation' );
-        // Check if last generation ids is done and clear it
-        // Default status to "generation done"
-        if ( !empty( $interval_posts_to_generate ) ) {
-            $no_more_post_to_generate = true;
+        if ( ! is_array( $interval_posts_to_generate ) ) {
+            $interval_posts_to_generate = array();
         }
+
+        // Default status to "generation done". The loop below sets it to false when it finds work.
+        $no_more_post_to_generate = true;
+
+        $new_ids_to_add_array    = is_array( $new_ids_to_add ) ? $new_ids_to_add : array();
+        $has_new_ids_to_add      = ! empty( $new_ids_to_add_array );
+        $new_ids_to_add_is_false = ( false === $new_ids_to_add );
+
         foreach ( $interval_posts_to_generate as $post => $post_val ) {
             $continue_loop = false;
             // Get the first post not already generated
@@ -1567,10 +1584,11 @@ class All_Sources_Images_Admin {
             }
         }
         // Generation done and new ids to generate
-        if ( TRUE == $no_more_post_to_generate && $new_ids_to_add ) {
+        if ( TRUE == $no_more_post_to_generate && $has_new_ids_to_add ) {
             // Delete old posts
             delete_transient( 'ALLSI_interval_generation' );
-            foreach ( $new_ids_to_add as $id ) {
+            $new_posts_to_generate = array();
+            foreach ( $new_ids_to_add_array as $id ) {
                 $new_posts_to_generate[] = array(
                     'id'        => (int) $id,
                     'processed' => false,
@@ -1578,18 +1596,19 @@ class All_Sources_Images_Admin {
             }
             // Add news posts
             set_transient( 'ALLSI_interval_generation', $new_posts_to_generate );
-        } elseif ( TRUE == $no_more_post_to_generate && FALSE == $new_ids_to_add ) {
+        } elseif ( TRUE == $no_more_post_to_generate && $new_ids_to_add_is_false ) {
             // Generation done
             // Nothing to add/do
-        } elseif ( FALSE == $no_more_post_to_generate && $new_ids_to_add ) {
+        } elseif ( FALSE == $no_more_post_to_generate && $has_new_ids_to_add ) {
             // Update with new ids (added at the end)
-            foreach ( $new_ids_to_add as $id ) {
+            foreach ( $new_ids_to_add_array as $id ) {
                 $interval_posts_to_generate[] = array(
                     'id'        => (int) $id,
                     'processed' => false,
                 );
             }
             // Allow ids into the array only once. Avoid duplicate ids (Remove the last ones)
+            $temp_generate_posts = array();
             foreach ( $interval_posts_to_generate as &$v ) {
                 if ( !isset( $temp_generate_posts[$v['id']] ) ) {
                     $temp_generate_posts[$v['id']] =& $v;
@@ -2156,26 +2175,27 @@ class All_Sources_Images_Admin {
             error_log( '[All Sources Images] ALLSI_block_searching_images CALLED' );
         }
         
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above with check_ajax_referer
-        if ( !isset($_GET['search']) || !isset($_GET['bank']) || !isset($_GET['id']) ) {
+        $search_raw = filter_input( INPUT_GET, 'search', FILTER_UNSAFE_RAW );
+        $bank_raw   = filter_input( INPUT_GET, 'bank', FILTER_UNSAFE_RAW );
+        $id_raw     = filter_input( INPUT_GET, 'id', FILTER_UNSAFE_RAW );
+
+        if ( ! is_string( $search_raw ) || ! is_string( $bank_raw ) || ! is_string( $id_raw ) || '' === $search_raw || '' === $bank_raw || '' === $id_raw ) {
             wp_send_json_error( 'Missing required parameters' );
             return;
         }
-        
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified above with check_ajax_referer
-        $search_term = sanitize_text_field( wp_unslash( $_GET['search'] ) );
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $bank = sanitize_text_field( strtolower( wp_unslash( $_GET['bank'] ) ) );
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $index = isset( $_GET['index'] ) ? absint( $_GET['index'] ) : 0;
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $id = absint( $_GET['id'] );
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $page = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
-        
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+        $search_term = sanitize_text_field( $search_raw );
+        $bank        = sanitize_text_field( strtolower( $bank_raw ) );
+        $index_raw   = filter_input( INPUT_GET, 'index', FILTER_UNSAFE_RAW );
+        $page_raw    = filter_input( INPUT_GET, 'page', FILTER_UNSAFE_RAW );
+        $skip_translation_raw = filter_input( INPUT_GET, 'skip_translation', FILTER_UNSAFE_RAW );
+
+        $index = is_string( $index_raw ) ? absint( $index_raw ) : 0;
+        $id    = absint( $id_raw );
+        $page  = is_string( $page_raw ) ? max( 1, absint( $page_raw ) ) : 1;
+
         // Skip translation if already translated by frontend (skip_translation=1)
-        $skip_translation = isset( $_GET['skip_translation'] ) && absint( $_GET['skip_translation'] ) === 1;
+        $skip_translation = is_string( $skip_translation_raw ) && absint( $skip_translation_raw ) === 1;
         
         // Translate search term to English if translation_EN is enabled AND not already translated
         if ( ! $skip_translation ) {
@@ -2744,30 +2764,40 @@ class All_Sources_Images_Admin {
             wp_send_json_error( __( 'Permission denied.', 'all-sources-images' ) );
         }
         
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer
-        $raw_url_image = isset( $_POST['url_image'] ) ? wp_unslash( $_POST['url_image'] ) : '';
+        $raw_url_image = filter_input( INPUT_POST, 'url_image', FILTER_UNSAFE_RAW );
+        $raw_url_image = is_string( $raw_url_image ) ? $raw_url_image : '';
         if ( 0 === strpos( $raw_url_image, 'data:image' ) ) {
             $url_image = $raw_url_image;
         } else {
             $url_image = esc_url_raw( $raw_url_image );
         }
-        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above with check_ajax_referer
-        $search_term = ( isset( $_POST['search_term'] ) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : 'image' );
-        $bank = ( isset( $_POST['bank'] ) ? sanitize_text_field( wp_unslash( $_POST['bank'] ) ) : '' );
-        $alt = ( isset( $_POST['alt_image'] ) ? sanitize_text_field( wp_unslash( $_POST['alt_image'] ) ) : '' );
-        $raw_caption = ( isset( $_POST['caption_image'] ) ? wp_unslash( $_POST['caption_image'] ) : '' );
-        $caption = wp_kses_post( $raw_caption );
-        $title_image = ( isset( $_POST['title_image'] ) ? sanitize_text_field( wp_unslash( $_POST['title_image'] ) ) : '' );
-        $file_name_raw = ( isset( $_POST['file_name'] ) ? wp_unslash( $_POST['file_name'] ) : '' );
+
+        $search_term_raw = filter_input( INPUT_POST, 'search_term', FILTER_UNSAFE_RAW );
+        $bank_raw        = filter_input( INPUT_POST, 'bank', FILTER_UNSAFE_RAW );
+        $alt_raw         = filter_input( INPUT_POST, 'alt_image', FILTER_UNSAFE_RAW );
+        $raw_caption     = filter_input( INPUT_POST, 'caption_image', FILTER_UNSAFE_RAW );
+        $title_image_raw = filter_input( INPUT_POST, 'title_image', FILTER_UNSAFE_RAW );
+        $file_name_raw   = filter_input( INPUT_POST, 'file_name', FILTER_UNSAFE_RAW );
+
+        $search_term = is_string( $search_term_raw ) ? sanitize_text_field( $search_term_raw ) : 'image';
+        $bank        = is_string( $bank_raw ) ? sanitize_text_field( $bank_raw ) : '';
+        $alt         = is_string( $alt_raw ) ? sanitize_text_field( $alt_raw ) : '';
+        $caption     = is_string( $raw_caption ) ? wp_kses_post( $raw_caption ) : '';
+        $title_image = is_string( $title_image_raw ) ? sanitize_text_field( $title_image_raw ) : '';
+        $file_name_raw = is_string( $file_name_raw ) ? $file_name_raw : '';
+
         $file_name_base = sanitize_file_name( $file_name_raw );
         if ( '' !== $file_name_base && false !== strpos( $file_name_base, '.' ) ) {
             $file_name_base = sanitize_file_name( pathinfo( $file_name_base, PATHINFO_FILENAME ) );
         }
-        $post_id = ( isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0 );
-        if ( !$post_id && isset( $_POST['id'] ) ) {
-            $post_id = intval( $_POST['id'] );
+
+        $post_id_raw = filter_input( INPUT_POST, 'post_id', FILTER_UNSAFE_RAW );
+        $id_fallback_raw = filter_input( INPUT_POST, 'id', FILTER_UNSAFE_RAW );
+
+        $post_id = is_string( $post_id_raw ) ? intval( $post_id_raw ) : 0;
+        if ( ! $post_id && is_string( $id_fallback_raw ) ) {
+            $post_id = intval( $id_fallback_raw );
         }
-        // phpcs:enable WordPress.Security.NonceVerification.Missing
 
         ALLSI_log( array(
             'url'      => $url_image,

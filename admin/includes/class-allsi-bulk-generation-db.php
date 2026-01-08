@@ -10,6 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 6.1.7
  */
 
+// This file manages custom plugin tables, so $wpdb direct queries and schema changes are expected here.
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -654,3 +657,5 @@ class ALLSI_Bulk_Generation_DB {
 
 // Initialize on load
 ALLSI_Bulk_Generation_DB::init();
+
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
