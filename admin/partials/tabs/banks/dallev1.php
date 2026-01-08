@@ -77,7 +77,7 @@ if ( isset( $options['dallev1'] ) && is_array( $options['dallev1'] ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ALLSI_plugin_banks_settings[dallev1][convert_jpg]" type="checkbox" value="true" <?php echo( !empty( $dalle_options['convert_jpg'] ) && $dalle_options['convert_jpg'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[dallev1][convert_jpg]" type="checkbox" value="true" <?php checked( ! empty( $dalle_options['convert_jpg'] ) && $dalle_options['convert_jpg'] == 'true' ); ?>><span></span>
 			<?php esc_html_e( 'Convert to Jpeg image extension', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'DALL-E will create a PNG file, click this option if you want to convert the file to a Jpeg image.', 'all-sources-images' ); ?></p>

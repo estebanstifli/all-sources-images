@@ -144,7 +144,7 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
                 $wp_lang_name = $wp_lang;
             }
             ?>
-            <tr class="allsi-source-lang-row" <?php echo ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) ? 'style="display:none;"' : ''; ?>>
+            <tr class="allsi-source-lang-row" <?php echo esc_attr( ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) ? 'style="display:none;"' : '' ); ?>>
                 <th scope="row">
                     <label for="source_lang"><?php esc_html_e( 'Source Language', 'all-sources-images' ); ?></label>
                 </th>
@@ -185,7 +185,7 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
             </tr>
 
             <!-- Google Translate API Key (shown when either translation option is enabled) -->
-            <tr class="allsi-google-api-row" <?php echo ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) && ( empty( $options_block['translate_alt'] ) || $options_block['translate_alt'] != 'true' ) ? 'style="display:none;"' : ''; ?>>
+            <tr class="allsi-google-api-row" <?php echo esc_attr( ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) && ( empty( $options_block['translate_alt'] ) || $options_block['translate_alt'] != 'true' ) ? 'style="display:none;"' : '' ); ?>>
                 <th scope="row">
                     <label for="google_translate_apikey"><?php esc_html_e( 'Google Translate API Key', 'all-sources-images' ); ?></label>
                     <span class="description" style="font-weight: normal; font-size: 11px; display: block;"><?php esc_html_e( '(Optional)', 'all-sources-images' ); ?></span>

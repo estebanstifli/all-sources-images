@@ -238,7 +238,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ALLSI_plugin_banks_settings[replicate][use_negative_prompt]" type="checkbox" value="true" <?php echo( !empty( $options['replicate']['use_negative_prompt'] ) && $options['replicate']['use_negative_prompt'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[replicate][use_negative_prompt]" type="checkbox" value="true" <?php checked( ! empty( $options['replicate']['use_negative_prompt'] ) && $options['replicate']['use_negative_prompt'] == 'true' ); ?>><span></span>
 			<?php esc_html_e( 'Use default negative prompt', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'Adds common exclusions: "blurry, low quality, distorted, disfigured, ugly, low resolution, watermark"', 'all-sources-images' ); ?></p>

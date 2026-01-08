@@ -222,13 +222,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</th>
 	<td class="checkbox-list">
 		<label class="checkbox ">
-			<input name="ALLSI_plugin_banks_settings[pexels][use_curated]" type="checkbox" value="true" <?php echo( !empty( $options['pexels']['use_curated'] ) && $options['pexels']['use_curated'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[pexels][use_curated]" type="checkbox" value="true" <?php checked( ! empty( $options['pexels']['use_curated'] ) && $options['pexels']['use_curated'] == 'true' ); ?>><span></span>
 			<?php esc_html_e( 'Prefer curated photos', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'When enabled, fallback to Pexels curated photos if search query returns no results. Curated photos are hand-picked daily.', 'all-sources-images' ); ?></p>
 		
 		<label class="checkbox ">
-			<input name="ALLSI_plugin_banks_settings[pexels][add_attribution]" type="checkbox" value="true" <?php echo( !empty( $options['pexels']['add_attribution'] ) && $options['pexels']['add_attribution'] == 'true' )? 'checked': ''; ?>><span></span>
+			<input name="ALLSI_plugin_banks_settings[pexels][add_attribution]" type="checkbox" value="true" <?php checked( ! empty( $options['pexels']['add_attribution'] ) && $options['pexels']['add_attribution'] == 'true' ); ?>><span></span>
 			<?php esc_html_e( 'Automatically add attribution to image caption', 'all-sources-images' ); ?>
 		</label>
 		<p class="description"><?php esc_html_e( 'Adds photographer credit to image caption: "Photo by [Name] on Pexels". Required by Pexels license.', 'all-sources-images' ); ?></p>

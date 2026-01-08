@@ -70,7 +70,7 @@ $render_checkboxes = function( $items, $option_key ) use ( $options, $render_sou
 
         $badge_markup = $render_source_badge( $slug );
 
-        $rendered_list[$key_api_chosen] = '<li><label class="checkbox ' . $class_disabled . '"><input class="ordered-checkbox" data-order="' . $key_api_chosen . '" type="checkbox" ' . $checked . ' ' . $disabled . ' value="' . esc_attr( $slug ) . '" name="ALLSI_plugin_banks_settings[' . esc_attr( $option_key ) . '][' . esc_attr( $slug ) . ']"> <span></span> ' . esc_html( $api ) . ' ' . $badge_markup . '</label></li>';
+        $rendered_list[$key_api_chosen] = '<li><label class="checkbox ' . esc_attr( $class_disabled ) . '"><input class="ordered-checkbox" data-order="' . esc_attr( $key_api_chosen ) . '" type="checkbox" ' . esc_attr( $checked ) . ' ' . esc_attr( $disabled ) . ' value="' . esc_attr( $slug ) . '" name="ALLSI_plugin_banks_settings[' . esc_attr( $option_key ) . '][' . esc_attr( $slug ) . ']"> <span></span> ' . esc_html( $api ) . ' ' . $badge_markup . '</label></li>';
     }
 
     ksort( $rendered_list );

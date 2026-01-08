@@ -58,10 +58,10 @@ header("Expires: 0");
  
 // Force download with filename
 header("Content-Type: application/force-download");
-header('Content-Disposition: attachment; filename="'.$result.'"');
+header('Content-Disposition: attachment; filename="' . esc_attr( $result ) . '"');
  
 // File size
-header("Content-Length: ".$size);
+header("Content-Length: " . absint( $size ));
  
 // Send the file using WP_Filesystem
 global $wp_filesystem;

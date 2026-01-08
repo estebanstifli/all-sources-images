@@ -288,15 +288,15 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         } elseif ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $ALLSI_return ) ) {
             // Display the newly generated image.
             $new_image = wp_get_attachment_image_src( $ALLSI_return, array(70, 70) );
-            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . $ALLSI_return . '"><img src="' . $new_image[0] . '" width="70" height="70" /></a>';
+            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . esc_url( admin_url( 'upload.php?item=' . absint( $ALLSI_return ) ) ) . '"><img src="' . esc_url( $new_image[0] ) . '" width="70" height="70" /></a>';
             $datas['thumbnail_id'] = $ALLSI_return;
             $datas['postimagediv'] = _wp_post_thumbnail_html( $ALLSI_return, $current_post_id );
         } elseif ( $generation_status == 'already-done' && "featured" === $image_location ) {
             // Display existing featured image.
-            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . admin_url() . 'upload.php?item=' . get_post_thumbnail_id( $current_post_id ) . '">' . get_the_post_thumbnail( $current_post_id, array('70', '70') ) . '</a>';
+            $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . esc_url( admin_url( 'upload.php?item=' . absint( get_post_thumbnail_id( $current_post_id ) ) ) ) . '">' . get_the_post_thumbnail( $current_post_id, array('70', '70') ) . '</a>';
         } else {
             // Display a placeholder image if generation fails.
-            $thumbnail_preview_html = '<img src="' . plugins_url( 'img/no-image.jpg', __FILE__ ) . '" />';
+            $thumbnail_preview_html = '<img src="' . esc_url( plugins_url( 'img/no-image.jpg', __FILE__ ) ) . '" />';
         }
         // Prepare data for the next image block iteration.
         $current_image_index++;

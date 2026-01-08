@@ -153,7 +153,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Minimum width', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="number" name="ALLSI_plugin_banks_settings[pixabay][min_width]" min="0" class="form-control" value="<?php echo( isset( $options['pixabay']['min_width'] ) && !empty( $options['pixabay']['min_width']) )? (int)$options['pixabay']['min_width']: '0'; ?>" >
+		<input type="number" name="ALLSI_plugin_banks_settings[pixabay][min_width]" min="0" class="form-control" value="<?php echo esc_attr( isset( $options['pixabay']['min_width'] ) && ! empty( $options['pixabay']['min_width'] ) ? absint( $options['pixabay']['min_width'] ) : 0 ); ?>" >
 		<i><?php esc_html_e( 'px minimum for width', 'all-sources-images' ); ?></i>
 	</td>
 </tr>
@@ -165,7 +165,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<label for="hseparator"><?php esc_html_e( 'Minimum height', 'all-sources-images' ); ?></label>
 	</th>
 	<td>
-		<input type="number" name="ALLSI_plugin_banks_settings[pixabay][min_height]" min="0" class="form-control" value="<?php echo( isset( $options['pixabay']['min_height'] ) && !empty( $options['pixabay']['min_height']) )? (int)$options['pixabay']['min_height']: '0'; ?>" >
+		<input type="number" name="ALLSI_plugin_banks_settings[pixabay][min_height]" min="0" class="form-control" value="<?php echo esc_attr( isset( $options['pixabay']['min_height'] ) && ! empty( $options['pixabay']['min_height'] ) ? absint( $options['pixabay']['min_height'] ) : 0 ); ?>" >
 		<i><?php esc_html_e( 'px minimum for height', 'all-sources-images' ); ?></i>
 	</td>
 </tr>
