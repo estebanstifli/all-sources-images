@@ -194,6 +194,7 @@ class ALLSI_Bulk_Generation_Ajax {
         $start_immediately = isset( $_POST['start_immediately'] ) ? absint( $_POST['start_immediately'] ) : 0;
 
         if ( empty( $job_name ) ) {
+            /* translators: %s: Date and time when the job was created. */
             $job_name = sprintf( __( 'Bulk Job %s', 'all-sources-images' ), current_time( 'Y-m-d H:i' ) );
         }
 
@@ -279,6 +280,7 @@ class ALLSI_Bulk_Generation_Ajax {
         }
 
         wp_send_json_success( array(
+            /* translators: %d: Number of posts added to the bulk job. */
             'message' => sprintf( __( 'Job created with %d posts', 'all-sources-images' ), $added ),
             'job_id'  => $job_id,
         ) );
@@ -310,10 +312,11 @@ class ALLSI_Bulk_Generation_Ajax {
         $images_per_post = max( 1, count( $image_blocks ) );
 
         // Generate job name
-        $job_name = sprintf( 
-            __( 'Quick Job - %d posts (%s)', 'all-sources-images' ), 
+        $job_name = sprintf(
+            /* translators: 1: Number of posts in the quick job. 2: Date and time when the job was created. */
+            __( 'Quick Job - %1$d posts (%2$s)', 'all-sources-images' ),
             count( $post_ids ),
-            current_time( 'Y-m-d H:i' ) 
+            current_time( 'Y-m-d H:i' )
         );
 
         // Determine post types from the IDs
@@ -358,6 +361,7 @@ class ALLSI_Bulk_Generation_Ajax {
         }
 
         wp_send_json_success( array(
+            /* translators: %d: Number of posts added to the bulk job. */
             'message' => sprintf( __( 'Job created and started with %d posts', 'all-sources-images' ), $added ),
             'job_id'  => $job_id,
             'total_posts' => $added,

@@ -20,7 +20,10 @@ $allsi_negative_prompt = isset( $allsi_workers_options['negative_prompt'] ) ? $a
 <tr valign="top">
     <td colspan="2">
         <div class="update-nag">
-            <?php printf( wp_kses_post( __( 'You need a Cloudflare account with Workers AI enabled. Create an API token with <strong>Workers AI:Read</strong> or higher and find your <strong>Account ID</strong> inside the <a href="%s" target="_blank" rel="noopener noreferrer">dashboard</a>.', 'all-sources-images' ) ), esc_url( 'https://dash.cloudflare.com/' ) ); ?>
+            <?php
+            /* translators: %s: Cloudflare dashboard URL. */
+            printf( wp_kses_post( __( 'You need a Cloudflare account with Workers AI enabled. Create an API token with <strong>Workers AI:Read</strong> or higher and find your <strong>Account ID</strong> inside the <a href="%s" target="_blank" rel="noopener noreferrer">dashboard</a>.', 'all-sources-images' ) ), esc_url( 'https://dash.cloudflare.com/' ) );
+            ?>
         </div>
         <div class="update-nag">
             <?php esc_html_e( 'Each request is billed by Cloudflare (roughly $0.00011 per step for FLUX). The plugin never proxies your credentials.', 'all-sources-images' ); ?>

@@ -110,6 +110,7 @@ class ALLSI_Source_Gemini extends ALLSI_Image_Source {
         }
 
         if ( isset( $body['promptFeedback']['blockReason'] ) && $body['promptFeedback']['blockReason'] ) {
+            /* translators: %s: Block reason returned by the Gemini API. */
             return new WP_Error( 'ALLSI_gemini_blocked', sprintf( __( 'Gemini blocked the prompt: %s', 'all-sources-images' ), $body['promptFeedback']['blockReason'] ) );
         }
 

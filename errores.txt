@@ -1,0 +1,5 @@
+ARCHIVO: admin/includes/class-allsi-bulk-generation-ajax.php
+Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
+317	13	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
+Saber más (abre en una nueva pestaña)	Ver en editor de código (abre en una nueva pestaña)
+

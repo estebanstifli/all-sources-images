@@ -21,7 +21,10 @@ $allsi_selected_size  = isset( $allsi_gemini_options['image_size'] ) ? $allsi_ge
             <?php esc_html_e( 'Provide a Google AI Studio API key with access to the Gemini Image models. Requests are billed directly by Google.', 'all-sources-images' ); ?>
         </div>
         <div class="update-nag">
-            <?php printf( wp_kses_post( __( 'Need a key? Create one in <a href="%s" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.', 'all-sources-images' ) ), esc_url( 'https://aistudio.google.com/app/apikey' ) ); ?>
+            <?php
+            /* translators: %s: Google AI Studio API key page URL. */
+            printf( wp_kses_post( __( 'Need a key? Create one in <a href="%s" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.', 'all-sources-images' ) ), esc_url( 'https://aistudio.google.com/app/apikey' ) );
+            ?>
         </div>
     </td>
 </tr>

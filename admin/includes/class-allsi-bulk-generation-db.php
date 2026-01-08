@@ -181,6 +181,7 @@ class ALLSI_Bulk_Generation_DB {
         self::init();
 
         $defaults = array(
+            /* translators: %s: Date and time when the job was created. */
             'job_name'        => sprintf( __( 'Bulk Job %s', 'all-sources-images' ), current_time( 'Y-m-d H:i' ) ),
             'job_status'      => 'pending',
             'total_posts'     => 0,

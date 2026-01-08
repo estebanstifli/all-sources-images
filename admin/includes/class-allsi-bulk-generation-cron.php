@@ -86,7 +86,8 @@ class ALLSI_Bulk_Generation_Cron {
                             'status'        => 'failed',
                             'retry_count'   => $retry_count,
                             'error_message' => sprintf( 
-                                __( 'Fatal error after %d attempts: %s', 'all-sources-images' ),
+                                /* translators: 1: Number of retry attempts. 2: Error message. */
+                                __( 'Fatal error after %1$d attempts: %2$s', 'all-sources-images' ),
                                 $retry_count,
                                 $error['message']
                             ),
@@ -101,7 +102,8 @@ class ALLSI_Bulk_Generation_Cron {
                             'status'        => 'pending',
                             'retry_count'   => $retry_count,
                             'error_message' => sprintf(
-                                __( 'Retry %d/%d after error: %s', 'all-sources-images' ),
+                                /* translators: 1: Current attempt number. 2: Maximum retry attempts. 3: Error message. */
+                                __( 'Retry %1$d/%2$d after error: %3$s', 'all-sources-images' ),
                                 $retry_count,
                                 self::MAX_RETRIES,
                                 $error['message']
@@ -161,7 +163,8 @@ class ALLSI_Bulk_Generation_Cron {
                     'status'      => 'pending',
                     'retry_count' => $retry_count,
                     'error_message' => sprintf(
-                        __( 'Retry %d/%d after timeout', 'all-sources-images' ),
+                        /* translators: 1: Current attempt number. 2: Maximum retry attempts. */
+                        __( 'Retry %1$d/%2$d after timeout', 'all-sources-images' ),
                         $retry_count,
                         self::MAX_RETRIES
                     ),
@@ -261,7 +264,8 @@ class ALLSI_Bulk_Generation_Cron {
                     ALLSI_Bulk_Generation_DB::mark_post_processed( $job_post->id, 'failed', array(
                         'featured_image_status' => 'failed',
                         'error_message'         => sprintf(
-                            __( 'Failed after %d attempts: %s', 'all-sources-images' ),
+                            /* translators: 1: Number of retry attempts. 2: Error message. */
+                            __( 'Failed after %1$d attempts: %2$s', 'all-sources-images' ),
                             $retry_count,
                             $result['error'] ?? __( 'Unknown error', 'all-sources-images' )
                         ),
@@ -275,7 +279,8 @@ class ALLSI_Bulk_Generation_Cron {
                         'status'        => 'pending',
                         'retry_count'   => $retry_count,
                         'error_message' => sprintf(
-                            __( 'Retry %d/%d: %s', 'all-sources-images' ),
+                            /* translators: 1: Current attempt number. 2: Maximum retry attempts. 3: Error message. */
+                            __( 'Retry %1$d/%2$d: %3$s', 'all-sources-images' ),
                             $retry_count,
                             self::MAX_RETRIES,
                             $result['error'] ?? __( 'Unknown error', 'all-sources-images' )
