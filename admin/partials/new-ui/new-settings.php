@@ -10,19 +10,19 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Determine active tab
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Tab parameter is used for display purposes only, no data modification
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'source';
+$allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'source';
 
 // Set title based on active tab
-switch ( $active_tab ) {
+switch ( $allsi_active_tab ) {
     case 'proxy':
-        $title = esc_html__( 'Settings [Proxy]', 'all-sources-images' );
+        $allsi_title = esc_html__( 'Settings [Proxy]', 'all-sources-images' );
         break;
     case 'others':
-        $title = esc_html__( 'Settings [Others]', 'all-sources-images' );
+        $allsi_title = esc_html__( 'Settings [Others]', 'all-sources-images' );
         break;
     case 'source':
     default:
-        $title = esc_html__( 'Settings [Source]', 'all-sources-images' );
+        $allsi_title = esc_html__( 'Settings [Source]', 'all-sources-images' );
         break;
 }
 
@@ -32,7 +32,7 @@ include_once plugin_dir_path( __FILE__ ) . 'header-simple.php';
 
 <div class="card-body">
     <?php
-    switch ( $active_tab ) {
+    switch ( $allsi_active_tab ) {
         case 'proxy':
             include_once 'tabs/new-settings-proxy.php';
             break;

@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 1.0.0
  */
 
-class KeywordExtractor
+class ALLSI_KeywordExtractor
 {
     private $stopWords;
 

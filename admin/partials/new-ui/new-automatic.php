@@ -10,16 +10,16 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Determine active tab - Default is now 'placement' since Sources tab is removed
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Tab parameter is used for display purposes only, no data modification
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
+$allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
 
 // Set title based on active tab
-switch ( $active_tab ) {
+switch ( $allsi_active_tab ) {
     case 'postprocessing':
-        $title = esc_html__( 'Bulk Settings [Post-Processing]', 'all-sources-images' );
+        $allsi_title = esc_html__( 'Bulk Settings [Post-Processing]', 'all-sources-images' );
         break;
     case 'placement':
     default:
-        $title = esc_html__( 'Bulk Settings [Image Placement]', 'all-sources-images' );
+        $allsi_title = esc_html__( 'Bulk Settings [Image Placement]', 'all-sources-images' );
         break;
 }
 
@@ -29,7 +29,7 @@ include_once plugin_dir_path( __FILE__ ) . 'header-automatic.php';
 
 <div class="card-body">
     <?php
-    switch ( $active_tab ) {
+    switch ( $allsi_active_tab ) {
         case 'postprocessing':
             include_once 'tabs/new-automatic-post-processing.php';
             break;

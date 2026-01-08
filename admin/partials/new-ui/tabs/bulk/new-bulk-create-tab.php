@@ -10,21 +10,21 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 
 // Check if WooCommerce is active
-$has_woocommerce = class_exists( 'WooCommerce' );
+$allsi_has_woocommerce = class_exists( 'WooCommerce' );
 
 // Get configured post types from settings
-$options = get_option( 'ALLSI_plugin_main_settings' );
+$allsi_options = get_option( 'ALLSI_plugin_main_settings' );
 if ( isset( $this ) && method_exists( $this, 'ALLSI_default_options_main_settings' ) ) {
-    $options = wp_parse_args( $options, $this->ALLSI_default_options_main_settings() );
+    $allsi_options = wp_parse_args( $allsi_options, $this->ALLSI_default_options_main_settings() );
 }
 
 // Get categories for posts
-$post_categories = get_categories( array( 'hide_empty' => false ) );
+$allsi_post_categories = get_categories( array( 'hide_empty' => false ) );
 
 // Get categories for products if WooCommerce is active
-$product_categories = array();
-if ( $has_woocommerce ) {
-    $product_categories = get_terms( array(
+$allsi_product_categories = array();
+if ( $allsi_has_woocommerce ) {
+    $allsi_product_categories = get_terms( array(
         'taxonomy'   => 'product_cat',
         'hide_empty' => false,
     ) );
@@ -36,15 +36,15 @@ if ( $has_woocommerce ) {
     
     <?php
     // Get image blocks count for hidden field
-    $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
-    $block_count = max( 1, count( $image_blocks ) );
+    $allsi_image_blocks = isset( $allsi_options['image_block'] ) ? $allsi_options['image_block'] : array();
+    $allsi_block_count = max( 1, count( $allsi_image_blocks ) );
     ?>
 
     <!-- Select Sources Card -->
     <div class="card card100 shadow-sm mb-4">
         <!-- Hidden fields for job creation -->
         <input type="hidden" id="allsi-job-name" name="job_name" value="">
-        <input type="hidden" id="allsi-images-per-post" name="images_per_post" value="<?php echo esc_attr( $block_count ); ?>">
+        <input type="hidden" id="allsi-images-per-post" name="images_per_post" value="<?php echo esc_attr( $allsi_block_count ); ?>">
         <div class="card-body">
             <h5 class="card-title mb-3">
                 <i class="bi bi-check2-square me-2 text-secondary"></i><?php esc_html_e( 'Select Content', 'all-sources-images' ); ?>
@@ -138,8 +138,8 @@ if ( $has_woocommerce ) {
                                             <div class="col-md-6">
                                                 <select id="category-select-post" class="form-select allsi-category-select" data-post-type="post">
                                                     <option value=""><?php esc_html_e( '-- Select Category --', 'all-sources-images' ); ?></option>
-                                                    <?php foreach ( $post_categories as $cat ) : ?>
-                                                        <option value="<?php echo esc_attr( $cat->term_id ); ?>"><?php echo esc_html( $cat->name ); ?> (<?php echo esc_html( $cat->count ); ?>)</option>
+                                                    <?php foreach ( $allsi_post_categories as $allsi_cat ) : ?>
+                                                        <option value="<?php echo esc_attr( $allsi_cat->term_id ); ?>"><?php echo esc_html( $allsi_cat->name ); ?> (<?php echo esc_html( $allsi_cat->count ); ?>)</option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -242,7 +242,7 @@ if ( $has_woocommerce ) {
             </div>
 
             <!-- PRODUCTS Section (WooCommerce) -->
-            <?php if ( $has_woocommerce ) : ?>
+            <?php if ( $allsi_has_woocommerce ) : ?>
             <div class="mb-4">
                 <div class="d-flex align-items-center mb-2">
                     <i class="bi bi-bag-check me-2 text-warning"></i>
@@ -331,9 +331,9 @@ if ( $has_woocommerce ) {
                                             <div class="col-md-6">
                                                 <select id="category-select-product" class="form-select allsi-category-select" data-post-type="product">
                                                     <option value=""><?php esc_html_e( '-- Select Category --', 'all-sources-images' ); ?></option>
-                                                    <?php if ( ! is_wp_error( $product_categories ) ) : ?>
-                                                        <?php foreach ( $product_categories as $cat ) : ?>
-                                                            <option value="<?php echo esc_attr( $cat->term_id ); ?>"><?php echo esc_html( $cat->name ); ?> (<?php echo esc_html( $cat->count ); ?>)</option>
+                                                    <?php if ( ! is_wp_error( $allsi_product_categories ) ) : ?>
+                                                        <?php foreach ( $allsi_product_categories as $allsi_cat ) : ?>
+                                                            <option value="<?php echo esc_attr( $allsi_cat->term_id ); ?>"><?php echo esc_html( $allsi_cat->name ); ?> (<?php echo esc_html( $allsi_cat->count ); ?>)</option>
                                                         <?php endforeach; ?>
                                                     <?php endif; ?>
                                                 </select>

@@ -87,7 +87,7 @@ add_action( 'activated_plugin', function( $plugin ) {
     if ( $plugin === plugin_basename( __FILE__ ) ) {
         ALLSI_log( 'Plugin successfully activated by WordPress', 'ACTIVATION' );
         ALLSI_log( 'Current user ID: ' . get_current_user_id(), 'ACTIVATION' );
-        ALLSI_log( 'User capabilities: ' . print_r( wp_get_current_user()->allcaps, true ), 'ACTIVATION' );
+        ALLSI_log( 'User capabilities: ' . wp_json_encode( wp_get_current_user()->allcaps ), 'ACTIVATION' );
     }
 } );
 

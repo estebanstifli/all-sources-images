@@ -11,23 +11,23 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 
 // Get options
-$options = get_option( 'ALLSI_plugin_main_settings' );
-$options = wp_parse_args( $options, $this->ALLSI_default_options_main_settings() );
+$allsi_options = get_option( 'ALLSI_plugin_main_settings' );
+$allsi_options = wp_parse_args( $allsi_options, $this->ALLSI_default_options_main_settings() );
 
 // Premium check
-$checkbox_disabled = '';
-$disabled = '';
+$allsi_checkbox_disabled = '';
+$allsi_disabled = '';
 if ( function_exists( 'ALLSI_freemius' ) && !ALLSI_freemius()->is_premium() ) {
-    $checkbox_disabled = 'disabled-custom';
-    $disabled = 'disabled';
+    $allsi_checkbox_disabled = 'disabled-custom';
+    $allsi_disabled = 'disabled';
 }
 
 // Alt language
-if( !isset( $options['translate_alt_lang'] ) ) {
-    $wp_lang    = get_bloginfo('language');
-    $alt_lang   = substr( $wp_lang, 0, 2 );
+if ( ! isset( $allsi_options['translate_alt_lang'] ) ) {
+    $allsi_wp_lang  = get_bloginfo( 'language' );
+    $allsi_alt_lang = substr( $allsi_wp_lang, 0, 2 );
 } else {
-    $alt_lang   = $options['translate_alt_lang'];
+    $allsi_alt_lang = $allsi_options['translate_alt_lang'];
 }
 ?>
 
@@ -52,15 +52,15 @@ if( !isset( $options['translate_alt_lang'] ) ) {
             </th>
             <td class="chosen_title radio-inline">
                 <label class="radio radio-outline radio-outline-2x radio-primary">
-                    <input value="title" name="ALLSI_plugin_main_settings[image_filename]" type="radio" <?php checked( ! empty( $options['image_filename'] ) && $options['image_filename'] == 'title' ); ?>>
+                    <input value="title" name="ALLSI_plugin_main_settings[image_filename]" type="radio" <?php checked( ! empty( $allsi_options['image_filename'] ) && $allsi_options['image_filename'] == 'title' ); ?>>
                     <span></span> <?php esc_html_e( 'Title', 'all-sources-images' ); ?>
                 </label><br/>
                 <label class="radio radio-outline radio-outline-2x radio-primary">
-                    <input value="date" name="ALLSI_plugin_main_settings[image_filename]" type="radio" <?php checked( ! empty( $options['image_filename'] ) && $options['image_filename'] == 'date' ); ?>>
+                    <input value="date" name="ALLSI_plugin_main_settings[image_filename]" type="radio" <?php checked( ! empty( $allsi_options['image_filename'] ) && $allsi_options['image_filename'] == 'date' ); ?>>
                     <span></span> <?php esc_html_e( 'Date', 'all-sources-images' ); ?>
                 </label><br/>
                 <label class="radio radio-outline radio-outline-2x radio-primary">
-                    <input value="random" name="ALLSI_plugin_main_settings[image_filename]" type="radio" <?php checked( ! empty( $options['image_filename'] ) && $options['image_filename'] == 'random' ); ?>>
+                    <input value="random" name="ALLSI_plugin_main_settings[image_filename]" type="radio" <?php checked( ! empty( $allsi_options['image_filename'] ) && $allsi_options['image_filename'] == 'random' ); ?>>
                     <span></span> <?php esc_html_e( 'Random number', 'all-sources-images' ); ?>
                 </label>
             </td>
@@ -73,7 +73,7 @@ if( !isset( $options['translate_alt_lang'] ) ) {
             </th>
             <td class="checkbox-list">
                 <label class="checkbox">
-                    <input <?php checked( ! empty( $options['rewrite_featured'] ) && $options['rewrite_featured'] == 'true' ); ?> name="ALLSI_plugin_main_settings[rewrite_featured]" type="checkbox" value="true">
+                    <input <?php checked( ! empty( $allsi_options['rewrite_featured'] ) && $allsi_options['rewrite_featured'] == 'true' ); ?> name="ALLSI_plugin_main_settings[rewrite_featured]" type="checkbox" value="true">
                     <span></span> <?php esc_html_e( 'Overwrite', 'all-sources-images' ); ?>
                 </label>
                 <p class="description">
@@ -89,7 +89,7 @@ if( !isset( $options['translate_alt_lang'] ) ) {
             </th>
             <td class="checkbox-list">
                 <label class="checkbox">
-                    <input <?php checked( ! empty( $options['image_reuse'] ) && $options['image_reuse'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_reuse]" type="checkbox" value="true">
+                    <input <?php checked( ! empty( $allsi_options['image_reuse'] ) && $allsi_options['image_reuse'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_reuse]" type="checkbox" value="true">
                     <span></span> <?php esc_html_e( 'Enable', 'all-sources-images' ); ?>
                 </label>
                 <p class="description">
@@ -104,15 +104,15 @@ if( !isset( $options['translate_alt_lang'] ) ) {
                 <?php esc_html_e( 'Image Modifications', 'all-sources-images' ); ?>
             </th>
             <td class="checkbox-list">
-                <label class="checkbox <?php echo esc_attr( $checkbox_disabled ); ?>">
-                    <input <?php checked( ! empty( $options['image_flip'] ) && $options['image_flip'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_flip]" type="checkbox" value="true" <?php echo esc_attr( $disabled ); ?>>
+                <label class="checkbox <?php echo esc_attr( $allsi_checkbox_disabled ); ?>">
+                    <input <?php checked( ! empty( $allsi_options['image_flip'] ) && $allsi_options['image_flip'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_flip]" type="checkbox" value="true" <?php echo esc_attr( $allsi_disabled ); ?>>
                     <span></span> <?php esc_html_e( 'Flip horizontally', 'all-sources-images' ); ?>
                 </label>
-                <label class="checkbox <?php echo esc_attr( $checkbox_disabled ); ?>">
-                    <input <?php checked( ! empty( $options['image_crop'] ) && $options['image_crop'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_crop]" type="checkbox" value="true" <?php echo esc_attr( $disabled ); ?>>
+                <label class="checkbox <?php echo esc_attr( $allsi_checkbox_disabled ); ?>">
+                    <input <?php checked( ! empty( $allsi_options['image_crop'] ) && $allsi_options['image_crop'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_crop]" type="checkbox" value="true" <?php echo esc_attr( $allsi_disabled ); ?>>
                     <span></span> <?php esc_html_e( 'Crop Image by 10%', 'all-sources-images' ); ?>
                 </label>
-                <?php if ( $disabled ) : ?>
+                <?php if ( $allsi_disabled ) : ?>
                     <p class="description text-warning"><?php esc_html_e( 'Premium feature - upgrade to unlock', 'all-sources-images' ); ?></p>
                 <?php endif; ?>
             </td>
@@ -129,40 +129,40 @@ if( !isset( $options['translate_alt_lang'] ) ) {
             </th>
             <td>
                 <label class="checkbox">
-                    <input data-switch="true" type="checkbox" name="ALLSI_plugin_main_settings[enable_alt]" id="enable_alt" value="enable" <?php checked( ! empty( $options['enable_alt'] ) && $options['enable_alt'] == 'enable' ); ?> />
+                    <input data-switch="true" type="checkbox" name="ALLSI_plugin_main_settings[enable_alt]" id="enable_alt" value="enable" <?php checked( ! empty( $allsi_options['enable_alt'] ) && $allsi_options['enable_alt'] == 'enable' ); ?> />
                 </label>
             </td>
         </tr>
 
-        <tr valign="top" class="show_alt" <?php echo esc_attr( ! isset( $options['enable_alt'] ) || ( $options['enable_alt'] != 'enable' ) ? 'style="display:none;"' : '' ); ?>>
+        <tr valign="top" class="show_alt" <?php echo esc_attr( ! isset( $allsi_options['enable_alt'] ) || ( $allsi_options['enable_alt'] != 'enable' ) ? 'style="display:none;"' : '' ); ?>>
             <th scope="row">
                 <label for="hseparator"><?php esc_html_e( 'Alt Text from', 'all-sources-images' ); ?></label>
             </th>
             <td class="tags radio-list">
                 <label class="radio">
-                    <input value="source" name="ALLSI_plugin_main_settings[alt_from]" type="radio" <?php checked( ! empty( $options['alt_from'] ) && $options['alt_from'] == 'source' ); ?>><span></span> 
+                    <input value="source" name="ALLSI_plugin_main_settings[alt_from]" type="radio" <?php checked( ! empty( $allsi_options['alt_from'] ) && $allsi_options['alt_from'] == 'source' ); ?>><span></span> 
                     <?php esc_html_e( 'Source', 'all-sources-images' ); ?>
                 </label>
                 <label class="radio">
-                    <input value="based_on" name="ALLSI_plugin_main_settings[alt_from]" type="radio" <?php checked( ! empty( $options['alt_from'] ) && $options['alt_from'] == 'based_on' ); ?>> <span></span>
+                    <input value="based_on" name="ALLSI_plugin_main_settings[alt_from]" type="radio" <?php checked( ! empty( $allsi_options['alt_from'] ) && $allsi_options['alt_from'] == 'based_on' ); ?>> <span></span>
                     <?php esc_html_e( 'Text "based_on"', 'all-sources-images' ); ?>
                 </label>
             </td>
         </tr>
 
-        <tr valign="top" class="show_alt" <?php echo esc_attr( isset( $options['enable_alt'] ) && ( $options['enable_alt'] != 'enable' ) ? 'style="display:none;"' : '' ); ?>>
+        <tr valign="top" class="show_alt" <?php echo esc_attr( isset( $allsi_options['enable_alt'] ) && ( $allsi_options['enable_alt'] != 'enable' ) ? 'style="display:none;"' : '' ); ?>>
             <th scope="row">
                 <?php esc_html_e( 'ALT Text Translation', 'all-sources-images' ); ?>
             </th>
             <td class="checkbox-list">
                 <label class="checkbox">
-                    <input name="ALLSI_plugin_main_settings[translate_alt]" type="checkbox" value="true" <?php checked( ! empty( $options['translate_alt'] ) && $options['translate_alt'] == 'true' ); ?>><span></span> 
+                    <input name="ALLSI_plugin_main_settings[translate_alt]" type="checkbox" value="true" <?php checked( ! empty( $allsi_options['translate_alt'] ) && $allsi_options['translate_alt'] == 'true' ); ?>><span></span> 
                     <?php esc_html_e( 'Translate alt text from english to', 'all-sources-images' ); ?>:
                 </label>
 
                 <select name="ALLSI_plugin_main_settings[translate_alt_lang]" class="form-control form-control-lg">
                     <?php
-                    $country_choose = array(
+                    $allsi_country_choose = array(
                         __( 'German', 'all-sources-images' )    => 'de',
                         __( 'Spanish', 'all-sources-images' )   => 'es',
                         __( 'French', 'all-sources-images' )    => 'fr',
@@ -176,11 +176,10 @@ if( !isset( $options['translate_alt_lang'] ) ) {
                         __( 'Korean', 'all-sources-images' )    => 'ko',
                         __( 'Arabic', 'all-sources-images' )    => 'ar',
                     );
-                    ksort( $country_choose );
+                    ksort( $allsi_country_choose );
 
-                    foreach( $country_choose as $name_country => $code_country ) {
-                        $choose = ( $alt_lang == $code_country) ? 'selected="selected"': '';
-                        echo '<option ' . esc_attr( $choose ) . ' value="' . esc_attr( $code_country ) . '">' . esc_html( $name_country ) . '</option>';
+                    foreach ( $allsi_country_choose as $allsi_name_country => $allsi_code_country ) {
+                        echo '<option value="' . esc_attr( $allsi_code_country ) . '" ' . selected( $allsi_alt_lang, $allsi_code_country, false ) . '>' . esc_html( $allsi_name_country ) . '</option>';
                     }
                     ?>
                 </select>
@@ -198,22 +197,22 @@ if( !isset( $options['translate_alt_lang'] ) ) {
             </th>
             <td>
                 <label class="checkbox">
-                    <input data-switch="true" type="checkbox" name="ALLSI_plugin_main_settings[enable_caption]" id="enable_caption" value="enable" <?php checked( ! empty( $options['enable_caption'] ) && $options['enable_caption'] == 'enable' ); ?> />
+                    <input data-switch="true" type="checkbox" name="ALLSI_plugin_main_settings[enable_caption]" id="enable_caption" value="enable" <?php checked( ! empty( $allsi_options['enable_caption'] ) && $allsi_options['enable_caption'] == 'enable' ); ?> />
                 </label>
             </td>
         </tr>
 
-        <tr valign="top" class="show_caption" <?php echo esc_attr( ! isset( $options['enable_caption'] ) || ( $options['enable_caption'] != 'enable' ) ? 'style="display:none;"' : '' ); ?>>
+        <tr valign="top" class="show_caption" <?php echo esc_attr( ! isset( $allsi_options['enable_caption'] ) || ( $allsi_options['enable_caption'] != 'enable' ) ? 'style="display:none;"' : '' ); ?>>
             <th scope="row">
                 <label for="hseparator"><?php esc_html_e( 'Caption Format', 'all-sources-images' ); ?></label>
             </th>
             <td class="tags radio-list">
                 <label class="radio">
-                    <input value="author" name="ALLSI_plugin_main_settings[caption_from]" type="radio" <?php checked( ! empty( $options['caption_from'] ) && $options['caption_from'] == 'author' ); ?>><span></span> 
+                    <input value="author" name="ALLSI_plugin_main_settings[caption_from]" type="radio" <?php checked( ! empty( $allsi_options['caption_from'] ) && $allsi_options['caption_from'] == 'author' ); ?>><span></span> 
                     <?php esc_html_e( 'Image Author', 'all-sources-images' ); ?>
                 </label>
                 <label class="radio">
-                    <input value="author_bank" name="ALLSI_plugin_main_settings[caption_from]" type="radio" <?php checked( ! empty( $options['caption_from'] ) && $options['caption_from'] == 'author_bank' ); ?>> <span></span>
+                    <input value="author_bank" name="ALLSI_plugin_main_settings[caption_from]" type="radio" <?php checked( ! empty( $allsi_options['caption_from'] ) && $allsi_options['caption_from'] == 'author_bank' ); ?>> <span></span>
                     <?php echo wp_kses_post( __( 'Image Author + Name of Image Bank (Example: <em>Author Name from Pixabay</em>)', 'all-sources-images' ) ); ?>
                 </label>
             </td>

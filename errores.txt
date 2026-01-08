@@ -1,1 +1,7 @@
+ARCHIVO: all-sources-images.php
+Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
+90	44	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_print_r	print_r() found. Debug code should not normally be used in production.	Ver en editor de código (abre en una nueva pestaña)
 
+ARCHIVO: includes/php-ml/index.php
+Línea	Columna	Tipo	Código	Mensaje	Enlace para editarlo
+14	1	ERROR	WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound	Classes declared by a theme/plugin should start with the theme/plugin prefix. Found: "KeywordExtractor".	Ver en editor de código (abre en una nueva pestaña)

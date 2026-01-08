@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Determine active tab for styling - Default is now 'placement' since Sources tab is removed
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Tab parameter used only for display styling, no data modification.
-$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
+$allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
 ?>
 <div class="wrap main-mpt">
 	<!--begin::Main-->
@@ -26,7 +26,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 								<!--begin::Page Heading-->
 								<div class="d-flex align-items-baseline flex-wrap mr-5">
 									<!--begin::Page Title-->
-									<h5 class="text-dark font-weight-bold my-1 mr-5">All Sources Images : <?php echo esc_html( $title ); ?></h5>
+									<h5 class="text-dark font-weight-bold my-1 mr-5">All Sources Images : <?php echo esc_html( $allsi_title ); ?></h5>
 									<!--end::Page Title-->
 								</div>
 								<!--end::Page Heading-->
@@ -46,12 +46,12 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 									<!-- Tabs BEFORE the card -->
 									<ul class="nav nav-tabs nav-tabs-line nav-tabs-line-2x nav-tabs-primary" role="tablist" style="margin-bottom: 0; border-bottom: none;">
 										<li class="nav-item">
-											<a class="nav-link <?php echo esc_attr( $active_tab === 'placement' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=placement' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $allsi_active_tab === 'placement' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=placement' ) ); ?>">
 												<?php esc_html_e( 'Image Placement', 'all-sources-images' ); ?>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a class="nav-link <?php echo esc_attr( $active_tab === 'postprocessing' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=postprocessing' ) ); ?>">
+											<a class="nav-link <?php echo esc_attr( $allsi_active_tab === 'postprocessing' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-automatic&tab=postprocessing' ) ); ?>">
 												<?php esc_html_e( 'Post-Processing', 'all-sources-images' ); ?>
 											</a>
 										</li>

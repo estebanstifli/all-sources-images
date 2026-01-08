@@ -6,37 +6,37 @@ if ( ! class_exists( 'ALLSI_Image_Source' ) ) {
 }
 
 if ( ! class_exists( 'ALLSI_Source_Youtube' ) ) {
-    $youtube_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-youtube.php';
-    if ( file_exists( $youtube_source_path ) ) {
-        require_once $youtube_source_path;
+    $allsi_youtube_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-youtube.php';
+    if ( file_exists( $allsi_youtube_source_path ) ) {
+        require_once $allsi_youtube_source_path;
     }
 }
 
 if ( ! class_exists( 'ALLSI_Source_Google_Image' ) ) {
-    $google_image_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-google-image.php';
-    if ( file_exists( $google_image_source_path ) ) {
-        require_once $google_image_source_path;
+    $allsi_google_image_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-google-image.php';
+    if ( file_exists( $allsi_google_image_source_path ) ) {
+        require_once $allsi_google_image_source_path;
     }
 }
 
 if ( ! class_exists( 'ALLSI_Source_Dallev1' ) ) {
-    $dalle_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-dallev1.php';
-    if ( file_exists( $dalle_source_path ) ) {
-        require_once $dalle_source_path;
+    $allsi_dalle_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-dallev1.php';
+    if ( file_exists( $allsi_dalle_source_path ) ) {
+        require_once $allsi_dalle_source_path;
     }
 }
 
 if ( ! class_exists( 'ALLSI_Source_Stability' ) ) {
-    $stability_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-stability.php';
-    if ( file_exists( $stability_source_path ) ) {
-        require_once $stability_source_path;
+    $allsi_stability_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-stability.php';
+    if ( file_exists( $allsi_stability_source_path ) ) {
+        require_once $allsi_stability_source_path;
     }
 }
 
 if ( ! class_exists( 'ALLSI_Source_Replicate' ) ) {
-    $replicate_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-replicate.php';
-    if ( file_exists( $replicate_source_path ) ) {
-        require_once $replicate_source_path;
+    $allsi_replicate_source_path = plugin_dir_path( __FILE__ ) . 'sources/class-allsi-source-replicate.php';
+    if ( file_exists( $allsi_replicate_source_path ) ) {
+        require_once $allsi_replicate_source_path;
     }
 }
 

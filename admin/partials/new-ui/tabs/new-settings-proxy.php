@@ -9,8 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 settings_errors();
 
-$options = wp_parse_args( get_option( 'ALLSI_plugin_proxy_settings' ), $this->ALLSI_default_options_proxy_settings( FALSE ) );
-$is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_proxy'] === 'enable' );
+$allsi_options = wp_parse_args( get_option( 'ALLSI_plugin_proxy_settings' ), $this->ALLSI_default_options_proxy_settings( FALSE ) );
+$allsi_is_proxy_enabled = ( ! empty( $allsi_options['enable_proxy'] ) && $allsi_options['enable_proxy'] === 'enable' );
 ?>
 
 <form method="post" action="options.php">
@@ -62,7 +62,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
                     </th>
                     <td>
                         <label class="allsi-switch">
-                            <input type="checkbox" name="ALLSI_plugin_proxy_settings[enable_proxy]" id="enable_proxy" value="enable" <?php checked( $is_proxy_enabled ); ?> />
+                            <input type="checkbox" name="ALLSI_plugin_proxy_settings[enable_proxy]" id="enable_proxy" value="enable" <?php checked( $allsi_is_proxy_enabled ); ?> />
                             <span class="allsi-switch-slider"></span>
                         </label>
                         <p class="description"><?php esc_html_e( 'Enable a custom HTTPS proxy server for all API requests.', 'all-sources-images' ); ?></p>
@@ -72,7 +72,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
         </table>
 
         <!-- Proxy Settings (shown when enabled) -->
-        <div id="allsi-proxy-settings" style="display: <?php echo esc_attr( $is_proxy_enabled ? 'block' : 'none' ); ?>;">
+        <div id="allsi-proxy-settings" style="display: <?php echo esc_attr( $allsi_is_proxy_enabled ? 'block' : 'none' ); ?>;">
             <table class="form-table">
                 <tbody>
                     <!-- Proxy Address -->
@@ -81,7 +81,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
                             <label for="proxy_address"><?php esc_html_e( 'Address', 'all-sources-images' ); ?></label>
                         </th>
                         <td>
-                            <input type="text" class="regular-text" name="ALLSI_plugin_proxy_settings[proxy_address]" id="proxy_address" value="<?php echo esc_attr( isset($options['proxy_address']) ? $options['proxy_address'] : '' ); ?>" placeholder="xxx.xxx.xxx.xx" />
+                            <input type="text" class="regular-text" name="ALLSI_plugin_proxy_settings[proxy_address]" id="proxy_address" value="<?php echo esc_attr( isset( $allsi_options['proxy_address'] ) ? $allsi_options['proxy_address'] : '' ); ?>" placeholder="xxx.xxx.xxx.xx" />
                             <p class="description"><?php esc_html_e( 'Proxy server IP address or hostname.', 'all-sources-images' ); ?></p>
                         </td>
                     </tr>
@@ -92,7 +92,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
                             <label for="proxy_port"><?php esc_html_e( 'Port', 'all-sources-images' ); ?></label>
                         </th>
                         <td>
-                            <input type="number" class="small-text" name="ALLSI_plugin_proxy_settings[proxy_port]" id="proxy_port" value="<?php echo esc_attr( isset($options['proxy_port']) ? $options['proxy_port'] : '80' ); ?>" placeholder="80" min="1" max="65535" />
+                            <input type="number" class="small-text" name="ALLSI_plugin_proxy_settings[proxy_port]" id="proxy_port" value="<?php echo esc_attr( isset( $allsi_options['proxy_port'] ) ? $allsi_options['proxy_port'] : '80' ); ?>" placeholder="80" min="1" max="65535" />
                             <p class="description"><?php esc_html_e( 'Proxy server port (default: 80 for HTTP, 443 for HTTPS).', 'all-sources-images' ); ?></p>
                         </td>
                     </tr>
@@ -103,7 +103,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
                             <label for="proxy_username"><?php esc_html_e( 'Username', 'all-sources-images' ); ?></label>
                         </th>
                         <td>
-                            <input type="text" class="regular-text" name="ALLSI_plugin_proxy_settings[proxy_username]" id="proxy_username" value="<?php echo esc_attr( isset($options['proxy_username']) ? $options['proxy_username'] : '' ); ?>" />
+                            <input type="text" class="regular-text" name="ALLSI_plugin_proxy_settings[proxy_username]" id="proxy_username" value="<?php echo esc_attr( isset( $allsi_options['proxy_username'] ) ? $allsi_options['proxy_username'] : '' ); ?>" />
                             <p class="description"><?php esc_html_e( 'Username if authentication is required (optional).', 'all-sources-images' ); ?></p>
                         </td>
                     </tr>
@@ -114,7 +114,7 @@ $is_proxy_enabled = ( ! empty( $options['enable_proxy'] ) && $options['enable_pr
                             <label for="proxy_password"><?php esc_html_e( 'Password', 'all-sources-images' ); ?></label>
                         </th>
                         <td>
-                            <input type="password" class="regular-text" name="ALLSI_plugin_proxy_settings[proxy_password]" id="proxy_password" value="<?php echo esc_attr( isset($options['proxy_password']) ? $options['proxy_password'] : '' ); ?>" />
+                            <input type="password" class="regular-text" name="ALLSI_plugin_proxy_settings[proxy_password]" id="proxy_password" value="<?php echo esc_attr( isset( $allsi_options['proxy_password'] ) ? $allsi_options['proxy_password'] : '' ); ?>" />
                             <p class="description"><?php esc_html_e( 'Password if authentication is required (optional).', 'all-sources-images' ); ?></p>
                         </td>
                     </tr>

@@ -10,12 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 settings_errors();
 
-$options_block = wp_parse_args( get_option( 'ALLSI_plugin_block_settings' ), $this->ALLSI_default_options_block_settings( TRUE ) );
-$options_logs = wp_parse_args( get_option( 'ALLSI_plugin_logs_settings' ), $this->ALLSI_default_options_logs_settings( TRUE ) );
-$options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
+$allsi_options_block = wp_parse_args( get_option( 'ALLSI_plugin_block_settings' ), $this->ALLSI_default_options_block_settings( TRUE ) );
+$allsi_options_logs = wp_parse_args( get_option( 'ALLSI_plugin_logs_settings' ), $this->ALLSI_default_options_logs_settings( TRUE ) );
+$allsi_options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
 
 // Language options for translation
-$country_choose = array(
+$allsi_country_choose = array(
     __( 'Afrikaans', 'all-sources-images' )             => 'af',
     __( 'Albanian', 'all-sources-images' )              => 'sq',
     __( 'Arabic', 'all-sources-images' )                => 'ar',
@@ -60,28 +60,28 @@ $country_choose = array(
 );
 
 // Get WordPress language and find matching code in country_choose
-$wp_lang = get_bloginfo( 'language' );
-$wp_lang_code = substr( $wp_lang, 0, 2 );
+$allsi_wp_lang = get_bloginfo( 'language' );
+$allsi_wp_lang_code = substr( $allsi_wp_lang, 0, 2 );
 
 // Find the best matching language code from the list
-$wp_lang_matched = $wp_lang_code; // Default to 2-letter code
-foreach ( $country_choose as $name => $code ) {
+$allsi_wp_lang_matched = $allsi_wp_lang_code; // Default to 2-letter code
+foreach ( $allsi_country_choose as $allsi_name => $allsi_code ) {
     // First try exact match with full locale (e.g., pt-BR)
-    if ( str_replace( '-', '-', $wp_lang ) === $code ) {
-        $wp_lang_matched = $code;
+    if ( str_replace( '-', '-', $allsi_wp_lang ) === $allsi_code ) {
+        $allsi_wp_lang_matched = $allsi_code;
         break;
     }
     // Then try 2-letter code match
-    if ( substr( $code, 0, 2 ) === $wp_lang_code && strlen( $code ) === 2 ) {
-        $wp_lang_matched = $code;
+    if ( substr( $allsi_code, 0, 2 ) === $allsi_wp_lang_code && strlen( $allsi_code ) === 2 ) {
+        $allsi_wp_lang_matched = $allsi_code;
     }
 }
 
 // Alt tag language - use saved value or default to WordPress language
-if ( ! empty( $options_block['translate_alt_lang'] ) ) {
-    $alt_lang = $options_block['translate_alt_lang'];
+if ( ! empty( $allsi_options_block['translate_alt_lang'] ) ) {
+    $allsi_alt_lang = $allsi_options_block['translate_alt_lang'];
 } else {
-    $alt_lang = $wp_lang_matched;
+    $allsi_alt_lang = $allsi_wp_lang_matched;
 }
 ?>
 
@@ -119,7 +119,7 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
                 </th>
                 <td>
                     <label class="checkbox">
-                        <input type="checkbox" name="ALLSI_plugin_block_settings[translation_EN]" id="translation_EN" value="true" <?php checked( ! empty( $options_block['translation_EN'] ) && $options_block['translation_EN'] == 'true' ); ?> />
+                        <input type="checkbox" name="ALLSI_plugin_block_settings[translation_EN]" id="translation_EN" value="true" <?php checked( ! empty( $allsi_options_block['translation_EN'] ) && $allsi_options_block['translation_EN'] == 'true' ); ?> />
                         <span></span>
                         <?php esc_html_e( 'Translate search keywords to English', 'all-sources-images' ); ?>
                     </label>
@@ -130,34 +130,34 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
             <!-- Source Language for Translation -->
             <?php
             // Determine current source language setting
-            $current_source_lang = ! empty( $options_block['source_lang'] ) ? $options_block['source_lang'] : '';
+            $allsi_current_source_lang = ! empty( $allsi_options_block['source_lang'] ) ? $allsi_options_block['source_lang'] : '';
             
             // Find the display name for WordPress language
-            $wp_lang_name = '';
-            foreach ( $country_choose as $name => $code ) {
-                if ( $code === $wp_lang_matched ) {
-                    $wp_lang_name = $name;
+            $allsi_wp_lang_name = '';
+            foreach ( $allsi_country_choose as $allsi_name => $allsi_code ) {
+                if ( $allsi_code === $allsi_wp_lang_matched ) {
+                    $allsi_wp_lang_name = $allsi_name;
                     break;
                 }
             }
-            if ( empty( $wp_lang_name ) ) {
-                $wp_lang_name = $wp_lang;
+            if ( empty( $allsi_wp_lang_name ) ) {
+                $allsi_wp_lang_name = $allsi_wp_lang;
             }
             ?>
-            <tr class="allsi-source-lang-row" <?php echo esc_attr( ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) ? 'style="display:none;"' : '' ); ?>>
+            <tr class="allsi-source-lang-row" <?php echo esc_attr( ( empty( $allsi_options_block['translation_EN'] ) || $allsi_options_block['translation_EN'] != 'true' ) ? 'style="display:none;"' : '' ); ?>>
                 <th scope="row">
                     <label for="source_lang"><?php esc_html_e( 'Source Language', 'all-sources-images' ); ?></label>
                 </th>
                 <td>
                     <select name="ALLSI_plugin_block_settings[source_lang]" id="source_lang" class="form-control" style="width: auto;">
-                        <option value="" <?php selected( $current_source_lang, '' ); ?>>
+                        <option value="" <?php selected( $allsi_current_source_lang, '' ); ?>>
                             <?php 
                             /* translators: %s: WordPress language name */
-                            printf( esc_html__( 'Auto (WordPress: %s)', 'all-sources-images' ), esc_html( $wp_lang_name ) ); 
+                            printf( esc_html__( 'Auto (WordPress: %s)', 'all-sources-images' ), esc_html( $allsi_wp_lang_name ) ); 
                             ?>
                         </option>
-                        <?php foreach ( $country_choose as $country => $value ) : ?>
-                            <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current_source_lang, $value ); ?>><?php echo esc_html( $country ); ?></option>
+                        <?php foreach ( $allsi_country_choose as $allsi_country => $allsi_value ) : ?>
+                            <option value="<?php echo esc_attr( $allsi_value ); ?>" <?php selected( $allsi_current_source_lang, $allsi_value ); ?>><?php echo esc_html( $allsi_country ); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <p class="description"><?php esc_html_e( 'Select the language of your content. This is the language that will be translated to English for searching. By default, it uses your WordPress site language.', 'all-sources-images' ); ?></p>
@@ -171,13 +171,13 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
                 </th>
                 <td>
                     <label class="checkbox">
-                        <input type="checkbox" name="ALLSI_plugin_block_settings[translate_alt]" id="translate_alt" value="true" <?php checked( ! empty( $options_block['translate_alt'] ) && $options_block['translate_alt'] == 'true' ); ?> />
+                        <input type="checkbox" name="ALLSI_plugin_block_settings[translate_alt]" id="translate_alt" value="true" <?php checked( ! empty( $allsi_options_block['translate_alt'] ) && $allsi_options_block['translate_alt'] == 'true' ); ?> />
                         <span></span>
                         <?php esc_html_e( 'Translate alt text from English to:', 'all-sources-images' ); ?>
                     </label>
                     <select name="ALLSI_plugin_block_settings[translate_alt_lang]" class="form-control" style="width: auto; display: inline-block; margin-left: 10px;">
-                        <?php foreach ( $country_choose as $country => $value ) : ?>
-                            <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $alt_lang, $value ); ?>><?php echo esc_html( $country ); ?></option>
+                        <?php foreach ( $allsi_country_choose as $allsi_country => $allsi_value ) : ?>
+                            <option value="<?php echo esc_attr( $allsi_value ); ?>" <?php selected( $allsi_alt_lang, $allsi_value ); ?>><?php echo esc_html( $allsi_country ); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <p class="description"><?php esc_html_e( 'Translates the image ALT attribute from English to your selected language. Improves SEO for non-English sites.', 'all-sources-images' ); ?></p>
@@ -185,13 +185,13 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
             </tr>
 
             <!-- Google Translate API Key (shown when either translation option is enabled) -->
-            <tr class="allsi-google-api-row" <?php echo esc_attr( ( empty( $options_block['translation_EN'] ) || $options_block['translation_EN'] != 'true' ) && ( empty( $options_block['translate_alt'] ) || $options_block['translate_alt'] != 'true' ) ? 'style="display:none;"' : '' ); ?>>
+            <tr class="allsi-google-api-row" <?php echo esc_attr( ( empty( $allsi_options_block['translation_EN'] ) || $allsi_options_block['translation_EN'] != 'true' ) && ( empty( $allsi_options_block['translate_alt'] ) || $allsi_options_block['translate_alt'] != 'true' ) ? 'style="display:none;"' : '' ); ?>>
                 <th scope="row">
                     <label for="google_translate_apikey"><?php esc_html_e( 'Google Translate API Key', 'all-sources-images' ); ?></label>
                     <span class="description" style="font-weight: normal; font-size: 11px; display: block;"><?php esc_html_e( '(Optional)', 'all-sources-images' ); ?></span>
                 </th>
                 <td id="password-google-translate" class="password">
-                    <input type="password" name="ALLSI_plugin_block_settings[google_translate_apikey]" id="google_translate_apikey" class="form-control" placeholder="<?php esc_attr_e( 'Leave empty to use free translation', 'all-sources-images' ); ?>" value="<?php echo ! empty( $options_block['google_translate_apikey'] ) ? esc_attr( $options_block['google_translate_apikey'] ) : ''; ?>" />
+                    <input type="password" name="ALLSI_plugin_block_settings[google_translate_apikey]" id="google_translate_apikey" class="form-control" placeholder="<?php esc_attr_e( 'Leave empty to use free translation', 'all-sources-images' ); ?>" value="<?php echo ! empty( $allsi_options_block['google_translate_apikey'] ) ? esc_attr( $allsi_options_block['google_translate_apikey'] ) : ''; ?>" />
                     <i id="togglePassword"></i>
                     <p class="description" style="clear: both; padding-top: 10px;">
                         <?php esc_html_e( 'Optional: Provide your Google Cloud Translation API key for better quality and reliability. If left empty, the plugin will use the free Google Translate service.', 'all-sources-images' ); ?>
@@ -225,7 +225,7 @@ if ( ! empty( $options_block['translate_alt_lang'] ) ) {
                 </th>
                 <td>
                     <label class="checkbox">
-                        <input type="checkbox" name="ALLSI_plugin_logs_settings[logs]" id="enable_logs" value="true" <?php checked( ! empty( $options_logs['logs'] ) && $options_logs['logs'] == 'true' ); ?> />
+                        <input type="checkbox" name="ALLSI_plugin_logs_settings[logs]" id="enable_logs" value="true" <?php checked( ! empty( $allsi_options_logs['logs'] ) && $allsi_options_logs['logs'] == 'true' ); ?> />
                         <span></span>
                         <?php esc_html_e( 'Enable logging', 'all-sources-images' ); ?>
                     </label>

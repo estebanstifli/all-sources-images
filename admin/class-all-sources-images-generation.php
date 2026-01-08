@@ -1122,13 +1122,13 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                         'post_excerpt' => $caption_img,
                     ) );
                 }
-                /* Fire filter "wp_handle_upload" for plugins like optimizers etc. */
+                /* Allow integrations to react after attachment creation. */
                 $img_values = array(
                     'file' => $wp_upload_dir['path'] . '/' . urlencode( $filename ),
                     'url'  => $wp_upload_dir['url'] . '/' . urlencode( $filename ),
                     'type' => $wp_filetype['type'],
                 );
-                apply_filters( 'wp_handle_upload', $img_values );
+                do_action( 'allsi_after_attachment_created', $attach_id, $img_values );
                 require_once ABSPATH . 'wp-admin/includes/image.php';
                 $attach_data = wp_generate_attachment_metadata( $attach_id, $wp_upload_dir['path'] . '/' . urlencode( $filename ) );
                 $update_attach_data = wp_update_attachment_metadata( $attach_id, $attach_data );
@@ -2119,7 +2119,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      */
     private function get_extracted_term( $text, $selected_lang = 'en' ) {
         require_once dirname( __FILE__ ) . '/../includes/php-ml/index.php';
-        $extractor = new KeywordExtractor($selected_lang);
+        $extractor = new ALLSI_KeywordExtractor( $selected_lang );
         $keywords = $extractor->extractKeywords( $text );
         return $keywords[0];
     }
