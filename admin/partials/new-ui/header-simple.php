@@ -18,30 +18,26 @@ $allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_G
 				<!--begin::Content-->
 				<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 
-					<!--begin::Subheader-->
-					<div class="subheader py-2 py-lg-6 subheader-solid" id="kt_subheader">
-						<div class="container-fluid d-flex align-items-center justify-content-between flex-wrap flex-sm-nowrap">
-							<!--begin::Info-->
-							<div class="d-flex align-items-center flex-wrap mr-1">
-								<!--begin::Page Heading-->
-								<div class="d-flex align-items-baseline flex-wrap mr-5">
-									<!--begin::Page Title-->
-									<h5 class="text-dark font-weight-bold my-1 mr-5">All Sources Images : <?php echo esc_html( $allsi_title ); ?></h5>
-									<!--end::Page Title-->
-								</div>
-								<!--end::Page Heading-->
-							</div>
-							<!--end::Info-->
-						</div>
-					</div>
-					<!--end::Subheader-->
-
 					<!--begin::Entry-->
 					<div class="d-flex flex-column-fluid">
 						<!--begin::Container-->
 						<div class="container">
 							<div class="row">
 								<div class="col-md-12">
+
+									<div class="alert alert-custom alert-primary alert-shadow fade show mb-5 rounded" role="alert">
+										<div class="alert-icon">
+											<span class="dashicons dashicons-format-image text-white icon-2x" aria-hidden="true"></span>
+										</div>
+										<div class="alert-text">
+											<div class="font-size-h3 font-weight-bold text-white mb-1">
+												<?php esc_html_e( 'All Sources Images', 'all-sources-images' ); ?>
+											</div>
+											<div class="text-white">
+												<?php esc_html_e( 'You can use it in several places: Media > All Sources Images, the ASI Images block in Gutenberg, or the ASI Image widget in Elementor.', 'all-sources-images' ); ?>
+											</div>
+										</div>
+									</div>
 
 									<!-- Tabs BEFORE the card -->
 									<ul class="nav nav-tabs nav-tabs-line nav-tabs-line-2x nav-tabs-primary" role="tablist" style="margin-bottom: 0; border-bottom: none;">
