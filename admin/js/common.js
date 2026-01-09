@@ -1,4 +1,4 @@
-/**
+﻿/**
   * bootstrap-switch - Turn checkboxes and radio buttons into toggle switches.
   *
   * @version v3.3.4
@@ -847,14 +847,14 @@ function showValueInterval(value) {
         output.innerHTML = slider.value;
     }
 
-    //console.log( translationsJsVars );
+    //console.log( allsiTranslationsJsVars );
 
-    var minute         = translationsJsVars.translations.per_minute;
-    var hour           = translationsJsVars.translations.per_hour;
+    var minute         = allsiTranslationsJsVars.translations.per_minute;
+    var hour           = allsiTranslationsJsVars.translations.per_hour;
 
     switch (value) {
         case '0':
-            var intervalValue  = translationsJsVars.translations.no_interval;
+            var intervalValue  = allsiTranslationsJsVars.translations.no_interval;
             var unitInterval   = '';
             break;
         case '1':
@@ -886,7 +886,7 @@ function showValueInterval(value) {
             var unitInterval   = hour;
             break;
         default:
-            var intervalValue  = translationsJsVars.translations.no_interval;
+            var intervalValue  = allsiTranslationsJsVars.translations.no_interval;
             var unitInterval   = '';
     }
 
@@ -899,3 +899,4 @@ function showValueInterval(value) {
 
 
 }
+

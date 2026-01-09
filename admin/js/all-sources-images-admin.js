@@ -320,7 +320,7 @@ jQuery(document).ready(function() {
             #general-options .category_choice .checkbox-disabled, \n\
             #general-options .choosed_banks .checkbox-disabled"
     ).click(function(e) {
-        var alertProVersion = translationsJsVars.translations.pro_version;
+        var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
         alert( alertProVersion );
         return false;
     });
@@ -485,7 +485,7 @@ jQuery(document).ready(function() {
               jQuery( '.image-block-' + blockNumber + '.section_openai_extractor' ).show( 'fast' );
             }
           } else {
-            var alertProVersion = translationsJsVars.translations.pro_version;
+            var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
             alert( alertProVersion );
             jQuery(".section_basedon .based_on input[value='title']").attr( 'checked', true );
           }
@@ -547,7 +547,7 @@ jQuery(document).ready(function() {
         $('#add-image-btn-disabled').click(function(e) {
           e.preventDefault();
           if ($('.available-pro-version').length === 0) { // Checks whether the element already exists
-            $('#add-image-btn-disabled').after('<span class="available-pro-version">' + translationsJsVars.translations.one_block + '</span>');
+            $('#add-image-btn-disabled').after('<span class="available-pro-version">' + allsiTranslationsJsVars.translations.one_block + '</span>');
           }
         });
 
@@ -646,7 +646,7 @@ jQuery(document).ready(function() {
     /* Google scrap domains textarea */
     if( false === checkRights() ) {
       jQuery('#restricted_domains, #blacklisted_domains').click(function() {
-              var alertProVersion = translationsJsVars.translations.pro_version;
+              var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
               alert( alertProVersion );
       });
     }
@@ -656,7 +656,7 @@ jQuery(document).ready(function() {
     //jQuery('.chosen_api li label.checkbox-disabled').click(function() {
     jQuery('label.checkbox-disabled').click(function(e) {
       
-            var alertProVersion = translationsJsVars.translations.pro_version;
+            var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
             alert( alertProVersion );
             e.preventDefault();
     });
@@ -664,7 +664,7 @@ jQuery(document).ready(function() {
 
     // Delete logs confirmation
     jQuery('.delete-logs').click(function(e) {
-            var deleteLogsSentence = translationsJsVars.translations.delete_logs;
+            var deleteLogsSentence = allsiTranslationsJsVars.translations.delete_logs;
             var deleteLogsAction = confirm(deleteLogsSentence);
             if ( true !== deleteLogsAction ) {
                 e.preventDefault();
@@ -839,7 +839,7 @@ jQuery(document).ready(function() {
           e.preventDefault();
           
           // Retrieve the translation for the alert message
-          var alertOneFeatured = translationsJsVars.translations.only_one_featured;
+          var alertOneFeatured = allsiTranslationsJsVars.translations.only_one_featured;
           
           // Display the alert with the message
           alert(alertOneFeatured);
@@ -902,7 +902,7 @@ function checkButton( selectorSwitch, selectorOptions, noNeedRights = false ) {
                 }
         } else {
                 if( true === state ) {
-                    var alertProVersion = translationsJsVars.translations.pro_version;
+                    var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
                     alert( alertProVersion );
                 }
                 jQuery( selectorSwitch ).bootstrapSwitch( 'state', false, false );
@@ -919,5 +919,6 @@ function checkRights() {
     return premium_version;
     //return false;
 }
+
 
 

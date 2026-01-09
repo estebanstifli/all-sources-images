@@ -876,9 +876,9 @@ class All_Sources_Images_Admin {
             'per_minute'        => esc_html__( 'per minute', 'all-sources-images' ),
             'per_hour'          => esc_html__( 'per hour', 'all-sources-images' ),
         );
-        wp_localize_script( $this->plugin_name, 'translationsJsVars', $translations_var );
-        wp_localize_script( 'common-mpt', 'translationsJsVars', $translations_var );
-        wp_localize_script( 'mpt-rating', 'translationsJsVars', $translations_var );
+        wp_localize_script( $this->plugin_name, 'allsiTranslationsJsVars', $translations_var );
+        wp_localize_script( 'common-mpt', 'allsiTranslationsJsVars', $translations_var );
+        wp_localize_script( 'mpt-rating', 'allsiTranslationsJsVars', $translations_var );
         wp_localize_script( 'images-generation', 'allsiGenerationVars', $js_vars );
     }
 

@@ -1,8 +1,8 @@
-/* Rating div */
+﻿/* Rating div */
 jQuery(document).ready(function($){
     $('#mpt-rate').on('click', function(e){
       e.preventDefault();
-      $('#mpt-rating-notice').html(translationsJsVars.translations.rate_notice);
+      $('#mpt-rating-notice').html(allsiTranslationsJsVars.translations.rate_notice);
     });
   
     $(document).on('click', '#mpt-hide-notice', function(e){
