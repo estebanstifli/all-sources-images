@@ -80,7 +80,23 @@ $allsi_render_checkboxes = function( $allsi_items, $allsi_option_key ) use ( $al
 
     echo '<ul class="radio-list">';
     foreach ( $allsi_rendered_list as $allsi_rendered_item ) {
-        echo $allsi_rendered_item; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo wp_kses(
+            $allsi_rendered_item,
+            array(
+                'li'    => array(),
+                'label' => array( 'class' => array() ),
+                'input' => array(
+                    'class'      => array(),
+                    'data-order' => array(),
+                    'type'       => array(),
+                    'checked'    => array(),
+                    'disabled'   => array(),
+                    'value'      => array(),
+                    'name'       => array(),
+                ),
+                'span'  => array( 'class' => array() ),
+            )
+        );
     }
     echo '</ul>';
 };

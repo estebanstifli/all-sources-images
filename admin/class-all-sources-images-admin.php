@@ -1039,7 +1039,6 @@ class All_Sources_Images_Admin {
         register_setting( 'ASI-plugin-logs-settings', 'ALLSI_plugin_logs_settings', array(
             'sanitize_callback' => array( $this, 'ALLSI_sanitize_logs_settings' ),
         ) );
-        require_once dirname( __FILE__ ) . '/partials/download_log.php';
         require_once dirname( __FILE__ ) . '/partials/delete_log.php';
         add_filter(
             'map_meta_cap',

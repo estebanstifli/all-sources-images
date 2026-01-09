@@ -539,13 +539,13 @@ if ( ! class_exists( 'ALLSI_Elementor_Image_Widget' ) ) {
                 $this->add_render_attribute( 'link', 'href', $link );
             }
 
-            echo '<figure ' . $this->get_render_attribute_string( 'wrapper' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo '<figure ' . wp_kses_post( $this->get_render_attribute_string( 'wrapper' ) ) . '>';
             
             if ( $link ) {
-                echo '<a ' . $this->get_render_attribute_string( 'link' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo '<a ' . wp_kses_post( $this->get_render_attribute_string( 'link' ) ) . '>';
             }
             
-            echo '<img ' . $this->get_render_attribute_string( 'img' ) . ' />'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo '<img ' . wp_kses_post( $this->get_render_attribute_string( 'img' ) ) . ' />';
             
             if ( $link ) {
                 echo '</a>';
