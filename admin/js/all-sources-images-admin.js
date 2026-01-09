@@ -1,4 +1,4 @@
-window.onload = function(){
+﻿window.onload = function(){
 
   setTimeout(function (){
       var gutenbergEditor   = false;
@@ -9,7 +9,7 @@ window.onload = function(){
       }
 
       // Insert Generation button on edit post page (only if variable exists)
-      if (typeof generationSpecificPostJsVars !== 'undefined') {
+      if (typeof allsiGenerationSpecificPostJsVars !== 'undefined') {
           displayGenerationButton(gutenbergEditor);
 
           jQuery( "body" ).click(function(e) {
@@ -44,19 +44,19 @@ function displayGenerationButton(gutenbergEditor = true) {
 
     var outline = '';
 
-    if( "true" == generationSpecificPostJsVars.postgeneration.dalle ) {
-      outline += '<p class="dalle-wait">'+  generationSpecificPostJsVars.postgeneration.strDalleGenerate +'.</p>';
+    if( "true" == allsiGenerationSpecificPostJsVars.postgeneration.dalle ) {
+      outline += '<p class="dalle-wait">'+  allsiGenerationSpecificPostJsVars.postgeneration.strDalleGenerate +'.</p>';
     }
     outline +=  '<div class="button button-primary button-hero '+ uniqueButtonIdentifier +'" id="post-button-generate">';
-    outline += '<img src="'+ generationSpecificPostJsVars.postgeneration.generateImg +'" class="icon-dashboard" width="24px" height="24px" /> ';
-    outline += '<span class="no-generation">'+  generationSpecificPostJsVars.postgeneration.strNoGenerate +'</span>';
-    outline += '<span class="generation">'+  generationSpecificPostJsVars.postgeneration.strGenerate +'</span>';
+    outline += '<img src="'+ allsiGenerationSpecificPostJsVars.postgeneration.generateImg +'" class="icon-dashboard" width="24px" height="24px" /> ';
+    outline += '<span class="no-generation">'+  allsiGenerationSpecificPostJsVars.postgeneration.strNoGenerate +'</span>';
+    outline += '<span class="generation">'+  allsiGenerationSpecificPostJsVars.postgeneration.strGenerate +'</span>';
     outline += '</div>';
 
-    if( ( "true" == generationSpecificPostJsVars.postgeneration.manual_search ) && (true === gutenbergEditor ) ) {
+    if( ( "true" == allsiGenerationSpecificPostJsVars.postgeneration.manual_search ) && (true === gutenbergEditor ) ) {
       outline += '<div class="button button-primary button-hero '+ uniqueButtonIdentifier +'" onClick="addMPTBlockAndOpenModal()" id="post-button-generate-manual">';
-      outline += '<img src="'+ generationSpecificPostJsVars.postgeneration.generateImg +'" class="icon-dashboard" width="24px" height="24px" /> ';
-      outline += '<span class="no-generation">'+ generationSpecificPostJsVars.postgeneration.strManualGenerate +'</span>';
+      outline += '<img src="'+ allsiGenerationSpecificPostJsVars.postgeneration.generateImg +'" class="icon-dashboard" width="24px" height="24px" /> ';
+      outline += '<span class="no-generation">'+ allsiGenerationSpecificPostJsVars.postgeneration.strManualGenerate +'</span>';
       outline += '</div>';
     }
 
@@ -105,18 +105,18 @@ function displayGenerationButton(gutenbergEditor = true) {
         // Wait 1 sec max to ensure post is saved
         setTimeout(function (){
            jQuery.ajax({
-                    url : generationSpecificPostJsVars.postgeneration.wp_ajax_url,
+                    url : allsiGenerationSpecificPostJsVars.postgeneration.wp_ajax_url,
                     method : 'POST',
                     data : {
                             action             : 'allsi_generate_image',
-                            ids_mpt_generation : generationSpecificPostJsVars.postgeneration.postID,
+                            ids_mpt_generation : allsiGenerationSpecificPostJsVars.postgeneration.postID,
                             currentPostIndex   : 1,
                             count              : 1,
                             totalBlocks        : 1, // Number of img block
                             imageCounter       : 0, // Number of img
                             blockIndex         : 0,
                             buttonAutoGenerate : true,
-                            nonce              : generationSpecificPostJsVars.postgeneration.nonce
+                            nonce              : allsiGenerationSpecificPostJsVars.postgeneration.nonce
                     },
                     success: function( data ) {
                             console.log('Generate response:', data);
@@ -130,14 +130,14 @@ function displayGenerationButton(gutenbergEditor = true) {
 
                             // Featured image already exist
                             if( data.data && 'already-done' === data.data.status ) {
-                                if( confirm( generationSpecificPostJsVars.postgeneration.strConfirmReplace ) ) {
+                                if( confirm( allsiGenerationSpecificPostJsVars.postgeneration.strConfirmReplace ) ) {
                                     // User wants to replace - make new request with forceRewrite
                                     jQuery.ajax({
-                                        url : generationSpecificPostJsVars.postgeneration.wp_ajax_url,
+                                        url : allsiGenerationSpecificPostJsVars.postgeneration.wp_ajax_url,
                                         method : 'POST',
                                         data : {
                                             action             : 'allsi_generate_image',
-                                            ids_mpt_generation : generationSpecificPostJsVars.postgeneration.postID,
+                                            ids_mpt_generation : allsiGenerationSpecificPostJsVars.postgeneration.postID,
                                             currentPostIndex   : 1,
                                             count              : 1,
                                             totalBlocks        : 1,
@@ -145,11 +145,11 @@ function displayGenerationButton(gutenbergEditor = true) {
                                             blockIndex         : 0,
                                             buttonAutoGenerate : true,
                                             forceRewrite       : true,
-                                            nonce              : generationSpecificPostJsVars.postgeneration.nonce
+                                            nonce              : allsiGenerationSpecificPostJsVars.postgeneration.nonce
                                         },
                                         success: function( replaceData ) {
                                             if ( replaceData.success && replaceData.data ) {
-                                                var fifuOn              = generationSpecificPostJsVars.postgeneration.fifu_on;
+                                                var fifuOn              = allsiGenerationSpecificPostJsVars.postgeneration.fifu_on;
                                                 var classicEditorImage  = jQuery('#postimagediv .inside');
                                                 var fifuPlugin          = jQuery('#fifu_image');
                                                 if( (true == fifuOn) && ( fifuPlugin.length ) ) {
@@ -185,7 +185,7 @@ function displayGenerationButton(gutenbergEditor = true) {
 
                             if ( data.success && data.data ) {
 
-                                    var fifuOn              = generationSpecificPostJsVars.postgeneration.fifu_on;
+                                    var fifuOn              = allsiGenerationSpecificPostJsVars.postgeneration.fifu_on;
                                     var classicEditorImage  = jQuery('#postimagediv .inside');
                                     var fifuPlugin          = jQuery('#fifu_image');
 
@@ -497,9 +497,9 @@ jQuery(document).ready(function() {
     // CLONE NEW IMAGE AREA
     jQuery(document).ready(function($){
 
-      if (typeof automaticSettings !== 'undefined' && automaticSettings !== null) {
+      if (typeof allsiAutomaticSettings !== 'undefined' && allsiAutomaticSettings !== null) {
 
-        var blockIndex = automaticSettings.blockIndex; // Initialize block index
+        var blockIndex = allsiAutomaticSettings.blockIndex; // Initialize block index
 
         // Function to add a new block
         $('#add-image-btn').click(function(e) {
@@ -919,3 +919,5 @@ function checkRights() {
     return premium_version;
     //return false;
 }
+
+

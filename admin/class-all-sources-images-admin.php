@@ -732,7 +732,7 @@ class All_Sources_Images_Admin {
         // Source/Settings scripts (new page)
         if ( $hook == 'toplevel_page_allsi-new-settings' ) {
             wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui-core') );
-            wp_localize_script( 'source', 'apisTestingAjax', array(
+            wp_localize_script( 'source', 'allsiApisTestingAjax', array(
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
                 'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
                 'successful_testing' => esc_html__( 'Your API key works!', 'all-sources-images' ),
@@ -831,7 +831,7 @@ class All_Sources_Images_Admin {
             // Calculating the current block index based on existing blocks
             $blockIndex = count( $image_blocks ) + 1;
             // Starts after the existing blocks
-            wp_localize_script( $this->plugin_name, 'automaticSettings', array(
+            wp_localize_script( $this->plugin_name, 'allsiAutomaticSettings', array(
                 'blockIndex' => $blockIndex,
             ) );
         }
@@ -864,7 +864,7 @@ class All_Sources_Images_Admin {
         );
         // Do not include this file into unselected posts types
         if ( ($pagenow == 'index.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') && in_array( get_post_type( get_the_ID() ), $post_types_default['choosed_post_type'] ) ) {
-            wp_localize_script( $this->plugin_name, 'generationSpecificPostJsVars', $post_vars );
+            wp_localize_script( $this->plugin_name, 'allsiGenerationSpecificPostJsVars', $post_vars );
         }
         /* Translation for JS file */
         $translations_var['translations'] = array(

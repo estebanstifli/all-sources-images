@@ -1,4 +1,4 @@
-jQuery(function($) {
+﻿jQuery(function($) {
 
     // Drag & Drop Banks
     $(".chosen_api .radio-list").sortable({
@@ -24,7 +24,7 @@ jQuery(function($) {
 document.addEventListener("DOMContentLoaded", function() {
     const btnPixabay    = document.getElementById("btnPixabay");
     const resultPixabay = document.getElementById("resultPixabay");
-    const apiKeyInput   = document.querySelector('input[name="allsi_plugin_banks_settings[pixabay][apikey]"]');
+    const apiKeyInput   = document.querySelector('input[name="ALLSI_plugin_banks_settings[pixabay][apikey]"]');
     const imagePixabay  = document.querySelector("#resultPixabay img");
 
     if (!btnPixabay || !resultPixabay || !apiKeyInput || !imagePixabay) {
@@ -35,25 +35,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imagePixabay.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=allsi_test_apis&apibank=pixabay&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=pixabay&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
             const parsedData = JSON.parse(data.data);
 
             if (data.success && parsedData.hits && parsedData.hits.length > 0) {
-                resultPixabay.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultPixabay.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultPixabay.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultPixabay.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })
         .catch(error => {
-            resultPixabay.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + ' or ' + apisTestingAjax.error_testing + '</span>';
+            resultPixabay.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + ' or ' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnDalle          = document.getElementById("btnDalle");
     const resultDalle       = document.getElementById("resultDalle");
-    const apiKeyInputDalle  = document.querySelector('input[name="allsi_plugin_banks_settings[dallev1][apikey]"]');
+    const apiKeyInputDalle  = document.querySelector('input[name="ALLSI_plugin_banks_settings[dallev1][apikey]"]');
     const imageDalle        = document.querySelector("#resultDalle img");
 
     if (!btnDalle || !resultDalle || !apiKeyInputDalle || !imageDalle) {
@@ -77,24 +77,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imageDalle.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=allsi_test_apis&apibank=dalle&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInputDalle.value
+            body: "action=allsi_test_apis&apibank=dalle&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + apiKeyInputDalle.value
         })
         .then(response => response.json())
         .then(data => {
             const parsedData = JSON.parse(data.data);
             if (data.success && parsedData.data && parsedData.data.length > 0) {
-                resultDalle.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultDalle.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultDalle.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultDalle.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })
         .catch(error => {
-            resultDalle.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultDalle.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnStability          = document.getElementById("btnStability");
     const resultStability       = document.getElementById("resultStability");
-    const apiKeyInputStability  = document.querySelector('input[name="allsi_plugin_banks_settings[stability][apikey]"]');
+    const apiKeyInputStability  = document.querySelector('input[name="ALLSI_plugin_banks_settings[stability][apikey]"]');
     const imageStability        = document.querySelector("#resultStability img");
 
     if (!btnStability || !resultStability || !apiKeyInputStability || !imageStability) {
@@ -127,16 +127,16 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => {
             if (response.status === 200) {
-                resultStability.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultStability.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else if (response.status === 401) {
-                resultStability.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultStability.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             } else {
                 resultStability.innerHTML = '<span class="text-warning">Erreur inattendue : ' + response.status + '</span>';
             }
             return response.json();
         })
         .catch(error => {
-            resultStability.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultStability.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnGemini          = document.getElementById("btnGemini");
     const resultGemini       = document.getElementById("resultGemini");
-    const apiKeyInputGemini  = document.querySelector('input[name="allsi_plugin_banks_settings[gemini][apikey]"]');
+    const apiKeyInputGemini  = document.querySelector('input[name="ALLSI_plugin_banks_settings[gemini][apikey]"]');
     const imageGemini        = document.querySelector("#resultGemini img");
 
     if (!btnGemini || !resultGemini || !apiKeyInputGemini || !imageGemini) {
@@ -159,13 +159,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imageGemini.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
                 action:  "allsi_test_apis",
                 apibank: "gemini",
-                nonce:   apisTestingAjax.nonce,
+                nonce:   allsiApisTestingAjax.nonce,
                 apikey:  apiKeyInputGemini.value
             })
         })
@@ -174,16 +174,16 @@ document.addEventListener("DOMContentLoaded", function() {
             try {
                 const parsed = JSON.parse(data.data);
                 if (data.success && parsed.models && parsed.models.length > 0) {
-                    resultGemini.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                    resultGemini.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
                 } else {
-                    resultGemini.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                    resultGemini.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
                 }
             } catch (e) {
-                resultGemini.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+                resultGemini.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
             }
         })
         .catch(() => {
-            resultGemini.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultGemini.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -193,8 +193,8 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnWorkersAI      = document.getElementById("btnWorkersAI");
     const resultWorkersAI   = document.getElementById("resultWorkersAI");
-    const tokenInputWorkers = document.querySelector('input[name="allsi_plugin_banks_settings[workers_ai][api_token]"]');
-    const accountInput      = document.querySelector('input[name="allsi_plugin_banks_settings[workers_ai][account_id]"]');
+    const tokenInputWorkers = document.querySelector('input[name="ALLSI_plugin_banks_settings[workers_ai][api_token]"]');
+    const accountInput      = document.querySelector('input[name="ALLSI_plugin_banks_settings[workers_ai][account_id]"]');
     const imageWorkersAI    = document.querySelector("#resultWorkersAI img");
 
     if (!btnWorkersAI || !resultWorkersAI || !tokenInputWorkers || !accountInput || !imageWorkersAI) {
@@ -205,13 +205,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imageWorkersAI.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
                 action:     "allsi_test_apis",
                 apibank:    "workers_ai",
-                nonce:      apisTestingAjax.nonce,
+                nonce:      allsiApisTestingAjax.nonce,
                 apikey:     tokenInputWorkers.value,
                 account_id: accountInput.value
             })
@@ -219,14 +219,14 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                resultWorkersAI.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultWorkersAI.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                const errorMessage = data.data ? data.data : apisTestingAjax.error_key;
+                const errorMessage = data.data ? data.data : allsiApisTestingAjax.error_key;
                 resultWorkersAI.innerHTML = '<span class="text-warning">' + errorMessage + '</span>';
             }
         })
         .catch(() => {
-            resultWorkersAI.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultWorkersAI.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnReplicate    = document.getElementById("btnReplicate");
     const resultReplicate = document.getElementById("resultReplicate");
-    const apiKeyInput     = document.querySelector('input[name="allsi_plugin_banks_settings[replicate][apitoken]"]');
+    const apiKeyInput     = document.querySelector('input[name="ALLSI_plugin_banks_settings[replicate][apitoken]"]');
     const imageReplicate  = document.querySelector("#resultReplicate img");
 
     if (!btnReplicate || !resultReplicate || !apiKeyInput || !imageReplicate) {
@@ -249,13 +249,13 @@ document.addEventListener("DOMContentLoaded", function() {
         imageReplicate.classList.remove("hidden");
 
         // send AJAX request to test Replicate API key
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
                 action:  "allsi_test_apis",
                 apibank: "replicate",
-                nonce:   apisTestingAjax.nonce,
+                nonce:   allsiApisTestingAjax.nonce,
                 apikey:  apiKeyInput.value
             })
         })
@@ -266,16 +266,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // check for a non-empty 'results' array
             if ( data.success && parsed.results && parsed.results.length > 0 ) {
-                resultReplicate.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultReplicate.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultReplicate.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultReplicate.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })
         .catch(error => {
             // network or unexpected error
             resultReplicate.innerHTML = '<span class="text-warning">' 
-                + apisTestingAjax.error_key + ' or ' 
-                + apisTestingAjax.error_testing + '</span>';
+                + allsiApisTestingAjax.error_key + ' or ' 
+                + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnYoutube    = document.getElementById("btnYouTube");
     const resultYoutube = document.getElementById("resultYoutube");
-    const apiKeyInput   = document.querySelector('input[name="allsi_plugin_banks_settings[youtube][apikey]"]');
+    const apiKeyInput   = document.querySelector('input[name="ALLSI_plugin_banks_settings[youtube][apikey]"]');
     const imageYt       = document.querySelector("#resultYoutube img");
 
     if (!btnYoutube || !resultYoutube || !apiKeyInput || !imageYt) {
@@ -300,24 +300,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imageYt.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=allsi_test_apis&apibank=youtube&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=youtube&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
             const parsedData = JSON.parse(data.data);
             if (data.success && parsedData.items && parsedData.items.length > 0) {
-                resultYoutube.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultYoutube.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultYoutube.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultYoutube.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })
         .catch(error => {
-            resultYoutube.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultYoutube.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -330,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnUnsplash       = document.getElementById("btnUnsplash");
     const resultUnsplash    = document.getElementById("resultUnsplash");
-    const apiKeyInput       = document.querySelector('input[name="allsi_plugin_banks_settings[unsplash][apikey]"]');
+    const apiKeyInput       = document.querySelector('input[name="ALLSI_plugin_banks_settings[unsplash][apikey]"]');
     const imageUnsplash     = document.querySelector("#resultUnsplash img");
 
     if (!btnUnsplash || !resultUnsplash || !apiKeyInput || !imageUnsplash) {
@@ -341,24 +341,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imageUnsplash.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=allsi_test_apis&apibank=unsplash&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=unsplash&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
             const parsedData = JSON.parse(data.data);
             if (data.success && parsedData.results && parsedData.results.length > 0) {
-                resultUnsplash.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultUnsplash.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultUnsplash.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultUnsplash.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })
         .catch(error => {
-            resultUnsplash.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultUnsplash.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnPexels         = document.getElementById("btnPexels");
     const resultPexels      = document.getElementById("resultPexels");
-    const apiKeyInput       = document.querySelector('input[name="allsi_plugin_banks_settings[pexels][apikey]"]');
+    const apiKeyInput       = document.querySelector('input[name="ALLSI_plugin_banks_settings[pexels][apikey]"]');
     const imagePexels       = document.querySelector("#resultPexels img");
 
     if (!btnPexels || !resultPexels || !apiKeyInput || !imagePexels) {
@@ -382,24 +382,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imagePexels.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=allsi_test_apis&apibank=pexels&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
+            body: "action=allsi_test_apis&apibank=pexels&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + apiKeyInput.value
         })
         .then(response => response.json())
         .then(data => {
             const parsedData = JSON.parse(data.data);
             if (data.success && parsedData.photos && parsedData.photos.length > 0) {
-                resultPexels.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultPexels.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultPexels.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultPexels.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })
         .catch(error => {
-            resultPexels.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultPexels.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnGiphy    = document.getElementById("btnGiphy");
     const resultGiphy = document.getElementById("resultGiphy");
-    const apiKeyInput = document.querySelector('input[name="allsi_plugin_banks_settings[giphy][apikey]"]');
+    const apiKeyInput = document.querySelector('input[name="ALLSI_plugin_banks_settings[giphy][apikey]"]');
     const imageGiphy  = document.querySelector("#resultGiphy img");
 
     if (!btnGiphy || !resultGiphy || !apiKeyInput || !imageGiphy) {
@@ -422,20 +422,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
         imageGiphy.classList.remove("hidden");
 
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
                 action:  "allsi_test_apis",
                 apibank: "giphy",
-                nonce:   apisTestingAjax.nonce,
+                nonce:   allsiApisTestingAjax.nonce,
                 apikey:  apiKeyInput.value
             })
         })
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                const rawMessage = (data && data.data) ? data.data : apisTestingAjax.error_testing;
+                const rawMessage = (data && data.data) ? data.data : allsiApisTestingAjax.error_testing;
                 const safeMessage = rawMessage.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 resultGiphy.innerHTML = '<span class="text-warning">' + safeMessage + '</span>';
                 return;
@@ -443,16 +443,16 @@ document.addEventListener("DOMContentLoaded", function() {
             try {
                 const parsed = JSON.parse(data.data);
                 if (data.success && parsed.data && parsed.data.length > 0) {
-                    resultGiphy.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                    resultGiphy.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
                 } else {
-                    resultGiphy.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                    resultGiphy.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
                 }
             } catch (e) {
-                resultGiphy.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+                resultGiphy.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
             }
         })
         .catch(() => {
-            resultGiphy.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultGiphy.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -466,32 +466,32 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnEnvato         = document.getElementById("btnEnvato");
     const resultEnvato      = document.getElementById("resultEnvato");
-    const envatoTokenInput  = document.querySelector('input[name="allsi_plugin_banks_settings[envato][envato_token]"]');
+    const envatoTokenInput  = document.querySelector('input[name="ALLSI_plugin_banks_settings[envato][envato_token]"]');
     const imageEnvato       = document.querySelector("#resultEnvato img");
 
     btnEnvato.addEventListener("click", function() {
 
         imageEnvato.classList.remove("hidden");
         
-        fetch(apisTestingAjax.ajaxurl, {
+        fetch(allsiApisTestingAjax.ajaxurl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "action=allsi_test_apis&apibank=envato&nonce=" + apisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
+            body: "action=allsi_test_apis&apibank=envato&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
         })
         .then(response => response.json())
         .then(data => {
             const parsedData = JSON.parse(data.data);
 
             if (data.success && ( 'paid' === parsedData.subscription_status )  ) {
-                resultEnvato.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                resultEnvato.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
             } else {
-                resultEnvato.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                resultEnvato.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
             }
         })        
         .catch(error => {
-            resultEnvato.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+            resultEnvato.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
         });
     });
 });
@@ -502,8 +502,8 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const btnGoogleImage = document.getElementById("btnGoogleImage");
     const resultGoogleImage = document.getElementById("resultGoogleImage");
-    const apiKeyInput = document.querySelector('input[name="allsi_plugin_banks_settings[googleimage][apikey]"]');
-    const cxIdInput = document.querySelector('input[name="allsi_plugin_banks_settings[googleimage][cxid]"]');
+    const apiKeyInput = document.querySelector('input[name="ALLSI_plugin_banks_settings[googleimage][apikey]"]');
+    const cxIdInput = document.querySelector('input[name="ALLSI_plugin_banks_settings[googleimage][cxid]"]');
     const imageGoogleImage = document.querySelector("#resultGoogleImage img");
 
     if (!btnGoogleImage || !resultGoogleImage || !apiKeyInput || !cxIdInput || !imageGoogleImage) {
@@ -513,28 +513,30 @@ document.addEventListener("DOMContentLoaded", function() {
     btnGoogleImage.addEventListener("click", function() {
             imageGoogleImage.classList.remove("hidden");
 
-            fetch(apisTestingAjax.ajaxurl, {
+            fetch(allsiApisTestingAjax.ajaxurl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: "action=allsi_test_apis&apibank=google_image&nonce=" + apisTestingAjax.nonce + "&apikey=" + apiKeyInput.value + "&cxid=" + cxIdInput.value
+                body: "action=allsi_test_apis&apibank=google_image&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + apiKeyInput.value + "&cxid=" + cxIdInput.value
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const parsedData = JSON.parse(data.data);
                     if (parsedData.items && parsedData.items.length > 0) {
-                        resultGoogleImage.innerHTML = '<span class="text-success">' + apisTestingAjax.successful_testing + '</span>';
+                        resultGoogleImage.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
                     } else {
-                        resultGoogleImage.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_key + '</span>';
+                        resultGoogleImage.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
                     }
                 } else {
-                    resultGoogleImage.innerHTML = '<span class="text-warning">' + (data.data || apisTestingAjax.error_key) + '</span>';
+                    resultGoogleImage.innerHTML = '<span class="text-warning">' + (data.data || allsiApisTestingAjax.error_key) + '</span>';
                 }
             })
             .catch(error => {
-                resultGoogleImage.innerHTML = '<span class="text-warning">' + apisTestingAjax.error_testing + '</span>';
+                resultGoogleImage.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
             });
         });
 });
+
+

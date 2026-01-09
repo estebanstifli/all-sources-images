@@ -117,7 +117,7 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
     
     // Source page JS (for API testing)
     wp_enqueue_script( 'source', $plugin_url . 'js/source.js', array('jquery', 'jquery-ui-core'), $version, true );
-    wp_localize_script( 'source', 'apisTestingAjax', array(
+    wp_localize_script( 'source', 'allsiApisTestingAjax', array(
         'ajaxurl'            => admin_url( 'admin-ajax.php' ),
         'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
         'successful_testing' => esc_html__( 'Your API key works!', 'all-sources-images' ),
