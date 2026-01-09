@@ -70,11 +70,8 @@ class ALLSI_Bulk_Generation_Cron {
                 // Get current retry count
                 global $wpdb;
                 ALLSI_Bulk_Generation_DB::init();
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
-                $job_post = $wpdb->get_row( $wpdb->prepare(
-                    "SELECT * FROM `" . esc_sql( ALLSI_Bulk_Generation_DB::$table_posts ) . "` WHERE id = %d",
-                    self::$current_job_post_id
-                ) );
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is a safe class constant.
+                $job_post = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . ALLSI_Bulk_Generation_DB::$table_posts . "` WHERE id = %d", self::$current_job_post_id ) );
                 
                 if ( $job_post ) {
                     $retry_count = isset( $job_post->retry_count ) ? (int) $job_post->retry_count : 0;
@@ -134,13 +131,8 @@ class ALLSI_Bulk_Generation_Cron {
         $timeout_time = gmdate( 'Y-m-d H:i:s', time() - self::PROCESSING_TIMEOUT );
         
         // Find posts stuck in 'processing' status
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is a safe class constant.
-        $stuck_posts = $wpdb->get_results( $wpdb->prepare(
-            "SELECT * FROM `" . esc_sql( ALLSI_Bulk_Generation_DB::$table_posts ) . "` 
-             WHERE job_id = %d 
-             AND status = 'processing'",
-            $job_id
-        ) );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is a safe class constant.
+        $stuck_posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . ALLSI_Bulk_Generation_DB::$table_posts . "` WHERE job_id = %d AND status = 'processing'", $job_id ) );
         
         foreach ( $stuck_posts as $post ) {
             $retry_count = isset( $post->retry_count ) ? (int) $post->retry_count : 0;
