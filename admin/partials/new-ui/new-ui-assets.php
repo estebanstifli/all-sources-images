@@ -43,42 +43,42 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
         'all'
     );
     wp_enqueue_style(
-        'plugins-bundle',
+        'allsi-plugins-bundle',
         $plugin_url . 'css/plugins.bundle.css',
         array(),
         $version,
         'all'
     );
     wp_enqueue_style(
-        'style.bundle',
+        'allsi-style-bundle',
         $plugin_url . 'css/style.bundle.css',
         array(),
         $version,
         'all'
     );
     wp_enqueue_style(
-        'theme-base-light',
+        'allsi-theme-base-light',
         $plugin_url . 'css/themes/layout/header/base/light.css',
         array(),
         $version,
         'all'
     );
     wp_enqueue_style(
-        'theme-menu-light',
+        'allsi-theme-menu-light',
         $plugin_url . 'css/themes/layout/header/menu/light.css',
         array(),
         $version,
         'all'
     );
     wp_enqueue_style(
-        'theme-brand-dark',
+        'allsi-theme-brand-dark',
         $plugin_url . 'css/themes/layout/brand/dark.css',
         array(),
         $version,
         'all'
     );
     wp_enqueue_style(
-        'theme-aside-dark',
+        'allsi-theme-aside-dark',
         $plugin_url . 'css/themes/layout/aside/dark.css',
         array(),
         $version,
@@ -87,14 +87,14 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
     
     // === JavaScript - Same as original admin pages ===
     wp_enqueue_script(
-        'prismjs-bundle',
+        'allsi-prismjs-bundle',
         $plugin_url . 'js/prismjs.bundle.js',
         array('jquery'),
         $version,
         true
     );
     wp_enqueue_script(
-        'scripts-bundle',
+        'allsi-scripts-bundle',
         $plugin_url . 'js/scripts.bundle.js',
         array('jquery'),
         $version,
@@ -116,8 +116,8 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
     wp_enqueue_script( 'jquery-ui-droppable' );
     
     // Source page JS (for API testing)
-    wp_enqueue_script( 'source', $plugin_url . 'js/source.js', array('jquery', 'jquery-ui-core'), $version, true );
-    wp_localize_script( 'source', 'allsiApisTestingAjax', array(
+    wp_enqueue_script( 'allsi-source', $plugin_url . 'js/source.js', array('jquery', 'jquery-ui-core'), $version, true );
+    wp_localize_script( 'allsi-source', 'allsiApisTestingAjax', array(
         'ajaxurl'            => admin_url( 'admin-ajax.php' ),
         'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
         'successful_testing' => esc_html__( 'Your API key works!', 'all-sources-images' ),
@@ -237,7 +237,7 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
     wp_enqueue_style(
         'allsi-new-ui-styles',
         plugin_dir_url( __FILE__ ) . 'new-ui-styles.css',
-        array( 'all-sources-images', 'style.bundle' ),
+        array( 'all-sources-images', 'allsi-style-bundle' ),
         $version,
         'all'
     );

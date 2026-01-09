@@ -731,8 +731,8 @@ class All_Sources_Images_Admin {
         // Old bulk generation scripts removed - now using bulk-generation.js via new-ui-assets.php
         // Source/Settings scripts (new page)
         if ( $hook == 'toplevel_page_allsi-new-settings' ) {
-            wp_enqueue_script( 'source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui-core') );
-            wp_localize_script( 'source', 'allsiApisTestingAjax', array(
+            wp_enqueue_script( 'allsi-source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui-core') );
+            wp_localize_script( 'allsi-source', 'allsiApisTestingAjax', array(
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
                 'nonce'              => wp_create_nonce( 'api_testing_nonce' ),
                 'successful_testing' => esc_html__( 'Your API key works!', 'all-sources-images' ),
