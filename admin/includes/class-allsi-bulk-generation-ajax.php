@@ -97,12 +97,21 @@ class ALLSI_Bulk_Generation_Ajax {
         $paged     = isset( $_POST['paged'] ) ? absint( $_POST['paged'] ) : 1;
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
         $category  = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_request().
+        $include_drafts = isset( $_POST['include_drafts'] ) ? absint( $_POST['include_drafts'] ) : 1;
         
         $per_page = 20;
+        
+        // Build post_status array based on include_drafts setting
+        $post_status = array( 'publish' );
+        if ( $include_drafts ) {
+            $post_status[] = 'draft';
+            $post_status[] = 'pending';
+        }
 
         $args = array(
             'post_type'      => $post_type,
-            'post_status'    => 'publish',
+            'post_status'    => $post_status,
             'posts_per_page' => $per_page,
             'paged'          => $paged,
             'orderby'        => 'date',
@@ -156,11 +165,38 @@ class ALLSI_Bulk_Generation_Ajax {
                 $badge_class = $has_featured ? 'has' : 'no';
                 $badge_text = $has_featured ? __( 'Has image', 'all-sources-images' ) : __( 'No image', 'all-sources-images' );
                 
+                // Add status badge for non-published posts
+                $status_badge = '';
+                if ( $post->post_status !== 'publish' ) {
+                    $status_label = '';
+                    $status_class = '';
+                    switch ( $post->post_status ) {
+                        case 'draft':
+                            $status_label = __( 'Draft', 'all-sources-images' );
+                            $status_class = 'draft';
+                            break;
+                        case 'pending':
+                            $status_label = __( 'Pending', 'all-sources-images' );
+                            $status_class = 'pending';
+                            break;
+                        default:
+                            $status_label = ucfirst( $post->post_status );
+                            $status_class = 'other';
+                            break;
+                    }
+                    $status_badge = sprintf(
+                        ' <span class="status-badge %s">%s</span>',
+                        esc_attr( $status_class ),
+                        esc_html( $status_label )
+                    );
+                }
+                
                 $html .= sprintf(
-                    '<label class="%s"><input type="checkbox" value="%d"> %s <span class="featured-badge %s">%s</span></label>',
+                    '<label class="%s"><input type="checkbox" value="%d"> %s%s <span class="featured-badge %s">%s</span></label>',
                     esc_attr( $class ),
                     esc_attr( $post->ID ),
                     esc_html( $post->post_title ),
+                    $status_badge,
                     esc_attr( $badge_class ),
                     esc_html( $badge_text )
                 );
@@ -416,34 +452,54 @@ class ALLSI_Bulk_Generation_Ajax {
                 $post->image_urls = array();
                 $post->thumbnail_url = ''; // Keep for backward compatibility
                 
-                // Get featured image if exists
-                if ( has_post_thumbnail( $post->post_id ) ) {
-                    $thumb_id = get_post_thumbnail_id( $post->post_id );
-                    $thumb = wp_get_attachment_image_src( $thumb_id, 'thumbnail' );
-                    if ( $thumb ) {
-                        $post->thumbnail_url = $thumb[0];
-                        $post->image_urls[] = $thumb[0];
-                        if ( empty( $post->featured_image_id ) ) {
-                            $post->featured_image_id = $thumb_id;
+                // First, check if we have additional_images stored in the database
+                $additional_images = isset( $post->additional_images ) ? maybe_unserialize( $post->additional_images ) : array();
+                
+                if ( ! empty( $additional_images ) && is_array( $additional_images ) ) {
+                    // Use the stored image IDs from bulk generation
+                    foreach ( $additional_images as $image_id ) {
+                        $thumb = wp_get_attachment_image_src( $image_id, 'thumbnail' );
+                        if ( $thumb && ! in_array( $thumb[0], $post->image_urls, true ) ) {
+                            $post->image_urls[] = $thumb[0];
+                            // Set first image as thumbnail for backward compatibility
+                            if ( empty( $post->thumbnail_url ) ) {
+                                $post->thumbnail_url = $thumb[0];
+                            }
                         }
                     }
                 }
                 
-                // Get images attached to this post (uploaded during bulk generation)
-                $attached_images = get_posts( array(
-                    'post_type'      => 'attachment',
-                    'post_mime_type' => 'image',
-                    'post_parent'    => $post->post_id,
-                    'posts_per_page' => 10,
-                    'orderby'        => 'date',
-                    'order'          => 'DESC',
-                    'exclude'        => has_post_thumbnail( $post->post_id ) ? array( get_post_thumbnail_id( $post->post_id ) ) : array(),
-                ) );
-                
-                foreach ( $attached_images as $image ) {
-                    $thumb = wp_get_attachment_image_src( $image->ID, 'thumbnail' );
-                    if ( $thumb && ! in_array( $thumb[0], $post->image_urls, true ) ) {
-                        $post->image_urls[] = $thumb[0];
+                // If no additional_images stored, fallback to checking featured image and attachments
+                if ( empty( $post->image_urls ) ) {
+                    // Get featured image if exists
+                    if ( has_post_thumbnail( $post->post_id ) ) {
+                        $thumb_id = get_post_thumbnail_id( $post->post_id );
+                        $thumb = wp_get_attachment_image_src( $thumb_id, 'thumbnail' );
+                        if ( $thumb ) {
+                            $post->thumbnail_url = $thumb[0];
+                            $post->image_urls[] = $thumb[0];
+                            if ( empty( $post->featured_image_id ) ) {
+                                $post->featured_image_id = $thumb_id;
+                            }
+                        }
+                    }
+                    
+                    // Get images attached to this post (uploaded during bulk generation)
+                    $attached_images = get_posts( array(
+                        'post_type'      => 'attachment',
+                        'post_mime_type' => 'image',
+                        'post_parent'    => $post->post_id,
+                        'posts_per_page' => 10,
+                        'orderby'        => 'date',
+                        'order'          => 'DESC',
+                        'exclude'        => has_post_thumbnail( $post->post_id ) ? array( get_post_thumbnail_id( $post->post_id ) ) : array(),
+                    ) );
+                    
+                    foreach ( $attached_images as $image ) {
+                        $thumb = wp_get_attachment_image_src( $image->ID, 'thumbnail' );
+                        if ( $thumb && ! in_array( $thumb[0], $post->image_urls, true ) ) {
+                            $post->image_urls[] = $thumb[0];
+                        }
                     }
                 }
             }
@@ -519,7 +575,7 @@ class ALLSI_Bulk_Generation_Ajax {
         $job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
 
         if ( ! $job_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid job ID', 'all-sources-images' ) ) );
+            wp_send_json_error( __( 'Invalid job ID.', 'all-sources-images' ) );
         }
 
         // Clear all scheduled cron events for this job
@@ -529,7 +585,9 @@ class ALLSI_Bulk_Generation_Ajax {
         $deleted = ALLSI_Bulk_Generation_DB::delete_job( $job_id );
 
         if ( $deleted ) {
-            wp_send_json_success( array( 'message' => __( 'Job deleted', 'all-sources-images' ) ) );
+            // translators: %d is the job ID.
+            $message = sprintf( __( 'Job %d has been successfully deleted.', 'all-sources-images' ), $job_id );
+            wp_send_json_success( array( 'message' => $message ) );
         } else {
             wp_send_json_error( array( 'message' => __( 'Failed to delete job', 'all-sources-images' ) ) );
         }

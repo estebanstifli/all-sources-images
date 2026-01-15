@@ -484,6 +484,16 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 return false;
             }
             
+            // Merge with default block settings to ensure all fields have defaults
+            $default_block = array(
+                'image_location'  => 'featured',
+                'based_on'        => 'title',
+                'translation_EN'  => 'true', // Default to ON for translation
+                'title_selection' => 'full_title',
+                'selected_image'  => 'first_result',
+            );
+            $img_block = wp_parse_args( $img_block, $default_block );
+            
             // Ensure api_chosen is set from banks settings if not in img_block
             if ( !isset( $img_block['api_chosen'] ) || empty( $img_block['api_chosen'] ) ) {
                 $banks_settings = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( true ) );
@@ -832,8 +842,17 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             $search = preg_replace( '/((\\w+\\W*){' . $length_title . '}(\\w+))(.*)/', '${1}', $search );
         }
         
-        // Translate search keywords to English if enabled
-        if ( isset( $img_block['translation_EN'] ) && $img_block['translation_EN'] == 'true' ) {
+        // Translate search keywords to English if enabled (defaults to ON if not set)
+        $do_translation = ! isset( $img_block['translation_EN'] ) || $img_block['translation_EN'] === 'true';
+        
+        ALLSI_log( array(
+            'post_id' => $id,
+            'translation_EN_value' => isset( $img_block['translation_EN'] ) ? $img_block['translation_EN'] : 'NOT SET (defaulting to true)',
+            'do_translation' => $do_translation ? 'YES' : 'NO',
+            'original_search' => $search,
+        ), 'TRANSLATION_CHECK' );
+        
+        if ( $do_translation ) {
             // Use configured source language or auto-detect from WordPress
             $block_settings = wp_parse_args( get_option( 'ALLSI_plugin_block_settings' ), array( 'source_lang' => '' ) );
             if ( ! empty( $block_settings['source_lang'] ) ) {
@@ -842,8 +861,24 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 $wp_lang = get_bloginfo('language');
                 $source_lang = substr( $wp_lang, 0, 2 );
             }
+            
+            ALLSI_log( array(
+                'post_id' => $id,
+                'source_lang' => $source_lang,
+                'target_lang' => 'en',
+                'will_translate' => $source_lang !== 'en' ? 'YES' : 'NO (already English)',
+            ), 'TRANSLATION_LANG_DETECT' );
+            
             if ( $source_lang !== 'en' ) {
                 $translated_search = $this->ALLSI_translate_text( $search, $source_lang, 'en' );
+                
+                ALLSI_log( array(
+                    'post_id' => $id,
+                    'original' => $search,
+                    'translated' => $translated_search !== false ? $translated_search : 'TRANSLATION FAILED',
+                    'success' => $translated_search !== false ? 'YES' : 'NO',
+                ), 'TRANSLATION_RESULT' );
+                
                 if ( $translated_search !== false ) {
                     $search = $translated_search;
                     $log->info( 'Search term translated to English', array(
@@ -912,8 +947,9 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             );
             return $result_body;
         }
-        // Check if button "Generate Automatically" is clicked
-        if ( true == $button_autogenerate && is_array( $options_banks['api_chosen_auto'] ) ) {
+        // Check if button "Generate Automatically" is clicked (but NOT for bulk cron processing)
+        // When $button_autogenerate is 'bulk', we use the specific api_chosen from the image block
+        if ( true === $button_autogenerate && is_array( $options_banks['api_chosen_auto'] ) ) {
             $log->info( 'Button "Generate Automatically" clicked', array(
                 'post' => $id,
             ) );
@@ -976,6 +1012,15 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             }
             }
         } else {
+            // Log the search term before processing
+            ALLSI_log( array(
+                'post_id' => $id,
+                'api_chosen' => $img_block['api_chosen'],
+                'search_term' => $search,
+                'based_on' => isset( $img_block['based_on'] ) ? $img_block['based_on'] : 'title',
+                'translation_EN' => isset( $img_block['translation_EN'] ) ? $img_block['translation_EN'] : 'not set',
+            ), 'GENERATION_SEARCH_TERM' );
+            
             // Process the main image block
             $result = $this->ALLSI_Process_Image_Block(
                 $img_block,
@@ -1002,6 +1047,15 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             if ( $result === false ) {
                 return false;
             }
+            
+            // Log the image result
+            ALLSI_log( array(
+                'post_id' => $id,
+                'api_chosen' => $img_block['api_chosen'],
+                'image_url' => isset( $result['url_results'] ) ? $result['url_results'] : 'N/A',
+                'file_name' => isset( $result['file_media']['headers']['content-disposition'] ) ? $result['file_media']['headers']['content-disposition'] : 'N/A',
+            ), 'GENERATION_IMAGE_RESULT' );
+            
             // Extract results and continue processing
             extract( $result );
         }
@@ -1243,6 +1297,18 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $id
     ) {
         $source_manager = $this->ALLSI_get_source_manager_instance();
+        
+        // Debug logging for source resolution
+        $api_chosen = isset( $img_block['api_chosen'] ) ? $img_block['api_chosen'] : null;
+        ALLSI_log( array(
+            'post_id' => $id,
+            'api_chosen' => $api_chosen,
+            'api_chosen_type' => gettype( $api_chosen ),
+            'source_manager_exists' => ( $source_manager !== null ),
+            'has_source' => ( $source_manager && is_string( $api_chosen ) ) ? $source_manager->has_source( $api_chosen ) : false,
+            'all_sources' => $source_manager ? array_keys( $source_manager->all() ) : array(),
+        ), 'PROCESS_IMAGE_BLOCK_DEBUG' );
+        
         if ( $source_manager && $source_manager->has_source( $img_block['api_chosen'] ) ) {
             $source = $source_manager->get_source( $img_block['api_chosen'] );
             $result = $source->generate( array(
@@ -1263,11 +1329,36 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 ) );
                 return false;
             }
+            
+            // Log the source result with image URL
+            ALLSI_log( array(
+                'post_id' => $id,
+                'source' => $img_block['api_chosen'],
+                'search_term' => $search,
+                'image_url' => isset( $result['url_results'] ) ? $result['url_results'] : 'N/A',
+                'alt_img' => isset( $result['alt_img'] ) ? $result['alt_img'] : 'N/A',
+            ), 'SOURCE_GENERATION_SUCCESS' );
+            
             return $result;
         }
 
+        // Source manager did not find the source - falling back to legacy ALLSI_Get_Parameters
+        ALLSI_log( array(
+            'post_id' => $id,
+            'api_chosen' => isset( $img_block['api_chosen'] ) ? $img_block['api_chosen'] : null,
+            'message' => 'Source not found in source_manager, falling back to ALLSI_Get_Parameters',
+        ), 'PROCESS_IMAGE_BLOCK_FALLBACK' );
+        
         // Set all parameters
         $array_parameters = $this->ALLSI_Get_Parameters( $img_block, $options, $search );
+        
+        ALLSI_log( array(
+            'post_id' => $id,
+            'api_chosen' => isset( $img_block['api_chosen'] ) ? $img_block['api_chosen'] : null,
+            'array_parameters' => $array_parameters,
+            'has_url' => isset( $array_parameters['url'] ),
+        ), 'PROCESS_IMAGE_BLOCK_LEGACY_PARAMS' );
+        
         $api_url = ( isset( $array_parameters['url'] ) ? $array_parameters['url'] : null );
         unset($array_parameters['url']);
         // Check if API URL is provided

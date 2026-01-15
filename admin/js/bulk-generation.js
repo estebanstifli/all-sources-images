@@ -604,13 +604,18 @@ jQuery(document).ready(function($) {
                     imagesHtml = '<i class="bi bi-check-circle text-success" title="Image ID: ' + post.featured_image_id + '"></i>';
                 }
                 
-                // Build status HTML with retry info
+                // Build status HTML with retry info and error details
                 let statusHtml = `<span class="status-badge ${post.status}">${post.status}</span>`;
                 if (post.retry_count && post.retry_count > 0) {
                     statusHtml += `<br><small class="text-muted">Retry ${post.retry_count}/3</small>`;
                 }
-                if (post.error_message && post.status === 'failed') {
-                    statusHtml += `<br><small class="text-danger" title="${escapeHtml(post.error_message)}">⚠ Error</small>`;
+                if (post.error_message) {
+                    // Show error for failed status, or partial errors for completed with issues
+                    if (post.status === 'failed') {
+                        statusHtml += `<br><small class="text-danger" title="${escapeHtml(post.error_message)}">⚠ ${escapeHtml(truncateText(post.error_message, 50))}</small>`;
+                    } else if (post.status === 'completed' && post.error_message.includes('Partial')) {
+                        statusHtml += `<br><small class="text-warning" title="${escapeHtml(post.error_message)}">⚠ Some blocks failed</small>`;
+                    }
                 }
                 
                 html += `<tr>
@@ -754,6 +759,7 @@ jQuery(document).ready(function($) {
     // Helpers
     // =====================
     function escapeHtml(text) {
+        if (!text) return '';
         const map = {
             '&': '&amp;',
             '<': '&lt;',
@@ -761,7 +767,14 @@ jQuery(document).ready(function($) {
             '"': '&quot;',
             "'": '&#039;'
         };
-        return text.replace(/[&<>"']/g, m => map[m]);
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        text = String(text);
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
     }
 
     // =====================

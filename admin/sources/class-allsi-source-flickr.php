@@ -12,6 +12,14 @@ class ALLSI_Source_Flickr extends ALLSI_Image_Source {
     }
 
     public function generate( array $context ) {
+        // Log that Flickr source is being called
+        if ( function_exists( 'ALLSI_log' ) ) {
+            ALLSI_log( array(
+                'message' => 'Flickr generate() called',
+                'post_id' => isset( $context['post_id'] ) ? $context['post_id'] : 'N/A',
+            ), 'FLICKR_SOURCE_START' );
+        }
+        
         $global_options = isset( $context['options'] ) && is_array( $context['options'] ) ? $context['options'] : array();
         $bank_options   = isset( $global_options['flickr'] ) && is_array( $global_options['flickr'] ) ? $global_options['flickr'] : array();
         $api_key        = $this->resolve_api_key( $bank_options );
@@ -24,6 +32,16 @@ class ALLSI_Source_Flickr extends ALLSI_Image_Source {
         // Use Cloudflare fallback if no API key configured
         $use_cloudflare_fallback = empty( $api_key );
         
+        // Log API key status
+        if ( function_exists( 'ALLSI_log' ) ) {
+            ALLSI_log( array(
+                'post_id' => isset( $context['post_id'] ) ? $context['post_id'] : 'N/A',
+                'has_api_key' => ! empty( $api_key ),
+                'use_cloudflare_fallback' => $use_cloudflare_fallback,
+                'search_term' => $search_term,
+            ), 'FLICKR_CONFIG' );
+        }
+        
         // Store fallback flag in context for nested requests
         $context['use_cloudflare_fallback'] = $use_cloudflare_fallback;
 
@@ -35,6 +53,14 @@ class ALLSI_Source_Flickr extends ALLSI_Image_Source {
         $search_data  = $this->perform_rest_request( $query_args, $proxy_args, 'ALLSI_flickr_http_error', $context );
 
         if ( is_wp_error( $search_data ) ) {
+            // Log the error
+            if ( function_exists( 'ALLSI_log' ) ) {
+                ALLSI_log( array(
+                    'post_id' => isset( $context['post_id'] ) ? $context['post_id'] : 'N/A',
+                    'error_code' => $search_data->get_error_code(),
+                    'error_message' => $search_data->get_error_message(),
+                ), 'FLICKR_API_ERROR' );
+            }
             return $search_data;
         }
 
@@ -66,6 +92,16 @@ class ALLSI_Source_Flickr extends ALLSI_Image_Source {
             $image_url = $this->resolve_image_url_from_photo( $photo, $api_key, $proxy_args, $context );
             if ( empty( $image_url ) ) {
                 continue;
+            }
+            
+            // Log the image URL for debugging
+            if ( function_exists( 'ALLSI_log' ) ) {
+                ALLSI_log( array(
+                    'source' => 'flickr',
+                    'search_term' => $search_term,
+                    'image_url' => $image_url,
+                    'photo_id' => isset( $photo['id'] ) ? $photo['id'] : 'N/A',
+                ), 'FLICKR_IMAGE_FOUND' );
             }
 
             $file_media = $this->download_image( $image_url, $proxy_args, $context );

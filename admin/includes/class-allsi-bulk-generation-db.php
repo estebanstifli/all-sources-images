@@ -25,7 +25,7 @@ class ALLSI_Bulk_Generation_DB {
      *
      * @var string
      */
-    private static $db_version = '1.1.0';
+    private static $db_version = '1.2.0';
 
     /**
      * Table name for jobs (parent)
@@ -113,6 +113,9 @@ class ALLSI_Bulk_Generation_DB {
 
         // Add retry_count column if it doesn't exist (for upgrades from 1.0.0)
         self::maybe_add_retry_column();
+        
+        // Add additional_images column if it doesn't exist (for upgrades)
+        self::maybe_add_additional_images_column();
 
         update_option( 'ALLSI_bulk_db_version', self::$db_version );
     }
@@ -136,6 +139,28 @@ class ALLSI_Bulk_Generation_DB {
         if ( empty( $column_exists ) ) {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- Table name is a safe internal constant, not user input.
             $wpdb->query( "ALTER TABLE `" . self::$table_posts . "` ADD COLUMN retry_count TINYINT(3) UNSIGNED DEFAULT 0 AFTER status" );
+        }
+    }
+
+    /**
+     * Add additional_images column if upgrading from older version
+     */
+    private static function maybe_add_additional_images_column() {
+        global $wpdb;
+        
+        self::init();
+        
+        // Check if column exists
+        $column_exists = $wpdb->get_results( $wpdb->prepare(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = 'additional_images'",
+            DB_NAME,
+            self::$table_posts
+        ) );
+        
+        if ( empty( $column_exists ) ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- Table name is a safe internal constant, not user input.
+            $wpdb->query( "ALTER TABLE `" . self::$table_posts . "` ADD COLUMN additional_images TEXT AFTER featured_image_status" );
         }
     }
 
@@ -700,6 +725,11 @@ class ALLSI_Bulk_Generation_DB {
         global $wpdb;
         
         self::init();
+
+        // Ensure additional_images column exists before trying to save to it
+        if ( isset( $data['additional_images'] ) ) {
+            self::maybe_add_additional_images_column();
+        }
 
         // Serialize arrays
         if ( isset( $data['additional_images'] ) && is_array( $data['additional_images'] ) ) {

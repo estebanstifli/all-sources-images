@@ -52,6 +52,25 @@ if ( function_exists( 'ALLSI_freemius' ) && !ALLSI_freemius()->is_premium() ) {
 // Calculate next block index - after the last re-indexed block
 $allsi_block_index = count( $allsi_image_blocks ) + 1;
 
+// Get the first block (index 1) for the Featured Image section, with defaults
+$allsi_first_block = isset( $allsi_image_blocks[1] ) ? $allsi_image_blocks[1] : array();
+$allsi_first_block = wp_parse_args( $allsi_first_block, array(
+    'image_location' => 'featured',
+    'api_chosen' => 'pixabay',
+    'api_chosen_2' => 'none',
+    'based_on' => 'title',
+    'translation_EN' => 'true',
+    'title_selection' => 'full_title',
+    'title_length' => 3,
+    'selected_image' => 'first_result',
+    'custom_request' => '%%Title%% %%Category%%',
+    'openai_extractor_apikey' => '',
+    'openai_number_of_keywords' => '2',
+    'ai_prompt_apikey' => '',
+    'ai_prompt_style' => 'photorealistic',
+    'custom_field_name' => '',
+) );
+
 // Note: Styles are now enqueued via wp_enqueue_style( 'allsi-image-placement' ) in new-ui-assets.php
 // See: admin/css/allsi-image-placement.css
 ?>
@@ -305,7 +324,7 @@ $allsi_block_index = count( $allsi_image_blocks ) + 1;
                     <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
                     <div class="field-content">
                         <label class="toggle-switch">
-                            <input type="checkbox" name="ALLSI_plugin_main_settings[image_block][0][translation_EN]" value="true" checked>
+                            <input type="checkbox" name="ALLSI_plugin_main_settings[image_block][0][translation_EN]" value="true" <?php checked( ! isset( $allsi_first_block['translation_EN'] ) || $allsi_first_block['translation_EN'] === 'true' ); ?>>
                             <span class="toggle-slider"></span>
                             <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
                         </label>
@@ -610,7 +629,7 @@ $allsi_block_index = count( $allsi_image_blocks ) + 1;
                                 <label><?php esc_html_e( 'Translate to English', 'all-sources-images' ); ?></label>
                                 <div class="field-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" name="ALLSI_plugin_main_settings[image_block][<?php echo esc_attr( $allsi_display_index ); ?>][translation_EN]" value="true" <?php checked( isset( $allsi_block['translation_EN'] ) && $allsi_block['translation_EN'] == 'true' ); ?>>
+                                        <input type="checkbox" name="ALLSI_plugin_main_settings[image_block][<?php echo esc_attr( $allsi_display_index ); ?>][translation_EN]" value="true" <?php checked( ! isset( $allsi_block['translation_EN'] ) || $allsi_block['translation_EN'] === 'true' ); ?>>
                                         <span class="toggle-slider"></span>
                                         <span class="toggle-label"><?php esc_html_e( 'Translate', 'all-sources-images' ); ?></span>
                                     </label>

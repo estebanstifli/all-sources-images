@@ -4,7 +4,7 @@ Donate link: https://github.com/estebanstifli/all-sources-images
 Tags: image, pixabay, openverse, ai, auto
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,6 +22,10 @@ Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or im
 * **AI-Powered** - Generate unique images with DALL·E, Stable Diffusion, Gemini, and more
 * **Flexible Placement** - Set as featured image or insert anywhere in your content
 * **Bulk Processing** - Generate images for hundreds of posts at once
+
+= 🎬 Demo Video =
+
+Watch the plugin in action: https://youtu.be/XLHrwJsnGiY
 
 = 🚀 Key Features =
 
@@ -48,7 +52,6 @@ Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or im
 
 * 🔄 Scheduled generation with WP-Cron
 * 🔗 REST API support for headless WordPress
-* 🔌 Compatible with WPeMatico, FeedWordPress, WP All Import
 * 🌍 Multi-language search support
 * 🖼️ Image post-processing (resize, crop)
 * 📊 Detailed logging for troubleshooting
@@ -62,13 +65,34 @@ Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or im
 * **Agencies** - Streamline client site management
 * **Elementor Users** - Native widget for seamless page building
 
-= 📖 How It Works =
+= 📖 How to Use =
 
-1. **Configure** - Add your API keys for your preferred image sources
-2. **Select** - Choose which post types should get automatic images
-3. **Publish** - Images are automatically fetched and attached to your posts
+**This plugin works immediately after installation — no configuration required!** Stock photo sources (Pexels, Unsplash, Pixabay, Flickr, GIPHY) work out of the box thanks to our built-in proxy service.
 
-That's it! The plugin handles keyword extraction, API calls, image downloading, and media library management automatically.
+There are three ways to search and add images:
+
+**📚 1. Media Library**
+
+1. Go to **Media > Add New** or open any media picker
+2. Click the **"All Sources Images"** tab
+3. Search for images across multiple banks simultaneously
+4. Select an image to download it to your Media Library
+
+**🧱 2. Gutenberg Block**
+
+1. In the Block Editor, click **"+"** to add a new block
+2. Search for **"ASI Images"** and insert it
+3. Browse and search images from all configured sources
+4. Select an image to insert it directly into your content
+
+**🎨 3. Elementor Widget**
+
+1. In Elementor, find the **"ASI Image"** widget in the General category
+2. Drag it to your page
+3. Click **"Choose Image"** to open the image explorer
+4. Search and select from multiple image banks
+
+**💡 Want more control?** You can configure your own API keys in **All Sources Images > Image Banks** for higher rate limits, direct connections, or to use AI generation services (DALL·E, Stable Diffusion, etc.).
 
 == Installation ==
 
@@ -85,17 +109,18 @@ That's it! The plugin handles keyword extraction, API calls, image downloading, 
 3. Upload the ZIP file and click **Install Now**
 4. Activate the plugin
 
-= Configuration =
+= Configuration (Optional) =
+
+The plugin works immediately with stock photo sources. For advanced users who want higher rate limits, direct API connections, or AI image generation:
 
 1. Navigate to **All Sources Images** in your admin menu
 2. Go to the **Image Banks** tab
-3. Add API keys for your preferred image sources:
+3. Add your own API keys (optional):
    * [Get Pexels API Key](https://www.pexels.com/api/)
    * [Get Unsplash API Key](https://unsplash.com/developers)
    * [Get Pixabay API Key](https://pixabay.com/api/docs/)
-   * [Get OpenAI API Key](https://platform.openai.com/api-keys) (for DALL·E)
+   * [Get OpenAI API Key](https://platform.openai.com/api-keys) (required for DALL·E)
 4. Configure your generation preferences in the **Settings** tab
-5. Start generating images!
 
 == Frequently Asked Questions ==
 
@@ -111,10 +136,9 @@ There are multiple ways:
 
 = Which image sources are free to use? =
 
-* **Pexels, Unsplash, Pixabay, Openverse** - Free with API key (generous limits)
-* **Flickr** - Free with API key
-* **GIPHY** - Free with API key
-* **AI Services (DALL·E, Stable Diffusion, etc.)** - Paid per generation
+* **Pexels, Unsplash, Pixabay, Flickr, GIPHY** - Work immediately, no API key needed (uses built-in proxy)
+* **Openverse** - Free, no API key required
+* **AI Services (DALL·E, Stable Diffusion, etc.)** - Require your own API key (paid per generation)
 
 = Can I use this with custom post types? =
 
@@ -153,14 +177,15 @@ Absolutely! You can configure the plugin to extract keywords from:
 
 == Screenshots ==
 
-1. Main settings dashboard with source configuration
-2. Image bank API configuration
-3. Gutenberg block for manual image search
-4. Elementor widget integration
-5. Bulk generation interface
-6. Post editor with generation button
+1. Image search
+2. Main settings dashboard with source configuration
+3. Bulk generation interface
+4. Bulk generation
 
 == Changelog ==
+= 1.0.5 =
+* Fixed minor bugs.
+* Added demo video of the plugin in action
 
 = 1.0.4 - January 2026 =
 * 🎉 Initial release
@@ -170,10 +195,6 @@ Absolutely! You can configure the plugin to extract keywords from:
 * ✨ Bulk generation system with database-backed job queue
 * ✨ Multi-language keyword search
 
-== Upgrade Notice ==
-
-= 1.0.3 =
-Initial release. Welcome to All Sources Images!
 
 == Additional Info ==
 
@@ -181,7 +202,6 @@ Initial release. Welcome to All Sources Images!
 
 * WordPress 6.0 or higher
 * PHP 7.3 or higher
-* At least one API key from supported image sources
 
 = Support =
 

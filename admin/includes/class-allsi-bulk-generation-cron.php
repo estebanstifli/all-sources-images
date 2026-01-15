@@ -238,13 +238,31 @@ class ALLSI_Bulk_Generation_Cron {
 
             if ( $result['success'] ) {
                 $successful_count++;
-                ALLSI_Bulk_Generation_DB::mark_post_processed( $job_post->id, 'completed', array(
+                
+                // Build additional data for successful processing
+                $success_data = array(
                     'featured_image_id'     => $result['featured_image_id'] ?? null,
                     'featured_image_status' => 'completed',
                     'search_keyword'        => $result['search_keyword'] ?? '',
                     'image_source'          => $result['image_source'] ?? '',
                     'retry_count'           => $retry_count,
-                ) );
+                );
+                
+                // Add additional images if present
+                if ( ! empty( $result['additional_images'] ) ) {
+                    $success_data['additional_images'] = $result['additional_images'];
+                }
+                
+                // Add partial errors as info if some blocks failed but others succeeded
+                if ( ! empty( $result['partial_errors'] ) ) {
+                    $success_data['error_message'] = sprintf(
+                        /* translators: %s: Partial error messages from some blocks. */
+                        __( 'Partial success: %s', 'all-sources-images' ),
+                        $result['partial_errors']
+                    );
+                }
+                
+                ALLSI_Bulk_Generation_DB::mark_post_processed( $job_post->id, 'completed', $success_data );
                 ALLSI_log( 'Post ' . $job_post->post_id . ' completed successfully', 'CRON_BATCH' );
             } else {
                 // Check if we should retry
@@ -322,8 +340,18 @@ class ALLSI_Bulk_Generation_Cron {
 
         if ( ! $post ) {
             return array(
-                'success' => false,
-                'error'   => __( 'Post not found', 'all-sources-images' ),
+                'success'    => false,
+                'error'      => __( 'Post not found', 'all-sources-images' ),
+                'error_code' => 'post_not_found',
+            );
+        }
+
+        // Check if post is in trash
+        if ( 'trash' === get_post_status( $post_id ) ) {
+            return array(
+                'success'    => false,
+                'error'      => __( 'Post is in trash', 'all-sources-images' ),
+                'error_code' => 'post_trashed',
             );
         }
 
@@ -331,10 +359,23 @@ class ALLSI_Bulk_Generation_Cron {
         $options = get_option( 'ALLSI_plugin_main_settings' );
         $options = wp_parse_args( $options, array( 'rewrite_featured' => 'false' ) );
         
-        if ( has_post_thumbnail( $post_id ) && $options['rewrite_featured'] !== 'true' ) {
+        // Get image blocks to check if any are for featured image
+        $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array( array() );
+        $has_featured_block = false;
+        foreach ( $image_blocks as $block ) {
+            $location = isset( $block['image_location'] ) ? $block['image_location'] : 'featured';
+            if ( $location === 'featured' || $location === 'both' ) {
+                $has_featured_block = true;
+                break;
+            }
+        }
+        
+        // Only skip if there's a featured block and post already has featured image without rewrite
+        if ( $has_featured_block && has_post_thumbnail( $post_id ) && $options['rewrite_featured'] !== 'true' ) {
             return array(
-                'success' => false,
-                'error'   => __( 'Post already has featured image', 'all-sources-images' ),
+                'success'    => false,
+                'error'      => __( 'Post already has featured image (rewrite disabled)', 'all-sources-images' ),
+                'error_code' => 'featured_exists',
             );
         }
 
@@ -353,8 +394,9 @@ class ALLSI_Bulk_Generation_Cron {
             }
             
             return array(
-                'success' => false,
-                'error'   => __( 'Image generation class not available', 'all-sources-images' ),
+                'success'    => false,
+                'error'      => __( 'Image generation class not available', 'all-sources-images' ),
+                'error_code' => 'class_not_available',
             );
         }
 
@@ -380,11 +422,26 @@ class ALLSI_Bulk_Generation_Cron {
         $banks_settings = wp_parse_args( $banks_settings, $generation->ALLSI_default_options_banks_settings() );
 
         $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array( array() );
-        $search_keyword = '';
-        $image_source = '';
+        
+        // Debug log the image blocks configuration
+        ALLSI_log( array(
+            'post_id' => $post_id,
+            'total_configured_blocks' => count( $image_blocks ),
+            'blocks_config' => array_map( function( $block ) {
+                return array(
+                    'api_chosen' => isset( $block['api_chosen'] ) ? $block['api_chosen'] : 'NOT SET',
+                    'image_location' => isset( $block['image_location'] ) ? $block['image_location'] : 'NOT SET',
+                );
+            }, $image_blocks ),
+        ), 'CRON_IMAGE_BLOCKS_CONFIG' );
+        
+        $search_keywords = array();      // Array to collect all keywords from all blocks
+        $image_sources = array();        // Array to collect all sources from all blocks
+        $generated_image_ids = array();  // Array to collect all generated image IDs
         $featured_image_id = null;
         $blocks_processed = 0;
         $blocks_success = 0;
+        $block_errors = array();         // Array to collect errors from each block
 
         // Get rewrite_featured setting (used for all blocks)
         $rewrite_featured = ( isset( $options['rewrite_featured'] ) && $options['rewrite_featured'] === 'true' ) ? 1 : 0;
@@ -436,66 +493,146 @@ class ALLSI_Bulk_Generation_Cron {
                     $api_chosen,        // $api_chosen - from image_block config or null to use block's own
                     $current_block_key, // $key_img_block - use the actual block key
                     true,               // $avoid_revision
-                    null,               // $include_datas
+                    true,               // $include_datas - get detailed result with api_chosen
                     'bulk',             // $button_autogenerate
                     array()             // $additional_context
                 );
 
+                // Extract the actual source used from the result
+                $block_source = '';
+                $block_keyword = '';
+                $block_image_id = null;
+                
+                if ( is_array( $result ) ) {
+                    // Get the image ID from the generation result
+                    if ( isset( $result['id'] ) && ! empty( $result['id'] ) ) {
+                        $block_image_id = $result['id'];
+                        $generated_image_ids[] = $block_image_id;
+                    }
+                    
+                    // Get the keyword from the generation result
+                    if ( isset( $result['keyword'] ) && ! empty( $result['keyword'] ) ) {
+                        $block_keyword = $result['keyword'];
+                        if ( ! in_array( $block_keyword, $search_keywords, true ) ) {
+                            $search_keywords[] = $block_keyword;
+                        }
+                    }
+                    
+                    // Get the actual source from the generation result
+                    if ( isset( $result['api_chosen'] ) ) {
+                        if ( is_array( $result['api_chosen'] ) ) {
+                            $block_source = implode( ', ', $result['api_chosen'] );
+                        } else {
+                            $block_source = $result['api_chosen'];
+                        }
+                    }
+                } elseif ( is_int( $result ) && $result > 0 ) {
+                    // Result is just an attachment ID
+                    $block_image_id = $result;
+                    $generated_image_ids[] = $block_image_id;
+                }
+                
+                // Fallback to configured source if not in result
+                if ( empty( $block_source ) ) {
+                    if ( is_array( $api_chosen ) ) {
+                        $block_source = implode( ', ', $api_chosen );
+                    } elseif ( ! empty( $api_chosen ) ) {
+                        $block_source = $api_chosen;
+                    } elseif ( isset( $current_block['api_chosen'] ) ) {
+                        $block_source = is_array( $current_block['api_chosen'] ) 
+                            ? implode( ', ', $current_block['api_chosen'] ) 
+                            : $current_block['api_chosen'];
+                    }
+                }
+
                 // Track success - for featured image blocks check has_post_thumbnail,
-                // for content blocks, consider it successful if no exception was thrown
+                // for content blocks, consider it successful if result is valid
+                $block_success = false;
+                
                 if ( $image_location === 'featured' || $image_location === 'both' ) {
                     if ( has_post_thumbnail( $post_id ) ) {
+                        $block_success = true;
                         $blocks_success++;
                         $featured_image_id = get_post_thumbnail_id( $post_id );
                         
-                        // Get image source from the block config
-                        if ( is_array( $api_chosen ) ) {
-                            $image_source = implode( ', ', $api_chosen );
-                        } elseif ( ! empty( $api_chosen ) ) {
-                            $image_source = $api_chosen;
-                        } else {
-                            $image_source = isset( $current_block['api_chosen'] ) ? 
-                                ( is_array( $current_block['api_chosen'] ) ? implode( ', ', $current_block['api_chosen'] ) : $current_block['api_chosen'] ) 
-                                : 'unknown';
+                        // Add source to the array if not empty and not already present
+                        if ( ! empty( $block_source ) && ! in_array( $block_source, $image_sources, true ) ) {
+                            $image_sources[] = $block_source;
                         }
-                        ALLSI_log( 'Block ' . ( $block_index + 1 ) . ' SUCCESS - Featured image set for post ' . $post_id, 'CRON_GENERATE' );
+                        ALLSI_log( 'Block ' . ( $block_index + 1 ) . ' SUCCESS - Featured image set for post ' . $post_id . ' - Source: ' . $block_source . ' - Image ID: ' . $featured_image_id, 'CRON_GENERATE' );
+                    } else {
+                        // No featured image was set - record the error
+                        $block_errors[] = sprintf(
+                            /* translators: 1: Block number. 2: Source name. */
+                            __( 'Block %1$d (%2$s): No image found or could not be downloaded', 'all-sources-images' ),
+                            $block_index + 1,
+                            ! empty( $block_source ) ? $block_source : __( 'unknown source', 'all-sources-images' )
+                        );
                     }
                 } else {
-                    // For content insertion blocks (custom), we assume success if no exception
-                    $blocks_success++;
-                    ALLSI_log( 'Block ' . ( $block_index + 1 ) . ' processed - Content image for post ' . $post_id . ' (location: ' . $image_location . ')', 'CRON_GENERATE' );
+                    // For content insertion blocks (custom), check if we got a valid result
+                    if ( ! empty( $block_image_id ) ) {
+                        $block_success = true;
+                        $blocks_success++;
+                        // Add source to the array if not empty and not already present
+                        if ( ! empty( $block_source ) && ! in_array( $block_source, $image_sources, true ) ) {
+                            $image_sources[] = $block_source;
+                        }
+                        ALLSI_log( 'Block ' . ( $block_index + 1 ) . ' SUCCESS - Content image inserted for post ' . $post_id . ' (location: ' . $image_location . ') - Source: ' . $block_source . ' - Image ID: ' . $block_image_id, 'CRON_GENERATE' );
+                    } else {
+                        // Content image was not inserted - record the error
+                        $block_errors[] = sprintf(
+                            /* translators: 1: Block number. 2: Image location. 3: Source name. */
+                            __( 'Block %1$d (%2$s, %3$s): No image found or could not be inserted', 'all-sources-images' ),
+                            $block_index + 1,
+                            $image_location,
+                            ! empty( $block_source ) ? $block_source : __( 'unknown source', 'all-sources-images' )
+                        );
+                    }
                 }
 
             } catch ( Exception $e ) {
+                $error_msg = sprintf(
+                    /* translators: 1: Block number. 2: Error message. */
+                    __( 'Block %1$d: Exception - %2$s', 'all-sources-images' ),
+                    $block_index + 1,
+                    $e->getMessage()
+                );
+                $block_errors[] = $error_msg;
                 ALLSI_log( 'Block ' . ( $block_index + 1 ) . ' FAILED for post ' . $post_id . ': ' . $e->getMessage(), 'CRON_ERROR' );
                 // Continue to next block instead of returning
                 continue;
             }
         }
 
-        ALLSI_log( 'Finished processing post ' . $post_id . ' - Blocks processed: ' . $blocks_processed . ', Blocks successful: ' . $blocks_success, 'CRON_GENERATE' );
+        ALLSI_log( 'Finished processing post ' . $post_id . ' - Blocks processed: ' . $blocks_processed . ', Blocks successful: ' . $blocks_success . ', Sources: ' . implode( ', ', $image_sources ) . ', Images: ' . implode( ', ', $generated_image_ids ), 'CRON_GENERATE' );
 
         // Return result based on overall success
         if ( $blocks_success > 0 ) {
             return array(
-                'success'           => true,
-                'featured_image_id' => $featured_image_id,
-                'search_keyword'    => $search_keyword,
-                'image_source'      => $image_source,
-                'blocks_processed'  => $blocks_processed,
-                'blocks_success'    => $blocks_success,
+                'success'            => true,
+                'featured_image_id'  => $featured_image_id,
+                'additional_images'  => $generated_image_ids, // All generated image IDs
+                'search_keyword'     => implode( ', ', $search_keywords ), // All keywords used
+                'image_source'       => implode( ', ', $image_sources ), // Join all sources with comma
+                'blocks_processed'   => $blocks_processed,
+                'blocks_success'     => $blocks_success,
+                'partial_errors'     => ! empty( $block_errors ) ? implode( ' | ', $block_errors ) : '',
             );
+        }
+
+        // Build a detailed error message
+        $error_message = __( 'Could not generate any images', 'all-sources-images' );
+        if ( ! empty( $block_errors ) ) {
+            $error_message = implode( ' | ', $block_errors );
         }
 
         return array(
             'success' => false,
-            'error'   => __( 'Could not generate any images', 'all-sources-images' ),
+            'error'   => $error_message,
         );
     }
 }
-
-// Initialize
-new ALLSI_Bulk_Generation_Cron();
 
 // Initialize
 new ALLSI_Bulk_Generation_Cron();

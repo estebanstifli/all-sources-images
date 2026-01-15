@@ -81,6 +81,16 @@ class ALLSI_Source_Pixabay extends ALLSI_Image_Source {
             if ( empty( $image_url ) ) {
                 continue;
             }
+            
+            // Log the image URL for debugging
+            if ( function_exists( 'ALLSI_log' ) ) {
+                ALLSI_log( array(
+                    'source' => 'pixabay',
+                    'search_term' => $search_term,
+                    'image_url' => $image_url,
+                    'pixabay_id' => isset( $hit['id'] ) ? $hit['id'] : 'N/A',
+                ), 'PIXABAY_IMAGE_FOUND' );
+            }
 
             $file_media = $this->download_image( $image_url, $proxy_args );
             if ( is_wp_error( $file_media ) ) {

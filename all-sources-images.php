@@ -10,7 +10,7 @@
  * Plugin Name:       All Sources Images
  * Plugin URI:        https://github.com/estebanstifli/all-sources-images
  * Description:       Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or image banks (Pexels, Unsplash, etc)
- * Version:           1.0.4
+ * Version:           1.0.5
  * Author:            estebandezafra
  * Author URI:        https://github.com/estebanstifli
  * License:           GPLv2 or later
@@ -34,7 +34,7 @@ if ( !defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 if ( ! defined( 'ALLSI_DEBUG' ) ) {
-    define( 'ALLSI_DEBUG', true );
+    define( 'ALLSI_DEBUG', false );
 }
 
 if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {
@@ -45,7 +45,7 @@ if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  */
-define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.4' );
+define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.5' );
 
 /**
  * Load helper functions
