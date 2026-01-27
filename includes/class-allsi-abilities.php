@@ -222,6 +222,10 @@ class ALLSI_Abilities {
                 'permission_callback' => array( $this, 'can_edit_posts' ),
                 'meta'                => array(
                     'show_in_rest' => true,
+                    'mcp'          => array(
+                        'public' => true,
+                        'type'   => 'tool',
+                    ),
                 ),
             )
         );
@@ -300,6 +304,10 @@ class ALLSI_Abilities {
                 'permission_callback' => array( $this, 'can_edit_posts' ),
                 'meta'                => array(
                     'show_in_rest' => true,
+                    'mcp'          => array(
+                        'public' => true,
+                        'type'   => 'tool',
+                    ),
                 ),
             )
         );
@@ -389,6 +397,10 @@ class ALLSI_Abilities {
                 'permission_callback' => array( $this, 'can_edit_posts' ),
                 'meta'                => array(
                     'show_in_rest' => true,
+                    'mcp'          => array(
+                        'public' => true,
+                        'type'   => 'tool',
+                    ),
                 ),
             )
         );
@@ -492,6 +504,10 @@ class ALLSI_Abilities {
                 'permission_callback' => array( $this, 'can_edit_posts' ),
                 'meta'                => array(
                     'show_in_rest' => true,
+                    'mcp'          => array(
+                        'public' => true,
+                        'type'   => 'tool',
+                    ),
                 ),
             )
         );
@@ -590,6 +606,10 @@ class ALLSI_Abilities {
                 'permission_callback' => array( $this, 'can_edit_posts' ),
                 'meta'                => array(
                     'show_in_rest' => true,
+                    'mcp'          => array(
+                        'public' => true,
+                        'type'   => 'tool',
+                    ),
                 ),
             )
         );
