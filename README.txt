@@ -1,10 +1,10 @@
 === All Sources Images ===
 Contributors: estebandezafra
 Donate link: https://github.com/estebanstifli/all-sources-images
-Tags: image, pixabay, openverse, ai, auto
+Tags: image, pixabay, openverse, ai, auto, mcp, abilities
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -25,7 +25,7 @@ Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or im
 
 = 🎬 Demo Video =
 
-Watch the plugin in action: https://youtu.be/XLHrwJsnGiY
+[youtube https://www.youtube.com/watch?v=XLHrwJsnGiY]
 
 = 🚀 Key Features =
 
@@ -55,6 +55,17 @@ Watch the plugin in action: https://youtu.be/XLHrwJsnGiY
 * 🌍 Multi-language search support
 * 🖼️ Image post-processing (resize, crop)
 * 📊 Detailed logging for troubleshooting
+* 🤖 **AI Agent Integration** - WordPress Abilities API support for MCP clients (WP 6.9+)
+
+= 🤖 AI Agent Integration (NEW in 1.0.6) =
+
+With WordPress 6.9+, AI agents can interact with this plugin via the **Abilities API** and **MCP Adapter**:
+
+* `allsi/search-image` - "Search for images of cats playing"
+* `allsi/set-featured-image` - "Set this image as featured for post 123"  
+* `allsi/auto-generate-for-post` - "Generate a featured image for post 456"
+
+This enables AI assistants like Claude, ChatGPT, and others to automatically find and set images for your posts!
 
 = 🎯 Perfect For =
 
@@ -183,6 +194,17 @@ Absolutely! You can configure the plugin to extract keywords from:
 4. Bulk generation
 
 == Changelog ==
+
+= 1.0.6 - January 2026 =
+* 🤖 **NEW: WordPress Abilities API Integration** - AI agents can now interact with the plugin via MCP!
+* ✨ Added `allsi/search-image` ability - Search images from any source
+* ✨ Added `allsi/set-featured-image` ability - Set featured image from URL
+* ✨ Added `allsi/auto-generate-for-post` ability - Auto-generate image for a post
+* 📖 Requires WordPress 6.9+ and MCP Adapter plugin for AI agent integration
+* 🔧 Fixed translation checkbox not defaulting to ON
+* 🔧 Fixed bulk job deletion not working
+* 🔧 Fixed multiple image blocks using wrong sources
+
 = 1.0.5 =
 * Fixed minor bugs.
 * Added demo video of the plugin in action

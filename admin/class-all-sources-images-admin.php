@@ -1908,7 +1908,8 @@ class All_Sources_Images_Admin {
             if ( empty( $apiKey ) ) {
                 wp_send_json_error( __( 'API token is required.', 'all-sources-images' ) );
             }
-            $apiUrl = sprintf( 'https://api.cloudflare.com/client/v4/accounts/%s/ai/models/search', rawurlencode( $account_id ) );
+            // Use the AI finetunes endpoint to verify credentials (lightweight, read-only)
+            $apiUrl = sprintf( 'https://api.cloudflare.com/client/v4/accounts/%s/ai/finetunes', rawurlencode( $account_id ) );
             $request_args = array(
                 'headers' => array(
                     'Authorization' => 'Bearer ' . $apiKey,
@@ -1922,15 +1923,23 @@ class All_Sources_Images_Admin {
             }
             $code = wp_remote_retrieve_response_code( $response );
             $body = wp_remote_retrieve_body( $response );
-            if ( 200 === $code ) {
+            $decoded = json_decode( $body, true );
+            
+            // Check if response indicates success (even empty results mean valid credentials)
+            if ( 200 === $code && isset( $decoded['success'] ) && true === $decoded['success'] ) {
                 wp_send_json_success( $body );
             }
-            $decoded = json_decode( $body, true );
+            
+            // Handle specific error cases
             $message = '';
             if ( isset( $decoded['errors'][0]['message'] ) ) {
                 $message = $decoded['errors'][0]['message'];
             } elseif ( isset( $decoded['messages'][0] ) ) {
                 $message = $decoded['messages'][0];
+            } elseif ( 401 === $code || 403 === $code ) {
+                $message = __( 'Invalid API token or insufficient permissions. Ensure your token has Workers AI:Read permission.', 'all-sources-images' );
+            } elseif ( 404 === $code ) {
+                $message = __( 'Account not found. Please verify your Account ID.', 'all-sources-images' );
             } else {
                 $message = __( 'Unexpected Workers AI response.', 'all-sources-images' );
             }
@@ -2675,6 +2684,38 @@ class All_Sources_Images_Admin {
                         'is_data'  => true,
                     );
                 }
+            } elseif ( 'replicate' === $bank && isset( $results_thumbs['output'] ) ) {
+                // Replicate format: {"output": ["url1", "url2", ...]} or {"output": "url"}
+                $outputs = is_array( $results_thumbs['output'] ) ? $results_thumbs['output'] : array( $results_thumbs['output'] );
+                $model_name = isset( $results_thumbs['model'] ) ? $results_thumbs['model'] : 'Replicate';
+                
+                foreach ( $outputs as $output_url ) {
+                    if ( ! is_string( $output_url ) || '' === $output_url ) {
+                        continue;
+                    }
+                    $normalized_images[] = array(
+                        'url'     => $output_url,
+                        'thumb'   => $output_url,
+                        'title'   => $search_term,
+                        'alt'     => $search_term,
+                        'caption' => sprintf( __( 'Generated with %s on Replicate', 'all-sources-images' ), $model_name ),
+                    );
+                }
+            } elseif ( 'dallev1' === $bank && isset( $results_thumbs['data'] ) && is_array( $results_thumbs['data'] ) ) {
+                // DALL-E format: {"data": [{"url": "...", "revised_prompt": "..."}]}
+                foreach ( $results_thumbs['data'] as $dalle_item ) {
+                    if ( empty( $dalle_item['url'] ) ) {
+                        continue;
+                    }
+                    $alt_text = isset( $dalle_item['revised_prompt'] ) ? $dalle_item['revised_prompt'] : $search_term;
+                    $normalized_images[] = array(
+                        'url'     => $dalle_item['url'],
+                        'thumb'   => $dalle_item['url'],
+                        'title'   => $search_term,
+                        'alt'     => $alt_text,
+                        'caption' => __( 'Generated with DALL-E', 'all-sources-images' ),
+                    );
+                }
             }
             
             // Universal response format
@@ -3392,9 +3433,10 @@ class All_Sources_Images_Admin {
      * @return   mixed             Sanitized value
      */
     private function ALLSI_sanitize_bank_field( $key, $value ) {
-        // API keys and tokens - sanitize as text but preserve case
+        // API keys, tokens, and account IDs - sanitize as text but preserve case
         if ( strpos( $key, 'apikey' ) !== false || strpos( $key, 'api_key' ) !== false || 
-             strpos( $key, 'token' ) !== false || strpos( $key, 'secret' ) !== false ) {
+             strpos( $key, 'token' ) !== false || strpos( $key, 'secret' ) !== false ||
+             strpos( $key, 'account_id' ) !== false || strpos( $key, 'cxid' ) !== false ) {
             return sanitize_text_field( $value );
         }
         
@@ -3403,11 +3445,17 @@ class All_Sources_Images_Admin {
             return esc_url_raw( $value );
         }
         
-        // Numeric fields
+        // Specific image size fields that should be text (like 1024x1024)
+        if ( 'imgsize' === $key || 'image_size' === $key ) {
+            return sanitize_text_field( $value );
+        }
+        
+        // Numeric fields (but exclude imgsize which is handled above)
         if ( strpos( $key, 'max_results' ) !== false || strpos( $key, 'count' ) !== false ||
              strpos( $key, 'width' ) !== false || strpos( $key, 'height' ) !== false ||
-             strpos( $key, 'size' ) !== false || strpos( $key, 'steps' ) !== false ||
-             strpos( $key, 'seed' ) !== false ) {
+             strpos( $key, 'min_width' ) !== false || strpos( $key, 'min_height' ) !== false ||
+             strpos( $key, 'steps' ) !== false || strpos( $key, 'seed' ) !== false ||
+             strpos( $key, 'limit' ) !== false ) {
             return absint( $value );
         }
         

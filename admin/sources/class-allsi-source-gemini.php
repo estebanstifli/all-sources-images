@@ -177,7 +177,6 @@ class ALLSI_Source_Gemini extends ALLSI_Image_Source {
             'ALLSI_gemini_supported_models',
             array(
                 'gemini-2.5-flash-image'         => __( 'Gemini 2.5 Flash Image', 'all-sources-images' ),
-                'gemini-2.5-flash-preview-image' => __( 'Gemini 2.5 Flash Image Preview', 'all-sources-images' ),
                 'gemini-3-pro-image-preview'     => __( 'Gemini 3 Pro Image Preview', 'all-sources-images' ),
             )
         );

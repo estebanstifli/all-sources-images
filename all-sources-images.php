@@ -10,7 +10,7 @@
  * Plugin Name:       All Sources Images
  * Plugin URI:        https://github.com/estebanstifli/all-sources-images
  * Description:       Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or image banks (Pexels, Unsplash, etc)
- * Version:           1.0.5
+ * Version:           1.0.6
  * Author:            estebandezafra
  * Author URI:        https://github.com/estebanstifli
  * License:           GPLv2 or later
@@ -34,7 +34,7 @@ if ( !defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 if ( ! defined( 'ALLSI_DEBUG' ) ) {
-    define( 'ALLSI_DEBUG', false );
+    define( 'ALLSI_DEBUG', true );
 }
 
 if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {
@@ -45,7 +45,7 @@ if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  */
-define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.5' );
+define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.6' );
 
 /**
  * Load helper functions
@@ -96,6 +96,12 @@ add_action( 'activated_plugin', function( $plugin ) {
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-all-sources-images.php';
+
+/**
+ * WordPress Abilities API integration (WP 6.9+)
+ * Must be loaded early to catch the wp_abilities_api_init hook.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/class-allsi-abilities.php';
 
 /**
  * Add capabilities

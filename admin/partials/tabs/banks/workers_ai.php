@@ -48,7 +48,7 @@ $allsi_negative_prompt = isset( $allsi_workers_options['negative_prompt'] ) ? $a
     <td id="password-workers" class="password">
         <input id="workers-api-token" type="password" name="ALLSI_plugin_banks_settings[workers_ai][api_token]" class="form-control" value="<?php echo esc_attr( $allsi_api_token ); ?>" />
         <i id="togglePassword"></i>
-        <p class="description"><?php esc_html_e( 'Use a token with at least Workers AI Read access. The token is stored encrypted in WordPress options.', 'all-sources-images' ); ?></p>
+        <p class="description"><?php esc_html_e( 'Important: Use a specific Workers AI API Token, NOT the Global API Key. Create a token with Workers AI Read/Edit permissions from Cloudflare Dashboard → My Profile → API Tokens.', 'all-sources-images' ); ?></p>
     </td>
 </tr>
 

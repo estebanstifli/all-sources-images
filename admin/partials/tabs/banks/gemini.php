@@ -59,7 +59,6 @@ $allsi_selected_size  = isset( $allsi_gemini_options['image_size'] ) ? $allsi_ge
                 'ALLSI_gemini_supported_models',
                 array(
                     'gemini-2.5-flash-image'         => esc_html__( 'Gemini 2.5 Flash Image (Nano Banana)', 'all-sources-images' ),
-                    'gemini-2.5-flash-preview-image' => esc_html__( 'Gemini 2.5 Flash Image Preview', 'all-sources-images' ),
                     'gemini-3-pro-image-preview'     => esc_html__( 'Gemini 3 Pro Image Preview (4K capable)', 'all-sources-images' ),
                 )
             );

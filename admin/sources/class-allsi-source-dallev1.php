@@ -15,7 +15,12 @@ class ALLSI_Source_Dallev1 extends ALLSI_Image_Source {
         $global_options = isset( $context['options'] ) && is_array( $context['options'] ) ? $context['options'] : array();
         $bank_options   = isset( $global_options['dallev1'] ) && is_array( $global_options['dallev1'] ) ? $global_options['dallev1'] : array();
         $api_key        = isset( $bank_options['apikey'] ) ? trim( $bank_options['apikey'] ) : '';
-        $img_size       = isset( $bank_options['imgsize'] ) ? $bank_options['imgsize'] : '1024x1024';
+        
+        // Validate image size - DALL-E 3 requires specific string formats
+        $valid_sizes    = array( '1024x1024', '1024x1792', '1792x1024' );
+        $img_size_raw   = isset( $bank_options['imgsize'] ) ? $bank_options['imgsize'] : '1024x1024';
+        $img_size       = in_array( (string) $img_size_raw, $valid_sizes, true ) ? (string) $img_size_raw : '1024x1024';
+        
         $search_term    = $this->resolve_search_term( $context );
         $selected_image = isset( $context['selected_image'] ) ? $context['selected_image'] : 'first_result';
         $proxy_args     = isset( $context['proxy_args'] ) && is_array( $context['proxy_args'] ) ? $context['proxy_args'] : array();

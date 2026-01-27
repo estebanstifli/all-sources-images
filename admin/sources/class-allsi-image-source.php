@@ -52,11 +52,14 @@ abstract class ALLSI_Image_Source {
      * @param string $url Target URL
      * @param array $request_args Request arguments
      * @param array $context Generation context
-     * @param string $method HTTP method (GET, POST)
+     * @param string $method HTTP method (GET, POST) - only used if not already set in $request_args
      * @param bool $use_cloudflare_fallback Whether to use Cloudflare Worker (when no API key)
      */
     protected function request_with_proxy( $service, $url, array $request_args, array $context, $method = 'GET', $use_cloudflare_fallback = false ) {
-        $request_args['method'] = strtoupper( $method );
+        // Only set method if not already specified in request_args
+        if ( empty( $request_args['method'] ) ) {
+            $request_args['method'] = strtoupper( $method );
+        }
 
         if ( isset( $context['generation'] ) && method_exists( $context['generation'], 'ALLSI_remote_request' ) ) {
             return $context['generation']->ALLSI_remote_request( $service, $url, $request_args, $use_cloudflare_fallback );

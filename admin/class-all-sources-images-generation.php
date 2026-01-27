@@ -87,7 +87,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
      *
      * @return ALLSI_Source_Manager|null
      */
-    private function ALLSI_get_source_manager_instance() {
+    public function ALLSI_get_source_manager_instance() {
         if ( ! class_exists( 'ALLSI_Source_Manager' ) ) {
             return null;
         }
@@ -464,11 +464,11 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         
         // For Gutenberg block (get_only_thumb), we don't need image_block config
         if ( TRUE == $get_only_thumb ) {
-            // Create a minimal img_block array for Gutenberg
+            // Create a minimal img_block array for Gutenberg / Abilities API
             $img_block = array(
-                'api_chosen' => $api_chosen,
-                'based_on' => 'title', // Not used in get_only_thumb mode
-                'selected_image' => 'random_result',
+                'api_chosen'     => $api_chosen,
+                'based_on'       => 'title', // Not used in get_only_thumb mode
+                'selected_image' => isset( $additional_context['selected_image'] ) ? $additional_context['selected_image'] : 'random_result',
             );
         } else {
             // one shot generation - use saved configuration
