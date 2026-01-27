@@ -2693,12 +2693,14 @@ class All_Sources_Images_Admin {
                     if ( ! is_string( $output_url ) || '' === $output_url ) {
                         continue;
                     }
+                    // translators: %s is the AI model name used on Replicate.
+                    $caption = sprintf( __( 'Generated with %s on Replicate', 'all-sources-images' ), $model_name );
                     $normalized_images[] = array(
                         'url'     => $output_url,
                         'thumb'   => $output_url,
                         'title'   => $search_term,
                         'alt'     => $search_term,
-                        'caption' => sprintf( __( 'Generated with %s on Replicate', 'all-sources-images' ), $model_name ),
+                        'caption' => $caption,
                     );
                 }
             } elseif ( 'dallev1' === $bank && isset( $results_thumbs['data'] ) && is_array( $results_thumbs['data'] ) ) {

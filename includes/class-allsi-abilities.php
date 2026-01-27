@@ -60,7 +60,7 @@ class ALLSI_Abilities {
         
         // Debug logging
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( 'ALLSI_Abilities: Constructor called, hooks added' );
+            ALLSI_log( 'ALLSI_Abilities: Constructor called, hooks added' );
         }
     }
     
@@ -79,7 +79,7 @@ class ALLSI_Abilities {
         );
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( 'ALLSI_Abilities: Registered media category' );
+            ALLSI_log( 'ALLSI_Abilities: Registered media category' );
         }
     }
 
@@ -121,7 +121,7 @@ class ALLSI_Abilities {
     public function register_abilities() {
         // Debug logging
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( 'ALLSI_Abilities: register_abilities() called' );
+            ALLSI_log( 'ALLSI_Abilities: register_abilities() called' );
         }
         
         $this->register_search_image_ability();
@@ -131,7 +131,7 @@ class ALLSI_Abilities {
         $this->register_generate_ai_image_ability();
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( 'ALLSI_Abilities: All 5 abilities registered successfully' );
+            ALLSI_log( 'ALLSI_Abilities: All 5 abilities registered successfully' );
         }
     }
 
@@ -232,9 +232,9 @@ class ALLSI_Abilities {
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
             if ( is_wp_error( $result ) ) {
-                error_log( 'ALLSI_Abilities: Failed to register allsi/search-image: ' . $result->get_error_message() );
+                ALLSI_log( 'ALLSI_Abilities: Failed to register allsi/search-image: ' . $result->get_error_message() );
             } else {
-                error_log( 'ALLSI_Abilities: Registered allsi/search-image successfully' );
+                ALLSI_log( 'ALLSI_Abilities: Registered allsi/search-image successfully' );
             }
         }
     }
@@ -314,9 +314,9 @@ class ALLSI_Abilities {
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
             if ( is_wp_error( $result ) ) {
-                error_log( 'ALLSI_Abilities: Failed to register allsi/set-featured-image: ' . $result->get_error_message() );
+                ALLSI_log( 'ALLSI_Abilities: Failed to register allsi/set-featured-image: ' . $result->get_error_message() );
             } else {
-                error_log( 'ALLSI_Abilities: Registered allsi/set-featured-image successfully' );
+                ALLSI_log( 'ALLSI_Abilities: Registered allsi/set-featured-image successfully' );
             }
         }
     }
@@ -407,9 +407,9 @@ class ALLSI_Abilities {
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
             if ( is_wp_error( $result ) ) {
-                error_log( 'ALLSI_Abilities: Failed to register allsi/auto-generate-for-post: ' . $result->get_error_message() );
+                ALLSI_log( 'ALLSI_Abilities: Failed to register allsi/auto-generate-for-post: ' . $result->get_error_message() );
             } else {
-                error_log( 'ALLSI_Abilities: Registered allsi/auto-generate-for-post successfully' );
+                ALLSI_log( 'ALLSI_Abilities: Registered allsi/auto-generate-for-post successfully' );
             }
         }
     }
@@ -514,9 +514,9 @@ class ALLSI_Abilities {
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
             if ( is_wp_error( $result ) ) {
-                error_log( 'ALLSI_Abilities: Failed to register allsi/insert-image-in-content: ' . $result->get_error_message() );
+                ALLSI_log( 'ALLSI_Abilities: Failed to register allsi/insert-image-in-content: ' . $result->get_error_message() );
             } else {
-                error_log( 'ALLSI_Abilities: Registered allsi/insert-image-in-content successfully' );
+                ALLSI_log( 'ALLSI_Abilities: Registered allsi/insert-image-in-content successfully' );
             }
         }
     }
@@ -616,9 +616,9 @@ class ALLSI_Abilities {
         
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
             if ( is_wp_error( $result ) ) {
-                error_log( 'ALLSI_Abilities: Failed to register allsi/generate-ai-image: ' . $result->get_error_message() );
+                ALLSI_log( 'ALLSI_Abilities: Failed to register allsi/generate-ai-image: ' . $result->get_error_message() );
             } else {
-                error_log( 'ALLSI_Abilities: Registered allsi/generate-ai-image successfully' );
+                ALLSI_log( 'ALLSI_Abilities: Registered allsi/generate-ai-image successfully' );
             }
         }
     }
@@ -762,11 +762,13 @@ class ALLSI_Abilities {
         // Pixabay format
         if ( isset( $result['hits'] ) && is_array( $result['hits'] ) ) {
             foreach ( array_slice( $result['hits'], 0, $count ) as $hit ) {
+                // translators: %s is the photographer's name.
+                $caption = sprintf( __( 'Photo by %s on Pixabay', 'all-sources-images' ), isset( $hit['user'] ) ? $hit['user'] : 'Unknown' );
                 $images[] = array(
                     'url'       => isset( $hit['largeImageURL'] ) ? $hit['largeImageURL'] : ( isset( $hit['webformatURL'] ) ? $hit['webformatURL'] : '' ),
                     'thumbnail' => isset( $hit['previewURL'] ) ? $hit['previewURL'] : '',
                     'alt'       => isset( $hit['tags'] ) ? $hit['tags'] : $search_term,
-                    'caption'   => sprintf( __( 'Photo by %s on Pixabay', 'all-sources-images' ), isset( $hit['user'] ) ? $hit['user'] : 'Unknown' ),
+                    'caption'   => $caption,
                     'width'     => isset( $hit['imageWidth'] ) ? (int) $hit['imageWidth'] : 0,
                     'height'    => isset( $hit['imageHeight'] ) ? (int) $hit['imageHeight'] : 0,
                 );
@@ -775,11 +777,13 @@ class ALLSI_Abilities {
         // Pexels format
         elseif ( isset( $result['photos'] ) && is_array( $result['photos'] ) ) {
             foreach ( array_slice( $result['photos'], 0, $count ) as $photo ) {
+                // translators: %s is the photographer's name.
+                $caption = sprintf( __( 'Photo by %s on Pexels', 'all-sources-images' ), isset( $photo['photographer'] ) ? $photo['photographer'] : 'Unknown' );
                 $images[] = array(
                     'url'       => isset( $photo['src']['original'] ) ? $photo['src']['original'] : ( isset( $photo['src']['large'] ) ? $photo['src']['large'] : '' ),
                     'thumbnail' => isset( $photo['src']['medium'] ) ? $photo['src']['medium'] : '',
                     'alt'       => isset( $photo['alt'] ) ? $photo['alt'] : $search_term,
-                    'caption'   => sprintf( __( 'Photo by %s on Pexels', 'all-sources-images' ), isset( $photo['photographer'] ) ? $photo['photographer'] : 'Unknown' ),
+                    'caption'   => $caption,
                     'width'     => isset( $photo['width'] ) ? (int) $photo['width'] : 0,
                     'height'    => isset( $photo['height'] ) ? (int) $photo['height'] : 0,
                 );
@@ -788,11 +792,13 @@ class ALLSI_Abilities {
         // Unsplash format
         elseif ( isset( $result['results'] ) && is_array( $result['results'] ) ) {
             foreach ( array_slice( $result['results'], 0, $count ) as $item ) {
+                // translators: %s is the photographer's name.
+                $caption = sprintf( __( 'Photo by %s on Unsplash', 'all-sources-images' ), isset( $item['user']['name'] ) ? $item['user']['name'] : 'Unknown' );
                 $images[] = array(
                     'url'       => isset( $item['urls']['regular'] ) ? $item['urls']['regular'] : '',
                     'thumbnail' => isset( $item['urls']['thumb'] ) ? $item['urls']['thumb'] : '',
                     'alt'       => isset( $item['alt_description'] ) ? $item['alt_description'] : $search_term,
-                    'caption'   => sprintf( __( 'Photo by %s on Unsplash', 'all-sources-images' ), isset( $item['user']['name'] ) ? $item['user']['name'] : 'Unknown' ),
+                    'caption'   => $caption,
                     'width'     => isset( $item['width'] ) ? (int) $item['width'] : 0,
                     'height'    => isset( $item['height'] ) ? (int) $item['height'] : 0,
                 );
@@ -824,11 +830,13 @@ class ALLSI_Abilities {
                 if ( ! is_string( $url ) || empty( $url ) ) {
                     continue;
                 }
+                // translators: %s is the AI model name used on Replicate.
+                $caption = sprintf( __( 'Generated with %s on Replicate', 'all-sources-images' ), $model_name );
                 $images[] = array(
                     'url'       => $url,
                     'thumbnail' => $url,
                     'alt'       => $search_term,
-                    'caption'   => sprintf( __( 'Generated with %s on Replicate', 'all-sources-images' ), $model_name ),
+                    'caption'   => $caption,
                     'width'     => 0,
                     'height'    => 0,
                 );
@@ -916,6 +924,7 @@ class ALLSI_Abilities {
         if ( ! $post ) {
             return array(
                 'success' => false,
+                // translators: %d is the WordPress post ID.
                 'error'   => sprintf( __( 'Post with ID %d not found.', 'all-sources-images' ), $post_id ),
             );
         }
@@ -985,9 +994,10 @@ class ALLSI_Abilities {
             $attachment_id = media_handle_sideload( $file_array, $post_id, $alt_text );
 
             if ( is_wp_error( $attachment_id ) ) {
-                @unlink( $tmp );
+                wp_delete_file( $tmp );
                 return array(
                     'success' => false,
+                    // translators: %s is the error message from media_handle_sideload.
                     'error'   => sprintf( __( 'Failed to sideload image: %s', 'all-sources-images' ), $attachment_id->get_error_message() ),
                 );
             }
@@ -1093,6 +1103,7 @@ class ALLSI_Abilities {
                     'post_id'     => $post_id,
                     'post_title'  => $post->post_title,
                     'search_term' => $search_term,
+                    // translators: %s is the search term used to find images.
                     'error'       => sprintf(
                         __( 'No images found for search term: %s', 'all-sources-images' ),
                         $search_term
@@ -1172,6 +1183,7 @@ class ALLSI_Abilities {
         if ( ! $post ) {
             return array(
                 'success' => false,
+                // translators: %d is the WordPress post ID.
                 'error'   => sprintf( __( 'Post with ID %d not found.', 'all-sources-images' ), $post_id ),
             );
         }
@@ -1246,9 +1258,10 @@ class ALLSI_Abilities {
                 $attachment_id = media_handle_sideload( $file_array, $post_id, $alt_text );
 
                 if ( is_wp_error( $attachment_id ) ) {
-                    @unlink( $tmp );
+                    wp_delete_file( $tmp );
                     return array(
                         'success' => false,
+                        // translators: %s is the error message from media_handle_sideload.
                         'error'   => sprintf( __( 'Failed to sideload image: %s', 'all-sources-images' ), $attachment_id->get_error_message() ),
                     );
                 }
@@ -1263,6 +1276,7 @@ class ALLSI_Abilities {
             if ( ! wp_attachment_is_image( $attachment_id ) ) {
                 return array(
                     'success' => false,
+                    // translators: %d is the WordPress attachment ID.
                     'error'   => sprintf( __( 'Attachment ID %d is not a valid image.', 'all-sources-images' ), $attachment_id ),
                 );
             }
@@ -1309,6 +1323,7 @@ class ALLSI_Abilities {
             if ( is_wp_error( $update_result ) ) {
                 return array(
                     'success' => false,
+                    // translators: %s is the error message from wp_update_post.
                     'error'   => sprintf( __( 'Failed to update post: %s', 'all-sources-images' ), $update_result->get_error_message() ),
                 );
             }
@@ -1370,8 +1385,9 @@ class ALLSI_Abilities {
         if ( ! in_array( $source, $ai_sources, true ) ) {
             return array(
                 'success' => false,
+                // translators: %1$s is the invalid source name, %2$s is the list of valid AI sources.
                 'error'   => sprintf(
-                    __( 'Invalid AI source: %s. Valid options: %s', 'all-sources-images' ),
+                    __( 'Invalid AI source: %1$s. Valid options: %2$s', 'all-sources-images' ),
                     $source,
                     implode( ', ', $ai_sources )
                 ),
@@ -1426,6 +1442,7 @@ class ALLSI_Abilities {
             if ( ! $ai_source ) {
                 return array(
                     'success' => false,
+                    // translators: %s is the name of the AI source (e.g., dallev1, stability).
                     'error'   => sprintf( __( 'AI source "%s" not available.', 'all-sources-images' ), $source ),
                 );
             }
@@ -1624,6 +1641,6 @@ function ALLSI_abilities_init() {
 
 // Auto-initialize when this file is loaded to ensure we catch wp_abilities_api_init hook
 if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-    error_log( 'ALLSI_Abilities: File loaded. did_action(wp_abilities_api_init)=' . did_action( 'wp_abilities_api_init' ) );
+    ALLSI_log( 'ALLSI_Abilities: File loaded. did_action(wp_abilities_api_init)=' . did_action( 'wp_abilities_api_init' ) );
 }
 ALLSI_abilities_init();

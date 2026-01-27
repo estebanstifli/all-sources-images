@@ -1,7 +1,7 @@
 === All Sources Images ===
 Contributors: estebandezafra
 Donate link: https://github.com/estebanstifli/all-sources-images
-Tags: image, pixabay, openverse, ai, auto, mcp, abilities
+Tags: image, pixabay, openverse, ai, mcp
 Requires at least: 5.8
 Tested up to: 6.9
 Stable tag: 1.0.6
@@ -64,6 +64,8 @@ With WordPress 6.9+, AI agents can interact with this plugin via the **Abilities
 * `allsi/search-image` - "Search for images of cats playing"
 * `allsi/set-featured-image` - "Set this image as featured for post 123"  
 * `allsi/auto-generate-for-post` - "Generate a featured image for post 456"
+* `allsi/insert-image-in-content` - "Insert an image after paragraph 2"
+* `allsi/generate-ai-image` - "Generate an AI image of a sunset over mountains"
 
 This enables AI assistants like Claude, ChatGPT, and others to automatically find and set images for your posts!
 
@@ -200,10 +202,10 @@ Absolutely! You can configure the plugin to extract keywords from:
 * ✨ Added `allsi/search-image` ability - Search images from any source
 * ✨ Added `allsi/set-featured-image` ability - Set featured image from URL
 * ✨ Added `allsi/auto-generate-for-post` ability - Auto-generate image for a post
+* ✨ Added `allsi/insert-image-in-content` ability - Insert image within post content
+* ✨ Added `allsi/generate-ai-image` ability - Generate images with AI (DALL-E, Stability, Gemini, Replicate, Workers AI)
 * 📖 Requires WordPress 6.9+ and MCP Adapter plugin for AI agent integration
-* 🔧 Fixed translation checkbox not defaulting to ON
-* 🔧 Fixed bulk job deletion not working
-* 🔧 Fixed multiple image blocks using wrong sources
+
 
 = 1.0.5 =
 * Fixed minor bugs.
