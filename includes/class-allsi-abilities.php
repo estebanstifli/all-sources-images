@@ -972,6 +972,7 @@ class ALLSI_Abilities {
             if ( is_wp_error( $tmp ) ) {
                 return array(
                     'success' => false,
+                    // translators: %s is the error message from download_url.
                     'error'   => sprintf( __( 'Failed to download image: %s', 'all-sources-images' ), $tmp->get_error_message() ),
                 );
             }
@@ -1063,6 +1064,7 @@ class ALLSI_Abilities {
         if ( ! $post ) {
             return array(
                 'success' => false,
+                // translators: %d is the WordPress post ID.
                 'error'   => sprintf( __( 'Post with ID %d not found.', 'all-sources-images' ), $post_id ),
             );
         }
@@ -1103,8 +1105,8 @@ class ALLSI_Abilities {
                     'post_id'     => $post_id,
                     'post_title'  => $post->post_title,
                     'search_term' => $search_term,
-                    // translators: %s is the search term used to find images.
                     'error'       => sprintf(
+                        // translators: %s is the search term used to find images.
                         __( 'No images found for search term: %s', 'all-sources-images' ),
                         $search_term
                     ),
@@ -1236,6 +1238,7 @@ class ALLSI_Abilities {
                 if ( is_wp_error( $tmp ) ) {
                     return array(
                         'success' => false,
+                        // translators: %s is the error message from download_url.
                         'error'   => sprintf( __( 'Failed to download image: %s', 'all-sources-images' ), $tmp->get_error_message() ),
                     );
                 }
@@ -1385,8 +1388,8 @@ class ALLSI_Abilities {
         if ( ! in_array( $source, $ai_sources, true ) ) {
             return array(
                 'success' => false,
-                // translators: %1$s is the invalid source name, %2$s is the list of valid AI sources.
                 'error'   => sprintf(
+                    // translators: %1$s is the invalid source name, %2$s is the list of valid AI sources.
                     __( 'Invalid AI source: %1$s. Valid options: %2$s', 'all-sources-images' ),
                     $source,
                     implode( ', ', $ai_sources )

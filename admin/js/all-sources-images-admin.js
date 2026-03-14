@@ -543,14 +543,6 @@ jQuery(document).ready(function() {
 
         });
 
-        // Avoid new block
-        $('#add-image-btn-disabled').click(function(e) {
-          e.preventDefault();
-          if ($('.available-pro-version').length === 0) { // Checks whether the element already exists
-            $('#add-image-btn-disabled').after('<span class="available-pro-version">' + allsiTranslationsJsVars.translations.one_block + '</span>');
-          }
-        });
-
         // Function to remove a block when the "Remove" button is clicked
         $(document).on('click', '.remove-block-btn', function() {
             var blockClass = $(this).closest('tr').attr('class').match(/image-block-\d+/)[0]; // Get the unique block class
@@ -913,11 +905,7 @@ function checkButton( selectorSwitch, selectorOptions, noNeedRights = false ) {
 
 
 function checkRights() {
-    var premium_version = true;
-    
-
-    return premium_version;
-    //return false;
+  return true;
 }
 
 

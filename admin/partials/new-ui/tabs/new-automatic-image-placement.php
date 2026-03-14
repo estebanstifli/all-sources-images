@@ -39,15 +39,10 @@ $allsi_image_sizes = get_intermediate_image_sizes();
 // Get available image sources
 $allsi_list_api_auto = $this->ALLSI_banks_name_auto();
 
-// Pro feature check
+// Feature availability (all options enabled in free plugin)
 $allsi_disabled = '';
 $allsi_class_disabled = '';
 $allsi_checkbox_disabled = '';
-if ( function_exists( 'ALLSI_freemius' ) && !ALLSI_freemius()->is_premium() ) {
-    $allsi_disabled = 'disabled';
-    $allsi_class_disabled = 'disabled-option';
-    $allsi_checkbox_disabled = 'checkbox-disabled';
-}
 
 // Calculate next block index - after the last re-indexed block
 $allsi_block_index = count( $allsi_image_blocks ) + 1;

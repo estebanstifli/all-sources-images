@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php echo wp_kses_post( __( '<b>It\'s required</b> to provide your own <b>API key</b>. You can register at Stability AI platform <a target="_blank" href="https://platform.stability.ai/account/keys">here</a> and get your API key. New accounts receive 25 free credits.', 'all-sources-images' ) ); ?>
 		</div>
 		<div class="update-nag">
-			<?php echo wp_kses_post( __( 'Stable Diffusion API uses credits: $1 USD = 100 credits. Image generation costs vary by model and resolution. Check <a target="_blank" href="https://platform.stability.ai/pricing">pricing details</a>.', 'all-sources-images' ) ); ?>
+			<?php echo wp_kses_post( __( 'Stable Diffusion is an external service. Refer to the provider documentation for usage details and limits.', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>

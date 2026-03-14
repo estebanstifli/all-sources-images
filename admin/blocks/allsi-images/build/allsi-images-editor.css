@@ -345,35 +345,6 @@
     box-shadow: 0 12px 25px rgba(6, 78, 59, 0.45);
 }
 
-/* Unlock gate visuals */
-.unlock-pro {
-    position: relative;
-    text-align: center;
-    margin: 0 auto;
-    display: block;
-    top: 175px;
-    background: rgba(255, 255, 255, 0.65);
-    z-index: 9;
-    padding: 13px 0 22px;
-    width: 50%;
-    min-width: 350px;
-    font-size: 18px;
-    border-radius: 5px;
-    font-weight: 700;
-}
-
-.unlock-pro a {
-    text-decoration: none;
-}
-
-.unlock-pro a:hover {
-    text-decoration: initial;
-}
-
-.unlock-pro img {
-    vertical-align: -40%;
-}
-
 /* Settings panel */
 .allsi-settings-backdrop {
     position: fixed;

@@ -224,8 +224,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         } else {
             $rewrite_featured = false;
         }
-        $int_blockIndex = 0;
-        $counter_blocks = 1;
+        $int_blockIndex = isset( $_POST['blockIndex'] ) ? absint( wp_unslash( $_POST['blockIndex'] ) ) : 0;
         $img_blocks = isset( $main_settings['image_block'] ) && is_array( $main_settings['image_block'] ) ? $main_settings['image_block'] : array(
             1 => array(
                 'image_location'  => 'featured',
@@ -235,6 +234,22 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 'selected_image'  => 'first_result',
             ),
         );
+        $counter_blocks = count( $img_blocks );
+        if ( 0 === $counter_blocks ) {
+            $img_blocks = array(
+                1 => array(
+                    'image_location'  => 'featured',
+                    'based_on'        => 'title',
+                    'translation_EN'  => 'true',
+                    'title_selection' => 'full_title',
+                    'selected_image'  => 'first_result',
+                ),
+            );
+            $counter_blocks = 1;
+        }
+        if ( $int_blockIndex >= $counter_blocks ) {
+            $int_blockIndex = 0;
+        }
         $speed = '500';
         // Default speed for image generation.
         $current_image_index = $int_blockIndex;
@@ -249,6 +264,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         $image_location = ( !empty( $img_block['image_location'] ) ? $img_block['image_location'] : 'featured' );
         $generation_status = 'pending';
         $ALLSI_return = null;
+        $image_generation_result = null;
         // Handle generation of the featured image.
         if ( has_post_thumbnail( $current_post_id ) && $rewrite_featured == false && $image_location == 'featured' ) {
             $generation_status = 'already-done';

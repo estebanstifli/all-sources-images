@@ -1,61 +1,8 @@
-FILE: admin/class-all-sources-images-admin.php
-Line	Column	Type	Code	Message	Edit Link
-2701	47	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+Checks complete. Errors were found.
 
 FILE: includes/class-allsi-abilities.php
 Line	Column	Type	Code	Message	Edit Link
-769	45	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
+1110	25	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
 Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-782	45	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
+1393	21	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
 Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-795	45	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-831	45	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-919	39	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-966	43	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-991	43	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1056	39	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1097	25	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1175	39	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1227	47	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1252	47	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1266	43	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1312	43	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1374	21	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1374	25	ERROR	WordPress.WP.I18n.UnorderedPlaceholdersText	Multiple placeholders in translatable strings should be ordered. Expected "%1$s, %2$s", but got "%s, %s" in 'Invalid AI source: %s. Valid options: %s'.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-1429	43	ERROR	WordPress.WP.I18n.MissingTranslatorsComment	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
-Learn more (opens in a new tab)	View in code editor (opens in a new tab)
-
-FILE: includes/class-allsi-abilities.php
-Line	Column	Type	Code	Message	Edit Link
-988	18	ERROR	WordPress.WP.AlternativeFunctions.unlink_unlink	unlink() is discouraged. Use wp_delete_file() to delete a file.	View in code editor (opens in a new tab)
-1249	22	ERROR	WordPress.WP.AlternativeFunctions.unlink_unlink	unlink() is discouraged. Use wp_delete_file() to delete a file.	View in code editor (opens in a new tab)
-63	13	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-82	13	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-124	13	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-134	13	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-235	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-237	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-317	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-319	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-410	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-412	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-517	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-519	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-619	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-621	17	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
-1627	5	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)

@@ -258,7 +258,7 @@ class ALLSI_Abilities {
 
 ## 10. Estado de Implementación
 
-### ✅ Implementadas y Testeadas (v1.0.6):
+### ✅ Implementadas y Testeadas (v1.0.7):
 
 | Ability | Estado | Testeado en |
 |---------|--------|-------------|

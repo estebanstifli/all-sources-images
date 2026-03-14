@@ -62,10 +62,7 @@ td.infos {
 .ui-progressbar .ui-progressbar-value {
 	background-image: url( '../img/pbar-ani.gif' );
 }
-.upgrade-pro {
-	font-weight: 700;
-	color: red !important;
-}
+
 
 
 /* Bulk Generation Table */
@@ -420,9 +417,7 @@ form.form-images p.submit {
     display: none !important;
 }
 
-.available-pro-version {
-    margin-left: 15px;
-}
+
 
 
 /* Account */

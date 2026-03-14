@@ -14,13 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $allsi_options = get_option( 'ALLSI_plugin_main_settings' );
 $allsi_options = wp_parse_args( $allsi_options, $this->ALLSI_default_options_main_settings() );
 
-// Premium check
+// Feature availability (all options enabled in free plugin)
 $allsi_checkbox_disabled = '';
 $allsi_disabled = '';
-if ( function_exists( 'ALLSI_freemius' ) && !ALLSI_freemius()->is_premium() ) {
-    $allsi_checkbox_disabled = 'disabled-custom';
-    $allsi_disabled = 'disabled';
-}
 
 // Alt language
 if ( ! isset( $allsi_options['translate_alt_lang'] ) ) {
@@ -112,9 +108,6 @@ if ( ! isset( $allsi_options['translate_alt_lang'] ) ) {
                     <input <?php checked( ! empty( $allsi_options['image_crop'] ) && $allsi_options['image_crop'] == 'true' ); ?> name="ALLSI_plugin_main_settings[image_crop]" type="checkbox" value="true" <?php echo esc_attr( $allsi_disabled ); ?>>
                     <span></span> <?php esc_html_e( 'Crop Image by 10%', 'all-sources-images' ); ?>
                 </label>
-                <?php if ( $allsi_disabled ) : ?>
-                    <p class="description text-warning"><?php esc_html_e( 'Premium feature - upgrade to unlock', 'all-sources-images' ); ?></p>
-                <?php endif; ?>
             </td>
         </tr>
 

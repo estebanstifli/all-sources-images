@@ -461,41 +461,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-// Envato Elements - DISABLED (no longer working)
-/*
-document.addEventListener("DOMContentLoaded", function() {
-    const btnEnvato         = document.getElementById("btnEnvato");
-    const resultEnvato      = document.getElementById("resultEnvato");
-    const envatoTokenInput  = document.querySelector('input[name="ALLSI_plugin_banks_settings[envato][envato_token]"]');
-    const imageEnvato       = document.querySelector("#resultEnvato img");
 
-    btnEnvato.addEventListener("click", function() {
-
-        imageEnvato.classList.remove("hidden");
-        
-        fetch(allsiApisTestingAjax.ajaxurl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "action=allsi_test_apis&apibank=envato&nonce=" + allsiApisTestingAjax.nonce + "&apikey=" + envatoTokenInput.value
-        })
-        .then(response => response.json())
-        .then(data => {
-            const parsedData = JSON.parse(data.data);
-
-            if (data.success && ( 'paid' === parsedData.subscription_status )  ) {
-                resultEnvato.innerHTML = '<span class="text-success">' + allsiApisTestingAjax.successful_testing + '</span>';
-            } else {
-                resultEnvato.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_key + '</span>';
-            }
-        })        
-        .catch(error => {
-            resultEnvato.innerHTML = '<span class="text-warning">' + allsiApisTestingAjax.error_testing + '</span>';
-        });
-    });
-});
-*/
 
 
 // Google Image API

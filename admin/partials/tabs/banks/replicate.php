@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <tr valign="top">
 	<td colspan="2">
 		<div class="update-nag">
-			<?php echo wp_kses_post( __( '<b>It\'s required</b> to provide your own <b>API token</b>. You can create an account and get your token at <a target="_blank" href="https://replicate.com/account/api-tokens">Replicate API Tokens</a>. New accounts receive free credit.', 'all-sources-images' ) ); ?>
+			<?php echo wp_kses_post( __( '<b>It\'s required</b> to provide your own <b>API token</b>. You can create an account and get your token at <a target="_blank" href="https://replicate.com/account/api-tokens">Replicate API Tokens</a>.', 'all-sources-images' ) ); ?>
 		</div>
 		<div class="update-nag">
-			<?php echo wp_kses_post( __( 'Replicate offers access to thousands of AI models including FLUX, SDXL, and custom community models. Pricing varies by model and compute time. Check <a target="_blank" href="https://replicate.com/pricing">pricing details</a>.', 'all-sources-images' ) ); ?>
+			<?php echo wp_kses_post( __( 'Replicate is an external service. Refer to the provider documentation for usage details and limits.', 'all-sources-images' ) ); ?>
 		</div>
 	</td>
 </tr>

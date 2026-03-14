@@ -105,7 +105,7 @@ class All_Sources_Images_Admin {
         $this->version = $version;
         $ALLSI_generation = $this->ALLSI_generation_features();
 
-        // Crons for pro version
+        // Cron settings for scheduled generation
         $cron_options = wp_parse_args( get_option( 'ALLSI_plugin_cron_settings' ) );
         $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         
@@ -681,8 +681,7 @@ class All_Sources_Images_Admin {
         $ALLSI_pages = array(
             'toplevel_page_allsi-new-settings',
             'all-sources-images_page_allsi-new-automatic',
-            'all-sources-images_page_allsi-new-bulk-generation',
-            'admin_page_all-sources-images-admin-display-pricing'
+            'all-sources-images_page_allsi-new-bulk-generation'
         );
         if ( in_array( $hook, $ALLSI_pages ) ) {
             wp_enqueue_style(
@@ -800,7 +799,8 @@ class All_Sources_Images_Admin {
             $count = count( $ids );
             $ids = json_encode( $ids );
             $ajax_nonce = wp_create_nonce( 'ajax_nonce_All_Sources_Images' );
-            $counter_image_block = 1;
+            $image_blocks = isset( $options_auto['image_block'] ) && is_array( $options_auto['image_block'] ) ? $options_auto['image_block'] : array();
+            $counter_image_block = ! empty( $image_blocks ) ? count( $image_blocks ) : 1;
             if ( isset( $options_auto['bulk_generation_interval'] ) && (int) $options_auto['bulk_generation_interval'] !== 0 ) {
                 $remaining_seconds = $this->cron_scheduled();
             } else {
@@ -868,8 +868,8 @@ class All_Sources_Images_Admin {
         }
         /* Translation for JS file */
         $translations_var['translations'] = array(
-            'pro_version'       => esc_html__( 'Only available with the pro version.', 'all-sources-images' ),
-            'one_block'         => esc_html__( 'The free version allows one block generation. Multiple blocks are available with the Pro version.', 'all-sources-images' ),
+            'pro_version'       => esc_html__( 'This option is not available.', 'all-sources-images' ),
+            'one_block'         => esc_html__( 'Multiple blocks are enabled.', 'all-sources-images' ),
             'only_one_featured' => esc_html__( 'Only one featured image per post is possible', 'all-sources-images' ),
             'delete_logs'       => esc_html__( 'Are you sure to delete all logs ?', 'all-sources-images' ),
             'no_interval'       => esc_html__( 'No interval', 'all-sources-images' ),

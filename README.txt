@@ -4,7 +4,7 @@ Donate link: https://github.com/estebanstifli/all-sources-images
 Tags: image, pixabay, openverse, ai, mcp
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -57,7 +57,7 @@ Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or im
 * 📊 Detailed logging for troubleshooting
 * 🤖 **AI Agent Integration** - WordPress Abilities API support for MCP clients (WP 6.9+)
 
-= 🤖 AI Agent Integration (NEW in 1.0.6) =
+= 🤖 AI Agent Integration =
 
 With WordPress 6.9+, AI agents can interact with this plugin via the **Abilities API** and **MCP Adapter**:
 
@@ -151,7 +151,7 @@ There are multiple ways:
 
 * **Pexels, Unsplash, Pixabay, Flickr, GIPHY** - Work immediately, no API key needed (uses built-in proxy)
 * **Openverse** - Free, no API key required
-* **AI Services (DALL·E, Stable Diffusion, etc.)** - Require your own API key (paid per generation)
+* **AI Services (DALL·E, Stable Diffusion, etc.)** - Require your own API key
 
 = Can I use this with custom post types? =
 
@@ -168,7 +168,7 @@ The plugin itself has no limits. However, each image source has its own API rate
 * Pexels: 200 requests/hour (free)
 * Unsplash: 50 requests/hour (free)
 * Pixabay: 5000 requests/hour (free)
-* AI services: Based on your subscription
+* AI services: Based on provider limits
 
 = Does it work with the Classic Editor? =
 
@@ -196,6 +196,9 @@ Absolutely! You can configure the plugin to extract keywords from:
 4. Bulk generation
 
 == Changelog ==
+
+= 1.0.7 - March 2026 =
+* Compliance updates and multi-block generation enabled
 
 = 1.0.6 - January 2026 =
 * 🤖 **NEW: WordPress Abilities API Integration** - AI agents can now interact with the plugin via MCP!
@@ -357,9 +360,5 @@ Optional translation service for search keywords. Sends text to translate.
 * Terms of Service: https://cloud.google.com/terms
 * Privacy Policy: https://policies.google.com/privacy
 
-**Envato Elements API**
-Premium stock assets (requires Envato Elements subscription). Sends search keywords.
-* Service: https://elements.envato.com/
-* Terms of Service: https://elements.envato.com/user-terms
-* Privacy Policy: https://www.envato.com/privacy/
+
 
