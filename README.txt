@@ -198,7 +198,7 @@ Absolutely! You can configure the plugin to extract keywords from:
 == Changelog ==
 
 = 1.0.7 - March 2026 =
-* Compliance updates and multi-block generation enabled
+* Compliance updates
 
 = 1.0.6 - January 2026 =
 * 🤖 **NEW: WordPress Abilities API Integration** - AI agents can now interact with the plugin via MCP!
