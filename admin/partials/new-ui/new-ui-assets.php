@@ -137,8 +137,6 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
     // Localize translations for admin JS files
     $allsi_translations_var = array(
         'translations' => array(
-            'pro_version'       => esc_html__( 'This option is not available.', 'all-sources-images' ),
-            'one_block'         => esc_html__( 'Multiple blocks are enabled.', 'all-sources-images' ),
             'only_one_featured' => esc_html__( 'Only one featured image per post is possible', 'all-sources-images' ),
             'delete_logs'       => esc_html__( 'Are you sure to delete all logs ?', 'all-sources-images' ),
             'no_interval'       => esc_html__( 'No interval', 'all-sources-images' ),

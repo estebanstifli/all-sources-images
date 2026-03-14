@@ -310,20 +310,7 @@ jQuery(document).ready(function() {
 	});
 
 
-    /* GENERAL - CHOSEN OPTION FREE VERSION*/
-    jQuery("#general-options .chosen_api .radio-disabled, \n\
-            #general-options .based_on .radio-disabled, \n\
-            #general-options .image_location .radio-disabled, \n\
-            #general-options .result_position .radio-disabled, \n\
-            #general-options .shuffle_image .checkbox-disabled, \n\
-            #general-options .translation_EN .checkbox-disabled, \n\
-            #general-options .category_choice .checkbox-disabled, \n\
-            #general-options .choosed_banks .checkbox-disabled"
-    ).click(function(e) {
-        var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
-        alert( alertProVersion );
-        return false;
-    });
+
 
 
     /*
@@ -428,7 +415,6 @@ jQuery(document).ready(function() {
       var basedOnSelected = [ 'tags', 'categories', 'custom_field', 'custom_request', 'openai_extractor' ];
 
       if( basedOnSelected.indexOf(jQuery(this).val()) !== -1 ) {
-          if( true === checkRights() ) {
 
             if( jQuery(this).val() == 'tags' && blockNumber ) {
                 jQuery( '.image-block-' + blockNumber + '.section_title' ).hide( 'fast' );
@@ -484,11 +470,6 @@ jQuery(document).ready(function() {
               jQuery( '.image-block-' + blockNumber + '.category_choice' ).hide( 'fast' );
               jQuery( '.image-block-' + blockNumber + '.section_openai_extractor' ).show( 'fast' );
             }
-          } else {
-            var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
-            alert( alertProVersion );
-            jQuery(".section_basedon .based_on input[value='title']").attr( 'checked', true );
-          }
       }
 
     });
@@ -559,25 +540,25 @@ jQuery(document).ready(function() {
     });
 
     // CRON
-    checkButton( '#enable_cron', '.show_cron', false );
+    checkButton( '#enable_cron', '.show_cron' );
 
     // ALT
-    checkButton( '#enable_alt', '.show_alt', false );
+    checkButton( '#enable_alt', '.show_alt' );
 
     // CAPTION
-    checkButton( '#enable_caption', '.show_caption', true );
+    checkButton( '#enable_caption', '.show_caption' );
 
     // SAVE HOOK
-    checkButton( '#enable_save_post_hook', '.show_save_post_hook', false );
+    checkButton( '#enable_save_post_hook', '.show_save_post_hook' );
 
     // WP INSERT POST
-    checkButton( '#enable_wp_insert_post_hook', '.show_wp_insert_post_hook', true );
+    checkButton( '#enable_wp_insert_post_hook', '.show_wp_insert_post_hook' );
 
     // PROXY
-    checkButton( '#enable_proxy', '.show_proxy', false );
+    checkButton( '#enable_proxy', '.show_proxy' );
 
     /* LOGS */
-    checkButton( '#enable_logs', '.show_logs', true );
+    checkButton( '#enable_logs', '.show_logs' );
 
     /* TITLE SELECTION */
     jQuery(document).on('change', ".section_title .chosen_title input[type='radio']", function() {
@@ -635,24 +616,7 @@ jQuery(document).ready(function() {
 
 
 
-    /* Google scrap domains textarea */
-    if( false === checkRights() ) {
-      jQuery('#restricted_domains, #blacklisted_domains').click(function() {
-              var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
-              alert( alertProVersion );
-      });
-    }
 
-  /* Image Banks buttons  */
-  if( false === checkRights() ) {
-    //jQuery('.chosen_api li label.checkbox-disabled').click(function() {
-    jQuery('label.checkbox-disabled').click(function(e) {
-      
-            var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
-            alert( alertProVersion );
-            e.preventDefault();
-    });
-  }
 
     // Delete logs confirmation
     jQuery('.delete-logs').click(function(e) {
@@ -772,7 +736,6 @@ jQuery(document).ready(function() {
         "#password-flickr",
         "#password-gemini",
         "#password-workers",
-        "#password-envato",
         "#password-cc_search",
         "#password-google-translate"
     ];
@@ -884,28 +847,14 @@ jQuery(document).ready(function() {
 });
 
 
-function checkButton( selectorSwitch, selectorOptions, noNeedRights = false ) {
+function checkButton( selectorSwitch, selectorOptions ) {
     jQuery( selectorSwitch ).on( 'switchChange.bootstrapSwitch ', function( event, state ) {
-        if( ( true === checkRights() ) || ( noNeedRights ) ) {
-                if( true === state ) {
-                        jQuery( selectorOptions ).show( 'fast' );
-                } else {
-                        jQuery( selectorOptions ).hide( 'fast' );
-                }
+        if( true === state ) {
+            jQuery( selectorOptions ).show( 'fast' );
         } else {
-                if( true === state ) {
-                    var alertProVersion = allsiTranslationsJsVars.translations.pro_version;
-                    alert( alertProVersion );
-                }
-                jQuery( selectorSwitch ).bootstrapSwitch( 'state', false, false );
+            jQuery( selectorOptions ).hide( 'fast' );
         }
     });
-}
-
-
-
-function checkRights() {
-  return true;
 }
 
 

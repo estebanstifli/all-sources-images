@@ -18,7 +18,7 @@
  * Text Domain:       all-sources-images
  * Domain Path:       /languages
  * Requires at least: 5.8
- * Tested up to:      6.9
+ * Tested up to:      6.9.1
  * Requires PHP:      7.4
  *
  */
