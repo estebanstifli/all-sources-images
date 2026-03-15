@@ -2,12 +2,13 @@
 .DS_Store
 thumbs.db
 
+# Dot directories (docs, github, etc.)
+.*/
+
 # Logs
 *.log
 
 # IDE
-.idea/
-.vscode/
 *.sublime-project
 *.sublime-workspace
 
