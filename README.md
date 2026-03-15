@@ -8,7 +8,8 @@ A WordPress plugin to search, download, generate, and insert images into posts u
 
 ## Demo Video
 
-[![Demo Video](https://img.youtube.com/vi/XLHrwJsnGiY/maxresdefault.jpg)](https://www.youtube.com/watch?v=XLHrwJsnGiY)
+[![Watch the demo](https://img.youtube.com/vi/XLHrwJsnGiY/hqdefault.jpg)](https://www.youtube.com/watch?v=XLHrwJsnGiY)
+
 
 ## Features
 
