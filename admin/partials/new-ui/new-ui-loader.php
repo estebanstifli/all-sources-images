@@ -5,10 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * New UI Loader
  * 
  * Main entry point for loading the new admin UI.
- * Include this file from the main plugin or functions.php to activate the new UI.
- * 
- * Usage:
- *   include_once WP_PLUGIN_DIR . '/all-sources-images/admin/partials/new-ui/new-ui-loader.php';
+ * This file is loaded by the plugin bootstrap.
  *
  * @package All_Sources_Images
  * @since 6.2.0

@@ -296,12 +296,8 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         } else {
             $generation_status = 'error';
         }
-        // Load compatibility settings for external plugins.
-        $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         $thumbnail_url = '';
-        // Handle image preview when using the FIFU plugin.
-        if ( true == $compatibility['enable_FIFU'] && 'FIFU' == $img_block['image_location'] && (is_plugin_active( 'featured-image-from-url/featured-image-from-url.php' ) || is_plugin_active( 'fifu-premium/fifu-premium.php' )) && $ALLSI_return != null ) {
-        } elseif ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $ALLSI_return ) ) {
+        if ( ($generation_status == 'already-done' || $generation_status == 'successful') && !empty( $ALLSI_return ) ) {
             // Display the newly generated image.
             $new_image = wp_get_attachment_image_src( $ALLSI_return, array(70, 70) );
             $thumbnail_preview_html = '<a class="generated-img" target="_blank" href="' . esc_url( admin_url( 'upload.php?item=' . absint( $ALLSI_return ) ) ) . '"><img src="' . esc_url( $new_image[0] ) . '" width="70" height="70" /></a>';
@@ -1075,7 +1071,6 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             // Extract results and continue processing
             extract( $result );
         }
-        $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         $path_parts = pathinfo( $url_results );
         $filename = $path_parts['basename'];
         $wp_upload_dir = wp_upload_dir();
@@ -1869,9 +1864,6 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             return false;
         }
         // Check if function is launch for Gutenberg block
-        /* if( ( TRUE == $get_only_thumb ) && ( $service == 'envato' ) ) { // DISABLED - Envato Elements no longer working
-        		return $result_body['results']['search_query_result']['search_payload'];
-        	} else */
         if ( TRUE == $get_only_thumb ) {
             return $result_body;
         }
@@ -1936,27 +1928,6 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 } else {
                     $caption = '';
                 }
-                // ENVATO : Additional remote request to get image url - DISABLED (no longer working)
-                /*
-                if( $service == 'envato' ) {
-                
-                		$url 				= 'https://api.extensions.envato.com/extensions/item/' . $url_result . '/download';
-                		$project_ags 		= array( 'project_name' => get_bloginfo('name') );
-                		$result_img_envato 	= wp_remote_post(
-                			add_query_arg($project_ags, $url),
-                			array(
-                				'headers' => array(
-                					"Extensions-Extension-Id" 	=> md5( get_site_url() ),
-                					"Extensions-Token" 			=> $url_parameters['envato_token'],
-                					"Content-Type"				=> "application/json"
-                				),
-                			)
-                		);
-                		$result 			= json_decode( $result_img_envato['body'] );
-                		$url_result			 = $result->download_urls->max2000;
-                
-                }
-                */
                 if ( empty( $url_result ) ) {
                     continue;
                 }

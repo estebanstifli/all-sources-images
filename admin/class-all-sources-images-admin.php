@@ -107,7 +107,6 @@ class All_Sources_Images_Admin {
 
         // Cron settings for scheduled generation
         $cron_options = wp_parse_args( get_option( 'ALLSI_plugin_cron_settings' ) );
-        $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         
         // Register cron hook for automated image generation
         add_action( 'ALLSI_cron_image_generation', array(&$this, 'ALLSI_execute_cron_generation') );
@@ -175,16 +174,6 @@ class All_Sources_Images_Admin {
                 return;
             }
             
-            // Skip if triggered by WP All Import (uses global flag set by integrations class)
-            if ( defined( 'ALLSI_WPAI_IMPORTING' ) && ALLSI_WPAI_IMPORTING ) {
-                return;
-            }
-            
-            // Skip if triggered by WPeMatico 
-            // Check our flag set by integration class (via wpematico_pre_insert_post filter)
-            if ( defined( 'ALLSI_WPEMATICO_IMPORTING' ) && ALLSI_WPEMATICO_IMPORTING ) {
-                return;
-            }
             // Check if WPeMatico campaign_fetch class is active (it's instantiated during feed processing)
             if ( class_exists( 'wpematico_campaign_fetch' ) ) {
                 return;
@@ -702,7 +691,6 @@ class All_Sources_Images_Admin {
     public function enqueue_scripts( $hook ) {
         global $pagenow;
         $post_types_default = $this->ALLSI_default_posts_types();
-        $compatibility = wp_parse_args( get_option( 'ALLSI_plugin_compatibility_settings' ), $this->ALLSI_default_options_compatibility_settings( TRUE ) );
         $block = wp_parse_args( get_option( 'ALLSI_plugin_block_settings' ), $this->ALLSI_default_options_block_settings( TRUE ) );
         $options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
         $options_auto = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( TRUE ) );
@@ -848,7 +836,6 @@ class All_Sources_Images_Admin {
         }
         /* General settings */
         $post_vars['postgeneration'] = array(
-            'fifu_on'           => filter_var( $compatibility['enable_FIFU'], FILTER_VALIDATE_BOOLEAN ),
             'wp_ajax_url'       => admin_url( 'admin-ajax.php' ),
             'postID'            => $current_post_ID,
             'generateImg'       => plugin_dir_url( __FILE__ ) . 'img/generate.png',
@@ -1031,9 +1018,6 @@ class All_Sources_Images_Admin {
         register_setting( 'ASI-plugin-proxy-settings', 'ALLSI_plugin_proxy_settings', array(
             'sanitize_callback' => array( $this, 'ALLSI_sanitize_proxy_settings' ),
         ) );
-        register_setting( 'ASI-plugin-compatibility-settings', 'ALLSI_plugin_compatibility_settings', array(
-            'sanitize_callback' => array( $this, 'ALLSI_sanitize_compatibility_settings' ),
-        ) );
         register_setting( 'ASI-plugin-logs-settings', 'ALLSI_plugin_logs_settings', array(
             'sanitize_callback' => array( $this, 'ALLSI_sanitize_logs_settings' ),
         ) );
@@ -1066,7 +1050,6 @@ class All_Sources_Images_Admin {
                 'ASI-plugin-proxy-settings',
                 'ASI-plugin-main-settings',
                 'ASI-plugin-block-settings',
-                'ASI-plugin-compatibility-settings',
                 'ASI-plugin-cron-settings',
                 'ASI-plugin-logs-settings',
                 'ASI-plugin-rights-settings',
@@ -1353,18 +1336,6 @@ class All_Sources_Images_Admin {
     
     	    return $default_options;
     	}*/
-    /**
-     * Default values for Compatibility admin tabs
-     *
-     * @since    4.0.0
-     */
-    public function ALLSI_default_options_compatibility_settings( $never_set = FALSE ) {
-        $default_options = array(
-            'enable_FIFU' => false,
-        );
-        return $default_options;
-    }
-
     /**
      * Default values for Gutenberg Block
      *
@@ -2845,29 +2816,6 @@ class All_Sources_Images_Admin {
             'bank'     => $bank,
             'search'   => $search_term,
         ), 'GUTENBERG_DOWNLOAD_START' );
-        // ENVATO : Additional remote request to get image url - DISABLED (no longer working)
-        /*
-        if( $bank == 'envato' ) {
-        
-        	$options_banks 		= get_option( 'ALLSI_plugin_banks_settings' );
-        	$envato_token		= ( ! empty( $options_banks['envato']['envato_token'] ) ) ? $options_banks['envato']['envato_token'] : '' ;
-        
-        	$url 				= 'https://api.extensions.envato.com/extensions/item/' . $url_image . '/download';
-        	$project_ags 		= array( 'project_name' => get_bloginfo('name') );
-        	$result_img_envato 	= wp_remote_post(
-        		add_query_arg($project_ags, $url),
-        		array(
-        			'headers' => array(
-        				"Extensions-Extension-Id" 	=> md5( get_site_url() ),
-        				"Extensions-Token" 			=> $envato_token,
-        				"Content-Type"				=> "application/json"
-        			),
-        		)
-        	);
-        	$result 			= json_decode( $result_img_envato['body'] );
-        	$url_image			= $result->download_urls->max2000;
-        }
-        */
         $file_array = array();
         $is_data_uri = ( 0 === strpos( $url_image, 'data:image' ) );
         $tmp = '';
@@ -3636,43 +3584,44 @@ class All_Sources_Images_Admin {
         if ( ! is_array( $input ) ) {
             return array();
         }
-        
+
         $sanitized = array();
+        $allowed_proxy_modes = array( 'legacy', 'cloudflare', 'disabled' );
+        $allowed_enable_values = array( 'enable', 'disable' );
+
         foreach ( $input as $key => $value ) {
             switch ( $key ) {
-                case 'proxy_url':
-                    $sanitized[ $key ] = esc_url_raw( $value );
+                case 'enable_proxy':
+                    $enable_value = sanitize_text_field( $value );
+                    $sanitized['enable_proxy'] = in_array( $enable_value, $allowed_enable_values, true ) ? $enable_value : 'disable';
+                    break;
+                case 'proxy_mode':
+                    $mode_value = sanitize_text_field( $value );
+                    $sanitized['proxy_mode'] = in_array( $mode_value, $allowed_proxy_modes, true ) ? $mode_value : 'legacy';
+                    break;
+                case 'proxy_address':
+                    $address = sanitize_text_field( $value );
+                    $sanitized['proxy_address'] = preg_replace( '#^https?://#i', '', trim( $address ) );
                     break;
                 case 'proxy_port':
-                    $sanitized[ $key ] = absint( $value );
+                    $port = absint( $value );
+                    $sanitized['proxy_port'] = ( $port >= 1 && $port <= 65535 ) ? $port : 80;
                     break;
-                default:
-                    $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
+                case 'proxy_username':
+                    $sanitized['proxy_username'] = sanitize_text_field( $value );
+                    break;
+                case 'proxy_password':
+                    $sanitized['proxy_password'] = sanitize_text_field( $value );
+                    break;
+                case 'cloudflare_worker_url':
+                    $sanitized['cloudflare_worker_url'] = esc_url_raw( $value );
+                    break;
+                case 'cloudflare_token':
+                    $sanitized['cloudflare_token'] = sanitize_text_field( $value );
                     break;
             }
         }
-        
-        return $sanitized;
-    }
 
-    /**
-     * Sanitize compatibility settings
-     *
-     * @since    6.2.0
-     * @param    array    $input    Raw input from settings form
-     * @return   array             Sanitized settings
-     */
-    public function ALLSI_sanitize_compatibility_settings( $input ) {
-        if ( ! is_array( $input ) ) {
-            return array();
-        }
-        
-        $sanitized = array();
-        foreach ( $input as $key => $value ) {
-            // Most compatibility settings are enable/disable checkboxes
-            $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $value );
-        }
-        
         return $sanitized;
     }
 

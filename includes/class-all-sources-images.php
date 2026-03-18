@@ -75,7 +75,6 @@ class All_Sources_Images {
 
 		$this->load_dependencies();
 		$this->define_admin_hooks();
-		//$this->define_public_hooks();
 
 	}
 
@@ -134,26 +133,7 @@ class All_Sources_Images {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/includes/class-allsi-bulk-generation-cron.php';
 
-		/**
-		 * Plugin Integrations (WP All Import, WPeMatico, FeedWordPress, etc.)
-		 * DISABLED: Plugin compatibility features have been removed from the UI.
-		 * The file is kept for backward compatibility but not loaded by default.
-		 */
-		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-allsi-plugin-integrations.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-all-sources-images-public.php';
-
 		$this->loader = new All_Sources_Images_Loader();
-		
-		/**
-		 * Initialize Plugin Integrations
-		 * DISABLED: Plugin compatibility features have been removed from the UI.
-		 */
-		// ALLSI_Plugin_Integrations::get_instance( $this->plugin_name, $this->version );
 
 	}
 
@@ -175,22 +155,6 @@ class All_Sources_Images {
     	$this->loader->add_action( 'admin_menu', $plugin_admin, 'ALLSI_main_settings' );
 
     	$this->loader->add_action( 'init', $plugin_admin, 'ALLSI_main_actions' );
-
-	}
-
-	/**
-	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
-	 *
-	 * @since    4.0.0
-	 * @access   private
-	 */
-	private function define_public_hooks() {
-
-		$plugin_public = new All_Sources_Images_Public( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 	}
 

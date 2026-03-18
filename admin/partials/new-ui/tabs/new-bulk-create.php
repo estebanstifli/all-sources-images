@@ -44,8 +44,3 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     </div>
 </div>
-
-<?php
-// Include styles
-include plugin_dir_path( __FILE__ ) . 'bulk/new-bulk-styles.php';
-?>

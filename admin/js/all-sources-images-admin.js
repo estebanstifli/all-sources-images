@@ -149,13 +149,8 @@ function displayGenerationButton(gutenbergEditor = true) {
                                         },
                                         success: function( replaceData ) {
                                             if ( replaceData.success && replaceData.data ) {
-                                                var fifuOn              = allsiGenerationSpecificPostJsVars.postgeneration.fifu_on;
                                                 var classicEditorImage  = jQuery('#postimagediv .inside');
-                                                var fifuPlugin          = jQuery('#fifu_image');
-                                                if( (true == fifuOn) && ( fifuPlugin.length ) ) {
-                                                    jQuery(fifuPlugin).css({'display': 'block', 'background-image': 'url("'+ replaceData.data.img +'")'});
-                                                    jQuery('#fifu_input_url').val(replaceData.data.img);
-                                                } else if( classicEditorImage.length ) {
+                                            if( classicEditorImage.length ) {
                                                     classicEditorImage.html(replaceData.data.postimagediv);
                                                 } else {
                                                     if (replaceData.data.thumbnail_id) {
@@ -185,25 +180,19 @@ function displayGenerationButton(gutenbergEditor = true) {
 
                             if ( data.success && data.data ) {
 
-                                    var fifuOn              = allsiGenerationSpecificPostJsVars.postgeneration.fifu_on;
-                                    var classicEditorImage  = jQuery('#postimagediv .inside');
-                                    var fifuPlugin          = jQuery('#fifu_image');
+                              var classicEditorImage  = jQuery('#postimagediv .inside');
 
-                                    if( (true == fifuOn) && ( fifuPlugin.length ) ) {
-                                        // Fifu Plugin enabled
-                                        jQuery(fifuPlugin).css({'display': 'block', 'background-image': 'url("'+ data.data.img +'")'});
-                                        jQuery('#fifu_input_url').val(data.data.img);
-                                    } else if( classicEditorImage.length ) {
-                                        // Classic editor
-                                        classicEditorImage.html(data.data.postimagediv);
-                                    } else {
-                                        // Gutemberg editor
-                                        if (data.data.thumbnail_id) {
-                                            wp.data.dispatch( 'core/editor' ).editPost({ featured_media: data.data.thumbnail_id });
-                                        } else {
-                                            console.error('No thumbnail_id in response:', data.data);
-                                        }
+                              if( classicEditorImage.length ) {
+                                // Classic editor
+                                classicEditorImage.html(data.data.postimagediv);
+                              } else {
+                                // Gutemberg editor
+                                if (data.data.thumbnail_id) {
+                                  wp.data.dispatch( 'core/editor' ).editPost({ featured_media: data.data.thumbnail_id });
+                                } else {
+                                  console.error('No thumbnail_id in response:', data.data);
                                     }
+                              }
 
                             } else {
                                 console.error('Generation failed:', data);

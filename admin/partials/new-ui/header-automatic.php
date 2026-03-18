@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Determine active tab for styling - Default is now 'placement' since Sources tab is removed
+// Determine active tab for styling
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Tab parameter used only for display styling, no data modification.
 $allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'placement';
 ?>
