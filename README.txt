@@ -1,30 +1,35 @@
-=== All Sources Images ===
+=== All Sources Images - Free Images from Pixabay, Unsplash, Openverse, Pexels & Giphy ===
 Contributors: estebandezafra
 Donate link: https://github.com/estebanstifli/all-sources-images
-Tags: image, pixabay, openverse, ai, mcp
+Tags: pixabay, unsplash, featured image, ai images, pexels
 Requires at least: 5.8
-Tested up to: 6.9
-Stable tag: 1.0.8
+Tested up to: 7.0
+Stable tag: 1.0.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or image banks (Pexels, Unsplash, etc)
+Search Pixabay and Unsplash images, set automatic featured images, and generate AI images for WordPress posts.
 
 == Description ==
-**All Sources Images** helps you search, download, generate, and insert images into WordPress posts using multiple external image providers and AI services.
+**All Sources Images** helps WordPress users search Pixabay and Unsplash images, download Pixabay photos or Unsplash photos, and turn them into a featured image, inline content image, or bulk image workflow without leaving the editor.
+
+If your goal is to find a fast WordPress Pixabay plugin or an Unsplash plugin, this plugin is built for that use case: search Pixabay from the Media Library, browse Unsplash inside Gutenberg or Elementor, and assign a featured image automatically when you publish.
+
+Beyond Pixabay and Unsplash, the plugin also supports Pexels, Openverse, Flickr, GIPHY, YouTube thumbnails, and AI image generation with DALL·E, Stability AI, Gemini, Replicate, and Cloudflare Workers AI.
 
 
 = Main Features =
 
-* Search images from multiple stock photo providers
-* Generate images using supported AI providers
+* Search Pixabay, Unsplash, Pexels, Flickr, Openverse, GIPHY, and more stock photo providers
+* Generate images using supported AI providers when Pixabay or Unsplash are not enough for a specific post
 * Set images as featured images
-* Insert images inside post content
-* Bulk-generate images for multiple posts
-* Gutenberg block for manual image search and insertion
-* Elementor widget for image search and insertion
-* Automatic generation on post publish (optional)
+* Set a featured image automatically on publish or in bulk workflows
+* Insert Pixabay, Unsplash, or AI images inside post content
+* Bulk-generate featured images for multiple posts
+* Gutenberg block for manual Pixabay and Unsplash image search and insertion
+* Elementor widget for Pixabay and Unsplash image search and insertion
+* Automatic featured image generation on post publish (optional)
 * Keyword extraction from title, content, tags, and categories
 * Logging for troubleshooting
 * REST API support
@@ -45,9 +50,9 @@ Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or im
 * Cloudflare Workers AI
 
 **Stock / Search Sources**
-* Pexels
-* Unsplash
 * Pixabay
+* Unsplash
+* Pexels
 * Flickr
 * Openverse
 * GIPHY
@@ -65,14 +70,20 @@ The plugin can work in two ways depending on the source:
 
 AI image generation services generally require your own API keys.
 
+= Why publishers use it for featured images =
+
+Many site owners search for a WordPress Pixabay plugin or a WordPress Unsplash plugin because their main goal is simple: find a relevant featured image fast. This plugin makes Pixabay and Unsplash part of the normal WordPress editorial workflow, so editors can search, compare, download, and assign a featured image without jumping between browser tabs.
+
+The same setup can also automate featured image generation on publish, bulk generation for archives, and AI fallback when a Pixabay or Unsplash result is not the best match. That combination is useful for blogs, news sites, affiliate sites, magazines, and content teams publishing at scale.
+
 = Typical Use Cases =
 
-* Automatically find a featured image for a blog post
-* Insert an image after a selected paragraph
-* Search stock images directly from the Media Library
-* Use the Gutenberg block to manually insert images in content
-* Use the Elementor widget to search and display images
-* Bulk-process many posts
+* Automatically find a featured image from Pixabay or Unsplash for a blog post
+* Insert a Pixabay or Unsplash image after a selected paragraph
+* Search Pixabay and Unsplash directly from the Media Library
+* Use the Gutenberg block to manually insert Pixabay or Unsplash images in content
+* Use the Elementor widget to search and display Pixabay or Unsplash images
+* Bulk-process many posts with Pixabay, Unsplash, or AI fallback
 
 = AI Agent Integration =
 
@@ -148,12 +159,12 @@ Configuration depends on the providers you want to use.
 
 = Stock image sources =
 
-Some stock image providers can work either:
+Pixabay and Unsplash, along with some other stock image providers, can work either:
 
 * through the optional developer proxy, or
 * through your own API keys, where supported
 
-Using your own API keys may provide direct connections and provider-specific rate limits.
+Using your own API keys for Pixabay, Unsplash, and other supported sources may provide direct connections and provider-specific rate limits.
 
 = AI image generation sources =
 
@@ -170,7 +181,7 @@ To configure providers:
 
 = Is the plugin fully functional in the WordPress.org version? =
 
-Yes. The plugin distributed on WordPress.org is fully functional and does not contain built-in features locked behind a license key, payment, trial period, quota, or similar restriction.
+Yes. The plugin distributed on WordPress.org is fully functional and released under GPLv2 or later.
 
 = Do I need API keys? =
 
@@ -182,9 +193,13 @@ Other providers, especially AI image generation services, require your own API k
 
 = Which services can work without my own API key? =
 
-Some stock photo sources may work through the optional developer proxy service, depending on the plugin configuration.
+Some stock photo sources, including Pixabay and Unsplash workflows depending on configuration, may work through the optional developer proxy service.
 
-If you prefer, you can use your own API keys for supported services instead of relying on the proxy.
+If you prefer, you can use your own Pixabay API key, Unsplash API key, or other supported service credentials instead of relying on the proxy.
+
+= Can it automatically set a featured image from Pixabay or Unsplash? =
+
+Yes. You can search Pixabay or Unsplash manually from the editor, or configure automatic featured image workflows so a Pixabay or Unsplash result can be assigned when a post is published, depending on your settings and source order.
 
 = What data is sent to external services? =
 
@@ -409,6 +424,13 @@ A lightweight dependency-free masonry layout library used for the image grid dis
 * Version: 1.3.2
 
 == Changelog ==
+
+= 1.0.9 - May 2026 =
+* Added a new Auto Image tab in Settings (between Source and Proxy)
+* Added Auto Image publish filters (post types, taxonomy terms, excluded post IDs)
+* Added robust publish hooks for compatibility with manual publishing, RSS autobloggers, and importers
+* Improved duplicate prevention by queue locking and scheduled-event checks for publish generation
+* Updated bundled frontend libraries: Bootstrap Icons to 1.13.1, Bootstrap Switch to 3.4.0, PrismJS to 1.30.0
 
 = 1.0.7 - March 2026 =
 * Compliance updates

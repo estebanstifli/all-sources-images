@@ -47,6 +47,11 @@ $allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_G
 											</a>
 										</li>
 										<li class="nav-item">
+											<a class="nav-link <?php echo esc_attr( $allsi_active_tab === 'auto-image' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=auto-image' ) ); ?>">
+												<?php esc_html_e( 'Auto Image', 'all-sources-images' ); ?>
+											</a>
+										</li>
+										<li class="nav-item">
 											<a class="nav-link <?php echo esc_attr( $allsi_active_tab === 'proxy' ? 'active' : '' ); ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=allsi-new-settings&tab=proxy' ) ); ?>">
 												<?php esc_html_e( 'Proxy', 'all-sources-images' ); ?>
 											</a>

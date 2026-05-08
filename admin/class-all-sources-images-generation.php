@@ -71,8 +71,10 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
         // AJAX endpoints for image generation (authenticated users only)
         add_action( 'wp_ajax_allsi_generate_image', array(&$this, 'ALLSI_ajax_call') );
         $main_settings = wp_parse_args( get_option( 'ALLSI_plugin_main_settings' ), $this->ALLSI_default_options_main_settings( FALSE ) );
+        $auto_image_settings = wp_parse_args( get_option( 'ALLSI_plugin_auto_image_settings' ), $this->ALLSI_default_options_auto_image_settings( FALSE ) );
+        $auto_image_enabled = ( ! empty( $auto_image_settings['enabled'] ) && 'enable' === $auto_image_settings['enabled'] );
         // Enable save_post hook
-        if ( isset( $main_settings['enable_save_post_hook'] ) && 'enable' == $main_settings['enable_save_post_hook'] ) {
+        if ( isset( $main_settings['enable_save_post_hook'] ) && 'enable' == $main_settings['enable_save_post_hook'] && ! $auto_image_enabled ) {
             add_action(
                 'save_post',
                 array(&$this, 'ALLSI_check_post_type'),
@@ -541,7 +543,7 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 ) );
                 return false;
             }
-            if ( !current_user_can( 'ALLSI_manage' ) && !class_exists( 'Main_WPeMatico' ) && !class_exists( 'FeedWordPress' ) && !class_exists( 'rssPostImporter' ) && !class_exists( 'CyberSyn_Syndicator' ) && !class_exists( 'wp_automatic' ) ) {
+            if ( ! current_user_can( 'ALLSI_manage' ) && ! wp_doing_cron() && ! class_exists( 'Main_WPeMatico' ) && ! class_exists( 'FeedWordPress' ) && ! class_exists( 'rssPostImporter' ) && ! class_exists( 'CyberSyn_Syndicator' ) && ! class_exists( 'wp_automatic' ) ) {
                 ALLSI_log( 'User lacks permissions', 'CREATE_THUMB_SKIP' );
                 $log->error( 'The user does not have sufficient rights', array(
                     'post' => $id,

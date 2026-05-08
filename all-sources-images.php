@@ -7,10 +7,10 @@
  * @package           All_Sources_Images
  *
  * @wordpress-plugin
- * Plugin Name:       All Sources Images
+ * Plugin Name:       All Sources Images - Free Images from Pixabay, Unsplash, Openverse, Pexels & Giphy 
  * Plugin URI:        https://github.com/estebanstifli/all-sources-images
  * Description:       Generate stunning images for posts via AI (DALL·E, Stable Diffusion, etc) or image banks (Pexels, Unsplash, etc)
- * Version:           1.0.8
+ * Version:           1.0.9
  * Author:            estebandezafra
  * Author URI:        https://github.com/estebanstifli
  * License:           GPLv2 or later
@@ -18,7 +18,7 @@
  * Text Domain:       all-sources-images
  * Domain Path:       /languages
  * Requires at least: 5.8
- * Tested up to:      6.9.1
+ * Tested up to:      7.0
  * Requires PHP:      7.4
  *
  */
@@ -45,7 +45,7 @@ if ( ! defined( 'ALLSI_DIAGNOSTIC_TOKEN' ) ) {
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  */
-define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.8' );
+define( 'ALL_SOURCES_IMAGES_VERSION', '1.0.9' );
 
 /**
  * Load helper functions

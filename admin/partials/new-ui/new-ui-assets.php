@@ -186,7 +186,7 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
         'bootstrap-icons',
         $plugin_root_url . 'vendor/bootstrap-icons/font/bootstrap-icons.css',
         array(),
-        '1.11.3'
+        '1.13.1'
     );
     
     // Bulk Generation JS (only on bulk generation page)

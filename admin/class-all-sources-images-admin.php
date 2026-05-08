@@ -113,6 +113,10 @@ class All_Sources_Images_Admin {
         
         // Register hook for scheduled image generation (used by plugin integrations)
         add_action( 'ALLSI_generate_scheduled_image', array(&$this, 'ALLSI_generate_scheduled_image') );
+
+        // Robust publish hooks for automatic image generation on publish.
+        add_action( 'transition_post_status', array( $this, 'ALLSI_auto_image_transition_post_status' ), 20, 3 );
+        add_action( 'wp_after_insert_post', array( $this, 'ALLSI_auto_image_after_insert_post' ), 20, 4 );
         
         // Testing APIs function with Ajax call
         add_action( 'wp_ajax_allsi_test_apis', array(&$this, 'ALLSI_test_apis') );
@@ -213,8 +217,22 @@ class All_Sources_Images_Admin {
      * @access   public
      */
     public function ALLSI_generate_scheduled_image( $post_id ) {
+        $post_id = absint( $post_id );
         $log = $this->ALLSI_monolog_call();
         $log->info( '=== SCHEDULED GENERATION START for post ID: ' . $post_id . ' ===' );
+
+        if ( 0 === $post_id ) {
+            $log->info( 'Invalid post ID, exiting scheduled generation' );
+            return;
+        }
+
+        // Always clear queue lock for this post when the scheduled task starts.
+        delete_transient( 'ALLSI_auto_image_queued_' . $post_id );
+
+        if ( ! $this->ALLSI_auto_image_should_process_post( $post_id ) ) {
+            $log->info( 'Post does not match Auto Image filters, exiting' );
+            return;
+        }
         
         // Retrieve main settings from the plugin options
         $main_settings = get_option( 'ALLSI_plugin_main_settings' );
@@ -288,6 +306,181 @@ class All_Sources_Images_Admin {
         }
         
         $log->info( '=== SCHEDULED GENERATION END for post ID: ' . $post_id . ' ===' );
+    }
+
+    /**
+     * Schedule auto image generation when a post transitions to publish.
+     *
+     * @param string  $new_status New post status.
+     * @param string  $old_status Old post status.
+     * @param WP_Post $post       Post object.
+     */
+    public function ALLSI_auto_image_transition_post_status( $new_status, $old_status, $post ) {
+        if ( 'publish' !== $new_status || 'publish' === $old_status ) {
+            return;
+        }
+
+        if ( ! ( $post instanceof WP_Post ) ) {
+            return;
+        }
+
+        $this->ALLSI_auto_image_schedule_post( $post->ID, 'transition_post_status' );
+    }
+
+    /**
+     * Fallback publish trigger for importers and integrations that bypass the classic editor flow.
+     *
+     * @param int          $post_id     Post ID.
+     * @param WP_Post      $post        Post object.
+     * @param bool         $update      Whether this is an existing post being updated.
+     * @param WP_Post|null $post_before Previous post object.
+     */
+    public function ALLSI_auto_image_after_insert_post( $post_id, $post, $update, $post_before ) {
+        if ( ! ( $post instanceof WP_Post ) ) {
+            return;
+        }
+
+        if ( 'publish' !== $post->post_status ) {
+            return;
+        }
+
+        // Skip normal content updates that were already published before.
+        if ( true === (bool) $update && ( $post_before instanceof WP_Post ) && 'publish' === $post_before->post_status ) {
+            return;
+        }
+
+        $this->ALLSI_auto_image_schedule_post( $post_id, 'wp_after_insert_post' );
+    }
+
+    /**
+     * Queue a single delayed event for image generation.
+     *
+     * @param int    $post_id Post ID.
+     * @param string $reason  Hook name used for logging.
+     */
+    private function ALLSI_auto_image_schedule_post( $post_id, $reason = '' ) {
+        $post_id = absint( $post_id );
+        if ( 0 === $post_id ) {
+            return;
+        }
+
+        if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+            return;
+        }
+
+        if ( ! $this->ALLSI_auto_image_should_process_post( $post_id ) ) {
+            return;
+        }
+
+        $transient_key = 'ALLSI_auto_image_queued_' . $post_id;
+        if ( get_transient( $transient_key ) ) {
+            return;
+        }
+
+        if ( wp_next_scheduled( 'ALLSI_generate_scheduled_image', array( $post_id ) ) ) {
+            return;
+        }
+
+        set_transient( $transient_key, true, 120 );
+        wp_schedule_single_event( time() + 5, 'ALLSI_generate_scheduled_image', array( $post_id ) );
+
+        $log = $this->ALLSI_monolog_call();
+        $log->info( 'Auto image scheduled', array(
+            'post_id' => $post_id,
+            'reason'  => sanitize_text_field( (string) $reason ),
+        ) );
+    }
+
+    /**
+     * Validate if a post matches Auto Image publish filters.
+     *
+     * @param int|WP_Post $post Post object or post ID.
+     * @return bool
+     */
+    private function ALLSI_auto_image_should_process_post( $post ) {
+        if ( ! ( $post instanceof WP_Post ) ) {
+            $post = get_post( $post );
+        }
+
+        if ( ! ( $post instanceof WP_Post ) ) {
+            return false;
+        }
+
+        if ( wp_is_post_revision( $post->ID ) || wp_is_post_autosave( $post->ID ) ) {
+            return false;
+        }
+
+        if ( 'publish' !== $post->post_status ) {
+            return false;
+        }
+
+        $options = wp_parse_args(
+            get_option( 'ALLSI_plugin_auto_image_settings' ),
+            $this->ALLSI_default_options_auto_image_settings( true )
+        );
+
+        if ( empty( $options['enabled'] ) || 'enable' !== $options['enabled'] ) {
+            return false;
+        }
+
+        $allowed_post_types = array();
+        if ( ! empty( $options['post_types'] ) && is_array( $options['post_types'] ) ) {
+            $allowed_post_types = array_values( array_unique( array_filter( array_map( 'sanitize_key', $options['post_types'] ) ) ) );
+        }
+
+        if ( ! empty( $allowed_post_types ) && ! in_array( $post->post_type, $allowed_post_types, true ) ) {
+            return false;
+        }
+
+        $excluded_ids = $this->ALLSI_auto_image_parse_ids(
+            isset( $options['exclude_post_ids'] ) ? $options['exclude_post_ids'] : ''
+        );
+        if ( in_array( $post->ID, $excluded_ids, true ) ) {
+            return false;
+        }
+
+        $selected_term_ids = array();
+        if ( ! empty( $options['term_ids'] ) && is_array( $options['term_ids'] ) ) {
+            $selected_term_ids = array_values( array_unique( array_filter( array_map( 'absint', $options['term_ids'] ) ) ) );
+        }
+
+        if ( ! empty( $selected_term_ids ) ) {
+            $taxonomies = get_object_taxonomies( $post->post_type, 'names' );
+            if ( empty( $taxonomies ) ) {
+                return false;
+            }
+
+            $post_term_ids = wp_get_post_terms( $post->ID, $taxonomies, array( 'fields' => 'ids' ) );
+            if ( is_wp_error( $post_term_ids ) || empty( $post_term_ids ) ) {
+                return false;
+            }
+
+            $post_term_ids = array_map( 'absint', $post_term_ids );
+            if ( empty( array_intersect( $selected_term_ids, $post_term_ids ) ) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Parse a comma-separated list of IDs and return unique integers.
+     *
+     * @param string $ids_raw Raw CSV string.
+     * @return array
+     */
+    private function ALLSI_auto_image_parse_ids( $ids_raw ) {
+        if ( ! is_string( $ids_raw ) || '' === trim( $ids_raw ) ) {
+            return array();
+        }
+
+        preg_match_all( '/\d+/', $ids_raw, $matches );
+        if ( empty( $matches[0] ) ) {
+            return array();
+        }
+
+        return array_values( array_unique( array_filter( array_map( 'absint', $matches[0] ) ) ) );
     }
 
     /**
@@ -1003,6 +1196,9 @@ class All_Sources_Images_Admin {
         register_setting( 'ASI-plugin-main-settings', 'ALLSI_plugin_main_settings', array(
             'sanitize_callback' => array($this, 'ALLSI_sanitize_main_settings'),
         ) );
+        register_setting( 'ASI-plugin-auto-image-settings', 'ALLSI_plugin_auto_image_settings', array(
+            'sanitize_callback' => array( $this, 'ALLSI_sanitize_auto_image_settings' ),
+        ) );
         register_setting( 'ASI-plugin-banks-settings', 'ALLSI_plugin_banks_settings', array(
             'sanitize_callback' => array($this, 'ALLSI_sanitize_banks_settings'),
         ) );
@@ -1049,6 +1245,7 @@ class All_Sources_Images_Admin {
             if ( $option_page && in_array( $option_page, array(
                 'ASI-plugin-proxy-settings',
                 'ASI-plugin-main-settings',
+                'ASI-plugin-auto-image-settings',
                 'ASI-plugin-block-settings',
                 'ASI-plugin-cron-settings',
                 'ASI-plugin-logs-settings',
@@ -1191,6 +1388,22 @@ class All_Sources_Images_Admin {
             'image_crop'               => '',
             'bulk_generation_interval' => 0,
         );
+        return $default_options;
+    }
+
+    /**
+     * Default values for Auto Image tab
+     *
+     * @since    6.2.0
+     */
+    public function ALLSI_default_options_auto_image_settings( $never_set = FALSE ) {
+        $default_options = array(
+            'enabled'          => 'disable',
+            'post_types'       => array(),
+            'term_ids'         => array(),
+            'exclude_post_ids' => '',
+        );
+
         return $default_options;
     }
 
@@ -3305,6 +3518,51 @@ class All_Sources_Images_Admin {
             }
         }
         
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize auto image settings.
+     *
+     * @since    6.2.0
+     * @param    array $input Raw input from settings form.
+     * @return   array
+     */
+    public function ALLSI_sanitize_auto_image_settings( $input ) {
+        $defaults = $this->ALLSI_default_options_auto_image_settings( true );
+
+        if ( ! is_array( $input ) ) {
+            return $defaults;
+        }
+
+        $sanitized = $defaults;
+
+        $sanitized['enabled'] = ( isset( $input['enabled'] ) && 'enable' === sanitize_text_field( $input['enabled'] ) )
+            ? 'enable'
+            : 'disable';
+
+        $post_types_input = array();
+        if ( isset( $input['post_types'] ) ) {
+            $post_types_input = is_array( $input['post_types'] ) ? $input['post_types'] : array( $input['post_types'] );
+        }
+
+        $post_types = array_values( array_unique( array_filter( array_map( 'sanitize_key', $post_types_input ) ) ) );
+        if ( ! empty( $post_types ) ) {
+            $public_post_types = get_post_types( array( 'public' => true ), 'names' );
+            $post_types = array_values( array_intersect( $post_types, $public_post_types ) );
+        }
+        $sanitized['post_types'] = $post_types;
+
+        $term_ids_input = array();
+        if ( isset( $input['term_ids'] ) ) {
+            $term_ids_input = is_array( $input['term_ids'] ) ? $input['term_ids'] : array( $input['term_ids'] );
+        }
+        $sanitized['term_ids'] = array_values( array_unique( array_filter( array_map( 'absint', $term_ids_input ) ) ) );
+
+        $exclude_ids_raw = isset( $input['exclude_post_ids'] ) ? sanitize_text_field( $input['exclude_post_ids'] ) : '';
+        $exclude_ids = $this->ALLSI_auto_image_parse_ids( $exclude_ids_raw );
+        $sanitized['exclude_post_ids'] = ! empty( $exclude_ids ) ? implode( ',', $exclude_ids ) : '';
+
         return $sanitized;
     }
 

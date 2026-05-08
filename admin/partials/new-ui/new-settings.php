@@ -14,6 +14,9 @@ $allsi_active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_G
 
 // Set title based on active tab
 switch ( $allsi_active_tab ) {
+    case 'auto-image':
+        $allsi_title = esc_html__( 'Settings [Auto Image]', 'all-sources-images' );
+        break;
     case 'proxy':
         $allsi_title = esc_html__( 'Settings [Proxy]', 'all-sources-images' );
         break;
@@ -33,6 +36,9 @@ include_once plugin_dir_path( __FILE__ ) . 'header-simple.php';
 <div class="card-body">
     <?php
     switch ( $allsi_active_tab ) {
+        case 'auto-image':
+            include_once 'tabs/new-settings-auto-image.php';
+            break;
         case 'proxy':
             include_once 'tabs/new-settings-proxy.php';
             break;
