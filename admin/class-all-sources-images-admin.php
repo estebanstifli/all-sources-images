@@ -86,6 +86,20 @@ class All_Sources_Images_Admin {
     private $media_picker_hook = '';
 
     /**
+     * Hook suffix for the top-level media browser page.
+     *
+     * @var string
+     */
+    private $media_picker_top_level_hook = '';
+
+    /**
+     * Hook suffix for the Search submenu under the plugin menu.
+     *
+     * @var string
+     */
+    private $media_picker_search_submenu_hook = '';
+
+    /**
      * Default post ID for media picker.
      *
      * @since    6.1.8
@@ -140,6 +154,9 @@ class All_Sources_Images_Admin {
         add_action( 'wp_ajax_allsi_block_searching_images', array(&$this, 'ALLSI_block_searching_images') );
         // Gutenberg Block : Download images from APIs
         add_action( 'wp_ajax_allsi_block_downloading_image', array(&$this, 'ALLSI_block_downloading_image') );
+        // Log viewer actions (Others > Logging)
+        add_action( 'wp_ajax_allsi_get_log_contents', array( $this, 'ALLSI_get_log_contents_ajax' ) );
+        add_action( 'wp_ajax_allsi_clear_log', array( $this, 'ALLSI_clear_log_ajax' ) );
         // Extend timeout request for wp_remote_request() with dalle
         $options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
         if ( isset( $options_banks['api_chosen_auto'] ) && true === in_array( 'dallev1', $options_banks['api_chosen_auto'] ) ) {
@@ -862,6 +879,7 @@ class All_Sources_Images_Admin {
         // ASI Admin Pages (new UI)
         $ALLSI_pages = array(
             'toplevel_page_allsi-new-settings',
+            'all-sources-images_page_allsi-new-settings',
             'all-sources-images_page_allsi-new-automatic',
             'all-sources-images_page_allsi-new-bulk-generation'
         );
@@ -890,6 +908,7 @@ class All_Sources_Images_Admin {
         // Scripts for new UI pages
         $ALLSI_new_pages = array(
             'toplevel_page_allsi-new-settings',
+            'all-sources-images_page_allsi-new-settings',
             'all-sources-images_page_allsi-new-automatic',
             'all-sources-images_page_allsi-new-bulk-generation'
         );
@@ -910,7 +929,7 @@ class All_Sources_Images_Admin {
         );
         // Old bulk generation scripts removed - now using bulk-generation.js via new-ui-assets.php
         // Source/Settings scripts (new page)
-        if ( $hook == 'toplevel_page_allsi-new-settings' ) {
+        if ( in_array( $hook, array( 'toplevel_page_allsi-new-settings', 'all-sources-images_page_allsi-new-settings' ), true ) ) {
             wp_enqueue_script( 'allsi-source', plugins_url( 'js/source.js', __FILE__ ), array('jquery', 'jquery-ui-core') );
             wp_localize_script( 'allsi-source', 'allsiApisTestingAjax', array(
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
@@ -1102,15 +1121,25 @@ class All_Sources_Images_Admin {
      * @since    6.2.0 Simplified to only use new UI pages
      */
     public function ALLSI_main_settings() {
-        // Main menu - redirects to Settings page
-        add_menu_page(
+        // Main menu now opens Search directly.
+        $this->media_picker_top_level_hook = add_menu_page(
             __( 'All Sources Images Options', 'all-sources-images' ),
             'All Sources Images',
             'ALLSI_manage',
-            'allsi-new-settings',
-            'ALLSI_render_new_settings_page',
+            'allsi-media-browser',
+            array( $this, 'ALLSI_render_media_picker_page' ),
             'dashicons-images-alt2',
             81
+        );
+
+        // First child: Search (same page as parent).
+        $this->media_picker_search_submenu_hook = add_submenu_page(
+            'allsi-media-browser',
+            __( 'Search', 'all-sources-images' ),
+            __( 'Search', 'all-sources-images' ),
+            'ALLSI_manage',
+            'allsi-media-browser',
+            array( $this, 'ALLSI_render_media_picker_page' )
         );
         
         // Include new UI menus (Settings, Automatic, Bulk Generation)
@@ -1663,6 +1692,172 @@ class All_Sources_Images_Admin {
             $result = 'mpt-' . wp_generate_password( 14, false, false ) . '.log';
         }
         return $result;
+    }
+
+    /**
+     * Get the absolute path to the current log file.
+     *
+     * @return string|false
+     */
+    private function ALLSI_get_log_file_path() {
+        $logs_dir = ALLSI_ensure_logs_dir();
+        if ( false === $logs_dir ) {
+            return false;
+        }
+
+        $log_file = $this->ALLSI_log_file( true );
+        if ( empty( $log_file ) ) {
+            return false;
+        }
+
+        $log_path = $logs_dir . $log_file;
+        if ( ! is_file( $log_path ) || ! is_readable( $log_path ) ) {
+            return false;
+        }
+
+        return $log_path;
+    }
+
+    /**
+     * Read log contents, optionally tailing large files for performance.
+     *
+     * @param int $max_bytes Maximum bytes to read from the end of the file.
+     *
+     * @return array
+     */
+    private function ALLSI_read_log_contents( $max_bytes = 200000 ) {
+        $log_path = $this->ALLSI_get_log_file_path();
+        if ( false === $log_path ) {
+            return array(
+                'content'   => '',
+                'filename'  => '',
+                'truncated' => false,
+                'size'      => 0,
+            );
+        }
+
+        $file_size = filesize( $log_path );
+        if ( false === $file_size || $file_size <= 0 ) {
+            return array(
+                'content'   => '',
+                'filename'  => basename( $log_path ),
+                'truncated' => false,
+                'size'      => 0,
+            );
+        }
+
+        $truncated = false;
+        $content   = '';
+        $max_bytes = max( 1024, absint( $max_bytes ) );
+
+        if ( $file_size > $max_bytes ) {
+            $truncated = true;
+            $handle    = fopen( $log_path, 'rb' );
+            if ( false !== $handle ) {
+                fseek( $handle, -$max_bytes, SEEK_END );
+                $content = fread( $handle, $max_bytes );
+                fclose( $handle );
+            }
+            if ( false === $content ) {
+                $content = '';
+            }
+            $content = ltrim( (string) $content );
+        } else {
+            $content = file_get_contents( $log_path );
+            if ( false === $content ) {
+                $content = '';
+            }
+        }
+
+        return array(
+            'content'   => (string) $content,
+            'filename'  => basename( $log_path ),
+            'truncated' => $truncated,
+            'size'      => (int) $file_size,
+        );
+    }
+
+    /**
+     * Build log viewer data for rendering and AJAX responses.
+     *
+     * @param int $max_bytes Maximum bytes to read from log file.
+     *
+     * @return array
+     */
+    public function ALLSI_get_log_view_data( $max_bytes = 200000 ) {
+        $log_data = $this->ALLSI_read_log_contents( $max_bytes );
+
+        if ( empty( $log_data['filename'] ) ) {
+            return array(
+                'content'   => '',
+                'filename'  => '',
+                'truncated' => false,
+                'size'      => 0,
+                'message'   => __( 'No log file found.', 'all-sources-images' ),
+            );
+        }
+
+        $message = sprintf(
+            /* translators: %s: log file name */
+            __( 'Viewing log file: %s', 'all-sources-images' ),
+            $log_data['filename']
+        );
+
+        if ( ! empty( $log_data['truncated'] ) ) {
+            $message .= ' ' . __( '(showing latest entries)', 'all-sources-images' );
+        }
+
+        $log_data['message'] = $message;
+        return $log_data;
+    }
+
+    /**
+     * AJAX: return log contents for the Logging viewer.
+     */
+    public function ALLSI_get_log_contents_ajax() {
+        check_ajax_referer( 'allsi_log_viewer_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'ALLSI_manage' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'all-sources-images' ) ), 403 );
+        }
+
+        $log_data = $this->ALLSI_get_log_view_data();
+        wp_send_json_success( $log_data );
+    }
+
+    /**
+     * AJAX: clear the active log file.
+     */
+    public function ALLSI_clear_log_ajax() {
+        check_ajax_referer( 'allsi_log_viewer_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'ALLSI_manage' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'all-sources-images' ) ), 403 );
+        }
+
+        $log_path = $this->ALLSI_get_log_file_path();
+        if ( false === $log_path ) {
+            wp_send_json_success( array(
+                'content'   => '',
+                'filename'  => '',
+                'truncated' => false,
+                'size'      => 0,
+                'message'   => __( 'No log file found.', 'all-sources-images' ),
+            ) );
+        }
+
+        $deleted = wp_delete_file( $log_path );
+        if ( false === $deleted && file_exists( $log_path ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unable to clear log file.', 'all-sources-images' ) ) );
+        }
+
+        wp_send_json_success( array(
+            'content'   => '',
+            'filename'  => '',
+            'truncated' => false,
+            'size'      => 0,
+            'message'   => __( 'Log file cleared.', 'all-sources-images' ),
+        ) );
     }
 
     /**
@@ -2258,7 +2453,13 @@ class All_Sources_Images_Admin {
      * Enqueue assets when viewing the standalone explorer page.
      */
     public function ALLSI_enqueue_media_picker_assets( $hook ) {
-        if ( empty( $this->media_picker_hook ) || $hook !== $this->media_picker_hook ) {
+        $allowed_hooks = array_filter( array(
+            $this->media_picker_hook,
+            $this->media_picker_top_level_hook,
+            $this->media_picker_search_submenu_hook,
+        ) );
+
+        if ( empty( $allowed_hooks ) || ! in_array( $hook, $allowed_hooks, true ) ) {
             return;
         }
 
@@ -2819,11 +3020,25 @@ class All_Sources_Images_Admin {
                         continue;
                     }
                     foreach ( $candidate['content']['parts'] as $part ) {
-                        if ( empty( $part['inline_data']['data'] ) ) {
+                        $inline_data = array();
+                        if ( isset( $part['inline_data'] ) && is_array( $part['inline_data'] ) ) {
+                            $inline_data = $part['inline_data'];
+                        } elseif ( isset( $part['inlineData'] ) && is_array( $part['inlineData'] ) ) {
+                            $inline_data = $part['inlineData'];
+                        }
+
+                        if ( empty( $inline_data['data'] ) ) {
                             continue;
                         }
-                        $mime = isset( $part['inline_data']['mime_type'] ) ? $part['inline_data']['mime_type'] : 'image/png';
-                        $data_uri = 'data:' . $mime . ';base64,' . $part['inline_data']['data'];
+
+                        $mime = 'image/png';
+                        if ( ! empty( $inline_data['mime_type'] ) ) {
+                            $mime = $inline_data['mime_type'];
+                        } elseif ( ! empty( $inline_data['mimeType'] ) ) {
+                            $mime = $inline_data['mimeType'];
+                        }
+
+                        $data_uri = 'data:' . $mime . ';base64,' . $inline_data['data'];
                         $normalized_images[] = array(
                             'url'      => $data_uri,
                             'thumb'    => $data_uri,
@@ -2900,6 +3115,21 @@ class All_Sources_Images_Admin {
                         'caption' => __( 'Generated with DALL-E', 'all-sources-images' ),
                     );
                 }
+            }
+
+            if ( 'gemini' === $bank && ! empty( $results_thumbs['candidates'] ) && empty( $normalized_images ) ) {
+                $first_part_keys = array();
+                if ( isset( $results_thumbs['candidates'][0]['content']['parts'][0] ) && is_array( $results_thumbs['candidates'][0]['content']['parts'][0] ) ) {
+                    $first_part_keys = array_keys( $results_thumbs['candidates'][0]['content']['parts'][0] );
+                }
+
+                ALLSI_log(
+                    array(
+                        'candidate_count' => is_array( $results_thumbs['candidates'] ) ? count( $results_thumbs['candidates'] ) : 0,
+                        'first_part_keys' => $first_part_keys,
+                    ),
+                    'GUTENBERG_BLOCK_GEMINI_EMPTY_NORMALIZATION'
+                );
             }
             
             // Universal response format

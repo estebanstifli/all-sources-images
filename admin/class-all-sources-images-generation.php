@@ -920,13 +920,16 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
                 ) );
                 if ( is_wp_error( $result ) ) {
                     $log->error( 'Source generation failed', array(
-                        'post'  => $id,
-                        'error' => $result->get_error_message(),
+                        'post'       => $id,
+                        'error'      => $result->get_error_message(),
+                        'error_code' => $result->get_error_code(),
+                        'error_data' => $result->get_error_data(),
                     ) );
                     ALLSI_log( array(
                         'post'    => $id,
                         'bank'    => $img_block['api_chosen'],
                         'message' => $result->get_error_message(),
+                        'code'    => $result->get_error_code(),
                         'data'    => $result->get_error_data(),
                     ), 'GUTENBERG_BLOCK_SOURCE_ERROR' );
                     return false;
@@ -1337,8 +1340,10 @@ class All_Sources_Images_Generation extends All_Sources_Images_Admin {
             ) );
             if ( is_wp_error( $result ) ) {
                 $log->error( 'Source generation failed', array(
-                    'post'  => $id,
-                    'error' => $result->get_error_message(),
+                    'post'       => $id,
+                    'error'      => $result->get_error_message(),
+                    'error_code' => $result->get_error_code(),
+                    'error_data' => $result->get_error_data(),
                 ) );
                 return false;
             }

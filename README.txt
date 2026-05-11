@@ -4,7 +4,7 @@ Donate link: https://github.com/estebanstifli/all-sources-images
 Tags: pixabay, unsplash, featured image, ai images, pexels
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.0.9
+Stable tag: 1.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -424,6 +424,15 @@ A lightweight dependency-free masonry layout library used for the image grid dis
 * Version: 1.3.2
 
 == Changelog ==
+
+= 1.1.0 - May 2026 =
+* Updated admin navigation so the parent All Sources Images menu opens the image Search page directly
+* Added Search as the first child menu item for faster access to the media browser
+* Added a Logging viewer in Settings > Others with Refresh and Clear actions
+* Improved log viewer readability with left-aligned content and horizontal scrolling support
+* Fixed Gemini image parsing compatibility for inline_data/inlineData and mime_type/mimeType payloads
+* Added Gemini 3.1 Flash Image Preview to the supported Gemini image model list
+
 
 = 1.0.9 - May 2026 =
 * Added a new Auto Image tab in Settings (between Source and Proxy)

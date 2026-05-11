@@ -47,9 +47,9 @@ function ALLSI_get_new_ui_admin() {
  * This should be called from the admin class or after admin_menu hook
  */
 function ALLSI_register_new_ui_menus() {
-    // Settings submenu (first item, replaces Dashboard)
+    // Settings submenu
     add_submenu_page(
-        'allsi-new-settings',
+        'allsi-media-browser',
         __( 'Settings', 'all-sources-images' ),
         __( 'Settings', 'all-sources-images' ),
         'ALLSI_manage',
@@ -59,7 +59,7 @@ function ALLSI_register_new_ui_menus() {
     
     // Bulk Settings submenu (formerly Automatic)
     add_submenu_page(
-        'allsi-new-settings',
+        'allsi-media-browser',
         __( 'Bulk Settings', 'all-sources-images' ),
         __( 'Bulk Settings', 'all-sources-images' ),
         'ALLSI_manage',
@@ -69,7 +69,7 @@ function ALLSI_register_new_ui_menus() {
     
     // Bulk Generation submenu
     add_submenu_page(
-        'allsi-new-settings',
+        'allsi-media-browser',
         __( 'Bulk Generation', 'all-sources-images' ),
         __( 'Bulk Generation', 'all-sources-images' ),
         'ALLSI_manage',

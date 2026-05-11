@@ -1,0 +1,12 @@
+# Git / local metadata
+.git/
+.gitignore
+
+# Development and docs folders not needed in wp.org package
+.github/
+.doc/
+.cloudflare/
+
+# Local planning / prompt artifacts
+new_page.md
+README.md

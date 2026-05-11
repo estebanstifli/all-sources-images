@@ -155,14 +155,16 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
         true
     );
     
+    $allsi_new_ui_data = array();
+
     // Localize script data for Image Placement page
     if ( $hook === 'all-sources-images_page_allsi-new-automatic' ) {
         // Get current block index from settings
         $options = get_option( 'ALLSI_plugin_main_settings', array() );
         $image_blocks = isset( $options['image_block'] ) ? $options['image_block'] : array();
         $block_index = empty( $image_blocks ) ? 1 : max( array_keys( $image_blocks ) ) + 1;
-        
-        wp_localize_script( 'allsi-new-ui', 'allsiNewUI', array(
+
+        $allsi_new_ui_data = array(
             'imagePlacement' => array(
                 'blockIndex' => $block_index,
                 'helpTexts'  => array(
@@ -178,7 +180,27 @@ function ALLSI_enqueue_new_ui_assets( $hook ) {
                     'ai_image_prompt'                 => esc_html__( 'Uses OpenAI to generate optimized prompts for AI image generation (DALL-E, Stable Diffusion, etc.).', 'all-sources-images' ),
                 ),
             ),
-        ) );
+        );
+    }
+
+    if ( $hook === 'all-sources-images_page_allsi-new-settings' || $hook === 'toplevel_page_allsi-new-settings' ) {
+        $allsi_new_ui_data['logViewer'] = array(
+            'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+            'nonce'         => wp_create_nonce( 'allsi_log_viewer_nonce' ),
+            'refreshAction' => 'allsi_get_log_contents',
+            'clearAction'   => 'allsi_clear_log',
+            'i18n'          => array(
+                'refreshing'       => esc_html__( 'Refreshing log...', 'all-sources-images' ),
+                'clearing'         => esc_html__( 'Clearing log...', 'all-sources-images' ),
+                'clearConfirm'     => esc_html__( 'Are you sure you want to clear the log file?', 'all-sources-images' ),
+                'requestFailed'    => esc_html__( 'Request failed. Please try again.', 'all-sources-images' ),
+                'truncatedNotice'  => esc_html__( 'Large log detected: showing latest entries.', 'all-sources-images' ),
+            ),
+        );
+    }
+
+    if ( ! empty( $allsi_new_ui_data ) ) {
+        wp_localize_script( 'allsi-new-ui', 'allsiNewUI', $allsi_new_ui_data );
     }
     
     // Bootstrap Icons CSS (local)

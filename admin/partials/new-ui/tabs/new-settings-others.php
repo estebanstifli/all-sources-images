@@ -13,6 +13,7 @@ settings_errors();
 $allsi_options_block = wp_parse_args( get_option( 'ALLSI_plugin_block_settings' ), $this->ALLSI_default_options_block_settings( TRUE ) );
 $allsi_options_logs = wp_parse_args( get_option( 'ALLSI_plugin_logs_settings' ), $this->ALLSI_default_options_logs_settings( TRUE ) );
 $allsi_options_banks = wp_parse_args( get_option( 'ALLSI_plugin_banks_settings' ), $this->ALLSI_default_options_banks_settings( TRUE ) );
+$allsi_log_view = $this->ALLSI_get_log_view_data();
 
 // Language options for translation
 $allsi_country_choose = array(
@@ -230,6 +231,30 @@ if ( ! empty( $allsi_options_block['translate_alt_lang'] ) ) {
                         <?php esc_html_e( 'Enable logging', 'all-sources-images' ); ?>
                     </label>
                     <p class="description"><?php esc_html_e( 'When enabled, the plugin will log image generation events for debugging.', 'all-sources-images' ); ?></p>
+                </td>
+            </tr>
+
+            <!-- Log Viewer -->
+            <tr>
+                <th scope="row">
+                    <label for="allsi-log-viewer"><?php esc_html_e( 'Log Viewer', 'all-sources-images' ); ?></label>
+                </th>
+                <td>
+                    <textarea
+                        id="allsi-log-viewer"
+                        class="large-text code allsi-log-viewer-textarea"
+                        rows="16"
+                        wrap="off"
+                        readonly="readonly"
+                        spellcheck="false"
+                    ><?php echo esc_textarea( $allsi_log_view['content'] ); ?></textarea>
+                    <p id="allsi-log-status" class="description" style="margin-top: 6px;">
+                        <?php echo esc_html( $allsi_log_view['message'] ); ?>
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <button type="button" class="button button-secondary" id="allsi-log-refresh"><?php esc_html_e( 'Refresh', 'all-sources-images' ); ?></button>
+                        <button type="button" class="button" id="allsi-log-clear"><?php esc_html_e( 'Clear', 'all-sources-images' ); ?></button>
+                    </p>
                 </td>
             </tr>
         </tbody>

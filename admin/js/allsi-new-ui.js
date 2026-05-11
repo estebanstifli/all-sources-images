@@ -62,6 +62,103 @@
             });
         }
 
+        // Log viewer (refresh/clear)
+        var logViewerConfig = (typeof allsiNewUI !== 'undefined' && allsiNewUI.logViewer) ? allsiNewUI.logViewer : null;
+        if (logViewerConfig && $('#allsi-log-viewer').length) {
+            var $logViewer = $('#allsi-log-viewer');
+            var $logStatus = $('#allsi-log-status');
+            var $refreshButton = $('#allsi-log-refresh');
+            var $clearButton = $('#allsi-log-clear');
+
+            function setLogStatus(message, isError) {
+                if (!message) {
+                    return;
+                }
+                $logStatus.text(message);
+                $logStatus.css('color', isError ? '#c92a2a' : '');
+            }
+
+            function setLogButtonsDisabled(disabled) {
+                $refreshButton.prop('disabled', disabled);
+                $clearButton.prop('disabled', disabled);
+            }
+
+            function extractErrorMessage(xhr) {
+                if (xhr && xhr.responseJSON && xhr.responseJSON.data) {
+                    if (typeof xhr.responseJSON.data === 'string') {
+                        return xhr.responseJSON.data;
+                    }
+                    if (xhr.responseJSON.data.message) {
+                        return xhr.responseJSON.data.message;
+                    }
+                }
+                if (logViewerConfig.i18n && logViewerConfig.i18n.requestFailed) {
+                    return logViewerConfig.i18n.requestFailed;
+                }
+                return 'Request failed.';
+            }
+
+            function applyLogPayload(payload) {
+                if (!payload) {
+                    return;
+                }
+
+                if (typeof payload.content === 'string') {
+                    $logViewer.val(payload.content);
+                    if ($logViewer.length && $logViewer[0]) {
+                        $logViewer.scrollTop($logViewer[0].scrollHeight);
+                    }
+                }
+
+                if (payload.message) {
+                    setLogStatus(payload.message, false);
+                }
+
+                if (payload.truncated && logViewerConfig.i18n && logViewerConfig.i18n.truncatedNotice) {
+                    setLogStatus(logViewerConfig.i18n.truncatedNotice, false);
+                }
+            }
+
+            function runLogAction(actionName, loadingMessage) {
+                setLogButtonsDisabled(true);
+                if (loadingMessage) {
+                    setLogStatus(loadingMessage, false);
+                }
+
+                return $.post(logViewerConfig.ajaxUrl, {
+                    action: actionName,
+                    nonce: logViewerConfig.nonce
+                }).done(function(response) {
+                    if (response && response.success) {
+                        applyLogPayload(response.data || {});
+                        return;
+                    }
+
+                    var responseMessage = response && response.data && response.data.message ? response.data.message : extractErrorMessage({});
+                    setLogStatus(responseMessage, true);
+                }).fail(function(xhr) {
+                    setLogStatus(extractErrorMessage(xhr), true);
+                }).always(function() {
+                    setLogButtonsDisabled(false);
+                });
+            }
+
+            $refreshButton.on('click', function() {
+                var loadingMessage = logViewerConfig.i18n && logViewerConfig.i18n.refreshing ? logViewerConfig.i18n.refreshing : '';
+                runLogAction(logViewerConfig.refreshAction, loadingMessage);
+            });
+
+            $clearButton.on('click', function() {
+                var clearConfirm = logViewerConfig.i18n && logViewerConfig.i18n.clearConfirm ? logViewerConfig.i18n.clearConfirm : '';
+                if (clearConfirm && !window.confirm(clearConfirm)) {
+                    return;
+                }
+
+                var loadingMessage = logViewerConfig.i18n && logViewerConfig.i18n.clearing ? logViewerConfig.i18n.clearing : '';
+                runLogAction(logViewerConfig.clearAction, loadingMessage);
+            });
+        }
+
         // =============================================
         // Post Processing Toggle (new-automatic-post-processing.php)
         // =============================================

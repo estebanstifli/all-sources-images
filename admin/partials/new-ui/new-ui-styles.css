@@ -343,6 +343,16 @@
     outline: none;
 }
 
+.allsi-tab-content .allsi-log-viewer-textarea {
+    font-family: Consolas, Monaco, monospace;
+    text-align: left;
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: auto;
+    word-break: normal;
+    resize: vertical;
+}
+
 /* Checkboxes */
 .allsi-tab-content .checkbox,
 .allsi-tab-content .radio {
